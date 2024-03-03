@@ -11,11 +11,11 @@
         - *Card's Decks* : methods to shuffle and retrieve cards from the decks.
         -
 - **View**:
-    - Cli
-    - Gui
+    - Cli: text based implementation of the game components for the client
+    - Gui: javaFX implementation of the game components for the client
 - **Controller**:
-    - Client: inter
-    - Server
+    - Client: will handle input received from the respective views and will submit it to the server.
+    - Server: will instantiate the game and handle the communications with all the clients.
 
 ## Model
 
