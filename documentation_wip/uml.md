@@ -32,7 +32,6 @@ class ResourcesTypes {
     INSECT_KINGDOM
 
     +toString() String
-
 }
 
 class ObjectTypes{
@@ -44,72 +43,144 @@ class ObjectTypes{
     +toString() String
 }
 
+class CardSides{
+    <<Enumeration>>
+    FRONT
+    BACK
+}
+
 class Card {
     %% potrebbe essere un'interfaccia
     <<Abstract>>
-    +createCard() void
+    %%+createCard() void
 }
 
-
-class CardSide {
-    +corners: Optional~Corner~ [4] 
-    %%+SidedCard(corners[]) 
+class CornerEnum {
+    <<Enumeration>>
+    UP_LEFT
+    DOWN_LEFT
+    UP_RIGHT
+    DOWN_RIGHT
 }
 
 class SidedCard {
-    +CardSide front;
-    +CardSide back;
-    +SidedCard(CardSide, CardSide)
+    sides : CardSide[2]
+    %% cardSide[1] will be instanced as CardBackSide obv. 
+    SidedCard(CardSide, CardBackSide)
+    
+    %%calls the method link of the corner and adjusts the content of the corners
+}
+
+class PlayableCard{
+    playedSide: CardSides
+    card: SidedCard
+    adjacentCards: PlayableCard[2]
+    relativePositionX: int
+    relativePositionY: int
+    getAvailableCorners() Corner[]
+    getLinkedCards()
+    linkCard(card: SidedCard, corner: Corner) void
+    %% the adjacent cards are the ones above and below the card which are not actually linked together but are useful to have a connection to to calculate the points of geometrical objective
+
+}
+
+class CardSide {
+    corners: Optional~Corner~ [4] 
+    CardSide(Corner corners[])
+    
+    %% You actually position cardSides not cards
+    getResources() hashmap~ResourceType, int~
+    getObjects() hashmap~Objects, int~ 
+    %% devo dargli i corners come input.
+}
+
+class CardBackSide {
+    centralResources: Optional~ResourceTypes~[2]
+    %% overrides 
+    getResources() hashmap~ResourceType, int~
 }
 
 class Corner~T~{
-    +content: Optional~T~
-    +linkedCorner: Optional~Corner~
-    +isLinked() bool
-    +link(Corner) void
+    cornerNumber: Enum:1,2,3,4~ 
+    content: Optional~T~
+    actualContent: Optional~T~
+    linkedCard: Optional~Card~
+    %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
+
+    isLinked() bool
+    linkCorner(Corner) void
+    %% changes the value of linkedCorner and the value of actualContent if the content of the linked corner is different
     getActualContent() T 
     %% returns the content of the linked corner if it's linked, else returns the content of the corner, also depending on which card is above (the one underneath will be the one that has the linked corner)
 }
 
-class Linkable{
-    <<Interface>>
-    -link() void
+%%class Linkable{
+  %%  <<Interface>>
+    %%-link() void
     %% couples that connect are 1-4 2-3 with transitivity
     %% come implementiamo link? 
+%%}
+
+
+
+
+class ResourceCard{
+    kingdom: ResourceType
+    points: Optional~int~
 }
 
 class GoldCard{
-    conditionalSet: ResourceType[5]
+    conditionalSet: Optional<ResourceType>[5]
+    pointCondition: optional~PointConditionTypes~
     %% o è meglio una lista?
+    conditionalObject optional~ObjectTypes~
+    %% object that if present on the player board will grant points
+    evalutePoints()
+    %%override
 }
 
-class ResourceCard{
-    +kingdom: ResourceType
-    +points: Optional~int~
+class PointConditionTypes{
+    <<Enumeration>>
+    OBJECTS
+    CORNERS
 }
+
+CardSide "1"<|--"1" CardBackSide : inherits from
 
 class StarterCard{
-    +Corner~ResourceType~() 
-    %% solo risorse niente oggetti negli angoli.
-    +Token 
+ 
+    starterCard()
+    %% solo risorse niente oggetti negli angoli ma con
+    firstPlayerToken: bool 
     %% useful for the GUI
 }
 
+%%class StarterCardBackSide {
+  %%  centralResources: ResourceTypes[2]
+%%}
+
+%%CardSide "1"<|--"1" %%StarterCardBackSide : extends
+
+
+
 class ObjectiveCard{
-    +points: final int
-    +objective: Optional~ObjectTypes[3]~
+    points: final int
+    objective: Optional~ObjectTypes[3]~
     %% è meglio una lista?
     +conditionalRule() bool
 }
 
 class Objective{
     <<abstract class>>
-    +evaluate() bool
+    count: int
+    %% how many times the objective has to be satisfied
+    evaluate() bool
 }
 
 class GeometricObjective{
-    +geometry: TODO
-    +evaluate() bool
+    geometry: ResourceTypes[3][3]
+    %% how many times the 
+    evaluate() bool
 }
 
 class CountingObjective{
@@ -118,19 +189,23 @@ class CountingObjective{
     evaluate() bool
 }
 
+PlayableCard -- CardSides : uses
+ PlayableCard --* SidedCard: is composed of 
+GoldCard -- PointConditionTypes : uses 
+CornerEnum -- CardSide : uses 
 Card <|-- SidedCard : Inherits from
 CardSide "1"--* "4" Corner: is composed of
 SidedCard  "1"*--"2" CardSide : is composed of 
-SidedCard  "2"*--"1" ResourceCard : is composed of 
-SidedCard "2"*--"1" StarterCard: is composed of 
+SidedCard  "1"<|--"1" ResourceCard : inherits from 
+SidedCard "1"<|--"1" StarterCard: inherits from 
 Card*-- ObjectiveCard: is composed of 
+
 ResourceCard <|-- GoldCard : inherits from
-GoldCard --|> Linkable : implements
-ResourceCard --|> Linkable : implements
-StarterCard --|> Linkable : implements
 ObjectiveCard --* Objective : is composed of
 Objective ..|> GeometricObjective : realization
 Objective ..|> CountingObjective : realization
+Corner --|> Iterable : implements
+CardSide --|> Iterable : implements
 
 
 
@@ -159,49 +234,49 @@ class TokenColors{
 
 
 class Game{
-    -tokens: Token[9] 
+    tokens: Token[9] 
 
 
-    -players: List~Player~ 
-    +gameBoard: GameBoard
+    players: List~Player~ 
+    gameBoard: GameBoard
     
-    +Game()
-    +isGameOver() bool
+    Game()
+    isGameOver() bool
     %%GameOver() void
 
 }
 
 
 class Deck {
-    -cards: Set~Card~ 
+    cards: Set~Card~ 
     %% Una pila forse
-    +Deck(Card[])
-    -shuffle() void
-    -draw() Card
-    -draw(int) Card []
-    -cardsLeft() int
+    Deck(Card[])
+    shuffle() void
+    draw() Card
+    draw(int) Card []
+    cardsLeft() int
 }
 
 class Player {
     %%nickname: String forse va nel client o forse si può mantenere per la persistenza del client.
-    -points: int
-    -cards: SidedCards[3]
+    points: int
+    cards: SidedCards[3]
     objectiveCards: ObjectiveCard[2]
     token: Token
     board: personalBoard
     %%+chooseToken(Token [] availableTokens) Token maybe implemented in client?
-    +Player(personalBoard)
-    +getPoints() int
-    -setPoints(int) void
+    Player(personalBoard)
+    getPoints() int
+    setPoints(int) void
     %% points are abviously private
-    -playTurn() void
-    -drawCard() card
+    playTurn() void
+    drawCard() card
 
 }
 
 class Token {
-    +color: TokenColors
-    +Token(TokenColors)
+    color: TokenColors
+    Token(TokenColors)
 
 }
 
@@ -210,31 +285,31 @@ class GameBoard {
     resourceDeck: deck~ResourceCard~
     starterDeck: deck~StarterCard~
     objectiveDeck: deck~ObjectiveCard~ 
-    -commonBoard: CommonBoard
-    + scoreBoard: ScoreBoard
-    +GameBoard()
+    commonBoard: CommonBoard
+    scoreBoard: ScoreBoard
+    GameBoard()
     %% ? +ceint[30]
 }
 
 class CommonBoard{
-    -goldCards: GoldCard[2]
-    -resourceCards: ResourceCard[2]
-    -objectiveCards: ObjectiveCard[2]
+    goldCards: GoldCard[2]
+    resourceCards: ResourceCard[2]
+    objectiveCards: ObjectiveCard[2]
     
-    +CommonBoard()
+    CommonBoard()
     %% without parameters cause we'll draw 2 cards with deck.draw(2) for each type.
 
     drawGoldCard() GoldCard
     drawResourceCard() ResourceCard
     %% the card drawn are replaced
-    +getObjectiveCards() ObjectiveCard[]
+    getObjectiveCards() ObjectiveCard[]
 }
 
 class ScoreBoard {
-    -buckets: HashMap ~int~~Token~
-    +addPoints(TokenColors, int) void
-    +getPoints(TokenColors) int
-    +getPoints() HashMap~TokenColors, int~
+    buckets: HashMap ~int~~Token~
+    addPoints(TokenColors, int) void
+    getPoints(TokenColors) int
+    getPoints() HashMap~TokenColors, int~
 
 }
 
