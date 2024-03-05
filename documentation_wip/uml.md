@@ -1,6 +1,6 @@
 # UML progetto di ingegneria del software
  A rough view of the UML of Model View Controller:
-- **Model**: 
+- **Model**: will be connected to the server side controller
     - *Game*: enforces the games rhythm, general rules about the game status, calls for turns and rounds, creates the game boards (common and personal), instantiates the players (passing their boards as parameters) and the decks of cards, keeps track of the game state and the game over condition.
     - *Player*: can play a turn (try to play a card on the player board given as parameter to their constructor and receive drawn cards), has points, 
         - *Player Board*: enforces rules for card placement and keeps tracks of resources, objets the geometry of the cards placed onto it
