@@ -234,18 +234,37 @@ class TokenColors{
 
 
 class Game{
-    tokens: Token[9] 
-
-
-    players: List~Player~ 
-    gameBoard: GameBoard
     
-    Game()
-    isGameOver() bool
-    %%GameOver() void
+    -tokens: Token[9] 
+    -players: List~Player~ 
+    -gameBoard: GameBoard
+    -state: GameStates
 
+    -currentPlayer: Player
+
+    
+    Game(int players)
+    %% contstructor: creates all the game assets.
+
+    -isGameOver() bool
+    %%GameOver() void
+    
+    
+    +addPlayer(String nickname) bool
+    %% TODO: decidere come gestire il caso in cui viene rifiutata la richiesta di aggiunta di un giocatore (nickname già presente o troppi giocatori)
+    
+
+    +getGameStates() GameStates
+    
+    getPlayersNames()
 }
 
+class GameStates{
+    <<Enumeration>>
+    WAITING
+    PLAYING
+    GAME_OVER
+}
 
 class Deck {
     cards: Set~Card~ 
@@ -258,7 +277,8 @@ class Deck {
 }
 
 class Player {
-    %%nickname: String forse va nel client o forse si può mantenere per la persistenza del client.
+    nickname: String 
+    %%forse va nel client o forse si può mantenere per la persistenza del client.
     points: int
     cards: SidedCards[3]
     objectiveCards: ObjectiveCard[2]
