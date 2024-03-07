@@ -334,7 +334,7 @@ class ScoreBoard {
 
 }
 
-class PersonalBoard {
+class PlayerBoard {
     cards: SidedCard[3]
     geometry: StarterCard
     %% the geometry is a graph with root a link to the starter card
