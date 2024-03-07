@@ -5,7 +5,7 @@
     - *Player*: can play a turn (try to play a card on the player board given as parameter to their constructor and receive drawn cards), has points, 
         - *Player Board*: enforces rules for card placement and keeps tracks of resources, objets the geometry of the cards placed onto it
     - *Cards hierarchy*: The uml is pretty self explanatory
-    - *GameBoard*: composed of
+    - *GameBoard*: composed of (composition class to keep things tidy (is it necessary tho?)
         - *Score Board*: hashmap with buckets, of (lists of) player tokens (optional utility to useful for the GUI development eventually)
         - *Common Board*: common cards for everyone to use, methods to get and draw cards from here (the latter also draws a new card from the deck) (card retrieval methods comprehend common goals retrival for point calculation). 
         - *Card's Decks* : methods to shuffle and retrieve cards from the decks.
@@ -266,6 +266,7 @@ class GameStates{
     GAME_OVER
 }
 
+
 class Deck {
     cards: Set~Card~ 
     %% Una pila forse
@@ -335,7 +336,8 @@ class ScoreBoard {
 
 class PersonalBoard {
     cards: SidedCard[3]
-    geometry: TODO
+    geometry: StarterCard
+    %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
     objects: HashMap~Objects, int~
     placeCard(SidedCard) bool
