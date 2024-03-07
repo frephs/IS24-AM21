@@ -166,44 +166,49 @@ class StarterCard{
 class ObjectiveCard{
     points: final int
     objective: Optional~ObjectTypes[3]~
+    %% FIXME: va cambiato in un optional di ObbjectTYpes o di Resources
+    %% Direi che va introdotta una classe che li metta assieme. 
     %% è meglio una lista?
-    +conditionalRule() bool
+    evaluate() int
+    %% return points * objective.evaluate()
+    
 }
 
 class Objective{
     <<abstract class>>
-    count: int
     %% how many times the objective has to be satisfied
-    evaluate() bool
+    evaluate() int
+    %% returns
+    %% lo realizzeremo dentro evaluate count: int
 }
 
 class GeometricObjective{
     geometry: ResourceTypes[3][3]
     %% how many times the 
-    evaluate() bool
+    evaluate(starterCard start) int
 }
 
 class CountingObjective{
     resources: HashMap~ResourceType, int~
     objects: HashMap~Objects, int~
-    evaluate() bool
+    evaluate(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects) int
 }
 
-PlayableCard -- CardSides : uses
- PlayableCard --* SidedCard: is composed of 
-GoldCard -- PointConditionTypes : uses 
-CornerEnum -- CardSide : uses 
+PlayableCard <-- CardSides : uses
+PlayableCard *-- SidedCard: is composed of 
+GoldCard <-- PointConditionTypes : uses 
+CornerEnum <-- CardSide : uses 
 Card <|-- SidedCard : Inherits from
-CardSide "1"--* "4" Corner: is composed of
-SidedCard  "1"*--"2" CardSide : is composed of 
-SidedCard  "1"<|--"1" ResourceCard : inherits from 
-SidedCard "1"<|--"1" StarterCard: inherits from 
-Card*-- ObjectiveCard: is composed of 
+CardSide "1"*-- "4" Corner: is composed of
+SidedCard "1" *-- "2" CardSide : is composed of 
+SidedCard  <|-- ResourceCard : inherits from 
+SidedCard <|-- StarterCard: inherits from 
+Card <|-- ObjectiveCard: inherits from 
 
 ResourceCard <|-- GoldCard : inherits from
-ObjectiveCard --* Objective : is composed of
-Objective ..|> GeometricObjective : realization
-Objective ..|> CountingObjective : realization
+ObjectiveCard *-- Objective : is composed of
+Objective <|.. GeometricObjective : realization
+Objective <|.. CountingObjective : realization
 Corner --|> Iterable : implements
 CardSide --|> Iterable : implements
 
@@ -236,7 +241,7 @@ class TokenColors{
 class Game{
     
     -tokens: Token[9] 
-    -players: List~Player~ 
+    -players: List~Player~[2..4] 
     -gameBoard: GameBoard
     -state: GameStates
 
@@ -291,7 +296,10 @@ class Player {
     setPoints(int) void
     %% points are abviously private
     playTurn() void
+    
     drawCard() card
+    %% only puts a card in the player's hand (aka the personal board)
+
 
 }
 
@@ -339,18 +347,22 @@ class PlayerBoard {
     geometry: StarterCard
     %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
+    AvailableCorners: List~Corner~
+    %% it is useful to have a list of available corners to play a card, it is updated every time a card is played 
     objects: HashMap~Objects, int~
     placeCard(SidedCard) bool
     evaluatePoints() int
+    playCard(SidedCard) bool
+    %% updates the list of available corners (removes one and adds up to 3), places the card on the board and updates the resources and objects
 }
 
-Game "2"--"4" Player : has
-Game "1"--"1" GameBoard : is composed of
-Game "1"--*"9" Token : is composed of
-Token -- TokenColors : uses
-GameBoard "1"--*"4" Deck : is composed of
-GameBoard "1"--*"1" CommonBoard : is composed of
-GameBoard "1"--*"1" ScoreBoard : is composed of
+Game "2"*--"4" Player : is composed of 
+Game "1"*--"1" GameBoard : is composed of
+Game "1"*--"9" Token : is composed of
+Token <-- TokenColors : uses
+GameBoard "1"*--"4" Deck : is composed of
+GameBoard "1"*--"1" CommonBoard : is composed of
+GameBoard "1"*--"1" ScoreBoard : is composed of
 
 Player --|> Iterable : implements
 Player --* PlayerBoard: composed of
