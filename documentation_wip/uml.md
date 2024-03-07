@@ -262,6 +262,8 @@ class Game{
     +getGameStates() GameStates
     
     getPlayersNames()
+
+    playTurn() void
 }
 
 class GameStates{
@@ -301,7 +303,7 @@ class Player {
 
 
     playCard(int cardNumber) void
-    %% removes the card from the player's hand and places it on the board
+    %% removes the card from the player's hand and places it on the board calling the playerboard method
     addCard(Card card) void
     %% only puts a card in the player's hand (aka the personal board)
 
