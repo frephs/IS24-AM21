@@ -272,7 +272,7 @@ class GameStates{
 }
 
 
-class Deck<T> {
+class Deck~T~ {
     cards: Set~Card~ 
     %% Una pila forse
     Deck(Card[])
@@ -281,7 +281,7 @@ class Deck<T> {
     draw(int) Card []
     cardsLeft() int
     insert(T ) void
-    %% insert card back after card drawing. (ie when you don't choose an objective card)
+    %% insert card back after card drawing. (ie when you don't choose an objective)
 }
 
 class Player {
@@ -304,7 +304,7 @@ class Player {
     %% removes the card from the player's hand and places it on the board
     addCard(Card card) void
     %% only puts a card in the player's hand (aka the personal board)
-    
+
 }
 
 class Token {
