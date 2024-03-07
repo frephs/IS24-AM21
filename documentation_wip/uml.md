@@ -272,7 +272,7 @@ class GameStates{
 }
 
 
-class Deck {
+class Deck<T> {
     cards: Set~Card~ 
     %% Una pila forse
     Deck(Card[])
@@ -280,6 +280,8 @@ class Deck {
     draw() Card
     draw(int) Card []
     cardsLeft() int
+    insert(T ) void
+    %% insert card back after card drawing. (ie when you don't choose an objective card)
 }
 
 class Player {
@@ -287,7 +289,7 @@ class Player {
     %%forse va nel client o forse si può mantenere per la persistenza del client.
     points: int
     cards: SidedCards[3]
-    objectiveCards: ObjectiveCard[2]
+    objectiveCards: ObjectiveCard
     token: Token
     board: personalBoard
     %%+chooseToken(Token [] availableTokens) Token maybe implemented in client?
@@ -295,12 +297,14 @@ class Player {
     getPoints() int
     setPoints(int) void
     %% points are abviously private
-    playTurn() void
     
-    drawCard() card
+
+
+    playCard(int cardNumber) void
+    %% removes the card from the player's hand and places it on the board
+    addCard(Card card) void
     %% only puts a card in the player's hand (aka the personal board)
-
-
+    
 }
 
 class Token {
