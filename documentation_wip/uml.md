@@ -266,8 +266,10 @@ class Game{
     playTurn() void
 }
 
-class GameStates{
+%% TODO decidere se implementarlo come un obietti
+class GameState_OR_PlayerStates{
     <<Enumeration>>
+    GAME_INIT
     WAITING
     PLAYING
     GAME_OVER
