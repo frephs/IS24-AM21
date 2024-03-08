@@ -75,8 +75,10 @@ class PlayableCard{
     playedSide: CardSides
     card: SidedCard
     adjacentCards: PlayableCard[2]
+    %%cards that are above and below the card
     relativePositionX: int
     relativePositionY: int
+    %% isometric position of the card on the board, updated every time a card is placed.
     getAvailableCorners() Corner[]
     getLinkedCards()
     linkCard(card: SidedCard, corner: Corner) void
@@ -101,10 +103,10 @@ class CardBackSide {
 }
 
 class Corner~T~{
-    cornerNumber: Enum:1,2,3,4~ 
+    cornerNumber: CornerEnum 
     content: Optional~T~
     actualContent: Optional~T~
-    linkedCard: Optional~Card~
+    linkedCard: Optional~PlayableCard~
     %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
 
     isLinked() bool
@@ -196,7 +198,8 @@ class CountingObjective{
 
 PlayableCard <-- CardSides : uses
 PlayableCard *-- SidedCard: is composed of 
-GoldCard <-- PointConditionTypes : uses 
+GoldCard <-- PointConditionTypes : uses
+CornerEnum <-- Corner : uses 
 CornerEnum <-- CardSide : uses 
 Card <|-- SidedCard : Inherits from
 CardSide "1"*-- "4" Corner: is composed of
@@ -243,7 +246,7 @@ class Game{
     -tokens: Token[9] 
     -players: List~Player~[2..4] 
     -gameBoard: GameBoard
-    -state: GameStates
+    -?state: GameStates 
 
     -currentPlayer: Player
 
@@ -259,7 +262,7 @@ class Game{
     %% TODO: decidere come gestire il caso in cui viene rifiutata la richiesta di aggiunta di un giocatore (nickname già presente o troppi giocatori)
     
 
-    +getGameStates() GameStates
+    +?getGameStates() GameStates
     
     getPlayersNames()
 
@@ -355,8 +358,10 @@ class PlayerBoard {
     geometry: StarterCard
     %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
-    AvailableCorners: List~Corner~
-    %% it is useful to have a list of available corners to play a card, it is updated every time a card is played 
+    -?AvailableCorners: List~Corner~
+    %% it is useful to have a list of available corners to play a card, it is updated every time a card is played. 
+
+    %% QUSTION maybe this goes in the controller???
     objects: HashMap~Objects, int~
     placeCard(SidedCard) bool
     evaluatePoints() int
@@ -378,7 +383,4 @@ Player --* PlayerBoard: composed of
 ```
 
 ## Considerazioni
-La ratio è implementare ogni elemento che può diventare grafico come una classe a se stante, in modo tale che ci sia corrispondenza una volta che si implementa la view. Ogni elemento avrà un decorator toString per la realizzare la cli e un metodo per disegnarlo sulla GUI
-
-
-
+The rationale is to implement every element that can become graphical as a separate class, so that there is a correspondence once the view is implemented. Each element will have a decorator toString to realize the cli and a method to draw it on the GUI
