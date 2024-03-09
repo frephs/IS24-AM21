@@ -43,6 +43,14 @@ class ObjectTypes{
     +toString() String
 }
 
+class CornerContentTypes{
+    <<Enumeration>>
+    RESOURCE
+    OBJECT
+    +toString() String
+
+}
+
 class CardSides{
     <<Enumeration>>
     FRONT
@@ -103,15 +111,17 @@ class CardBackSide {
 }
 
 class Corner~T~{
+    contentType: otpional~CornerContentTypes~
     cornerNumber: CornerEnum 
     content: Optional~T~
-    actualContent: Optional~T~
     linkedCard: Optional~PlayableCard~
     %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
 
     isLinked() bool
     linkCorner(Corner) void
     %% changes the value of linkedCorner and the value of actualContent if the content of the linked corner is different
+    getLinkedCorner() Corner~T~
+    %% returns the linked corner if it's linked, otherwise an empty optional
     getActualContent() T 
     %% returns the content of the linked corner if it's linked, else returns the content of the corner, also depending on which card is above (the one underneath will be the one that has the linked corner)
 }
@@ -132,7 +142,7 @@ class ResourceCard{
 }
 
 class GoldCard{
-    conditionalSet: Optional<ResourceType>[5]
+    conditionalSet: Optional~ResourceType~[5]
     pointCondition: optional~PointConditionTypes~
     %% o è meglio una lista?
     conditionalObject optional~ObjectTypes~
@@ -358,7 +368,7 @@ class ScoreBoard {
 class PlayerBoard {
     cards: SidedCard[3]
     objectiveCards: ObjectiveCard
-    geometry: StarterCard
+    playedCardsGraph: StarterCard
     %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
     -?AvailableCorners: List~Corner~
