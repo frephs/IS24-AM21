@@ -79,10 +79,10 @@ class SidedCard {
     %%calls the method link of the corner and adjusts the content of the corners
 }
 
-class PlayableCard{
+class PlayedCard{
     playedSide: CardSides
     card: SidedCard
-    adjacentCards: PlayableCard[2]
+    adjacentCards: PlayedCard[2]
     %%cards that are above and below the card
     relativePositionX: int
     relativePositionY: int
@@ -114,7 +114,8 @@ class Corner~T~{
     contentType: otpional~CornerContentTypes~
     cornerNumber: CornerEnum 
     content: Optional~T~
-    linkedCard: Optional~PlayableCard~
+    linkedCard: Optional~Played
+    Card~
     %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
 
     isLinked() bool
@@ -209,8 +210,8 @@ class CountingObjective{
     evaluate(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects) int
 }
 
-PlayableCard <-- CardSides : uses
-PlayableCard *-- SidedCard: is composed of 
+PlayedCard <-- CardSides : uses
+PlayedCard *-- SidedCard: is composed of 
 GoldCard <-- PointConditionTypes : uses
 CornerEnum <-- Corner : uses 
 CornerEnum <-- CardSide : uses 
@@ -368,7 +369,7 @@ class ScoreBoard {
 class PlayerBoard {
     cards: SidedCard[3]
     objectiveCards: ObjectiveCard
-    playedCardsGraph: StarterCard
+    playedCardsGraph: PlayedCard
     %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
     -?AvailableCorners: List~Corner~
