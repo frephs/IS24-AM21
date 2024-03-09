@@ -106,7 +106,7 @@ class CardSide {
     CardSide(Corner corners[])
     
     %% You actually position cardSides not cards
-    getResources() hashmap~ResourceType, int~
+    getResources() hashmap~ResourceTypes, int~
     getObjects() hashmap~Objects, int~ 
     %% devo dargli i corners come input.
 }
@@ -145,12 +145,12 @@ class Corner~T~{
 
 
 class ResourceCard{
-    kingdom: ResourceType
+    kingdom: ResourceTypes
     points: Optional~int~
 }
 
 class GoldCard{
-    conditionalSet: Optional~ResourceType~[5]
+    conditionalSet: Optional~ResourceTypes~[5]
     pointCondition: optional~PointConditionTypes~
     %% o è meglio una lista?
     conditionalObject optional~ObjectTypes~
@@ -173,7 +173,7 @@ class StarterCard{
     %% solo risorse niente oggetti negli angoli ma con
     firstPlayerToken: bool 
     %%OVERRIDE
-    cardSide(Corner~ResourceType~ corners[]) 
+    cardSide(Corner~ResourceTypes~ corners[]) 
     %% useful for the GUI
     
 }
@@ -212,7 +212,7 @@ class GeometricObjective{
 }
 
 class CountingObjective{
-    resources: HashMap~ResourceType, int~
+    resources: HashMap~ResourceTypes, int~
     objects: HashMap~Objects, int~
     evaluate(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects) int
 }
