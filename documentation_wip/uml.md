@@ -79,14 +79,21 @@ class SidedCard {
     %%calls the method link of the corner and adjusts the content of the corners
 }
 
+
+class RelativePosition{
+    x: int
+    y: int
+    computeLinkingPosition(CornerEnum linkedCorner) RelativePosition
+}
+
 class PlayedCard{
     playedSide: CardSides
     card: SidedCard
     adjacentCards: PlayedCard[2]
     %%cards that are above and below the card
-    relativePositionX: int
-    relativePositionY: int
+    relativePosition: RelativePosition
     %% isometric position of the card on the board, updated every time a card is placed.
+    getPlayedSide() CardSides
     getAvailableCorners() Corner[]
     getLinkedCards()
     linkCard(card: SidedCard, corner: Corner) void
@@ -211,6 +218,7 @@ class CountingObjective{
 }
 
 PlayedCard <-- CardSides : uses
+PlayedCard "1" *-- "1" RelativePosition : is composed of
 PlayedCard *-- SidedCard: is composed of 
 GoldCard <-- PointConditionTypes : uses
 CornerEnum <-- Corner : uses 
@@ -228,7 +236,6 @@ Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
 Corner --|> Iterable : implements
 CardSide --|> Iterable : implements
-
 
 
 
@@ -379,7 +386,7 @@ class PlayerBoard {
     objects: HashMap~Objects, int~
     placeCard(SidedCard) bool
     evaluatePoints() int
-    playCard(SidedCard) bool
+    playCard(SidedCard card, CardSide playedSide) void
     %% updates the list of available corners (removes one and adds up to 3), places the card on the board and updates the resources and objects
 }
 
