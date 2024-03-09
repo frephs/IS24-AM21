@@ -154,7 +154,10 @@ class StarterCard{
     starterCard()
     %% solo risorse niente oggetti negli angoli ma con
     firstPlayerToken: bool 
+    %%OVERRIDE
+    cardSide(Corner~ResourceType~ corners[]) 
     %% useful for the GUI
+    
 }
 
 %%class StarterCardBackSide {
@@ -295,12 +298,11 @@ class Player {
     nickname: String 
     %%forse va nel client o forse si può mantenere per la persistenza del client.
     points: int
-    cards: SidedCards[3]
-    objectiveCards: ObjectiveCard
+   
     token: Token
-    board: personalBoard
+    board: playerBoard
     %%+chooseToken(Token [] availableTokens) Token maybe implemented in client?
-    Player(personalBoard)
+    Player(String nickname, Token token)
     getPoints() int
     setPoints(int) void
     %% points are abviously private
@@ -355,6 +357,7 @@ class ScoreBoard {
 
 class PlayerBoard {
     cards: SidedCard[3]
+    objectiveCards: ObjectiveCard
     geometry: StarterCard
     %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
