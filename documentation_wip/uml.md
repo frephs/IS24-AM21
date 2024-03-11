@@ -112,7 +112,7 @@ class CardSide {
 }
 
 class CardBackSide {
-    centralResources: Optional~ResourceTypes~[2]
+    permanentResources: Optional~ResourceTypes~[3]
     %% overrides 
     getResources() hashmap~ResourceType, int~
 }
