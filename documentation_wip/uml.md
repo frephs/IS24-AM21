@@ -130,7 +130,7 @@ class Corner~T~{
     %% changes the value of linkedCorner and the value of actualContent if the content of the linked corner is different
     getLinkedCorner() Corner~T~
     %% returns the linked corner if it's linked, otherwise an empty optional
-    getActualContent() T 
+    getActualContent() Optional~T~
     %% returns the content of the linked corner if it's linked, else returns the content of the corner, also depending on which card is above (the one underneath will be the one that has the linked corner)
 }
 
