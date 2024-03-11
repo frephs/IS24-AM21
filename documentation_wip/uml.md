@@ -294,9 +294,15 @@ class Game{
 class GameState_OR_PlayerStates{
     <<Enumeration>>
     GAME_INIT
-    WAITING
+    %%WAITING
     PLAYING
     GAME_OVER
+}
+
+class PlayerState{
+    <<Enumeration>>
+    WAITING
+    PLAYING
 }
 
 

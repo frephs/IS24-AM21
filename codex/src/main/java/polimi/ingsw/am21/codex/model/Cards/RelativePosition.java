@@ -8,15 +8,18 @@ public class RelativePosition {
         this.y = y;
     }
 
-    private RelativePosition computeLinkingPosition(CornerEnum linkedCorner){
-        RelativePosition r;
-        switch (linkedCorner){
-            case UP_LEFT: r = new RelativePosition(x-1, y+1); break;
-            case UP_RIGHT: r = new RelativePosition(x+1, y+1); break;
-            case DOWN_LEFT: r = new RelativePosition(x-1, y-1); break;
-            case DOWN_RIGHT: r = new RelativePosition(x+1, y-1); break;
-        }
-        return r;
+    RelativePosition(){
+        this.x = 0;
+        this.y = 0;
+    }
+
+    public RelativePosition computeLinkingPosition(CornerEnum linkedCorner){
+        return switch (linkedCorner) {
+            case UP_LEFT -> new RelativePosition(x - 1, y + 1);
+            case UP_RIGHT -> new RelativePosition(x + 1, y + 1);
+            case DOWN_LEFT -> new RelativePosition(x - 1, y - 1);
+            case DOWN_RIGHT -> new RelativePosition(x + 1, y - 1);
+        };
     }
 
 }

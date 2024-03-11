@@ -12,9 +12,13 @@ public class CardSide {
 
 
 
-    public Corner getCorner(CornerEnum corner){
-        return corners.get(CornerEnum.ordinal());
-    }
 
+
+    public ResourceType [] getResources(){
+        for(corner: corners) {
+            corner.content
+        }
+        return
+    }
 
 }

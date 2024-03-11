@@ -2,16 +2,16 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 public class Corner<T> {
     T content;
-
-    PlayableCard linkedCard;
-
-    void setLinkedCard(){
-
+    PlayedCard linkedCard;
+    
+    void setLinkedCard(PlayedCard card){
+        this.linkedCard = card;
     }
 
-    public SidedCard getLinkedCard() {
+    private PlayedCard getLinkedCard() {
         return linkedCard;
     }
+
 
     public Corner(T content){
         this.content = content;
