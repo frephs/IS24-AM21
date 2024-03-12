@@ -6,7 +6,7 @@ public class SidedCard extends Card{
 
     SidedCard(){
         this.sides[0] = new CardSide();
-        this.sides[1] = new CardBackSIde ()
+        this.sides[1] = new CardBackSide ();
     }
 
 }
