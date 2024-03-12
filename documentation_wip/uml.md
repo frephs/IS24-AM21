@@ -96,7 +96,7 @@ class PlayedCard{
     card: SidedCard
 
     getPlayedSide() CardSides
-    getAvailableCorners() CornerEnum[]
+    getAvailableCorners() CornerEnum[0..4]
 }
 
 class CardSide {
@@ -111,7 +111,7 @@ class CardSide {
 }
 
 class CardBackSide {
-    permanentResources: Optional~ResourceTypes~[3]
+    permanentResources: ResourceTypes[0..3]
     CardBackSide(ResourceTypes resources \n, ResourceTypes permanentResources, ObjectTypes objects)
 
     %% overrides 
@@ -153,8 +153,7 @@ class ResourceCard{
 
 class GoldCard{
     int points; 
-    %% non è più optional
-    conditionalSet: Optional~ResourceTypes~[5]
+    conditionalSet: ResourceTypes[1..5]
     pointCondition: optional~PointConditionTypes~
     %% o è meglio una lista?
     conditionalObject optional~ObjectTypes~
@@ -192,7 +191,7 @@ class StarterCard{
 
 class ObjectiveCard{
     points: final int
-    objective: Optional~ObjectTypes[3]~
+    objective: Objective
     %% FIXME: va cambiato in un optional di ObbjectTYpes o di Resources
     %% Direi che va introdotta una classe che li metta assieme. 
     %% è meglio una lista?
@@ -269,7 +268,7 @@ class TokenColors{
 class Game{
     
     -tokens: Token[9] 
-    -players: List~Player~[2..4] 
+    -players: Player[2..4] 
     -gameBoard: GameBoard
     -?state: GameStates 
 
@@ -313,10 +312,10 @@ class PlayerState{
 class Deck~T~ {
     cards: Set~Card~ 
     %% Una pila forse
-    Deck(Card[])
+    Deck(Card[n])
     shuffle() void
     draw() Card
-    draw(int) Card []
+    draw(int) Card[*]
     cardsLeft() int
     insert(T ) void
     %% insert card back after card drawing. (ie when you don't choose an objective)
@@ -338,7 +337,7 @@ class Player {
 
     +drawCard(SidedCard) void
     %% receive 
-    +chooseObjective(ObjectiveCard[] availableObjectives) ObjectiveCard
+    +chooseObjective(ObjectiveCard[2] availableObjectives) ObjectiveCard
     +chooseDrawingDeck()
     +chooseToken()
 
@@ -377,7 +376,7 @@ class CommonBoard{
     drawGoldCard() GoldCard
     drawResourceCard() ResourceCard
     %% the card drawn are replaced
-    getObjectiveCards() ObjectiveCard[]
+    getObjectiveCards() ObjectiveCard[2]
 }
 
 class ScoreBoard {
