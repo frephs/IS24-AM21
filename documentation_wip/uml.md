@@ -119,7 +119,7 @@ class CardBackSide {
 }
 
 class Corner~T~{
-    contentType: otpional~CornerContentTypes~
+    contentType: Optional~CornerContentTypes~
     content: Optional~T~
     isCovered: bool
     %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
@@ -239,6 +239,7 @@ ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
 Corner --|> Iterable : implements
+Corner --|> CornerContentType : uses
 CardSide --|> Iterable : implements
 
 
