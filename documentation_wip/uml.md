@@ -74,7 +74,7 @@ class CornerEnum {
 class SidedCard {
     sides: Hasmap~CardSides, CardSides~ (*)
     %% cardSide[BACK] will be instanced as CardBackSide obv. 
-    SidedCard(CardSide, CardBackSide)
+    SidedCard(ResourceTypes []front, ResourceTypes[]back\n, ObjectTypes front[], objectTypes back[]\n, ResourceTypes permanentBackResources)
     
     %%calls the method link of the corner and adjusts the content of the corners
 }
@@ -239,7 +239,7 @@ ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
 Corner --|> Iterable : implements
-CardSide --|> Iterable : implements
+
 
 
 
