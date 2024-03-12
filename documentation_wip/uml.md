@@ -72,38 +72,37 @@ class CornerEnum {
 }
 
 class SidedCard {
-    sides : CardSide[2]
-    %% cardSide[1] will be instanced as CardBackSide obv. 
+    sides: Hasmap~CardSides, CardSides~ (*)
+    %% cardSide[BACK] will be instanced as CardBackSide obv. 
     SidedCard(CardSide, CardBackSide)
     
     %%calls the method link of the corner and adjusts the content of the corners
 }
 
 
-class RelativePosition{
+class Position{
     x: int
     y: int
-    computeLinkingPosition(CornerEnum linkedCorner) RelativePosition
+    computeLinkingPosition(CornerEnum linkedCorner) Position
+    Position(x,y)
+    
+    %% Overriding 
+    equals(Position) bool
+    hashCode() int
 }
 
 class PlayedCard{
     playedSide: CardSides
     card: SidedCard
-    adjacentCards: PlayedCard[2]
-    %%cards that are above and below the card
-    relativePosition: RelativePosition
-    %% isometric position of the card on the board, updated every time a card is placed.
-    getPlayedSide() CardSides
-    getAvailableCorners() Corner[]
-    getLinkedCards()
-    linkCard(card: SidedCard, corner: Corner) void
-    %% the adjacent cards are the ones above and below the card which are not actually linked together but are useful to have a connection to to calculate the points of geometrical objective
 
+    getPlayedSide() CardSides
+    getAvailableCorners() CornerEnum[]
 }
 
 class CardSide {
-    corners: Optional~Corner~ [4] 
-    CardSide(Corner corners[])
+    corners: HashMap~CornerEnum, Corner~ 
+
+    CardSide(ResourceTypes resources, ObjectTypes objects)
     
     %% You actually position cardSides not cards
     getResources() hashmap~ResourceTypes, int~
@@ -113,24 +112,27 @@ class CardSide {
 
 class CardBackSide {
     permanentResources: Optional~ResourceTypes~[3]
+    CardBackSide(ResourceTypes resources \n, ResourceTypes permanentResources, ObjectTypes objects)
+
     %% overrides 
     getResources() hashmap~ResourceType, int~
 }
 
 class Corner~T~{
     contentType: otpional~CornerContentTypes~
-    cornerNumber: CornerEnum 
     content: Optional~T~
-    linkedCard: Optional~Played
-    Card~
+    isCovered: bool
     %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
 
     isLinked() bool
-    linkCorner(Corner) void
+    
+    %%isLinked() bool
+    %%lilinkCorner(Corner) void
     %% changes the value of linkedCorner and the value of actualContent if the content of the linked corner is different
-    getLinkedCorner() Corner~T~
+    %%getLinkedCard() Optional~PlayedCard~
+    %%getLinkedCorner() Corner~T~
     %% returns the linked corner if it's linked, otherwise an empty optional
-    getActualContent() Optional~T~
+    %%getActualContent() Optional~T~
     %% returns the content of the linked corner if it's linked, else returns the content of the corner, also depending on which card is above (the one underneath will be the one that has the linked corner)
 }
 
@@ -142,14 +144,16 @@ class Corner~T~{
 %%}
 
 
-
-
 class ResourceCard{
-    kingdom: ResourceTypes
+    %% non importante, salviamo la risorsa 
+    %% kingdom: ResourceTypes
     points: Optional~int~
+    evaluate()
 }
 
 class GoldCard{
+    int points; 
+    %% non è più optional
     conditionalSet: Optional~ResourceTypes~[5]
     pointCondition: optional~PointConditionTypes~
     %% o è meglio una lista?
@@ -230,7 +234,7 @@ SidedCard  <|-- ResourceCard : inherits from
 SidedCard <|-- StarterCard: inherits from 
 Card <|-- ObjectiveCard: inherits from 
 
-ResourceCard <|-- GoldCard : inherits from
+SidedCard <|-- GoldCard : inherits from
 ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
@@ -332,6 +336,11 @@ class Player {
     %% points are abviously private
     
 
+    +drawCard(SidedCard) void
+    %% receive 
+    +chooseObjective(ObjectiveCard[] availableObjectives) ObjectiveCard
+    +chooseDrawingDeck()
+    +chooseToken()
 
     playCard(int cardNumber) void
     %% removes the card from the player's hand and places it on the board calling the playerboard method
@@ -382,7 +391,7 @@ class ScoreBoard {
 class PlayerBoard {
     cards: SidedCard[3]
     objectiveCards: ObjectiveCard
-    playedCardsGraph: PlayedCard
+    playedCards: MultiKeyMap~Position~~PlayedCard~
     %% the geometry is a graph with root a link to the starter card
     resources: HashMap~ResourceType, int~
     -?AvailableCorners: List~Corner~
