@@ -119,7 +119,7 @@ class CardBackSide {
 }
 
 class Corner~T~{
-    contentType: Optional~CornerContentTypes~
+    contentType: otpional~CornerContentTypes~
     content: Optional~T~
     isCovered: bool
     %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
@@ -173,7 +173,7 @@ CardSide "1"<|--"1" CardBackSide : inherits from
 
 class StarterCard{
  
-    starterCard()
+    starterCard(resourceTypes front, ResourceTypes back, ResourceType permanent)
     %% solo risorse niente oggetti negli angoli ma con
     firstPlayerToken: bool 
     %%OVERRIDE
@@ -238,8 +238,8 @@ SidedCard <|-- GoldCard : inherits from
 ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
-Corner --|> Iterable : implements
-Corner --|> CornerContentType : uses
+
+
 
 
 
@@ -403,6 +403,8 @@ class PlayerBoard {
     evaluatePoints() int
     playCard(SidedCard card, CardSide playedSide) void
     %% updates the list of available corners (removes one and adds up to 3), places the card on the board and updates the resources and objects
+    Corner(ResourceTypes)
+    Corner(ObjectTypes)
 }
 
 Game "2"*--"4" Player : is composed of 
