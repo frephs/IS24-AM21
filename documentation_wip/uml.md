@@ -72,7 +72,7 @@ class CornerEnum {
 }
 
 class SidedCard {
-    sides: Hasmap~CardSides, CardSides~ (*)
+    sides: Hasmap~CardSides, CardSide~ (*)
     %% cardSide[BACK] will be instanced as CardBackSide obv. 
     SidedCard(ResourceTypes []front, ResourceTypes[]back\n, ObjectTypes front[], objectTypes back[]\n, ResourceTypes permanentBackResources)
     
