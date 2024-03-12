@@ -380,10 +380,8 @@ class CommonBoard{
 }
 
 class ScoreBoard {
-    buckets: HashMap ~int~~Token~
-    addPoints(TokenColors, int) void
-    getPoints(TokenColors) int
-    getPoints() HashMap~TokenColors, int~
+    scores: Hasmap~String,int~
+    %%HashMap~TokenColors, int~
 
 }
 
@@ -400,7 +398,7 @@ class PlayerBoard {
     objects: HashMap~Objects, int~
     placeCard(SidedCard) bool
     evaluatePoints() int
-    playCard(SidedCard card, CardSide playedSide) void
+    placeCard(SidedCard card, CardSide playedSide) void
     %% updates the list of available corners (removes one and adds up to 3), places the card on the board and updates the resources and objects
     Corner(ResourceTypes)
     Corner(ObjectTypes)
@@ -412,7 +410,7 @@ Game "1"*--"9" Token : is composed of
 Token <-- TokenColors : uses
 GameBoard "1"*--"4" Deck : is composed of
 GameBoard "1"*--"1" CommonBoard : is composed of
-GameBoard "1"*--"1" ScoreBoard : is composed of
+Game "1"*--"1" ScoreBoard : is composed of
 
 Player --|> Iterable : implements
 Player --* PlayerBoard: composed of
