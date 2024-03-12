@@ -102,7 +102,10 @@ class PlayedCard{
 class CardSide {
     corners: HashMap~CornerEnum, Corner~ 
 
-    CardSide(ResourceTypes resources, ObjectTypes objects)
+    CardSide()
+
+    setCornerResource(ResourceType): void
+    setCornerObject(ObjectType): void
     
     %% You actually position cardSides not cards
     getResources() hashmap~ResourceTypes, int~
