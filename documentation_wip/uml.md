@@ -51,16 +51,10 @@ class CornerContentTypes{
 
 }
 
-class CardSides{
+class CardSidesTypes{
     <<Enumeration>>
     FRONT
     BACK
-}
-
-class Card {
-    %% potrebbe essere un'interfaccia
-    <<Abstract>>
-    %%+createCard() void
 }
 
 class CornerEnum {
@@ -71,32 +65,25 @@ class CornerEnum {
     DOWN_RIGHT
 }
 
-class SidedCard {
-    sides: Hasmap~CardSides, CardSide~ (*)
-    %% cardSide[BACK] will be instanced as CardBackSide obv. 
-    SidedCard(ResourceTypes []front, ResourceTypes[]back\n, ObjectTypes front[], objectTypes back[]\n, ResourceTypes permanentBackResources)
-    
-    %%calls the method link of the corner and adjusts the content of the corners
-}
-
-
-class Position{
-    x: int
-    y: int
-    computeLinkingPosition(CornerEnum linkedCorner) Position
-    Position(x,y)
-    
-    %% Overriding 
-    equals(Position) bool
-    hashCode() int
+class Card {
+    %% potrebbe essere un'interfaccia
+    <<Abstract>>
+    %%+createCard() void
 }
 
 class PlayedCard{
-    playedSide: CardSides
+    playedSide: CardSidesTypes
     card: SidedCard
 
-    getPlayedSide() CardSides
+    PlayedCard(CardSidesTypes side, SidedCard playedCard)
+    getPlayedSide() CardSide
     getAvailableCorners() CornerEnum[0..4]
+    
+}
+class SidedCard {
+    sides: Hashmap~CardSidesTypes, CardSide~ (*)
+    %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
+    SidedCard(CardSide front, CardSideBack back)    
 }
 
 class CardSide {
@@ -104,53 +91,41 @@ class CardSide {
 
     CardSide()
 
-    setCornerResource(ResourceType): void
-    setCornerObject(ObjectType): void
+    setCorner(CornerEnum position, Corner corner);
+    %% adds a corner to the hashmap (so to the card side)
     
-    %% You actually position cardSides not cards
     getResources() hashmap~ResourceTypes, int~
     getObjects() hashmap~Objects, int~ 
-    %% devo dargli i corners come input.
 }
 
 class CardBackSide {
-    permanentResources: ResourceTypes[0..3]
-    CardBackSide(ResourceTypes resources \n, ResourceTypes permanentResources, ObjectTypes objects)
-
-    %% overrides 
+    permanentResources: ResourceTypes[1..3]
+    
+    CardBackSide(ResourceTypes permanentResources[1..3])
+    %%calls super and then instancies permanent resources
+    
     getResources() hashmap~ResourceType, int~
+    %% overrides super returning also permanent resources
 }
 
 class Corner~T~{
-    contentType: otpional~CornerContentTypes~
+    contentType: Optional~CornerContentTypes~
+    %%set in the constructor
     content: Optional~T~
-    isCovered: bool
-    %% it is important that we link a card and not a corner cause otherwise we'd have to implement something like corner.parentCard and honestly ew.
-
-    isLinked() bool
     
-    %%isLinked() bool
-    %%lilinkCorner(Corner) void
-    %% changes the value of linkedCorner and the value of actualContent if the content of the linked corner is different
-    %%getLinkedCard() Optional~PlayedCard~
-    %%getLinkedCorner() Corner~T~
-    %% returns the linked corner if it's linked, otherwise an empty optional
-    %%getActualContent() Optional~T~
-    %% returns the content of the linked corner if it's linked, else returns the content of the corner, also depending on which card is above (the one underneath will be the one that has the linked corner)
+    Corner(T content)
+    
+    isCovered: bool
+    isEmpty() bool
 }
-
-%%class Linkable{
-  %%  <<Interface>>
-    %%-link() void
-    %% couples that connect are 1-4 2-3 with transitivity
-    %% come implementiamo link? 
-%%}
 
 
 class ResourceCard{
-    %% non importante, salviamo la risorsa 
-    %% kingdom: ResourceTypes
     points: Optional~int~
+    
+    ResourceCard(SidedCard card, int points)
+    ResourceCard(SidedCard card)
+
     evaluate()
 }
 
@@ -158,11 +133,21 @@ class GoldCard{
     int points; 
     conditionalSet: ResourceTypes[1..5]
     pointCondition: optional~PointConditionTypes~
-    %% o è meglio una lista?
     conditionalObject optional~ObjectTypes~
-    %% object that if present on the player board will grant points
-    evalutePoints()
-    %%override
+    
+    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition, ObjectTypes conditionalObject)
+
+    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition)
+
+    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet)
+
+    %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
+
+    evaluate()
+    isPlaceable(Hashmap~ResourceTypes,int~ resources) bool
+
+
+    %% similar to the resource card but does not extend it because points here are mandatory
 }
 
 class PointConditionTypes{
@@ -171,33 +156,26 @@ class PointConditionTypes{
     CORNERS
 }
 
-CardSide "1"<|--"1" CardBackSide : inherits from
-
 class StarterCard{
- 
-    starterCard(resourceTypes front, ResourceTypes back, ResourceType permanent)
+    %%FIXME: trovare il modo di indicare che può avere solo risorse negli angoli
+    %%perchè così è inutile come classe.
+    
+    starterCard(SidedCard card)
     %% solo risorse niente oggetti negli angoli ma con
-    firstPlayerToken: bool 
+    firstPlayerToken: bool
+    setFirstPlayerToken(bool) void 
     %%OVERRIDE
     cardSide(Corner~ResourceTypes~ corners[]) 
     %% useful for the GUI
     
 }
 
-%%class StarterCardBackSide {
-  %%  centralResources: ResourceTypes[2]
-%%}
-
-%%CardSide "1"<|--"1" %%StarterCardBackSide : extends
-
-
 
 class ObjectiveCard{
     points: final int
     objective: Objective
-    %% FIXME: va cambiato in un optional di ObbjectTYpes o di Resources
-    %% Direi che va introdotta una classe che li metta assieme. 
-    %% è meglio una lista?
+
+    ObjectiveCard(Objective objective)
     evaluate() int
     %% return points * objective.evaluate()
     
@@ -213,21 +191,24 @@ class Objective{
 
 class GeometricObjective{
     geometry: ResourceTypes[3][3]
-    %% how many times the 
-    evaluate(starterCard start) int
+    evaluate() int
+    GeometricObjective(ResourceTypes[3][3] geometry)
 }
 
 class CountingObjective{
     resources: HashMap~ResourceTypes, int~
     objects: HashMap~Objects, int~
+    
+    CountingObjective(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects)
+    
     evaluate(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects) int
 }
 
-PlayedCard <-- CardSides : uses
-PlayedCard "1" *-- "1" RelativePosition : is composed of
+PlayedCard <-- CardSidesTypes : uses
 PlayedCard *-- SidedCard: is composed of 
 GoldCard <-- PointConditionTypes : uses
 CornerEnum <-- Corner : uses 
+CardSide "1"<|--"1" CardBackSide : inherits from
 CornerEnum <-- CardSide : uses 
 Card <|-- SidedCard : Inherits from
 CardSide "1"*-- "4" Corner: is composed of
@@ -240,9 +221,6 @@ SidedCard <|-- GoldCard : inherits from
 ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
-
-
-
 
 
 ```
@@ -294,6 +272,10 @@ class Game{
     getPlayersNames()
 
     playTurn() void
+    %% to be specified
+
+    +evaluateObjectives()
+    %% calls player.evaluateObjectives() for each player with the common objectives as parameter
 }
 
 %% TODO decidere se implementarlo come un obietti
@@ -326,35 +308,57 @@ class Deck~T~ {
 
 class Player {
     nickname: String 
-    %%forse va nel client o forse si può mantenere per la persistenza del client.
     points: int
-   
     token: Token
     board: playerBoard
-    %%+chooseToken(Token [] availableTokens) Token maybe implemented in client?
     Player(String nickname, Token token)
     getPoints() int
     setPoints(int) void
     %% points are abviously private
     
 
-    +drawCard(SidedCard) void
-    %% receive 
+    +drawCard(SidedCard card) void
+    %% receive  card and put it in the player's hand
+
     +chooseObjective(ObjectiveCard[2] availableObjectives) ObjectiveCard
-    +chooseDrawingDeck()
+    
+    +chooseDrawingDeck(int source, int deck) DrawingSources, DeckDrawingSources
+    
     +chooseToken()
 
-    playCard(int cardNumber) void
+    placeCard(int cardNumber) void
     %% removes the card from the player's hand and places it on the board calling the playerboard method
-    addCard(Card card) void
-    %% only puts a card in the player's hand (aka the personal board)
 
+    evaluateObjectives(ObjectiveCard[2] commonObjectives) void
+}
+
+class DeckDrawingSources{
+    <<Enumeration>>
+    GOLD_DECK
+    RESOURCE_DECK
+}
+
+class DrawingSources{
+    <<Enumeration>>
+    DECK
+    COMMON_BOARD
 }
 
 class Token {
     color: TokenColors
     Token(TokenColors)
+}
 
+class Position{
+    x: int
+    y: int
+
+    computeLinkingPosition(CornerEnum linkedCorner) Position
+    Position(x,y)
+    
+    %% Overriding default hashmap key methods
+    equals(Position) bool
+    hashCode() int
 }
 
 class GameBoard {
@@ -364,8 +368,16 @@ class GameBoard {
     objectiveDeck: deck~ObjectiveCard~ 
     commonBoard: CommonBoard
     scoreBoard: ScoreBoard
+    
     GameBoard()
-    %% ? +ceint[30]
+    loadCardsSchemas() Static void
+    %% loads the cards from the json/xml files and creates the decks
+
+    drawGoldCard() GoldCard
+    drawGoldCard(int cards) GoldCard[]
+    drawResourceCard() ResourceCard
+    drawResourceCard(int cards) ResourceCard[]
+    %% draw cards from the common board and replace them
 }
 
 class CommonBoard{
@@ -373,38 +385,41 @@ class CommonBoard{
     resourceCards: ResourceCard[2]
     objectiveCards: ObjectiveCard[2]
     
-    CommonBoard()
+    CommonBoard(Goldcards goldCards[2], \nResourceCard resourceCards[2], objectiveCards)
     %% without parameters cause we'll draw 2 cards with deck.draw(2) for each type.
 
-    drawGoldCard() GoldCard
-    drawResourceCard() ResourceCard
-    %% the card drawn are replaced
     getObjectiveCards() ObjectiveCard[2]
 }
 
+%% is This redundant?
 class ScoreBoard {
     scores: Hasmap~String,int~
-    %%HashMap~TokenColors, int~
-
+    %%HashMap~TokenColors, int~ redundant???
 }
 
 class PlayerBoard {
     cards: SidedCard[3]
     objectiveCards: ObjectiveCard
-    playedCards: MultiKeyMap~Position~~PlayedCard~
-    %% the geometry is a graph with root a link to the starter card
-    resources: HashMap~ResourceType, int~
-    -?AvailableCorners: List~Corner~
-    %% it is useful to have a list of available corners to play a card, it is updated every time a card is played. 
+    %% the geometry is an hasmap of positions and played cards
 
-    %% QUSTION maybe this goes in the controller???
+    playedCards: HashMap~Position, PlayedCard~
+    AvailableSpots: List~Position~
+    
+    resources: HashMap~ResourceType, int~
     objects: HashMap~Objects, int~
-    placeCard(SidedCard) bool
-    evaluatePoints() int
-    placeCard(SidedCard card, CardSide playedSide) void
-    %% updates the list of available corners (removes one and adds up to 3), places the card on the board and updates the resources and objects
-    Corner(ResourceTypes)
-    Corner(ObjectTypes)
+
+    PlayerBoard(SidedCard[3] cards, ObjectiveCard objectiveCard, startCard)
+    
+    +chosePlacingPosition(int) Position
+    
+    placeCard(SidedCard card, cardSidesTypes side, Position position) void
+    %% instanciates a played card and places it on the board, updates the resources and objects calling the helper method, updates the available spots calling the helper method
+
+    updateResourcesandObjects(PlayedCard playedCard, Position position) void
+
+    updateAvailableSpots(Position position) void
+
+    evaluatePoints(PlayedCard card) int
 }
 
 Game "2"*--"4" Player : is composed of 
@@ -415,10 +430,13 @@ GameBoard "1"*--"4" Deck : is composed of
 GameBoard "1"*--"1" CommonBoard : is composed of
 Game "1"*--"1" ScoreBoard : is composed of
 
+PlayerBoard <-- Position : uses
 Player --|> Iterable : implements
 Player --* PlayerBoard: composed of
 
+Player <-- DrawingSources : uses
+Player <-- DeckDrawingSources : uses
 ```
 
-## Considerazioni
+## Considerations
 The rationale is to implement every element that can become graphical as a separate class, so that there is a correspondence once the view is implemented. Each element will have a decorator toString to realize the cli and a method to draw it on the GUI
