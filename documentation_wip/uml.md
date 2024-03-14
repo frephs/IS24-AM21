@@ -83,7 +83,7 @@ class PlayedCard{
 }
 class SidedCard {
     <<Abstract>>
-    sides: Hashmap~CardSidesTypes, CardSide~
+    sides: HashMap~CardSidesTypes; CardSide~
     %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
     SidedCard(CardSide front, CardSideBack back)    
     evaluate(PlayerBoard playerBoard = null) int
@@ -91,15 +91,15 @@ class SidedCard {
 }
 
 class CardSide {
-    corners: HashMap~CornerEnum, Corner~ 
+    corners: HashMap~CornerEnum; Corner~ 
 
     CardSide()
 
     setCorner(CornerEnum position, Corner corner);
     %% adds a corner to the hashmap (so to the card side)
     
-    getResources() hashmap~ResourceTypes, int~
-    getObjects() hashmap~Objects, int~ 
+    getResources() HashMap~ResourceTypes; int~
+    getObjects() HashMap~Objects; int~ 
 }
 
 class CardBackSide {
@@ -108,7 +108,7 @@ class CardBackSide {
     CardBackSide(ResourceTypes permanentResources[1..3])
     %%calls super and then instancies permanent resources
     
-    getResources() hashmap~ResourceType, int~
+    getResources() HashMap~ResourceType; int~
     %% overrides super returning also permanent resources
 }
 
@@ -151,7 +151,7 @@ class GoldCard{
     %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
 
     evaluate(PlayerBoard playerBoard) int
-    isPlaceable(Hashmap~ResourceTypes,int~ resources) bool
+    isPlaceable(HashMap~ResourceTypes; int~ resources) bool
 
 
     %% similar to the resource card but does not extend it because points here are mandatory
@@ -203,10 +203,10 @@ class GeometricObjective{
 }
 
 class CountingObjective{
-    resources: HashMap~ResourceTypes, int~
-    objects: HashMap~Objects, int~
+    resources: HashMap~ResourceTypes; int~
+    objects: HashMap~Objects; int~
     
-    CountingObjective(HashMap~ResourceTypes int~ resources, HashMap~ObjectsTypes; int~ objects)
+    CountingObjective(HashMap~ResourceTypes; int~ resources, HashMap~ObjectsTypes; int~ objects)
     
     evaluate(PlayerBoard playerBoard) int
 }
@@ -400,8 +400,8 @@ class CommonBoard{
 
 %% is This redundant?
 class ScoreBoard {
-    scores: Hasmap~String,int~
-    %%HashMap~TokenColors, int~ redundant???
+    scores: Hasmap~String; int~
+    %%HashMap~TokenColors; int~ redundant???
 }
 
 class PlayerBoard {
@@ -409,11 +409,11 @@ class PlayerBoard {
     objectiveCards: ObjectiveCard
     %% the geometry is an hasmap of positions and played cards
 
-    playedCards: HashMap~Position, PlayedCard~
+    playedCards: HashMap~Position; PlayedCard~
     AvailableSpots: List~Position~
     
-    resources: HashMap~ResourceType, int~
-    objects: HashMap~Objects, int~
+    resources: HashMap~ResourceType; int~
+    objects: HashMap~Objects; int~
 
     PlayerBoard(SidedCard[3] cards, ObjectiveCard objectiveCard, startCard)
     
