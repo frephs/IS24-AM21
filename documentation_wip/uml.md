@@ -24,7 +24,7 @@
 
 classDiagram
 
-class ResourcesTypes {
+class ResourceTypes {
     <<Enumeration>>
     PLANT_KINGDOM
     ANIMAL_KINGDOM
@@ -32,6 +32,7 @@ class ResourcesTypes {
     INSECT_KINGDOM
 
     +toString() String
+    has(Object value) boolean
 }
 
 class ObjectTypes{
@@ -41,14 +42,7 @@ class ObjectTypes{
     MANUSCRIPT
 
     +toString() String
-}
-
-class CornerContentTypes{
-    <<Enumeration>>
-    RESOURCE
-    OBJECT
-    +toString() String
-
+    has(Object value) boolean
 }
 
 class CardSidesTypes{
@@ -68,7 +62,7 @@ class CornerEnum {
 class Card {
     %% potrebbe essere un'interfaccia
     <<Abstract>>
-    evaluate(PlayerBoard playerBoard = null) int
+    evaluate(PlayerBoard playerBoard) int
     %%+createCard() void
 }
 
@@ -86,7 +80,7 @@ class SidedCard {
     sides: HashMap~CardSidesTypes; CardSide~
     %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
     SidedCard(CardSide front, CardSideBack back)    
-    evaluate(PlayerBoard playerBoard = null) int
+    evaluate(PlayerBoard playerBoard) int
 
 }
 
@@ -113,17 +107,17 @@ class CardBackSide {
 }
 
 class Corner~T~{
-    contentType: Optional~CornerContentTypes~
     %%set in the constructor
     content: Optional~T~
+    isCovered: bool
     
     Corner(T content)
-    
-    isCovered: bool
     isEmpty() bool
+    getContent() Optional~T~
 
     setCornerType(ResourceTypes type) void
     setCornerType(ObjectTypes type) void
+    cover() void
 }
 
 
@@ -133,7 +127,7 @@ class ResourceCard{
     ResourceCard(SidedCard card, int points)
     ResourceCard(SidedCard card)
 
-    evaluate() int
+    evaluate(PlayerBoard playerBoard) int
 }
 
 class GoldCard{
@@ -229,7 +223,14 @@ ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
 
-
+%% ResourceTypes <-- CardSide : uses
+%% ResourceTypes <-- CardBackSide : uses
+%% ResourceTypes <-- Corner : uses
+%% ResourceTypes <-- GoldCard : uses
+%% ResourceTypes <-- StarterCard : uses
+%% ResourceTypes <-- GeometricObjective : uses
+%% ResourceTypes <-- GeometricObjective : uses
+%% ResourceTypes <-- CountingObjective : uses
 ```
 
 ### Game model
