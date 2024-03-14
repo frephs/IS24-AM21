@@ -112,6 +112,7 @@ class Corner~T~{
     isCovered: bool
     
     Corner(T content)
+    Corner()
     isEmpty() bool
     getContent() Optional~T~
 
