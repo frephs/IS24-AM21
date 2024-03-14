@@ -115,8 +115,6 @@ class Corner~T~{
     isEmpty() bool
     getContent() Optional~T~
 
-    setCornerType(ResourceTypes type) void
-    setCornerType(ObjectTypes type) void
     cover() void
 }
 
