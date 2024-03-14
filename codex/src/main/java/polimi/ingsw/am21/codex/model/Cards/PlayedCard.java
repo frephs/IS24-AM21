@@ -8,9 +8,4 @@ public class PlayedCard {
     SidedCard playedCard;
     CardSide playedSide;
 
-
-
-
-
-
 }
