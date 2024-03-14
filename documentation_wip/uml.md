@@ -68,6 +68,7 @@ class CornerEnum {
 class Card {
     %% potrebbe essere un'interfaccia
     <<Abstract>>
+    evaluate(PlayerBoard playerBoard = null) int
     %%+createCard() void
 }
 
@@ -81,9 +82,12 @@ class PlayedCard{
     
 }
 class SidedCard {
-    sides: Hashmap~CardSidesTypes, CardSide~ (*)
+    <<Abstract>>
+    sides: Hashmap~CardSidesTypes, CardSide~
     %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
     SidedCard(CardSide front, CardSideBack back)    
+    evaluate(PlayerBoard playerBoard = null) int
+
 }
 
 class CardSide {
@@ -117,6 +121,9 @@ class Corner~T~{
     
     isCovered: bool
     isEmpty() bool
+
+    setCornerType(ResourceTypes type) void
+    setCornerType(ObjectTypes type) void
 }
 
 
@@ -126,7 +133,7 @@ class ResourceCard{
     ResourceCard(SidedCard card, int points)
     ResourceCard(SidedCard card)
 
-    evaluate()
+    evaluate() int
 }
 
 class GoldCard{
@@ -143,7 +150,7 @@ class GoldCard{
 
     %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
 
-    evaluate()
+    evaluate(PlayerBoard playerBoard) int
     isPlaceable(Hashmap~ResourceTypes,int~ resources) bool
 
 
@@ -176,32 +183,32 @@ class ObjectiveCard{
     objective: Objective
 
     ObjectiveCard(Objective objective)
-    evaluate() int
+    evaluate(PlayerBoard playerBoard) int
     %% return points * objective.evaluate()
     
 }
 
 class Objective{
-    <<abstract class>>
+    <<Abstract>>
     %% how many times the objective has to be satisfied
-    evaluate() int
+    evaluate(PlayerBoard playerBoard) int
     %% returns
     %% lo realizzeremo dentro evaluate count: int
 }
 
 class GeometricObjective{
     geometry: ResourceTypes[3][3]
-    evaluate() int
     GeometricObjective(ResourceTypes[3][3] geometry)
+    evaluate(PlayerBoard playerBoard) int
 }
 
 class CountingObjective{
     resources: HashMap~ResourceTypes, int~
     objects: HashMap~Objects, int~
     
-    CountingObjective(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects)
+    CountingObjective(HashMap~ResourceTypes int~ resources, HashMap~ObjectsTypes; int~ objects)
     
-    evaluate(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects) int
+    evaluate(PlayerBoard playerBoard) int
 }
 
 PlayedCard <-- CardSidesTypes : uses
@@ -210,14 +217,14 @@ GoldCard <-- PointConditionTypes : uses
 CornerEnum <-- Corner : uses 
 CardSide "1"<|--"1" CardBackSide : inherits from
 CornerEnum <-- CardSide : uses 
-Card <|-- SidedCard : Inherits from
+Card <|.. SidedCard : Inherits from
 CardSide "1"*-- "4" Corner: is composed of
 SidedCard "1" *-- "2" CardSide : is composed of 
-SidedCard  <|-- ResourceCard : inherits from 
-SidedCard <|-- StarterCard: inherits from 
-Card <|-- ObjectiveCard: inherits from 
+SidedCard  <|.. ResourceCard : realization 
+SidedCard <|.. StarterCard: realization
+Card <|.. ObjectiveCard: realization 
 
-SidedCard <|-- GoldCard : inherits from
+SidedCard <|.. GoldCard : realization
 ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
 Objective <|.. CountingObjective : realization
