@@ -368,6 +368,18 @@ class PlayerBoard {
     %% 2 overloads of the evaluate method, the first one is called on Playable cards every turn, the second one is called on the objective card at the end of the game.
 }
 
+class PlayerActions{
+    <<Interface>>
+    chooseTokenColor(int choice) TokenColors
+    chooseObjectiveCard(int choice) ObjectiveCard
+
+    chooseDrawingSource(int choice) DrawingSourceTypes
+    chooseDrawingDeck(int choice) DrawingDeckTypes
+
+    choosePlayingCard(int choice) PlayableCard
+    choosePlayingCardSide(int choice) CardSidesTypes
+    choosePlayingCardPosition(int choice) Position
+}
 
 class DrawingDeckTypes{
     <<Enumeration>>
@@ -445,6 +457,7 @@ Player --* PlayerBoard: composed of
 
 Player <-- DrawingSourceTypes : uses
 Player <-- DrawingDeckTypes : uses
+Player --> PlayerActions : offers
 
 ```
 

@@ -2,11 +2,17 @@ package polimi.ingsw.am21.codex.model;
 
 public interface PlayerActions {
     // will be implemented by the controller
-    ObjectiveCard chooseObjectiveCard(ObjectiveCard cards, int choice);
-    DrawingSource chooseDrawingSource(int source);
-    DeckType chooseDrawingDeck(int deck);
+    // player init
+    TokenColors chooseTokenColor(TokenColor availableColors, int choice);
+    ObjectiveCard chooseObjectiveCard(ObjectiveCard[] cards, int choice);
 
+    // player plays a card
     SidedCard choosePlayingCard(int choice);
-    CardSidesTypes choosePlayedCardSides(int choice);
+    CardSidesTypes choosePlayingCardSide(int choice);
+    Position choosePlayingCardPositions(int x, int y);
+
+    //player draws a card
+    DrawingSourceTypes chooseDrawingSource(int source);
+    DrawingDeckTypes chooseDrawingDeck(int deck);
 
 }
