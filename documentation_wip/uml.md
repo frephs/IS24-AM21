@@ -307,47 +307,80 @@ class Deck~T~ {
 }
 
 class Player {
-    nickname: String 
-    points: int
-    token: Token
-    board: playerBoard
-    Player(String nickname, Token token)
+    -nickname: String 
+    -points: int
+    -token: TokenColors
+    -board: playerBoard
+
+
+    Player(String nickname, Token token, PlayableCard starterCard, PlayableCard[3] hand)
+    
+    getNickname() String
+    getToken() TokenColors
+
+    setToken(TokenColors token) void
+    setObjectiveCard(ObjectiveCards)
+
     getPoints() int
     setPoints(int) void
     %% points are abviously private
-    
 
-    +drawCard(SidedCard card) void
-    %% receive  card and put it in the player's hand
+    +drawCard(PlayableCard card) void
+    %% receive card and put it in the player's hand
 
-    +chooseObjective(ObjectiveCard[2] availableObjectives) ObjectiveCard
-    
-    +chooseDrawingDeck(int source, int deck) DrawingSources, DeckDrawingSources
-    
-    +chooseToken()
+    +placeCard(PlayableCard card, CardSidesTypes side, Position position) void
+    %% calls the player board placeCard method with the card as parameter and updates the player's points calling the evaluate method on the played card
 
-    placeCard(int cardNumber) void
-    %% removes the card from the player's hand and places it on the board calling the playerboard method
-
-    evaluateObjectives(ObjectiveCard[2] commonObjectives) void
+    +evaluate(ObjectiveCard objectiveCard) void
+    %% calls the player board evaluate method with the objective card as parameter
 }
 
-class DeckDrawingSources{
+class PlayerBoard {
+    cards: SidedCard[3]
+    objectiveCard: ObjectiveCard
+    
+    playedCards: HashMap~Position, PlayedCard~
+    %% the geometry is an hasmap of positions and played cards
+    
+    AvailableSpots: Set~Position~
+    %% the available spots for the player to place a card on the board
+
+    resources: HashMap~ResourceType, int~
+    objects: HashMap~Objects, int~
+    %% the resources and objects the player has on the board
+
+    PlayerBoard(PlayableCard[3] cards, PlayableCard starterCard)
+    
+    setObjectiveCard(ObjectiveCard objectiveCard) void
+    %% sets the objective card in the player board after the player has chosen it
+
+    placeCard(PlayableCard card, cardSidesTypes side, Position position) void
+    %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
+
+    updateResourcesandObjects(PlayedCard playedCard, Position position) void
+    %% updates the player's resources and objects after a card has been placed on the board
+
+    updateAvailableSpots(Position position) void
+    %% updats the list of available spots in which card can be placed
+
+    evaluate(PlayedCard card) int
+    evaluate(ObjectiveCard objectiveCard) int
+    %% 2 overloads of the evaluate method, the first one is called on Playable cards every turn, the second one is called on the objective card at the end of the game.
+}
+
+
+class DrawingDeckTypes{
     <<Enumeration>>
     GOLD_DECK
     RESOURCE_DECK
 }
 
-class DrawingSources{
+class DrawingSourceTypes{
     <<Enumeration>>
     DECK
     COMMON_BOARD
 }
 
-class Token {
-    color: TokenColors
-    Token(TokenColors)
-}
 
 class Position{
     x: int
@@ -397,30 +430,6 @@ class ScoreBoard {
     %%HashMap~TokenColors, int~ redundant???
 }
 
-class PlayerBoard {
-    cards: SidedCard[3]
-    objectiveCards: ObjectiveCard
-    %% the geometry is an hasmap of positions and played cards
-
-    playedCards: HashMap~Position, PlayedCard~
-    AvailableSpots: List~Position~
-    
-    resources: HashMap~ResourceType, int~
-    objects: HashMap~Objects, int~
-
-    PlayerBoard(SidedCard[3] cards, ObjectiveCard objectiveCard, startCard)
-    
-    +chosePlacingPosition(int) Position
-    
-    placeCard(SidedCard card, cardSidesTypes side, Position position) void
-    %% instanciates a played card and places it on the board, updates the resources and objects calling the helper method, updates the available spots calling the helper method
-
-    updateResourcesandObjects(PlayedCard playedCard, Position position) void
-
-    updateAvailableSpots(Position position) void
-
-    evaluatePoints(PlayedCard card) int
-}
 
 Game "2"*--"4" Player : is composed of 
 Game "1"*--"1" GameBoard : is composed of
@@ -434,8 +443,9 @@ PlayerBoard <-- Position : uses
 Player --|> Iterable : implements
 Player --* PlayerBoard: composed of
 
-Player <-- DrawingSources : uses
-Player <-- DeckDrawingSources : uses
+Player <-- DrawingSourceTypes : uses
+Player <-- DrawingDeckTypes : uses
+
 ```
 
 ## Considerations
