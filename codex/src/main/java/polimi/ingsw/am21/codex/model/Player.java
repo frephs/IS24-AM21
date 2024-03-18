@@ -2,62 +2,46 @@ package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 
-
-
-
-
 public class Player {
     private final String nickname;
-    private int points;
     private PlayerBoard board;
-    private Token token;
+    private int points;
+    private TokenColors token;
 
-    private void setPoints(int points){
-        this.points = points;
-    }
-
-    public void getPoints(){
-        return this.points;
-    }
-
-    Player(String nickname, Token token, SidedCard cards ){
+    Player(String nickname, TokenColors token, PlayableCard[] hand, PlayableCard starterCard ){
         this.nickname = nickname;
+        this.board = new PlayerBoard(hand, starterCard);
+        this.points = 0;
+    }
+
+    public String getNickname(){
+        return this.nickname;
+    }
+
+    public TokenColors getToken(){
+        return this.token;
+    }
+
+    void setToken(TokenColors token){
         this.token = token;
-        this.board= new PlayerBoard(cards);
     }
 
-    // these are to be used from client, they fit more in the controller me thinks
-    private DrawingSource chooseDrawingSource(int source){
-        return DrawingSource.values()[source];
+    void setObjectiveCard(ObjectiveCard card){
+        board.setObjectiveCard(card);
     }
 
-    private DeckType chooseDrawingDeck(int deck){
-        return DeckType.values()[deck];
-    }
-
-
-    //IDEA game init: queste potremmo implementarle come interfacce che vanno realizzate dal controllore
-    private TokenColors choseToken(Tokens remainingTokens, int choice){
-        return remainingTokens
-    }
-
-    private ObjectiveCard chooseObjectiveCards(ObjectiveCard cards[], int choice){
-        return cards[choice];
-    }
-
-
-
-    // interfacce limitate per il player in modo tale da trovare tutto qui.
-
-    private void drawCard(SidedCard card){
+    private void drawCard(PlayableCard card){
         board.drawCard(card);
     }
 
-    private void placeCard(PlayedCard card, CardSides side, Corner corner){
-        board.placeCard(card, side, corner);
+    private void placeCard(PlayableCard card, CardSidesTypes side, Position position){
+        board.placeCard(card, side, position);
+        this.points += board.evaluate(card);
     }
 
-
+    private void evaluate(ObjectiveCard objectiveCard){
+        this.points += board.evaluate(objectiveCard);
+    }
 
 
 }
