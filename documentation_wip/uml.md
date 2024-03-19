@@ -21,10 +21,9 @@
 
 ### Cards
 ```mermaid
-
 classDiagram
 
-class ResourceTypes {
+class ResourceType {
     <<Enumeration>>
     PLANT_KINGDOM
     ANIMAL_KINGDOM
@@ -35,7 +34,7 @@ class ResourceTypes {
     has(Object value) boolean
 }
 
-class ObjectTypes{
+class ObjectType {
     <<Enumeration>>
     QUILL
     INKWELL
@@ -45,7 +44,7 @@ class ObjectTypes{
     has(Object value) boolean
 }
 
-class CardSidesTypes{
+class CardSideType {
     <<Enumeration>>
     FRONT
     BACK
@@ -58,52 +57,13 @@ class CornerEnum {
     UP_RIGHT
     DOWN_RIGHT
 }
+CornerEnum <-- Corner : uses 
 
 class Card {
     %% potrebbe essere un'interfaccia
     <<Abstract>>
     evaluate(PlayerBoard playerBoard) int
     %%+createCard() void
-}
-
-class PlayedCard{
-    playedSide: CardSidesTypes
-    card: SidedCard
-
-    PlayedCard(CardSidesTypes side, SidedCard playedCard)
-    getPlayedSide() CardSide
-    getAvailableCorners() CornerEnum[0..4]
-    
-}
-class SidedCard {
-    <<Abstract>>
-    sides: HashMap~CardSidesTypes; CardSide~
-    %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
-    SidedCard(CardSide front, CardSideBack back)    
-    evaluate(PlayerBoard playerBoard) int
-
-}
-
-class CardSide {
-    corners: HashMap~CornerEnum; Corner~ 
-
-    CardSide()
-
-    setCorner(CornerEnum position, Corner corner);
-    %% adds a corner to the hashmap (so to the card side)
-    
-    getResources() HashMap~ResourceTypes; int~
-    getObjects() HashMap~Objects; int~ 
-}
-
-class CardBackSide {
-    permanentResources: ResourceTypes[1..3]
-    
-    CardBackSide(ResourceTypes permanentResources[1..3])
-    %%calls super and then instancies permanent resources
-    
-    getResources() HashMap~ResourceType; int~
-    %% overrides super returning also permanent resources
 }
 
 class Corner~T~{
@@ -119,57 +79,11 @@ class Corner~T~{
     cover() void
 }
 
-
-class ResourceCard{
-    points: Optional~int~
-    
-    ResourceCard(SidedCard card, int points)
-    ResourceCard(SidedCard card)
-
-    evaluate(PlayerBoard playerBoard) int
-}
-
-class GoldCard{
-    int points; 
-    conditionalSet: ResourceTypes[1..5]
-    pointCondition: optional~PointConditionTypes~
-    conditionalObject optional~ObjectTypes~
-    
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition, ObjectTypes conditionalObject)
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition)
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet)
-
-    %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
-
-    evaluate(PlayerBoard playerBoard) int
-    isPlaceable(HashMap~ResourceTypes; int~ resources) bool
-
-
-    %% similar to the resource card but does not extend it because points here are mandatory
-}
-
-class PointConditionTypes{
+class PointConditionType {
     <<Enumeration>>
     OBJECTS
     CORNERS
 }
-
-class StarterCard{
-    %%FIXME: trovare il modo di indicare che può avere solo risorse negli angoli
-    %%perchè così è inutile come classe.
-    
-    starterCard(SidedCard card)
-    %% solo risorse niente oggetti negli angoli ma con
-    firstPlayerToken: bool
-    setFirstPlayerToken(bool) void 
-    %%OVERRIDE
-    cardSide(Corner~ResourceTypes~ corners[]) 
-    %% useful for the GUI
-    
-}
-
 
 class ObjectiveCard{
     points: final int
@@ -188,48 +102,104 @@ class Objective{
     %% returns
     %% lo realizzeremo dentro evaluate count: int
 }
-
-class GeometricObjective{
-    geometry: ResourceTypes[3][3]
-    GeometricObjective(ResourceTypes[3][3] geometry)
-    evaluate(PlayerBoard playerBoard) int
-}
-
-class CountingObjective{
-    resources: HashMap~ResourceTypes; int~
-    objects: HashMap~Objects; int~
-    
-    CountingObjective(HashMap~ResourceTypes; int~ resources, HashMap~ObjectsTypes; int~ objects)
-    
-    evaluate(PlayerBoard playerBoard) int
-}
-
-PlayedCard <-- CardSidesTypes : uses
-PlayedCard *-- SidedCard: is composed of 
-GoldCard <-- PointConditionTypes : uses
-CornerEnum <-- Corner : uses 
-CardSide "1"<|--"1" CardBackSide : inherits from
-CornerEnum <-- CardSide : uses 
-Card <|.. SidedCard : Inherits from
-CardSide "1"*-- "4" Corner: is composed of
-SidedCard "1" *-- "2" CardSide : is composed of 
-SidedCard  <|.. ResourceCard : realization 
-SidedCard <|.. StarterCard: realization
+ObjectiveCard *-- Objective : is composed of
 Card <|.. ObjectiveCard: realization 
 
-SidedCard <|.. GoldCard : realization
-ObjectiveCard *-- Objective : is composed of
+class GeometricObjective{
+    geometry: ResourceType[3][3]
+    GeometricObjective(ResourceType[3][3] geometry)
+    evaluate(PlayerBoard playerBoard) int
+}
 Objective <|.. GeometricObjective : realization
+
+class CountingObjective{
+    resources: HashMap~ResourceType; int~
+    objects: HashMap~Objects; int~
+    
+    CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectsType; int~ objects)
+    
+    evaluate(PlayerBoard playerBoard) int
+}
 Objective <|.. CountingObjective : realization
 
-%% ResourceTypes <-- CardSide : uses
-%% ResourceTypes <-- CardBackSide : uses
-%% ResourceTypes <-- Corner : uses
-%% ResourceTypes <-- GoldCard : uses
-%% ResourceTypes <-- StarterCard : uses
-%% ResourceTypes <-- GeometricObjective : uses
-%% ResourceTypes <-- GeometricObjective : uses
-%% ResourceTypes <-- CountingObjective : uses
+class PlayableCard {
+    frontSide: PlayableFrontSide
+    backSide: PlayableBackSide
+    playedSide: CardSideType[0..1]
+    coveredCorners: int
+
+    PlayableCard(PlayableSide front, PlayableSide back)
+
+    %% TODO getKingDom
+    getPlayedSide() PlayableSide
+    setPlayedSide(CardSideType sideType) void
+    getCoveredCorners() int
+    setCoveredCorners(int n) void
+    %% TODO
+    evaluate()
+}
+Card <|.. PlayableCard: realization
+
+class PlayableSide {
+    <<Abstract>>
+    corners: Corner[1..4]
+
+    PlayableSide(Corner[1..4] corners)
+
+    getCorners() Corner[1..4]
+    %% TODO abstract
+    evalutate()* 
+}
+
+class PlayableBackSide {
+    permanentResources: ResourceType[1..3]
+
+    PlayableBackSide(ResourceType[1..3] permanentResources)
+
+    getResources() ResourceType[1..3]
+    %% TODO
+    evaluate()
+}
+PlayableSide <|.. PlayableBackSide: realization
+PlayableCard "1" *-- "1"  PlayableBackSide: composition
+
+class PlayableFrontSide {
+    <<Abstract>>
+}
+PlayableSide <-- PlayableFrontSide: inheritance
+PlayableCard "1" *-- "1" PlayableFrontSide: composition
+
+class StarterCardFrontSide {
+    StarterCardFrontSide()
+
+    %% TODO
+    evaluate()
+}
+PlayableFrontSide <|.. StarterCardFrontSide: realization
+
+class ResourceCardFrontSide {
+    %% TODO Should it be optional, or should it just be 0 when absent?
+    points: int[0..1]
+
+    ResourceCard(int points)
+
+    %% TODO
+    evaluate()
+}
+PlayableFrontSide <|.. ResourceCardFrontSide: realization
+
+class GoldCardFrontSide {
+    placementCondition: ResourceType[1..5]
+    pointCondition: PointConditionType[0..1]
+    pointConditionObject: ObjectType[0..1]
+
+    GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+
+    %% TODO
+    evaluate()
+}
+ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
+
 ```
 
 ### Game model
