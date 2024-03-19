@@ -336,7 +336,6 @@ class Player {
     %% receive  card and put it in the player's hand
 
     +chooseObjective(ObjectiveCard[2] availableObjectives) ObjectiveCard
-    DrawingDeckTypes
 
     +chooseToken()
 
