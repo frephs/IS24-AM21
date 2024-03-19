@@ -21,10 +21,9 @@
 
 ### Cards
 ```mermaid
-
 classDiagram
 
-class ResourcesTypes {
+class ResourceType {
     <<Enumeration>>
     PLANT_KINGDOM
     ANIMAL_KINGDOM
@@ -32,32 +31,26 @@ class ResourcesTypes {
     INSECT_KINGDOM
 
     +toString() String
+    +has(Object value) boolean
 }
 
-class ObjectTypes{
+class ObjectType {
     <<Enumeration>>
     QUILL
     INKWELL
     MANUSCRIPT
 
     +toString() String
+    +has(Object value) boolean
 }
 
-class CornerContentTypes{
-    <<Enumeration>>
-    RESOURCE
-    OBJECT
-    +toString() String
-
-}
-
-class CardSidesTypes{
+class CardSideType {
     <<Enumeration>>
     FRONT
     BACK
 }
 
-class CornerEnum {
+class CornerPosition {
     <<Enumeration>>
     UP_LEFT
     DOWN_LEFT
@@ -66,163 +59,156 @@ class CornerEnum {
 }
 
 class Card {
-    %% potrebbe essere un'interfaccia
     <<Abstract>>
-    %%+createCard() void
+    -id: int
+
+    +Card(int id)
+
+    +getId() int
+    +evaluate(PlayerBoard playerBoard) int*
 }
 
-class PlayedCard{
-    playedSide: CardSidesTypes
-    card: SidedCard
-
-    PlayedCard(CardSidesTypes side, SidedCard playedCard)
-    getPlayedSide() CardSide
-    getAvailableCorners() CornerEnum[0..4]
-    
-}
-class SidedCard {
-    sides: Hashmap~CardSidesTypes, CardSide~ (*)
-    %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
-    SidedCard(CardSide front, CardSideBack back)    
-}
-
-class CardSide {
-    corners: HashMap~CornerEnum, Corner~ 
-
-    CardSide()
-
-    setCorner(CornerEnum position, Corner corner);
-    %% adds a corner to the hashmap (so to the card side)
-    
-    getResources() hashmap~ResourceTypes, int~
-    getObjects() hashmap~Objects, int~ 
-}
-
-class CardBackSide {
-    permanentResources: ResourceTypes[1..3]
-    
-    CardBackSide(ResourceTypes permanentResources[1..3])
-    %%calls super and then instancies permanent resources
-    
-    getResources() hashmap~ResourceType, int~
-    %% overrides super returning also permanent resources
-}
-
-class Corner~T~{
-    contentType: Optional~CornerContentTypes~
+class Corner~T~ {
     %%set in the constructor
-    content: Optional~T~
+    -content: Optional~T~
+    -isCovered: bool
     
-    Corner(T content)
-    
-    isCovered: bool
-    isEmpty() bool
+    +Corner()
+    +Corner(T content)
+
+    +isEmpty() bool
+    +getContent() Optional~T~
+    +cover() void
 }
+PlayableSide "1" *-- "1..4" Corner: composition
 
-
-class ResourceCard{
-    points: Optional~int~
-    
-    ResourceCard(SidedCard card, int points)
-    ResourceCard(SidedCard card)
-
-    evaluate()
-}
-
-class GoldCard{
-    int points; 
-    conditionalSet: ResourceTypes[1..5]
-    pointCondition: optional~PointConditionTypes~
-    conditionalObject optional~ObjectTypes~
-    
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition, ObjectTypes conditionalObject)
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition)
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet)
-
-    %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
-
-    evaluate()
-    isPlaceable(Hashmap~ResourceTypes,int~ resources) bool
-
-
-    %% similar to the resource card but does not extend it because points here are mandatory
-}
-
-class PointConditionTypes{
+class PointConditionType {
     <<Enumeration>>
     OBJECTS
     CORNERS
 }
 
-class StarterCard{
-    %%FIXME: trovare il modo di indicare che può avere solo risorse negli angoli
-    %%perchè così è inutile come classe.
-    
-    starterCard(SidedCard card)
-    %% solo risorse niente oggetti negli angoli ma con
-    firstPlayerToken: bool
-    setFirstPlayerToken(bool) void 
-    %%OVERRIDE
-    cardSide(Corner~ResourceTypes~ corners[]) 
-    %% useful for the GUI
-    
-}
+class ObjectiveCard {
+    -points: int
+    -objective: Objective
 
+    +ObjectiveCard(int id, int points, Objective objective)
 
-class ObjectiveCard{
-    points: final int
-    objective: Objective
-
-    ObjectiveCard(Objective objective)
-    evaluate() int
+    +evaluate(PlayerBoard playerBoard) int
     %% return points * objective.evaluate()
-    
 }
 
-class Objective{
-    <<abstract class>>
-    %% how many times the objective has to be satisfied
-    evaluate() int
-    %% returns
+class Objective {
+    <<Abstract>>
+    +evaluate(PlayerBoard playerBoard) int*
     %% lo realizzeremo dentro evaluate count: int
 }
+ObjectiveCard "1" *-- "1" Objective: composition
+Card <|.. ObjectiveCard: realization 
 
-class GeometricObjective{
-    geometry: ResourceTypes[3][3]
-    evaluate() int
-    GeometricObjective(ResourceTypes[3][3] geometry)
+class GeometricObjective {
+    -geometry: ResourceType[3][3]
+
+    +GeometricObjective(ResourceType[3][3] geometry)
+
+    +evaluate(PlayerBoard playerBoard) int
 }
-
-class CountingObjective{
-    resources: HashMap~ResourceTypes, int~
-    objects: HashMap~Objects, int~
-    
-    CountingObjective(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects)
-    
-    evaluate(HashMap~ResourceTypes,int~ resources, HashMap~ObjectsTypes,int~ objects) int
-}
-
-PlayedCard <-- CardSidesTypes : uses
-PlayedCard *-- SidedCard: is composed of 
-GoldCard <-- PointConditionTypes : uses
-CornerEnum <-- Corner : uses 
-CardSide "1"<|--"1" CardBackSide : inherits from
-CornerEnum <-- CardSide : uses 
-Card <|-- SidedCard : Inherits from
-CardSide "1"*-- "4" Corner: is composed of
-SidedCard "1" *-- "2" CardSide : is composed of 
-SidedCard  <|-- ResourceCard : inherits from 
-SidedCard <|-- StarterCard: inherits from 
-Card <|-- ObjectiveCard: inherits from 
-
-SidedCard <|-- GoldCard : inherits from
-ObjectiveCard *-- Objective : is composed of
 Objective <|.. GeometricObjective : realization
+%% ResourceType "3..n" <-- "n" GeometricObjective: dependency
+
+
+class CountingObjective {
+    -resources: HashMap~ResourceType; int~
+    -objects: HashMap~ObjectType; int~
+    
+    +CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
+    
+    +evaluate(PlayerBoard playerBoard) int
+}
 Objective <|.. CountingObjective : realization
+%% ResourceType "0..4" <-- "n" CountingObjective: dependency
+%% ObjectType "0..3" <-- "n" CountingObjective: dependency
 
+class PlayableCard {
+    -frontSide: PlayableFrontSide
+    -backSide: PlayableBackSide
+    -playedSide: CardSideType[0..1]
+    -coveredCorners: int
+    -kingdom: ResourceType[0..1]
 
+    +PlayableCard(int id, PlayableSide front, PlayableSide back)
+    +PlayableCard(int id, PlayableSide front, PlayableSide back, ResourceType kingdom)
+
+    +getKingdom() ResourceType[0..1]
+    +getPlayedSide() PlayableSide
+    +setPlayedSide(CardSideType sideType) void
+    +getCoveredCorners() int
+    +setCoveredCorners(int n) void
+    +evaluate(PlayerBoard playerBoard) int
+}
+Card <|.. PlayableCard: realization
+%% CardSideType "0..1" <-- "n" PlayableCard: dependency
+
+class PlayableSide {
+    <<Abstract>>
+    -corners: Corner[1..4]
+
+    +getCorners() Corner[1..4]
+    +setCorner(CornerPosition position, ResourceType resource)
+    +setCorner(CornerPosition position, ObjectType object)
+    +evaluate(PlayerBoard playerBoard) int*
+}
+%% CornerPosition "1..4" <-- "n" PlayableSide: dependency
+%% ResourceType "0..4" <-- "n" PlayableSide: dependency
+%% ObjectType "0..4" <-- "n" PlayableSide: dependency
+
+class PlayableBackSide {
+    -permanentResources: ResourceType[1..3]
+
+    +PlayableBackSide(ResourceType[1..3] permanentResources)
+
+    +getResources() ResourceType[1..3]
+    +evaluate(PlayerBoard playerBoard) int
+}
+PlayableSide <|.. PlayableBackSide: realization
+PlayableCard "1" *-- "1"  PlayableBackSide: composition
+%% ResourceType "1..3" <-- "n" PlayableBackSide: dependency
+
+class PlayableFrontSide {
+    <<Abstract>>
+}
+PlayableSide <-- PlayableFrontSide: inheritance
+PlayableCard "1" *-- "1" PlayableFrontSide: composition
+
+class StarterCardFrontSide {
+    +StarterCardFrontSide()
+
+    +evaluate(PlayerBoard playerBoard) int
+}
+PlayableFrontSide <|.. StarterCardFrontSide: realization
+
+class ResourceCardFrontSide {
+    -points: int
+
+    +ResourceCard(int points)
+
+    +evaluate(PlayerBoard playerBoard) int
+}
+PlayableFrontSide <|.. ResourceCardFrontSide: realization
+
+class GoldCardFrontSide {
+    -placementCondition: ResourceType[1..5]
+    -pointCondition: PointConditionType[0..1]
+    -pointConditionObject: ObjectType[0..1]
+
+    +GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+
+    +evaluate(PlayerBoard playerBoard) int
+}
+ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
+%% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
+%% PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
+%% ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
 ```
 
 ### Game model
@@ -393,8 +379,8 @@ class CommonBoard{
 
 %% is This redundant?
 class ScoreBoard {
-    scores: Hasmap~String,int~
-    %%HashMap~TokenColors, int~ redundant???
+    scores: Hasmap~String; int~
+    %%HashMap~TokenColors; int~ redundant???
 }
 
 class PlayerBoard {
@@ -402,11 +388,11 @@ class PlayerBoard {
     objectiveCards: ObjectiveCard
     %% the geometry is an hasmap of positions and played cards
 
-    playedCards: HashMap~Position, PlayedCard~
+    playedCards: HashMap~Position; PlayedCard~
     AvailableSpots: List~Position~
     
-    resources: HashMap~ResourceType, int~
-    objects: HashMap~Objects, int~
+    resources: HashMap~ResourceType; int~
+    objects: HashMap~Objects; int~
 
     PlayerBoard(SidedCard[3] cards, ObjectiveCard objectiveCard, startCard)
     
