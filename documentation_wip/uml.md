@@ -143,33 +143,10 @@ class PointConditionType {
     isEmpty() bool
 }
 
-
-class ResourceCard{
-    points: Optional~int~
-
-    ResourceCard(SidedCard card, int points)
-    ResourceCard(SidedCard card)
-
-    evaluate()
-}
-
 class PointConditionTypes{
     <<Enumeration>>
     OBJECTS
     CORNERS
-}
-
-class StarterCard{
-    %%FIXME: trovare il modo di indicare che può avere solo risorse negli angoli
-    %%perchè così è inutile come classe.
-    starterCard(SidedCard card)
-    %% solo risorse niente oggetti negli angoli ma con
-    firstPlayerToken: bool
-    setFirstPlayerToken(bool) void
-    %%OVERRIDE
-    cardSide(Corner~ResourceTypes~ corners[])
-    %% useful for the GUI
-
 }
 
 
@@ -428,24 +405,24 @@ class Position{
 class GameBoard {
     -goldDeck : Deck~PlayableCard~
     -goldCards: CardPair~PlayableCard~
-    -starterDeck: Deck~StarterCard~
+    -starterDeck: Deck~PlayableCard~
     -objectiveDeck: Deck~ObjectiveCard~
-    -resourceDeck: Deck~ResourceCard~
-    -resourceCards: CardPair~ResourceCard~
+    -resourceDeck: Deck~PlayableCard~
+    -resourceCards: CardPair~PlayableCard~
     -objectiveCards: CardPair~ObjectiveCard~
     
     %% the game board has two constructors, one with parameters and one without
     %% the constructor with parameters is used to restore a game from a save file
-    GameBoard(CardPair~Goldcards~ goldCards, CardPair~ResourceCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~StarterCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~ResourceCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
+    GameBoard(CardPair~Goldcards~ goldCards, CardPair~PlayableCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~PlayableCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~PlayableCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
     %% the constructor without parameters is used to create a new game
-    GameBoard(List~PlayableCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
+    GameBoard(List~PlayableCard~ goldCardsList,\n \nList~PlayableCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~PlayableCard~ resourceCardsList)
 
     drawGoldCardFromDeck() PlayableCard ~~throws~~ EmptyDeckException
     drawGoldCardFromPair(boolean first) PlayableCard ~~throws~~ EmptyDeckException
     getGoldCards() CardPair~PlayableCard~
     getGoldCardsLeft() int
 
-    drawStarterCard() StarterCard ~~throws~~ EmptyDeckException
+    drawStarterCard() PlayableCard ~~throws~~ EmptyDeckException
     getStarterCardsLeft() int
     
     drawObjectiveCardFromDeck() ObjectiveCard ~~throws~~ EmptyDeckException
@@ -453,9 +430,9 @@ class GameBoard {
     getObjectiveCards() CardPair~ObjectiveCard~
     getObjectiveCardsLeft() int
 
-    drawResourceCardFromDeck() ResourceCard ~~throws~~ EmptyDeckException
-    drawResourceCardFromPair(boolean first) ResourceCard ~~throws~~ EmptyDeckException
-    getResourceCards() CardPair~ResourceCard~
+    drawResourceCardFromDeck() PlayableCard ~~throws~~ EmptyDeckException
+    drawResourceCardFromPair(boolean first) PlayableCard ~~throws~~ EmptyDeckException
+    getResourceCards() CardPair~PlayableCard~
     getResourceCardsLeft() int
 
     
