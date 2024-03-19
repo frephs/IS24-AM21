@@ -62,14 +62,12 @@ class CornerPosition {
 }
 
 class Card {
-    %% potrebbe essere un'interfaccia
     <<Abstract>>
-    -frontImagePath: String
-    -backImagePath: String
+    -id: int
 
-    +Card(String frontImagePath, String backImagePath)
+    +Card(int id)
 
-    +getImagePath(CardSideType side) String
+    +getId() int
     +evaluate(PlayerBoard playerBoard) int*
 }
 
