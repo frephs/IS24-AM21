@@ -69,55 +69,6 @@ class Card {
 
     +getId() int
     +evaluate(PlayerBoard playerBoard) int*
-    %%+createCard() void
-}
-
-class CardPair~T~ {
-    -first: T
-    -second: T
-    CardPair(T first, T second)
-    +getFirst() T
-    +getSecond() T
-    +replaceFirst(T) T
-    +replaceSecond(T) T
-    +swap() void
-}
-
-class PlayedCard{
-    playedSide: CardSidesTypes
-    card: SidedCard
-
-    PlayedCard(CardSidesTypes side, SidedCard playedCard)
-    getPlayedSide() CardSide
-    getAvailableCorners() CornerEnum[0..4]
-
-}
-class SidedCard {
-    sides: Hashmap~CardSidesTypes, CardSide~ (*)
-    %% cardSide[BACK] will be instanced as CardBackSide obv. as reported below
-    SidedCard(CardSide front, CardSideBack back)
-}
-
-class CardSide {
-    corners: HashMap~CornerEnum, Corner~
-
-    CardSide()
-
-    setCorner(CornerEnum position, Corner corner);
-    %% adds a corner to the hashmap (so to the card side)
-
-    getResources() hashmap~ResourceTypes, int~
-    getObjects() hashmap~Objects, int~
-}
-
-class CardBackSide {
-    permanentResources: ResourceTypes[1..3]
-
-    CardBackSide(ResourceTypes permanentResources[1..3])
-    %%calls super and then instancies permanent resources
-
-    getResources() hashmap~ResourceType, int~
-    %% overrides super returning also permanent resources
 }
 
 class Corner~T~ {
@@ -135,24 +86,14 @@ class Corner~T~ {
 PlayableSide "1" *-- "1..4" Corner: composition
 
 class PointConditionType {
-    content: Optional~T~
-
-    Corner(T content)
-
-    isCovered: bool
-    isEmpty() bool
-}
-
-class PointConditionTypes{
     <<Enumeration>>
     OBJECTS
     CORNERS
 }
 
-
-class ObjectiveCard{
-    points: final int
-    objective: Objective
+class ObjectiveCard {
+    -points: int
+    -objective: Objective
 
     +ObjectiveCard(int id, int points, Objective objective)
 
@@ -263,7 +204,7 @@ class GoldCardFrontSide {
     -pointCondition: PointConditionType[0..1]
     -pointConditionObject: ObjectType[0..1]
 
-    +GoldCardFrontSide(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+    +GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
 
     +evaluate(PlayerBoard playerBoard) int
 }
