@@ -72,14 +72,14 @@ class Card {
     %%+createCard() void
 }
 
-class CardPair {
-    -first: Card
-    -second: Card
-    CardPair(Card first, Card second)
-    +getFirst() Card
-    +getSecond() Card
-    +setFirst(Card) Card
-    +setSecond(Card) Card
+class CardPair~T~ {
+    -first: T
+    -second: T
+    CardPair(T first, T second)
+    +getFirst() T
+    +getSecond() T
+    +replaceFirst(T) T
+    +replaceSecond(T) T
     +swap() void
 }
 
@@ -462,23 +462,23 @@ class GameBoard {
     %% the constructor without parameters is used to create a new game
     GameBoard(List~GoldCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
 
-    drawGoldCardFromDeck(): GoldCard
-    drawGoldCard(boolean): GoldCard
-    getGoldCards(): CardPair~GoldCard~
-    goldCardsLeft(): int
+    drawGoldCardFromDeck() GoldCard
+    drawGoldCardFromPair(boolean) GoldCard
+    getGoldCards() CardPair~GoldCard~
+    goldCardsLeft() int
 
-    drawStarterCard(): StarterCard
-    starterCardsLeft(): int
+    drawStarterCard() StarterCard
+    starterCardsLeft() int
     
-    drawObjectiveCardFromDeck(): ObjectiveCard
-    drawObjectiveCard(boolean): ObjectiveCard
-    getObjectiveCards(): CardPair~ObjectiveCard~
-    objectiveCardsLeft(): int
+    drawObjectiveCardFromDeck() ObjectiveCard
+    drawObjectiveCardFromPair(boolean) ObjectiveCard
+    getObjectiveCards() CardPair~ObjectiveCard~
+    objectiveCardsLeft() int
 
-    drawResourceCardFromDeck(): ResourceCard
-    drawResourceCard(boolean): ResourceCard
-    getResourceCards(): CardPair~ResourceCard~
-    resourceCardsLeft(): int
+    drawResourceCardFromDeck() ResourceCard
+    drawResourceCardFromPair(boolean) ResourceCard
+    getResourceCards() CardPair~ResourceCard~
+    resourceCardsLeft() int
 
     
 }

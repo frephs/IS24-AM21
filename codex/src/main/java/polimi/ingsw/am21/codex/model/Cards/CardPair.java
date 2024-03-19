@@ -17,13 +17,13 @@ public class CardPair<T extends Card> {
         return this.second;
     }
 
-    public T setFirst(T firstCard){
+    public T replaceFirst(T firstCard){
         T toRet = this.first;
         this.first = firstCard;
         return toRet;
     }
 
-    public T setSecond(T secondCard){
+    public T replaceSecond(T secondCard){
         T toRet = this.second;
         this.second = secondCard;
         return toRet;

@@ -76,11 +76,11 @@ public class GameBoard {
      * @return the gold card drawn
      * @throws EmptyDeckException there are no gold cards left in the deck
      */
-    public GoldCard drawGoldCard(Boolean first) throws EmptyDeckException {
+    public GoldCard drawGoldCardFromPair(Boolean first) throws EmptyDeckException {
         if (first) {
-            return this.goldCards.setFirst(this.drawGoldCardFromDeck());
+            return this.goldCards.replaceFirst(this.drawGoldCardFromDeck());
         } else {
-            return this.goldCards.setSecond(this.drawGoldCardFromDeck());
+            return this.goldCards.replaceSecond(this.drawGoldCardFromDeck());
         }
     }
 
@@ -104,7 +104,7 @@ public class GameBoard {
      * @return the starterDeck
      * @throws EmptyDeckException there are no objective cards left in the deck
      */
-    public StarterCard drawStarterCard() throws EmptyDeckException {
+    public StarterCard drawStarterCardFromDeck() throws EmptyDeckException {
         return this.starterDeck.draw();
     }
 
@@ -125,21 +125,6 @@ public class GameBoard {
      */
     public ObjectiveCard drawObjectiveCardFromDeck() throws EmptyDeckException {
         return this.objectiveDeck.draw();
-    }
-
-    /**
-     * Draws the first or the second objective card from the game board and replaces it with a new one from the deck
-     *
-     * @param first if true, the first card is drawn, otherwise the second
-     * @return the objective card drawn
-     * @throws EmptyDeckException there are no objective cards left in the deck
-     */
-    public ObjectiveCard drawObjectiveCard(Boolean first) throws EmptyDeckException {
-        if (first) {
-            return this.objectiveCards.setFirst(this.drawObjectiveCardFromDeck());
-        } else {
-            return this.objectiveCards.setSecond(this.drawObjectiveCardFromDeck());
-        }
     }
 
     /**
@@ -192,11 +177,11 @@ public class GameBoard {
      * @param first if true, the first card is drawn, otherwise the second
      * @return the resource card drawn
      */
-    public ResourceCard drawResourceCard(Boolean first) throws EmptyDeckException {
+    public ResourceCard drawResourceCardFromPair(Boolean first) throws EmptyDeckException {
         if (first) {
-            return this.resourceCards.setFirst(this.drawResourceCardFromDeck());
+            return this.resourceCards.replaceFirst(this.drawResourceCardFromDeck());
         } else {
-            return this.resourceCards.setSecond(this.drawResourceCardFromDeck());
+            return this.resourceCards.replaceSecond(this.drawResourceCardFromDeck());
         }
     }
 
