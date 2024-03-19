@@ -23,9 +23,6 @@
 ```mermaid
 classDiagram
 
-%% TODOs
-%% - revise constructors
-
 class ResourceType {
     <<Enumeration>>
     PLANT_KINGDOM
@@ -76,8 +73,8 @@ class Corner~T~ {
     -content: Optional~T~
     -isCovered: bool
     
-    +Corner(T content)
     +Corner()
+    +Corner(T content)
 
     +isEmpty() bool
     +getContent() Optional~T~
@@ -91,17 +88,17 @@ class PointConditionType {
     CORNERS
 }
 
-class ObjectiveCard{
+class ObjectiveCard {
     -points: int
     -objective: Objective
 
-    +ObjectiveCard(Objective objective)
+    +ObjectiveCard(int id, int points, Objective objective)
 
     +evaluate(PlayerBoard playerBoard) int
     %% return points * objective.evaluate()
 }
 
-class Objective{
+class Objective {
     <<Abstract>>
     %% how many times the objective has to be satisfied
     +evaluate(PlayerBoard playerBoard) int*
@@ -111,7 +108,7 @@ class Objective{
 ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization 
 
-class GeometricObjective{
+class GeometricObjective {
     -geometry: ResourceType[3][3]
 
     +GeometricObjective(ResourceType[3][3] geometry)
@@ -122,7 +119,7 @@ Objective <|.. GeometricObjective : realization
 %% ResourceType "3..n" <-- "n" GeometricObjective: dependency
 
 
-class CountingObjective{
+class CountingObjective {
     -resources: HashMap~ResourceType; int~
     -objects: HashMap~ObjectType; int~
     
@@ -140,7 +137,7 @@ class PlayableCard {
     -playedSide: CardSideType[0..1]
     -coveredCorners: int
 
-    +PlayableCard(PlayableSide front, PlayableSide back)
+    +PlayableCard(int id, PlayableSide front, PlayableSide back)
 
     %% TODO getKingDom
     +getPlayedSide() PlayableSide
@@ -155,8 +152,6 @@ Card <|.. PlayableCard: realization
 class PlayableSide {
     <<Abstract>>
     -corners: Corner[1..4]
-
-    +PlayableSide()
 
     +getCorners() Corner[1..4]
     +setCorner(CornerPosition position, ResourceType resource)
@@ -193,8 +188,7 @@ class StarterCardFrontSide {
 PlayableFrontSide <|.. StarterCardFrontSide: realization
 
 class ResourceCardFrontSide {
-    %% TODO Should it be optional, or should it just be 0 when absent?
-    -points: int[0..1]
+    -points: int
 
     +ResourceCard(int points)
 
