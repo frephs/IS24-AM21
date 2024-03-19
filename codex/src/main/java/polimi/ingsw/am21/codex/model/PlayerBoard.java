@@ -32,6 +32,10 @@ public class PlayerBoard {
         this.objectiveCard = objectiveCard;
     }
 
+    public ObjectiveCard getObjectiveCard() {
+        return objectiveCard;
+    }
+
     void drawCard(PlayableCard card){
         cards.add(card);
     }
