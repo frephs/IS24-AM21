@@ -183,7 +183,7 @@ class PlayableBackSide {
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
-ResourceType "1..3" <-- "n" PlayableSide: dependency
+ResourceType "1..3" <-- "n" PlayableBackSide: dependency
 
 class PlayableFrontSide {
     <<Abstract>>
