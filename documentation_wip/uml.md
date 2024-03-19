@@ -437,7 +437,7 @@ class CommonBoard{
 
 %% is This redundant?
 class ScoreBoard {
-    scores: Hashmap~String,int~
+    scores: HashMap~String,int~
     %%HashMap~TokenColor, int~ redundant???
 }
 
