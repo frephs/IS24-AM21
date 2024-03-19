@@ -26,7 +26,6 @@ classDiagram
 %% TODOs
 %% - evaluate on cards
 %% - revise constructors
-%% - handle card image
 
 class ResourceType {
     <<Enumeration>>
@@ -66,8 +65,13 @@ class CornerPosition {
 class Card {
     %% potrebbe essere un'interfaccia
     <<Abstract>>
+    -frontImagePath: String
+    -backImagePath: String
+
+    +Card(String frontImagePath, String backImagePath)
+
+    +getImagePath(CardSideType side) String
     +evaluate(PlayerBoard playerBoard) int
-    %%+createCard() void
 }
 
 class Corner~T~ {
