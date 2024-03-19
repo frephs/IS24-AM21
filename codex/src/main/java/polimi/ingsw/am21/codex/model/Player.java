@@ -36,11 +36,11 @@ public class Player {
 
     private void placeCard(PlayableCard card, CardSidesTypes side, Position position){
         board.placeCard(card, side, position);
-        this.points += board.evaluate(card);
+        this.points += card.evaluate(board);
     }
 
     private void evaluate(ObjectiveCard objectiveCard){
-        this.points += board.evaluate(objectiveCard);
+        this.points += objectiveCard.evaluate(board);
     }
 
 
