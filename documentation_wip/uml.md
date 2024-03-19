@@ -193,7 +193,7 @@ PlayableFrontSide <|.. StarterCardFrontSide: realization
 class ResourceCardFrontSide {
     -points: int
 
-    +ResourceCard(int points)
+    +ResourceCardFrontSide(int points)
 
     +evaluate(PlayerBoard playerBoard) int
 }
@@ -204,7 +204,7 @@ class GoldCardFrontSide {
     -pointCondition: PointConditionType[0..1]
     -pointConditionObject: ObjectType[0..1]
 
-    +GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+    +GoldCardFrontSide(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
 
     +evaluate(PlayerBoard playerBoard) int
 }
