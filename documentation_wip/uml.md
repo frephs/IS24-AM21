@@ -323,7 +323,6 @@ class Player {
 
     getPoints() int
     setPoints(int) void
-    %% points are abviously private
 
     +drawCard(PlayableCard card) void
     %% receive card and put it in the player's hand
@@ -341,9 +340,9 @@ class PlayerBoard {
     objectiveCard: ObjectiveCard
     
     playedCards: HashMap~Position, PlayableCard~
-    %% the geometry is an hasmap of positions and played cards
+    %% the geometry is an hashmap of positions and played cards
     
-    AvailableSpots: Set~Position~
+    availableSpots: Set~Position~
     %% the available spots for the player to place a card on the board
 
     resources: HashMap~ResourceType, int~
@@ -451,7 +450,6 @@ GameBoard "1"*--"1" CommonBoard : is composed of
 Game "1"*--"1" ScoreBoard : is composed of
 
 PlayerBoard <-- Position : uses
-Player --|> Iterable : implements
 Player --* PlayerBoard: composed of
 
 Player <-- DrawingSourceType : uses
