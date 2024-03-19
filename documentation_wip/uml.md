@@ -310,13 +310,13 @@ class PlayerState{
 
 
 class Deck~T~ {
-    cards: List~Card~
+    cards: List~T~
     %% Una pila forse
-    Deck(Card[n])
+    Deck(List~T~ cards)
     shuffle() void
-    draw() Card
-    draw(int) Card[*]
-    cardsLeft() int
+    draw() T <<throw>> EmptyDeckException
+    draw(int N) List~T~ <<throw>> EmptyDeckException
+    getCardsLeft() int
     %% insert card back after card drawing. (ie when you don't choose an objective)
     insert(T card) void
 }
@@ -379,12 +379,12 @@ class GameBoard {
     
     %% the game board has two constructors, one with parameters and one without
     %% the constructor with parameters is used to restore a game from a save file
-    GameBoard(CardPair~Goldcards~ goldCards, \n CardPair~ResourceCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~StarterCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~ResourceCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
+    GameBoard(CardPair~Goldcards~ goldCards, CardPair~ResourceCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~StarterCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~ResourceCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
     %% the constructor without parameters is used to create a new game
     GameBoard(List~GoldCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
 
     drawGoldCardFromDeck() GoldCard
-    drawGoldCardFromPair(boolean) GoldCard
+    drawGoldCardFromPair(boolean first) GoldCard
     getGoldCards() CardPair~GoldCard~
     getGoldCardsLeft() int
 
@@ -392,12 +392,12 @@ class GameBoard {
     getStarterCardsLeft() int
     
     drawObjectiveCardFromDeck() ObjectiveCard
-    drawObjectiveCardFromPair(boolean) ObjectiveCard
+    drawObjectiveCardFromPair(boolean first) ObjectiveCard
     getObjectiveCards() CardPair~ObjectiveCard~
     getObjectiveCardsLeft() int
 
     drawResourceCardFromDeck() ResourceCard
-    drawResourceCardFromPair(boolean) ResourceCard
+    drawResourceCardFromPair(boolean first) ResourceCard
     getResourceCards() CardPair~ResourceCard~
     getResourceCardsLeft() int
 
@@ -442,8 +442,8 @@ GameBoard "1"*--"4" Deck : is composed of
 
 PlayerBoard <-- Position : uses
 Player --|> Iterable : implements
-GameBoard --|> EmptyDeckException : <<throws>>
-Deck --|> EmptyDeckException : <<throws>>
+GameBoard --|> EmptyDeckException : composition
+Deck --|> EmptyDeckException : composition
 Player --* PlayerBoard: composed of
 
 Player <-- DrawingDeckTypes  : uses
