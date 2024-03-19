@@ -386,20 +386,20 @@ class GameBoard {
     drawGoldCardFromDeck() GoldCard
     drawGoldCardFromPair(boolean) GoldCard
     getGoldCards() CardPair~GoldCard~
-    goldCardsLeft() int
+    getGoldCardsLeft() int
 
     drawStarterCard() StarterCard
-    starterCardsLeft() int
+    getStarterCardsLeft() int
     
     drawObjectiveCardFromDeck() ObjectiveCard
     drawObjectiveCardFromPair(boolean) ObjectiveCard
     getObjectiveCards() CardPair~ObjectiveCard~
-    objectiveCardsLeft() int
+    getObjectiveCardsLeft() int
 
     drawResourceCardFromDeck() ResourceCard
     drawResourceCardFromPair(boolean) ResourceCard
     getResourceCards() CardPair~ResourceCard~
-    resourceCardsLeft() int
+    getResourceCardsLeft() int
 
     
 }
