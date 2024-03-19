@@ -65,23 +65,23 @@ class Card {
     <<Abstract>>
     -id: int
 
-    +Card(int id)
+    Card(int id)
 
-    +getId() int
-    +evaluate(PlayerBoard playerBoard) int*
+    getId() int
+    evaluate(PlayerBoard playerBoard) int*
 }
 
 class Corner~T~ {
     %%set in the constructor
     -content: Optional~T~
-    -isCovered: bool
+    -isCovered: boolean
     
-    +Corner()
-    +Corner(T content)
+    Corner()
+    Corner(T content)
 
-    +isEmpty() bool
-    +getContent() Optional~T~
-    +cover() void
+    isEmpty() bool
+    getContent() Optional~T~
+    cover() void
 }
 PlayableSide "1" *-- "1..4" Corner: composition
 
@@ -95,15 +95,15 @@ class ObjectiveCard {
     -points: int
     -objective: Objective
 
-    +ObjectiveCard(int id, int points, Objective objective)
+    ObjectiveCard(int id, int points, Objective objective)
 
-    +evaluate(PlayerBoard playerBoard) int
+    evaluate(PlayerBoard playerBoard) int
     %% return points * objective.evaluate()
 }
 
 class Objective {
     <<Abstract>>
-    +evaluate(PlayerBoard playerBoard) int*
+    evaluate(PlayerBoard playerBoard) int*
     %% lo realizzeremo dentro evaluate count: int
 }
 ObjectiveCard "1" *-- "1" Objective: composition
@@ -112,9 +112,9 @@ Card <|.. ObjectiveCard: realization
 class GeometricObjective {
     -geometry: ResourceType[3][3]
 
-    +GeometricObjective(ResourceType[3][3] geometry)
+    GeometricObjective(ResourceType[3][3] geometry)
 
-    +evaluate(PlayerBoard playerBoard) int
+    evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. GeometricObjective : realization
 %% ResourceType "3..n" <-- "n" GeometricObjective: dependency
@@ -124,9 +124,9 @@ class CountingObjective {
     -resources: HashMap~ResourceType; int~
     -objects: HashMap~ObjectType; int~
     
-    +CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
+    CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
     
-    +evaluate(PlayerBoard playerBoard) int
+    evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. CountingObjective : realization
 %% ResourceType "0..4" <-- "n" CountingObjective: dependency
@@ -139,15 +139,15 @@ class PlayableCard {
     -coveredCorners: int
     -kingdom: ResourceType[0..1]
 
-    +PlayableCard(int id, PlayableSide front, PlayableSide back)
-    +PlayableCard(int id, PlayableSide front, PlayableSide back, ResourceType kingdom)
+    PlayableCard(int id, PlayableSide front, PlayableSide back)
+    PlayableCard(int id, PlayableSide front, PlayableSide back, ResourceType kingdom)
 
-    +getKingdom() ResourceType[0..1]
-    +getPlayedSide() PlayableSide
-    +setPlayedSide(CardSideType sideType) void
-    +getCoveredCorners() int
-    +setCoveredCorners(int n) void
-    +evaluate(PlayerBoard playerBoard) int
+    getKingdom() ResourceType[0..1]
+    getPlayedSide() PlayableSide
+    setPlayedSide(CardSideType sideType) void
+    getCoveredCorners() int
+    setCoveredCorners(int n) void
+    evaluate(PlayerBoard playerBoard) int
 }
 Card <|.. PlayableCard: realization
 %% CardSideType "0..1" <-- "n" PlayableCard: dependency
@@ -156,10 +156,10 @@ class PlayableSide {
     <<Abstract>>
     -corners: Corner[1..4]
 
-    +getCorners() Corner[1..4]
-    +setCorner(CornerPosition position, ResourceType resource)
-    +setCorner(CornerPosition position, ObjectType object)
-    +evaluate(PlayerBoard playerBoard) int*
+    getCorners() Corner[1..4]
+    setCorner(CornerPosition position, ResourceType resource)
+    setCorner(CornerPosition position, ObjectType object)
+    evaluate(PlayerBoard playerBoard) int*
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -168,10 +168,10 @@ class PlayableSide {
 class PlayableBackSide {
     -permanentResources: ResourceType[1..3]
 
-    +PlayableBackSide(ResourceType[1..3] permanentResources)
+    PlayableBackSide(ResourceType[1..3] permanentResources)
 
-    +getResources() ResourceType[1..3]
-    +evaluate(PlayerBoard playerBoard) int
+    getResources() ResourceType[1..3]
+    evaluate(PlayerBoard playerBoard) int
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
@@ -184,18 +184,18 @@ PlayableSide <-- PlayableFrontSide: inheritance
 PlayableCard "1" *-- "1" PlayableFrontSide: composition
 
 class StarterCardFrontSide {
-    +StarterCardFrontSide()
+    StarterCardFrontSide()
 
-    +evaluate(PlayerBoard playerBoard) int
+    evaluate(PlayerBoard playerBoard) int
 }
 PlayableFrontSide <|.. StarterCardFrontSide: realization
 
 class ResourceCardFrontSide {
     -points: int
 
-    +ResourceCard(int points)
+    ResourceCardFrontSide(int points)
 
-    +evaluate(PlayerBoard playerBoard) int
+    evaluate(PlayerBoard playerBoard) int
 }
 PlayableFrontSide <|.. ResourceCardFrontSide: realization
 
@@ -204,9 +204,9 @@ class GoldCardFrontSide {
     -pointCondition: PointConditionType[0..1]
     -pointConditionObject: ObjectType[0..1]
 
-    +GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+    GoldCardFrontSide(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
 
-    +evaluate(PlayerBoard playerBoard) int
+    evaluate(PlayerBoard playerBoard) int
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
@@ -223,7 +223,7 @@ title: Rest of the model
 ---
 classDiagram
 
-class TokenColors{
+class TokenColor{
     <<Enumeration>>
     RED
     BLUE
@@ -236,12 +236,10 @@ class TokenColors{
  
 
 class Game {
-
-    -tokens: Token[9]
-    -players: Player[2..4]
+    -tokens: TokenColor[8] 
+    -players: Player[2..4] 
     -gameBoard: GameBoard
     -state: GameStates[0..1]
-    %% the scores key is the player's nickname
     -scores: HashMap~string, int~
     -currentPlayer: Player
 
@@ -249,27 +247,26 @@ class Game {
     Game(int players)
     %% contstructor: creates all the game assets.
 
-    -isGameOver() bool
+    -isGameOver() boolean
     %%GameOver() void
-
-
-    +addPlayer(String nickname) bool
+    
+    addPlayer(String nickname) boolean
     %% TODO: decidere come gestire il caso in cui viene rifiutata la richiesta di aggiunta di un giocatore (nickname già presente o troppi giocatori)
 
+    %% TODO
+    getGameState() GameState
 
-    +?getGameStates() GameStates
-
-    getPlayersNames()
+    getPlayerNames() String[2..4]
 
     playTurn() void
     %% to be specified
 
-    +evaluateObjectives()
+    evaluateObjectives()
     %% calls player.evaluateObjectives() for each player with the common objectives as parameter
 }
 
 %% TODO decidere se implementarlo come un obietti
-class GameState_OR_PlayerStates{
+class GameState{
     <<Enumeration>>
     GAME_INIT
     %%WAITING
@@ -285,7 +282,7 @@ class PlayerState{
 
 
 class Deck~T~ {
-    cards: List~T~
+    -cards: List~T~
     %% Una pila forse
     Deck(List~T~ cards)
     shuffle() void
@@ -297,49 +294,99 @@ class Deck~T~ {
 }
 
 class Player {
-    nickname: String
-    points: int
-    token: Token
-    board: playerBoard
-    Player(String nickname, Token token)
+    -nickname: String 
+    -points: int
+    -token: TokenColor
+    -board: PlayerBoard
+
+    Player(String nickname, PlayableCard starterCard, PlayableCard[3] hand)
+    
+    getNickname() String
+    getToken() TokenColor
+
+    setToken(TokenColor token) void
+    setObjectiveCard(ObjectiveCards) void
+
     getPoints() int
     setPoints(int) void
-    %% points are abviously private
 
+    drawCard(PlayableCard card) void
+    %% receive card and put it in the player's hand
 
-    +drawCard(SidedCard card) void
-    %% receive  card and put it in the player's hand
+    placeCard(PlayableCard card, CardSidesType side, Position position) void
+    %% calls the player board placeCard method with the card as parameter and updates the player's points calling the evaluate method on the played card
 
-    +chooseObjective(ObjectiveCard[2] availableObjectives) ObjectiveCard
-
-    +chooseToken()
-
-    placeCard(int cardNumber) void
-    %% removes the card from the player's hand and places it on the board calling the playerboard method
-
-    evaluateObjectives(ObjectiveCard[2] commonObjectives) void
+    evaluate(ObjectiveCard objectiveCard) void
+    %% calls the player board evaluate method with the objective card as parameter
 }
 
-class DrawingDeckTypes {
+class PlayerBoard {
+    %%FIXME: type of cards
+    -cards: SidedCard[3]
+    -objectiveCard: ObjectiveCard
+    
+    -playedCards: HashMap~Position, PlayableCard~
+    %% the geometry is an hashmap of positions and played cards
+    
+    -availableSpots: Set~Position~
+    %% the available spots for the player to place a card on the board
+
+    -resources: HashMap~ResourceType, int~
+    -objects: HashMap~Objects, int~
+    %% the resources and objects the player has on the board
+
+    PlayerBoard(PlayableCard[3] cards, PlayableCard starterCard)
+    
+    setObjectiveCard(ObjectiveCard objectiveCard) void
+    %% sets the objective card in the player board after the player has chosen it
+
+    placeCard(PlayableCard card, cardSidesType side, Position position) void
+    %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
+    updateResourcesandObjects(PlayableCard playedCard, Position position) void
+    %% updates the player's resources and objects after a card has been placed on the board
+
+    updateAvailableSpots(Position position) void
+    %% updats the list of available spots in which card can be placed
+
+    %%evaluate(PlayedCard card) int
+    %%evaluate(ObjectiveCard objectiveCard) int
+    %% 2 overloads of the evaluate method, the first one is called on Playable cards every turn, the second one is called on the objective card at the end of the game.
+}
+
+class PlayerActions {
+    <<Interface>>
+    chooseTokenColor(int choice) TokenColor
+    chooseObjectiveCard(int choice) ObjectiveCard
+
+    chooseDrawingSource(int choice) DrawingSourceType
+    chooseDrawingDeck(int choice) DrawingDeckType
+
+    choosePlayingCard(int choice) PlayableCard
+    choosePlayingCardSide(int choice) CardSidesType
+    choosePlayingCardPosition(int choice) Position
+}
+
+class DrawingDeckType {
     <<Enumeration>>
     GOLD_DECK
     RESOURCE_DECK
 }
 
-class Token {
-    color: TokenColors
-    Token(TokenColors)
+class DrawingSourceType {
+    <<Enumeration>>
+    DECK
+    COMMON_BOARD
 }
 
 class Position{
-    x: int
-    y: int
+    -x: int
+    -y: int
 
-    computeLinkingPosition(CornerEnum linkedCorner) Position
-    Position(x,y)
-
+    Position(int x, int y)
+    
     %% Overriding default hashmap key methods
-    equals(Position) bool
+    equals(Position position) boolean
+    computeLinkingPosition(CornerEnum linkedCorner) Position
     hashCode() int
 }
 
@@ -375,53 +422,27 @@ class GameBoard {
     drawResourceCardFromPair(boolean first) PlayableCard ~~throws~~ EmptyDeckException
     getResourceCards() CardPair~PlayableCard~
     getResourceCardsLeft() int
-
-    
 }
 
 class EmptyDeckException {
     
 }
 
-
-class PlayerBoard {
-    cards: SidedCard[3]
-    objectiveCards: ObjectiveCard
-    %% the geometry is an hasmap of positions and played cards
-
-    playedCards: HashMap~Position; PlayedCard~
-    AvailableSpots: List~Position~
-    
-    resources: HashMap~ResourceType; int~
-    objects: HashMap~Objects; int~
-
-    PlayerBoard(SidedCard[3] cards, ObjectiveCard objectiveCard, startCard)
-
-    +chosePlacingPosition(int) Position
-
-    placeCard(SidedCard card, cardSidesTypes side, Position position) void
-    %% instanciates a played card and places it on the board, updates the resources and objects calling the helper method, updates the available spots calling the helper method
-
-    updateResourcesandObjects(PlayedCard playedCard, Position position) void
-
-    updateAvailableSpots(Position position) void
-
-    evaluatePoints(PlayedCard card) int
-}
-
 Game "2"*--"4" Player : is composed of
 Game "1"*--"1" GameBoard : is composed of
-Game "1"*--"9" Token : is composed of
-Token <-- TokenColors : uses
+Game "1"*--"9" TokenColor : is composed of
 GameBoard "1"*--"4" Deck : is composed of
 
 PlayerBoard <-- Position : uses
-Player --|> Iterable : implements
-GameBoard --|> EmptyDeckException : composition
-Deck --|> EmptyDeckException : composition
 Player --* PlayerBoard: composed of
 
-Player <-- DrawingDeckTypes  : uses
+Player <-- DrawingSourceType : uses
+Player <-- DrawingDeckType : uses
+Player --> PlayerActions : offers
+
+GameBoard --|> EmptyDeckException : composition
+Deck --|> EmptyDeckException : composition
+
 GameBoard <-- CardPair: uses
 ```
 

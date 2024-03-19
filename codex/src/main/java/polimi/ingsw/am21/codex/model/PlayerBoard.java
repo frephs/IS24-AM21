@@ -1,79 +1,108 @@
 package polimi.ingsw.am21.codex.model;
 
-import polimi.ingsw.am21.codex.model.Cards.CornerContentTypes;
-import polimi.ingsw.am21.codex.model.Cards.PlayedCard;
-import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.SidedCard;
-
+import polimi.ingsw.am21.codex.model.Cards.*;
 import java.util.*;
 
 public class PlayerBoard {
 
     private final int MAX_CARDS = 3;
-    private List<SidedCard> cards = new ArrayList<SidedCard>(MAX_CARDS);
-    private ObectiveCard objectiveCard;
+    private List<PlayableCard> cards = new ArrayList<PlayableCard>(MAX_CARDS);
+    private ObjectiveCard objectiveCard;
 
-    Map <Position, PlayedCard> playedCards = new HashMap<>();
+    Map <Position, PlayableCard> playedCards = new HashMap<>();
     
    // Hashmaps to keep track of resources
-    private HashMap<ResourceTytoggle, Integer> resources = new HashMap<>(ResourceTypes.values().lenght);
+    private HashMap<ResourceTypes, Integer> resources = new HashMap<>(ResourceTypes.values().lenght);
     private HashMap<ObjectTypes, Integer> objects = new HashMap<>(ObjectTypes.values().lenght);
 
-    // List of all available corners
-    List<Corner> availableCorners = new LinkedList<Corner>();
+    // List of all available spots in which a card can be placed
+    Set<Position> availableSpots = new HashSet<>();
+    HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
 
-    //Occupied Relative Position
-    Set<Position> = new Set<>();
 
-    PlayedCard placedCardsGraph;
-
-    private PlayerBoard(StarterCard starterCard) {
-        this.playedCardsGraph = starterCard;
+    PlayerBoard(List<PlayableCard> cards, PlayableCard starterCard) {
+        this.cards= cards;
+        this.playedCards.set(new Position(), starterCard);
     }
 
-    void drawCard(SidedCard card){
+    public void setObjectiveCard(ObjectiveCard objectiveCard) {
+        this.objectiveCard = objectiveCard;
+    }
+
+    public ObjectiveCard getObjectiveCard() {
+        return objectiveCard;
+    }
+
+    void drawCard(PlayableCard card){
         cards.add(card);
     }
 
-    void placeCard(SidedCard playedCard, CardSide playedSide, PlayedCard linkingCard, CornerEnum cornerNumber){
+    void placeCard(PlayableCard playedCard, CardSidesTypes playedSide, Position position){
+        this.cards.remove(playedCard);
 
-        playedSide = new PlayedCard(
-                playedCard,
-                playedSide,
+        playedCard.setPlayedSide(CardSidesTypes);
+        this.playedCards.put(position, playedCard);
 
+        updateAvailableSpots(position);
+        updateResourcesAndObjects(playedCard, position);
+
+    }
+
+    //FIXME: maybe order it a little
+    void updateResourcesAndObjects(PlayableCard playedCard, Position position) {
+        playedCard.getPlayedSide().getCorners().foreach(
+                (cornerPosition, corner) ->{
+                    updateResourcesAndObjectsMaps(corner, +1);
+                    Position linkingCardPosition = cornerPosition.computeLinkingPosition(cornerPosition);
+
+                    if(!availableSpots.contains(linkingCardPosition)){
+                        // we need to remove its covered contents
+                        CornerEnum linkingCorner = CornerEnum.getOppositeCorner(cornerPosition);
+                        PlayableCard linkedCard= this.playedCards.get(linkingCardPosition);
+                        Corner linkedCorner = linkedCard.getPlayedSide().getCorner(linkingCorner);
+
+                        updateResourcesAndObjectsMaps(linkedCorner, -1);
+                    }
+                }
         );
+    }
 
-        linkingCorner = playedCard.getPlayedSide().getCorner(cornerNumber);
+    void updateResourcesAndObjectsMaps(Corner corner, int update){
+        if(ResourceTypes.has(Corner.getContent())){
+            ResourceTypes resource = Corner.getContent();
+            int prevVal = this.resources.get(resource);
+            this.resources.put(resource, prevVal+update);
+        }else if(ObjectTypes.has(Corner.getContent())) {
+            ObjectTypes object = Corner.getContent();
+            int prevVal = this.objects.get(object);
+            this.objects.put(object, prevVal+update);
+        }
+    }
 
-        // linking the card and removing the linking corner from the available ones.
-        linkingCorner.link(playedCard);
-        availableCorners.remove(linkingCorner);
-
-        //try looking for adjacent card:
-        playedCard.relativePosition
-
-        // removing the content of the covered content from resources and objects
-        updateResourcesAndObjects(linkingCorner, -1);
-
-        // updating the resources for every corner and putting them (besides the connected one) in the list of available ones
-        for(Corner corner : playedCard.corners) {
-            updateResourcesAndObjects(corner, +1);
-            if(linkingCorner.getLinkedCorner() != corner){
-                availableCorners.add(corner);
+    void updateAvailableSpots(Position position){
+        availableSpots.remove(position);
+        for (CornerEnum adjacentCorner : CornerEnum.values()) {
+            Position adjacentCardPosition = position.computeLinkingPosition((adjacentCorner));
+            if(!availableSpots.contains(adjacentCardPosition)){
+                if(! playedCards.containsKey(adjacentCardPosition)){
+                    availableSpots.add(adjacentCardPosition);
+                }else{
+                    availableSpots.remove(adjacentCardPosition);
+                }
             }
         }
     }
 
-    void updateResourcesAndObjects(Corner corner, int update){
-        if(corner.content.isPresent()){
-            switch (corner.contentType){
-                case CornerContentTypes.OBJECT: objects[corner.content] += update; break;
-                case CornerContentTypes.RESOURCE: resources[corner.content] += update; break;
-            }
-        }
+    int evaluate(ObjectiveCard card){
+        return card.evaluate(playedCards);
     }
 
-    void updateLink
+    int evaluate(PlayableCard card){
+        return card.evaluate(objects); // set coveredCorners
+    }
+
 }
+
+
 
 
