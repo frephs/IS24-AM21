@@ -383,21 +383,21 @@ class GameBoard {
     %% the constructor without parameters is used to create a new game
     GameBoard(List~GoldCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
 
-    drawGoldCardFromDeck() GoldCard
-    drawGoldCardFromPair(boolean first) GoldCard
+    drawGoldCardFromDeck() GoldCard <<throw>> EmptyDeckException
+    drawGoldCardFromPair(boolean first) GoldCard <<throw>> EmptyDeckException
     getGoldCards() CardPair~GoldCard~
     getGoldCardsLeft() int
 
-    drawStarterCard() StarterCard
+    drawStarterCard() StarterCard <<throw>> EmptyDeckException
     getStarterCardsLeft() int
     
-    drawObjectiveCardFromDeck() ObjectiveCard
-    drawObjectiveCardFromPair(boolean first) ObjectiveCard
+    drawObjectiveCardFromDeck() ObjectiveCard <<throw>> EmptyDeckException
+    drawObjectiveCardFromPair(boolean first) ObjectiveCard <<throw>> EmptyDeckException
     getObjectiveCards() CardPair~ObjectiveCard~
     getObjectiveCardsLeft() int
 
-    drawResourceCardFromDeck() ResourceCard
-    drawResourceCardFromPair(boolean first) ResourceCard
+    drawResourceCardFromDeck() ResourceCard <<throw>> EmptyDeckException
+    drawResourceCardFromPair(boolean first) ResourceCard <<throw>> EmptyDeckException
     getResourceCards() CardPair~ResourceCard~
     getResourceCardsLeft() int
 
