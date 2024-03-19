@@ -24,7 +24,6 @@
 classDiagram
 
 %% TODOs
-%% - evaluate on cards
 %% - revise constructors
 
 class ResourceType {
@@ -71,7 +70,7 @@ class Card {
     +Card(String frontImagePath, String backImagePath)
 
     +getImagePath(CardSideType side) String
-    +evaluate(PlayerBoard playerBoard) int
+    +evaluate(PlayerBoard playerBoard) int*
 }
 
 class Corner~T~ {
@@ -107,7 +106,7 @@ class ObjectiveCard{
 class Objective{
     <<Abstract>>
     %% how many times the objective has to be satisfied
-    +evaluate(PlayerBoard playerBoard) int
+    +evaluate(PlayerBoard playerBoard) int*
     %% returns
     %% lo realizzeremo dentro evaluate count: int
 }
@@ -150,8 +149,7 @@ class PlayableCard {
     +setPlayedSide(CardSideType sideType) void
     +getCoveredCorners() int
     +setCoveredCorners(int n) void
-    %% TODO
-    +evaluate()
+    +evaluate(PlayerBoard playerBoard) int
 }
 Card <|.. PlayableCard: realization
 %% CardSideType "0..1" <-- "n" PlayableCard: dependency
@@ -165,8 +163,7 @@ class PlayableSide {
     +getCorners() Corner[1..4]
     +setCorner(CornerPosition position, ResourceType resource)
     +setCorner(CornerPosition position, ObjectType object)
-    %% TODO abstract
-    +evalutate()* 
+    +evaluate(PlayerBoard playerBoard) int*
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -178,8 +175,7 @@ class PlayableBackSide {
     +PlayableBackSide(ResourceType[1..3] permanentResources)
 
     +getResources() ResourceType[1..3]
-    %% TODO
-    +evaluate()
+    +evaluate(PlayerBoard playerBoard) int
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
@@ -194,8 +190,7 @@ PlayableCard "1" *-- "1" PlayableFrontSide: composition
 class StarterCardFrontSide {
     +StarterCardFrontSide()
 
-    %% TODO
-    +evaluate()
+    +evaluate(PlayerBoard playerBoard) int
 }
 PlayableFrontSide <|.. StarterCardFrontSide: realization
 
@@ -205,8 +200,7 @@ class ResourceCardFrontSide {
 
     +ResourceCard(int points)
 
-    %% TODO
-    +evaluate()
+    +evaluate(PlayerBoard playerBoard) int
 }
 PlayableFrontSide <|.. ResourceCardFrontSide: realization
 
@@ -217,8 +211,7 @@ class GoldCardFrontSide {
 
     +GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
 
-    %% TODO
-    +evaluate()
+    +evaluate(PlayerBoard playerBoard) int
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
