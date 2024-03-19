@@ -115,8 +115,8 @@ class Corner~T~{
     
     Corner(T content)
     
-    isCovered: bool
-    isEmpty() bool
+    isCovered: boolean
+    isEmpty() boolean
 }
 
 
@@ -135,16 +135,16 @@ class GoldCard{
     pointCondition: optional~PointConditionTypes~
     conditionalObject optional~ObjectTypes~
     
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition, ObjectTypes conditionalObject)
+    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, PointConditionTypes pointCondition, ObjectTypes conditionalObject)
 
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition)
+    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, PointConditionTypes pointCondition)
 
     GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet)
 
     %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
 
     evaluate()
-    isPlaceable(Hashmap~ResourceTypes,int~ resources) bool
+    isPlaceable(Hashmap~ResourceTypes,int~ resources) boolean
 
 
     %% similar to the resource card but does not extend it because points here are mandatory
@@ -162,8 +162,8 @@ class StarterCard{
     
     starterCard(SidedCard card)
     %% solo risorse niente oggetti negli angoli ma con
-    firstPlayerToken: bool
-    setFirstPlayerToken(bool) void 
+    firstPlayerToken: boolean
+    setFirstPlayerToken(boolean) void 
     %%OVERRIDE
     cardSide(Corner~ResourceTypes~ corners[]) 
     %% useful for the GUI
@@ -248,7 +248,7 @@ class TokenColors{
 
 class Game{
     
-    -tokens: Token[9] 
+    -tokens: TokenColors[8] 
     -players: Player[2..4] 
     -gameBoard: GameBoard
     -?state: GameStates 
@@ -259,11 +259,11 @@ class Game{
     Game(int players)
     %% contstructor: creates all the game assets.
 
-    -isGameOver() bool
+    -isGameOver() boolean
     %%GameOver() void
     
     
-    +addPlayer(String nickname) bool
+    +addPlayer(String nickname) boolean
     %% TODO: decidere come gestire il caso in cui viene rifiutata la richiesta di aggiunta di un giocatore (nickname già presente o troppi giocatori)
     
 
@@ -313,7 +313,7 @@ class Player {
     -board: playerBoard
 
 
-    Player(String nickname, Token token, PlayableCard starterCard, PlayableCard[3] hand)
+    Player(String nickname, PlayableCard starterCard, PlayableCard[3] hand)
     
     getNickname() String
     getToken() TokenColors
@@ -399,10 +399,10 @@ class Position{
     y: int
 
     computeLinkingPosition(CornerEnum linkedCorner) Position
-    Position(x,y)
+    Position(int x, int y)
     
     %% Overriding default hashmap key methods
-    equals(Position) bool
+    equals(Position position) boolean
     hashCode() int
 }
 
@@ -430,7 +430,7 @@ class CommonBoard{
     resourceCards: ResourceCard[2]
     objectiveCards: ObjectiveCard[2]
     
-    CommonBoard(Goldcards goldCards[2], \nResourceCard resourceCards[2], objectiveCards)
+    CommonBoard(Goldcards goldCards[2], ResourceCard resourceCards[2], objectiveCards)
     %% without parameters cause we'll draw 2 cards with deck.draw(2) for each type.
 
     getObjectiveCards() ObjectiveCard[2]
@@ -438,15 +438,14 @@ class CommonBoard{
 
 %% is This redundant?
 class ScoreBoard {
-    scores: Hasmap~String,int~
+    scores: Hashmap~String,int~
     %%HashMap~TokenColors, int~ redundant???
 }
 
 
 Game "2"*--"4" Player : is composed of 
 Game "1"*--"1" GameBoard : is composed of
-Game "1"*--"9" Token : is composed of
-Token <-- TokenColors : uses
+Game "1"*--"9" TokenColors : is composed of
 GameBoard "1"*--"4" Deck : is composed of
 GameBoard "1"*--"1" CommonBoard : is composed of
 Game "1"*--"1" ScoreBoard : is composed of
