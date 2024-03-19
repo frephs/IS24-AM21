@@ -392,8 +392,8 @@ class Deck~T~ {
     %% Una pila forse
     Deck(List~T~ cards)
     shuffle() void
-    draw() T <<throw>> EmptyDeckException
-    draw(int N) List~T~ <<throw>> EmptyDeckException
+    draw() T ~~throws~~ EmptyDeckException
+    draw(int N) List~T~ ~~throws~~ EmptyDeckException
     getCardsLeft() int
     %% insert card back after card drawing. (ie when you don't choose an objective)
     insert(T card) void
@@ -461,21 +461,21 @@ class GameBoard {
     %% the constructor without parameters is used to create a new game
     GameBoard(List~GoldCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
 
-    drawGoldCardFromDeck() GoldCard <<throw>> EmptyDeckException
-    drawGoldCardFromPair(boolean first) GoldCard <<throw>> EmptyDeckException
+    drawGoldCardFromDeck() GoldCard ~~throws~~ EmptyDeckException
+    drawGoldCardFromPair(boolean first) GoldCard ~~throws~~ EmptyDeckException
     getGoldCards() CardPair~GoldCard~
     getGoldCardsLeft() int
 
-    drawStarterCard() StarterCard <<throw>> EmptyDeckException
+    drawStarterCard() StarterCard ~~throws~~ EmptyDeckException
     getStarterCardsLeft() int
     
-    drawObjectiveCardFromDeck() ObjectiveCard <<throw>> EmptyDeckException
-    drawObjectiveCardFromPair(boolean first) ObjectiveCard <<throw>> EmptyDeckException
+    drawObjectiveCardFromDeck() ObjectiveCard ~~throws~~ EmptyDeckException
+    drawObjectiveCardFromPair(boolean first) ObjectiveCard ~~throws~~ EmptyDeckException
     getObjectiveCards() CardPair~ObjectiveCard~
     getObjectiveCardsLeft() int
 
-    drawResourceCardFromDeck() ResourceCard <<throw>> EmptyDeckException
-    drawResourceCardFromPair(boolean first) ResourceCard <<throw>> EmptyDeckException
+    drawResourceCardFromDeck() ResourceCard ~~throws~~ EmptyDeckException
+    drawResourceCardFromPair(boolean first) ResourceCard ~~throws~~ EmptyDeckException
     getResourceCards() CardPair~ResourceCard~
     getResourceCardsLeft() int
 
