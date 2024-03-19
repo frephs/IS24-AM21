@@ -319,7 +319,7 @@ class Player {
     getToken() TokenColor
 
     setToken(TokenColor token) void
-    setObjectiveCard(ObjectiveCards)
+    setObjectiveCard(ObjectiveCards) void
 
     getPoints() int
     setPoints(int) void
