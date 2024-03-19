@@ -50,14 +50,13 @@ class CardSideType {
     BACK
 }
 
-class CornerEnum {
+class CornerPosition {
     <<Enumeration>>
     UP_LEFT
     DOWN_LEFT
     UP_RIGHT
     DOWN_RIGHT
 }
-CornerEnum <-- Corner : uses 
 
 class Card {
     %% potrebbe essere un'interfaccia
@@ -66,18 +65,19 @@ class Card {
     %%+createCard() void
 }
 
-class Corner~T~{
+class Corner~T~ {
     %%set in the constructor
     content: Optional~T~
     isCovered: bool
     
     Corner(T content)
     Corner()
+
     isEmpty() bool
     getContent() Optional~T~
-
     cover() void
 }
+PlayableSide "1" *-- "1..4" Corner: composition
 
 class PointConditionType {
     <<Enumeration>>
@@ -86,13 +86,12 @@ class PointConditionType {
 }
 
 class ObjectiveCard{
-    points: final int
+    points: int
     objective: Objective
 
     ObjectiveCard(Objective objective)
     evaluate(PlayerBoard playerBoard) int
     %% return points * objective.evaluate()
-    
 }
 
 class Objective{
@@ -102,25 +101,31 @@ class Objective{
     %% returns
     %% lo realizzeremo dentro evaluate count: int
 }
-ObjectiveCard *-- Objective : is composed of
+ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization 
 
 class GeometricObjective{
     geometry: ResourceType[3][3]
+
     GeometricObjective(ResourceType[3][3] geometry)
+
     evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. GeometricObjective : realization
+ResourceType "3..n" <-- "n" GeometricObjective: dependency
+
 
 class CountingObjective{
     resources: HashMap~ResourceType; int~
-    objects: HashMap~Objects; int~
+    objects: HashMap~ObjectType; int~
     
-    CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectsType; int~ objects)
+    CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
     
     evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. CountingObjective : realization
+ResourceType "0..4" <-- "n" CountingObjective: dependency
+ObjectType "0..3" <-- "n" CountingObjective: dependency
 
 class PlayableCard {
     frontSide: PlayableFrontSide
@@ -139,17 +144,23 @@ class PlayableCard {
     evaluate()
 }
 Card <|.. PlayableCard: realization
+CardSideType "0..1" <-- "n" PlayableCard: dependency
 
 class PlayableSide {
     <<Abstract>>
     corners: Corner[1..4]
 
-    PlayableSide(Corner[1..4] corners)
+    PlayableSide()
 
     getCorners() Corner[1..4]
+    setCorner(CornerPosition position, ResourceType resource)
+    setCorner(CornerPosition position, ObjectType object)
     %% TODO abstract
     evalutate()* 
 }
+CornerPosition "1..4" <-- "n" PlayableSide: dependency
+ResourceType "0..4" <-- "n" PlayableSide: dependency
+ObjectType "0..4" <-- "n" PlayableSide: dependency
 
 class PlayableBackSide {
     permanentResources: ResourceType[1..3]
@@ -162,6 +173,7 @@ class PlayableBackSide {
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
+ResourceType "1..3" <-- "n" PlayableSide: dependency
 
 class PlayableFrontSide {
     <<Abstract>>
@@ -199,7 +211,9 @@ class GoldCardFrontSide {
     evaluate()
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
-
+ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
+PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
+ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
 ```
 
 ### Game model
