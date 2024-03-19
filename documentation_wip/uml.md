@@ -122,7 +122,7 @@ class GeometricObjective{
     +evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. GeometricObjective : realization
-ResourceType "3..n" <-- "n" GeometricObjective: dependency
+%% ResourceType "3..n" <-- "n" GeometricObjective: dependency
 
 
 class CountingObjective{
@@ -134,8 +134,8 @@ class CountingObjective{
     +evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. CountingObjective : realization
-ResourceType "0..4" <-- "n" CountingObjective: dependency
-ObjectType "0..3" <-- "n" CountingObjective: dependency
+%% ResourceType "0..4" <-- "n" CountingObjective: dependency
+%% ObjectType "0..3" <-- "n" CountingObjective: dependency
 
 class PlayableCard {
     -frontSide: PlayableFrontSide
@@ -154,7 +154,7 @@ class PlayableCard {
     +evaluate()
 }
 Card <|.. PlayableCard: realization
-CardSideType "0..1" <-- "n" PlayableCard: dependency
+%% CardSideType "0..1" <-- "n" PlayableCard: dependency
 
 class PlayableSide {
     <<Abstract>>
@@ -168,9 +168,9 @@ class PlayableSide {
     %% TODO abstract
     +evalutate()* 
 }
-CornerPosition "1..4" <-- "n" PlayableSide: dependency
-ResourceType "0..4" <-- "n" PlayableSide: dependency
-ObjectType "0..4" <-- "n" PlayableSide: dependency
+%% CornerPosition "1..4" <-- "n" PlayableSide: dependency
+%% ResourceType "0..4" <-- "n" PlayableSide: dependency
+%% ObjectType "0..4" <-- "n" PlayableSide: dependency
 
 class PlayableBackSide {
     -permanentResources: ResourceType[1..3]
@@ -183,7 +183,7 @@ class PlayableBackSide {
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
-ResourceType "1..3" <-- "n" PlayableBackSide: dependency
+%% ResourceType "1..3" <-- "n" PlayableBackSide: dependency
 
 class PlayableFrontSide {
     <<Abstract>>
@@ -221,9 +221,9 @@ class GoldCardFrontSide {
     +evaluate()
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
-ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
-PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
-ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
+%% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
+%% PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
+%% ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
 ```
 
 ### Game model
