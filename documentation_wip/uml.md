@@ -153,27 +153,6 @@ class ResourceCard{
     evaluate()
 }
 
-class GoldCard{
-    int points;
-    conditionalSet: ResourceTypes[1..5]
-    pointCondition: optional~PointConditionTypes~
-    conditionalObject optional~ObjectTypes~
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition, ObjectTypes conditionalObject)
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet, \nPointConditionTypes pointCondition)
-
-    GoldCard(SidedCard card, int points, ResourceTypes[1..5] conditionalSet)
-
-    %%FIXME: c'è un modo migliore per non usare l'enum PointConditionTypes qui?
-
-    evaluate()
-    isPlaceable(Hashmap~ResourceTypes,int~ resources) bool
-
-
-    %% similar to the resource card but does not extend it because points here are mandatory
-}
-
 class PointConditionTypes{
     <<Enumeration>>
     OBJECTS
@@ -307,7 +286,7 @@ class GoldCardFrontSide {
     -pointCondition: PointConditionType[0..1]
     -pointConditionObject: ObjectType[0..1]
 
-    +GoldCard(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+    +GoldCardFrontSide(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
 
     +evaluate(PlayerBoard playerBoard) int
 }
@@ -447,8 +426,8 @@ class Position{
 }
 
 class GameBoard {
-    -goldDeck : Deck~GoldCard~
-    -goldCards: CardPair~GoldCard~
+    -goldDeck : Deck~PlayableCard~
+    -goldCards: CardPair~PlayableCard~
     -starterDeck: Deck~StarterCard~
     -objectiveDeck: Deck~ObjectiveCard~
     -resourceDeck: Deck~ResourceCard~
@@ -459,11 +438,11 @@ class GameBoard {
     %% the constructor with parameters is used to restore a game from a save file
     GameBoard(CardPair~Goldcards~ goldCards, CardPair~ResourceCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~StarterCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~ResourceCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
     %% the constructor without parameters is used to create a new game
-    GameBoard(List~GoldCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
+    GameBoard(List~PlayableCard~ goldCardsList,\n \nList~StarterCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~ResourceCard~ resourceCardsList)
 
-    drawGoldCardFromDeck() GoldCard ~~throws~~ EmptyDeckException
-    drawGoldCardFromPair(boolean first) GoldCard ~~throws~~ EmptyDeckException
-    getGoldCards() CardPair~GoldCard~
+    drawGoldCardFromDeck() PlayableCard ~~throws~~ EmptyDeckException
+    drawGoldCardFromPair(boolean first) PlayableCard ~~throws~~ EmptyDeckException
+    getGoldCards() CardPair~PlayableCard~
     getGoldCardsLeft() int
 
     drawStarterCard() StarterCard ~~throws~~ EmptyDeckException
