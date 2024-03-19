@@ -100,9 +100,7 @@ class ObjectiveCard {
 
 class Objective {
     <<Abstract>>
-    %% how many times the objective has to be satisfied
     +evaluate(PlayerBoard playerBoard) int*
-    %% returns
     %% lo realizzeremo dentro evaluate count: int
 }
 ObjectiveCard "1" *-- "1" Objective: composition
