@@ -1,7 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
-
 import java.util.*;
 
 public class PlayerBoard {
@@ -10,7 +9,7 @@ public class PlayerBoard {
     private List<PlayableCard> cards = new ArrayList<PlayableCard>(MAX_CARDS);
     private ObjectiveCard objectiveCard;
 
-    Map <Position, PlayedCard> playedCards = new HashMap<>();
+    Map <Position, PlayableCard> playedCards = new HashMap<>();
     
    // Hashmaps to keep track of resources
     private HashMap<ResourceTypes, Integer> resources = new HashMap<>(ResourceTypes.values().lenght);
@@ -18,13 +17,11 @@ public class PlayerBoard {
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
-    HashMap<Position, PlayedCard>  placedCards = new HashMap<>();
+    HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
 
 
-    private PlayerBoard(PlayableCard[] cards, StarterCard starterCard) {
-        for(PlayableCard card : cards){
-            this.cards.add(card);
-        }
+    PlayerBoard(List<PlayableCard> cards, PlayableCard starterCard) {
+        this.cards= cards;
         this.playedCards.set(new Position(), starterCard);
     }
 
@@ -73,10 +70,12 @@ public class PlayerBoard {
     void updateResourcesAndObjectsMaps(Corner corner, int update){
         if(ResourceTypes.has(Corner.getContent())){
             ResourceTypes resource = Corner.getContent();
-            this.resources[resource] += update;
+            int prevVal = this.resources.get(resource);
+            this.resources.put(resource, prevVal+update);
         }else if(ObjectTypes.has(Corner.getContent())) {
             ObjectTypes object = Corner.getContent();
-            this.objects[object] += update;
+            int prevVal = this.objects.get(object);
+            this.objects.put(object, prevVal+update);
         }
     }
 

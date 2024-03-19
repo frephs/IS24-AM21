@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
+import java.util.List;
 
 public class Player {
     private final String nickname;
@@ -8,7 +9,7 @@ public class Player {
     private int points;
     private TokenColors token;
 
-    Player(String nickname, TokenColors token, PlayableCard[] hand, PlayableCard starterCard ){
+    Player(String nickname, List<PlayableCard> hand, PlayableCard starterCard ){
         this.nickname = nickname;
         this.board = new PlayerBoard(hand, starterCard);
         this.points = 0;
