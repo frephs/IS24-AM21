@@ -343,7 +343,7 @@ class Game {
     -tokens: Token[9]
     -players: Player[2..4]
     -gameBoard: GameBoard
-    -?state: GameStates
+    -state: GameStates[0..1]
     %% the scores key is the player's nickname
     -scores: HashMap~string, int~
     -currentPlayer: Player
