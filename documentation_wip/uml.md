@@ -279,7 +279,7 @@ class Game{
 }
 
 %% TODO decidere se implementarlo come un obietti
-class GameState_OR_PlayerStates{
+class GameState{
     <<Enumeration>>
     GAME_INIT
     %%WAITING
