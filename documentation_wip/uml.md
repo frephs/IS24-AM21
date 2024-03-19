@@ -136,10 +136,12 @@ class PlayableCard {
     -backSide: PlayableBackSide
     -playedSide: CardSideType[0..1]
     -coveredCorners: int
+    -kingdom: ResourceType[0..1]
 
     +PlayableCard(int id, PlayableSide front, PlayableSide back)
+    +PlayableCard(int id, PlayableSide front, PlayableSide back, ResourceType kingdom)
 
-    %% TODO getKingDom
+    +getKingdom() ResourceType[0..1]
     +getPlayedSide() PlayableSide
     +setPlayedSide(CardSideType sideType) void
     +getCoveredCorners() int
