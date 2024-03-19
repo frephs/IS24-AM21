@@ -234,7 +234,7 @@ title: Rest of the model
 ---
 classDiagram
 
-class TokenColors{
+class TokenColor{
     <<Enumeration>>
     RED
     BLUE
@@ -248,10 +248,10 @@ class TokenColors{
 
 class Game{
     
-    -tokens: TokenColors[8] 
+    -tokens: TokenColor[8] 
     -players: Player[2..4] 
     -gameBoard: GameBoard
-    -?state: GameStates 
+    -?state: GameState 
 
     -currentPlayer: Player
 
@@ -267,7 +267,7 @@ class Game{
     %% TODO: decidere come gestire il caso in cui viene rifiutata la richiesta di aggiunta di un giocatore (nickname già presente o troppi giocatori)
     
 
-    +?getGameStates() GameStates
+    +?getGameStates() GameState
     
     getPlayersNames()
 
@@ -309,16 +309,16 @@ class Deck~T~ {
 class Player {
     -nickname: String 
     -points: int
-    -token: TokenColors
-    -board: playerBoard
+    -token: TokenColor
+    -board: PlayerBoard
 
 
     Player(String nickname, PlayableCard starterCard, PlayableCard[3] hand)
     
     getNickname() String
-    getToken() TokenColors
+    getToken() TokenColor
 
-    setToken(TokenColors token) void
+    setToken(TokenColor token) void
     setObjectiveCard(ObjectiveCards)
 
     getPoints() int
@@ -328,7 +328,7 @@ class Player {
     +drawCard(PlayableCard card) void
     %% receive card and put it in the player's hand
 
-    +placeCard(PlayableCard card, CardSidesTypes side, Position position) void
+    +placeCard(PlayableCard card, CardSidesType side, Position position) void
     %% calls the player board placeCard method with the card as parameter and updates the player's points calling the evaluate method on the played card
 
     +evaluate(ObjectiveCard objectiveCard) void
@@ -336,10 +336,11 @@ class Player {
 }
 
 class PlayerBoard {
+    %%FIXME: type of cards
     cards: SidedCard[3]
     objectiveCard: ObjectiveCard
     
-    playedCards: HashMap~Position, PlayedCard~
+    playedCards: HashMap~Position, PlayableCard~
     %% the geometry is an hasmap of positions and played cards
     
     AvailableSpots: Set~Position~
@@ -354,40 +355,39 @@ class PlayerBoard {
     setObjectiveCard(ObjectiveCard objectiveCard) void
     %% sets the objective card in the player board after the player has chosen it
 
-    placeCard(PlayableCard card, cardSidesTypes side, Position position) void
+    placeCard(PlayableCard card, cardSidesType side, Position position) void
     %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
-
-    updateResourcesandObjects(PlayedCard playedCard, Position position) void
+    updateResourcesandObjects(PlayableCard playedCard, Position position) void
     %% updates the player's resources and objects after a card has been placed on the board
 
     updateAvailableSpots(Position position) void
     %% updats the list of available spots in which card can be placed
 
-    evaluate(PlayedCard card) int
-    evaluate(ObjectiveCard objectiveCard) int
+    %%evaluate(PlayedCard card) int
+    %%evaluate(ObjectiveCard objectiveCard) int
     %% 2 overloads of the evaluate method, the first one is called on Playable cards every turn, the second one is called on the objective card at the end of the game.
 }
 
 class PlayerActions{
     <<Interface>>
-    chooseTokenColor(int choice) TokenColors
+    chooseTokenColor(int choice) TokenColor
     chooseObjectiveCard(int choice) ObjectiveCard
 
-    chooseDrawingSource(int choice) DrawingSourceTypes
-    chooseDrawingDeck(int choice) DrawingDeckTypes
+    chooseDrawingSource(int choice) DrawingSourceType
+    chooseDrawingDeck(int choice) DrawingDeckType
 
     choosePlayingCard(int choice) PlayableCard
-    choosePlayingCardSide(int choice) CardSidesTypes
+    choosePlayingCardSide(int choice) CardSidesType
     choosePlayingCardPosition(int choice) Position
 }
 
-class DrawingDeckTypes{
+class DrawingDeckType{
     <<Enumeration>>
     GOLD_DECK
     RESOURCE_DECK
 }
 
-class DrawingSourceTypes{
+class DrawingSourceType{
     <<Enumeration>>
     DECK
     COMMON_BOARD
@@ -439,13 +439,13 @@ class CommonBoard{
 %% is This redundant?
 class ScoreBoard {
     scores: Hashmap~String,int~
-    %%HashMap~TokenColors, int~ redundant???
+    %%HashMap~TokenColor, int~ redundant???
 }
 
 
 Game "2"*--"4" Player : is composed of 
 Game "1"*--"1" GameBoard : is composed of
-Game "1"*--"9" TokenColors : is composed of
+Game "1"*--"9" TokenColor : is composed of
 GameBoard "1"*--"4" Deck : is composed of
 GameBoard "1"*--"1" CommonBoard : is composed of
 Game "1"*--"1" ScoreBoard : is composed of
@@ -454,8 +454,8 @@ PlayerBoard <-- Position : uses
 Player --|> Iterable : implements
 Player --* PlayerBoard: composed of
 
-Player <-- DrawingSourceTypes : uses
-Player <-- DrawingDeckTypes : uses
+Player <-- DrawingSourceType : uses
+Player <-- DrawingDeckType : uses
 Player --> PlayerActions : offers
 
 ```
