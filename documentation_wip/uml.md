@@ -444,6 +444,7 @@ GameBoard "1"*--"4" Deck : is composed of
 PlayerBoard <-- Position : uses
 Player --|> Iterable : implements
 GameBoard --|> EmptyDeckException : <<throws>>
+Deck --|> EmptyDeckException : <<throws>>
 Player --* PlayerBoard: composed of
 
 Player <-- DrawingDeckTypes  : uses
