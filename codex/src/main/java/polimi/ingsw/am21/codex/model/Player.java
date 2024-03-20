@@ -108,7 +108,7 @@ public class Player {
 
 
     /**
-     * @param card drawn from the GameBoard
+     * @param card drawn from the GameBoard which is added to the players hand
      */
     private void drawCard(PlayableCard card){
         board.drawCard(card);
