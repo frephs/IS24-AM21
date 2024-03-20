@@ -157,8 +157,8 @@ public class GameBoard {
     //  * @param N number of cards to draw
     // * @return N resource cards drawn from the resource cards deck
     // */
-    // public List<ResourceCard> drawResourceCardsFromDeck(int N) {
-    //     return this.resourceDeck.draw(N);
+    // public List<ResourceCard> drawResourceCardsFromDeck(int n) {
+    //     return this.resourceDeck.draw(n);
     // }
 
     /**
@@ -169,6 +169,15 @@ public class GameBoard {
      */
     public ResourceCard drawResourceCardFromDeck() throws EmptyDeckException {
         return this.resourceDeck.draw();
+    }
+    /**
+     * Draws a resource card from the deck
+     * @param n number of cards to extract
+     * @return a resource card drawn from the resource cards deck
+     * @throws EmptyDeckException there are no resource cards left in the deck
+     */
+    public List<ResourceCard> drawResourceCardFromDeck(int n) throws EmptyDeckException {
+        return this.resourceDeck.draw(n);
     }
 
     /**

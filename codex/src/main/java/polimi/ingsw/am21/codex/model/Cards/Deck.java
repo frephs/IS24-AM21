@@ -35,10 +35,10 @@ public class Deck<T extends  Card> {
      * @param N number of cards to draw
      * @return the card drawn
      */
-    public List<T> draw(int N) throws EmptyDeckException {
-        if(this.cardsLeft() < N) throw new EmptyDeckException();
-        List<T> drawn = this.cards.subList(this.cards.size()-N, this.cards.size());
-        this.cards = this.cards.subList(0, this.cards.size()-N);
+    public List<T> draw(int n) throws EmptyDeckException {
+        if(this.cardsLeft() < n) throw new EmptyDeckException();
+        List<T> drawn = this.cards.subList(this.cards.size()-n, this.cards.size());
+        this.cards = this.cards.subList(0, this.cards.size()-n);
         return drawn;
     }
 
