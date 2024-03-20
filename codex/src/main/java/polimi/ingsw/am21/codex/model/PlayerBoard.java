@@ -6,7 +6,7 @@ import java.util.*;
 public class PlayerBoard {
 
     private final int MAX_CARDS = 3;
-    private List<PlayableCard> cards = new ArrayList<PlayableCard>(MAX_CARDS);
+    private List<PlayableCard> hand = new ArrayList<PlayableCard>(MAX_CARDS);
     private ObjectiveCard objectiveCard;
 
     Map <Position, PlayableCard> playedCards = new HashMap<>();
@@ -19,26 +19,45 @@ public class PlayerBoard {
     Set<Position> availableSpots = new HashSet<>();
     HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
 
-
-    PlayerBoard(List<PlayableCard> cards, PlayableCard starterCard) {
-        this.cards= cards;
+    /**
+     * @param hand the player's cards drawn from the GameBoard (2 resources and 1 goldcard)
+     * @param starterCard drawn from the playerboard
+     * @param objectiveCard chosen by the client controller (physical player)
+     */
+    PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
+        this.hand = hand;
         this.playedCards.set(new Position(), starterCard);
-    }
-
-    public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
     }
 
+    /**
+     * @return the player's secret objective
+     * */
     public ObjectiveCard getObjectiveCard() {
         return objectiveCard;
     }
 
-    void drawCard(PlayableCard card){
-        cards.add(card);
+    /**
+     * return the player's hand
+     * */
+    public List<PlayableCard> getHand(){
+        return this.hand;
     }
 
+    /**
+     * @param card which is added to the player's hand
+     * */
+    void drawCard(PlayableCard card){
+        hand.add(card);
+    }
+
+    /**
+     * @param playedCard chosen from the player's hand, will be evaluated after placement
+     * @param playedSide of the card chosen to be placed on the PlayerBoard
+     * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
+     */
     void placeCard(PlayableCard playedCard, CardSidesTypes playedSide, Position position){
-        this.cards.remove(playedCard);
+        this.hand.remove(playedCard);
 
         playedCard.setPlayedSide(CardSidesTypes);
         this.playedCards.put(position, playedCard);
@@ -47,8 +66,8 @@ public class PlayerBoard {
         updateResourcesAndObjects(playedCard, position);
 
     }
-
-    //FIXME: maybe order it a little
+    
+    //FIXME: maybe order it a little, maybe iterate over the corners once int the placecard method
     void updateResourcesAndObjects(PlayableCard playedCard, Position position) {
         playedCard.getPlayedSide().getCorners().foreach(
                 (cornerPosition, corner) ->{
@@ -92,15 +111,6 @@ public class PlayerBoard {
             }
         }
     }
-
-    int evaluate(ObjectiveCard card){
-        return card.evaluate(playedCards);
-    }
-
-    int evaluate(PlayableCard card){
-        return card.evaluate(objects); // set coveredCorners
-    }
-
 }
 
 
