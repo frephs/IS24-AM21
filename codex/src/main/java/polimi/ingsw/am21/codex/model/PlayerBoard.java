@@ -19,13 +19,9 @@ public class PlayerBoard {
     Set<Position> availableSpots = new HashSet<>();
     HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
 
-
-    PlayerBoard(List<PlayableCard> cards, PlayableCard starterCard) {
+    PlayerBoard(List<PlayableCard> cards, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.cards= cards;
         this.playedCards.set(new Position(), starterCard);
-    }
-
-    public void setObjectiveCard(ObjectiveCard objectiveCard) {
         this.objectiveCard = objectiveCard;
     }
 
@@ -93,6 +89,7 @@ public class PlayerBoard {
         }
     }
 
+    //TODO: decide if these are to be removed
     int evaluate(ObjectiveCard card){
         return card.evaluate(playedCards);
     }

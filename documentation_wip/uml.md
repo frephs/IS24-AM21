@@ -299,17 +299,13 @@ class Player {
     -token: TokenColor
     -board: PlayerBoard
 
-    Player(String nickname, PlayableCard starterCard, PlayableCard[3] hand)
+    Player(PlayerBukder builder)
     
     getNickname() String
     getToken() TokenColor
-
-    setToken(TokenColor token) void
-    setObjectiveCard(ObjectiveCards) void
-
     getPoints() int
-    setPoints(int) void
-
+    getBoard() PlayerBoard
+    
     drawCard(PlayableCard card) void
     %% receive card and put it in the player's hand
 
@@ -318,6 +314,24 @@ class Player {
 
     evaluate(ObjectiveCard objectiveCard) void
     %% calls the player board evaluate method with the objective card as parameter
+}
+
+Player *-- PlayerBuilder : composition
+
+class PlayerBuilder{
+    -nickname: String
+    -token: TokenColor
+    -objectiveCard: ObjectiveCard
+    -starterCard: PlayableCard
+    -hand: PlayableCard[3]
+
+    nickname(String) PlayerBuilder
+    token(TokenColor) PlayerBuilder
+    objectiveCard(ObjectiveCard) PlayerBuilder
+    starterCard(PlayableCard) PlayerBuilder
+    hand(PlayableCard[3]) PlayerBuilder
+    
+    build() Player
 }
 
 class PlayerBoard {
@@ -335,13 +349,12 @@ class PlayerBoard {
     -objects: HashMap~Objects, int~
     %% the resources and objects the player has on the board
 
-    PlayerBoard(PlayableCard[3] cards, PlayableCard starterCard)
-    
-    setObjectiveCard(ObjectiveCard objectiveCard) void
-    %% sets the objective card in the player board after the player has chosen it
+    PlayerBoard(PlayableCard[3] cards, PlayableCard starterCard, objectiveCard: ObjectiveCard)
+    %% constructor: initializes the player board with the player hand, the starter card in (0,0) and the objective card
 
     placeCard(PlayableCard card, cardSidesType side, Position position) void
     %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
+    
     updateResourcesandObjects(PlayableCard playedCard, Position position) void
     %% updates the player's resources and objects after a card has been placed on the board
 

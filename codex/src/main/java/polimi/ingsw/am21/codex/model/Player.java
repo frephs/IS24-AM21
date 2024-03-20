@@ -2,29 +2,94 @@ package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 import java.util.List;
+import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 public class Player {
     private final String nickname;
-    private PlayerBoard board;
+    private final PlayerBoard board;
+    private final TokenColors token;
     private int points;
-    private TokenColors token;
 
-    /**
-     * @param nickname the player's chose nickname, its uni
-     * @param hand the hand of cards first drawn by the player
-     * @param starterCard the starterCard first drawn by the player which is positioned on the playerboard in (0,0)
-     */
-    Player(String nickname, List<PlayableCard> hand, PlayableCard starterCard ){
-        this.nickname = nickname;
-        this.board = new PlayerBoard(hand, starterCard);
+    Player(PlayerBuilder builder){
+        this.nickname = builder.nickname;
+        this.token = builder.token;
         this.points = 0;
+        this.board = new PlayerBoard(
+                builder.cards,
+                builder.starterCard,
+                builder.objectiveCard
+        );
     }
+
+    public static class PlayerBuilder{
+        private String nickname;
+        private TokenColors token;
+        private List<PlayableCard> cards;
+        private PlayableCard starterCard;
+        private ObjectiveCard objectiveCard;
+
+        /**
+         * @param nickname the player's chose nickname, its uni
+         */
+        public PlayerBuilder nickname(String nickname){
+            this.nickname = nickname;
+            return this;
+        }
+
+        /**
+         * @param token chosen by the client controller (physical player)
+         */
+        public PlayerBuilder TokenColors(TokenColors token){
+            this.token = token;
+            return this;
+        }
+
+        /**
+         * @param cards list drawn from the GameBoard
+         */
+        public PlayerBuilder hand(List<PlayableCard> cards){
+            this.cards = cards;
+            return this;
+        }
+
+        /**
+         * @param starterCard drawn from the GameBoard
+         */
+        public PlayerBuilder starterCard(PlayableCard starterCard){
+            this.starterCard = starterCard;
+            return this;
+        }
+
+        /**
+         * @param objectiveCard chosen by the client controller (physical player)
+         */
+        public PlayerBuilder objectiveCard(ObjectiveCard objectiveCard){
+            this.objectiveCard = objectiveCard;
+            return this;
+        }
+
+        /**
+         * @return a functioning player
+         */
+        public Player build(){
+            return new Player(this);
+        }
+    }
+
+
 
     /**
      * @return player's nickname
      */
     public String getNickname(){
         return this.nickname;
+    }
+
+    /**
+     * @return player's board
+     */
+    public PlayerBoard getBoard(){
+        return this.board;
     }
 
     /**
@@ -35,18 +100,12 @@ public class Player {
     }
 
     /**
-     * @param token chosen by the client controller between the available ones
+     * @return player's points
      */
-    void setToken(TokenColors token){
-        this.token = token;
+    public int getPoints() {
+        return points;
     }
 
-    /**
-     * @param objectiveCard chosen by the client controller between the two given
-     */
-    void setObjectiveCard(ObjectiveCard objectiveCard){
-        board.setObjectiveCard(objectiveCard);
-    }
 
     /**
      * @param card drawn from the GameBoard
