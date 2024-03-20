@@ -39,7 +39,7 @@ public class Player {
         /**
          * @param token chosen by the client controller (physical player)
          */
-        public PlayerBuilder TokenColors(TokenColors token){
+        public PlayerBuilder tokenColor(TokenColors token){
             this.token = token;
             return this;
         }
