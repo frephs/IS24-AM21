@@ -235,37 +235,66 @@ class TokenColor{
 }
  
 
+class Lobby{
+    lobbyPlayers: HashMap~SocketId; PlayerBuilder~
+    %% the lobby players are stored in a hashmap with the socket id as key and the player builder as value, while the players are being constructed the player builder is updated with the player's attributes
+    extractedCards: Hashmap~SocketId;CardPair~ObjectiveCard~~
+    %% we store the extracted objective cards in a hashmap with the socket id so if they disconnect the cards are not lost and eventually put back in the deck
+
+    setNickname(UUID socketId, String nickname) void
+    setToken(UUID socketId, TokenColor token) void
+    finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
+    %% sets the objectiveCard in the player builder, draws the player hand from the respective decks and returns the player object
+
+}
+
 class Game {
     -tokens: TokenColor[8] 
     -players: Player[2..4] 
     -gameBoard: GameBoard
+    
     -state: GameStates[0..1]
     -scores: HashMap~string, int~
-    -currentPlayer: Player
+    
+    -currentPlayer: int
+    -remainingTurns: int[0..1]
 
+    %% index of the player list
 
     Game(int players)
     %% contstructor: creates all the game assets.
-
-    -isGameOver() boolean
-    %%GameOver() void
     
-    addPlayer(String nickname) boolean
-    %% TODO: decidere come gestire il caso in cui viene rifiutata la richiesta di aggiunta di un giocatore (nickname già presente o troppi giocatori)
+    %%game init
+    init() void
+    %% subprocedures of init comprehend:
+    extractFirstPlayer() void 
+    %% extracts the first player from the list of players
+    setGameboardCommonCards() void 
+    %% extracts the card pairs to be placed in the common area of the GameBoard
 
-    %% TODO
+    %% useful getters
     getGameState() GameState
+    getPlayerState(String nickname): PlayerState
+    
+    getPlayerNicknames() String[2..4]
+    getScoreBoard(): HashMap~String, int~
 
-    getPlayerNames() String[2..4]
+    getCurrentPlayerNickname() String
 
+    addPlayer(Player player) void 
+    %% method that will be called by the lobby when the player building process is finalized
+
+    %%TODO: this has to have parameters
     playTurn() void
-    %% to be specified
+    %% changes the current player index
 
-    evaluateObjectives()
-    %% calls player.evaluateObjectives() for each player with the common objectives as parameter
+    isGameOver() boolean
+    over() void 
+    %% sets the game state to GAME_OVER, sets the number of remaining turns, evaluates the objectives and finalizes the scores.
+    getRemainingTurns() int
+
 }
 
-%% TODO decidere se implementarlo come un obietti
 class GameState{
     <<Enumeration>>
     GAME_INIT
