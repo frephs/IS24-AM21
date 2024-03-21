@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class CardBackSide {
-    List<Optional<ResourceTypes>> permanentResource = new ArrayList<>(3);
+    List<Optional<ResourceType>> permanentResource = new ArrayList<>(3);
 
     @Override
-    private ResourceTypes getResources(){
+    private ResourceType getResources(){
         return super() +
     }
 }

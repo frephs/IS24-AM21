@@ -12,8 +12,8 @@ public class PlayerBoard {
     Map <Position, PlayableCard> playedCards = new HashMap<>();
     
    // Hashmaps to keep track of resources
-    private HashMap<ResourceTypes, Integer> resources = new HashMap<>(ResourceTypes.values().lenght);
-    private HashMap<ObjectTypes, Integer> objects = new HashMap<>(ObjectTypes.values().lenght);
+    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().lenght);
+    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().lenght);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
@@ -56,10 +56,10 @@ public class PlayerBoard {
      * @param playedSide of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    void placeCard(PlayableCard playedCard, CardSidesTypes playedSide, Position position){
+    void placeCard(PlayableCard playedCard, CardSidesType playedSide, Position position){
         this.hand.remove(playedCard);
 
-        playedCard.setPlayedSide(CardSidesTypes);
+        playedCard.setPlayedSide(CardSidesType);
         this.playedCards.put(position, playedCard);
 
         updateAvailableSpots(position);
@@ -87,12 +87,12 @@ public class PlayerBoard {
     }
 
     void updateResourcesAndObjectsMaps(Corner corner, int update){
-        if(ResourceTypes.has(Corner.getContent())){
-            ResourceTypes resource = Corner.getContent();
+        if(ResourceType.has(Corner.getContent())){
+            ResourceType resource = Corner.getContent();
             int prevVal = this.resources.get(resource);
             this.resources.put(resource, prevVal+update);
-        }else if(ObjectTypes.has(Corner.getContent())) {
-            ObjectTypes object = Corner.getContent();
+        }else if(ObjectType.has(Corner.getContent())) {
+            ObjectType object = Corner.getContent();
             int prevVal = this.objects.get(object);
             this.objects.put(object, prevVal+update);
         }
