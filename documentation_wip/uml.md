@@ -441,13 +441,13 @@ class EmptyDeckException {
     
 }
 
-Game "2"*--"4" Player : is composed of
-Game "1"*--"1" GameBoard : is composed of
-Game "1"*--"9" TokenColor : is composed of
-GameBoard "1"*--"4" Deck : is composed of
+Game "2"*--"4" Player : composition
+Game "1"*--"1" GameBoard : composition
+Game "1"*--"9" TokenColor : composition
+GameBoard "1"*--"4" Deck : composition
 
 PlayerBoard <-- Position : uses
-Player --* PlayerBoard: composed of
+Player --* PlayerBoard: composition
 
 Player <-- DrawingSourceType : uses
 Player <-- DrawingDeckType : uses
