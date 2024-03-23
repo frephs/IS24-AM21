@@ -238,8 +238,8 @@ class TokenColor{
 class Lobby{
     lobbyPlayers: HashMap~SocketId; PlayerBuilder~
     %% the lobby players are stored in a hashmap with the socket id as key and the player builder as value, while the players are being constructed the player builder is updated with the player's attributes
-    extractedCards: Hashmap~SocketId;CardPair~ObjectiveCard~~
-    %% we store the extracted objective cards in a hashmap with the socket id so if they disconnect the cards are not lost and eventually put back in the deck
+    extractedCards: HashMap~SocketId;CardPair~ObjectiveCard~~
+    %% We store the extracted objective cards in a HashMap along with the socket id, ensuring they can be restored to the deck if the player disconnects.
 
     setNickname(UUID socketId, String nickname) void
     setToken(UUID socketId, TokenColor token) void
@@ -277,7 +277,7 @@ class Game {
     getPlayerState(String nickname): PlayerState
     
     getPlayerNicknames() String[2..4]
-    getScoreBoard(): HashMap~String, int~
+    getScoreBoard() HashMap~String, int~
 
     getCurrentPlayerNickname() String
 
