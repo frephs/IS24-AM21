@@ -260,7 +260,9 @@ class Game {
     -scores: HashMap~string, int~
     
     -currentPlayer: int
-    -remainingTurns: int[0..1]
+    -remainingTurns: int
+    %%initially set to 0 by the constructor game.over() sets it to the number of players 
+
 
     %% index of the player list
 
@@ -294,8 +296,11 @@ class Game {
 
     isGameOver() boolean
     
-    over() void 
-    %% sets the game state to GAME_OVER, sets the number of remaining turns, evaluates the objectives and finalizes the scores.
+    setGameOver() void 
+    %% sets the game state to GAME_OVER, sets the number of remaining turns to the number of players
+    
+    over()
+    %%evaluates the objectives and finalizes the scores.
     
     getRemainingTurns() Optional~int~
     %% returns the number of remaining turns if the game is over (a player has 20+ points), othewise returns an empty optional
