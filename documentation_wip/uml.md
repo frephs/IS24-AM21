@@ -243,8 +243,8 @@ class Lobby{
 
     setNickname(UUID socketId, String nickname) void
     setToken(UUID socketId, TokenColor token) void
-    finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
     %% sets the objectiveCard in the player builder, draws the player hand from the respective decks and returns the player object
+    finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
 
 }
 
@@ -274,23 +274,23 @@ class Game {
 
     %% useful getters
     getGameState() GameState
-    getPlayerState(String nickname): PlayerState
+    getPlayerState(String nickname) PlayerState
     
     getPlayerNicknames() String[2..4]
     getScoreBoard() HashMap~String, int~
 
     getCurrentPlayerNickname() String
 
-    addPlayer(Player player) void 
     %% method that will be called by the lobby when the player building process is finalized
+    addPlayer(Player player) void
 
     %%TODO: this has to have parameters
     playTurn() void
     %% changes the current player index
 
     isGameOver() boolean
-    over() void 
     %% sets the game state to GAME_OVER, sets the number of remaining turns, evaluates the objectives and finalizes the scores.
+    over() void 
     getRemainingTurns() int
 
 }
