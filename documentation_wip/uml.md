@@ -238,13 +238,16 @@ class TokenColor{
 class Lobby{
     lobbyPlayers: HashMap~SocketId; PlayerBuilder~
     %% the lobby players are stored in a hashmap with the socket id as key and the player builder as value, while the players are being constructed the player builder is updated with the player's attributes
+    
     extractedCards: HashMap~SocketId;CardPair~ObjectiveCard~~
     %% We store the extracted objective cards in a HashMap along with the socket id, ensuring they can be restored to the deck if the player disconnects.
 
     setNickname(UUID socketId, String nickname) void
     setToken(UUID socketId, TokenColor token) void
-    %% sets the objectiveCard in the player builder, draws the player hand from the respective decks and returns the player object
+
+
     finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
+    %% sets the objectiveCard in the player builder, draws the player hand from the respective decks and returns the player object
 
 }
 
@@ -261,11 +264,12 @@ class Game {
 
     %% index of the player list
 
-    Game(int players)
     %% contstructor: creates all the game assets.
+    Game(int players)
     
     %%game init
     init() void
+
     %% subprocedures of init comprehend:
     extractFirstPlayer() void 
     %% extracts the first player from the list of players
@@ -281,17 +285,20 @@ class Game {
 
     getCurrentPlayerNickname() String
 
+    addPlayer(Player player) void 
     %% method that will be called by the lobby when the player building process is finalized
-    addPlayer(Player player) void
 
     %%TODO: this has to have parameters
     playTurn() void
     %% changes the current player index
 
     isGameOver() boolean
-    %% sets the game state to GAME_OVER, sets the number of remaining turns, evaluates the objectives and finalizes the scores.
+    
     over() void 
-    getRemainingTurns() int
+    %% sets the game state to GAME_OVER, sets the number of remaining turns, evaluates the objectives and finalizes the scores.
+    
+    getRemainingTurns() Optional~int~
+    %% returns the number of remaining turns if the game is over (a player has 20+ points), othewise returns an empty optional
 
 }
 
