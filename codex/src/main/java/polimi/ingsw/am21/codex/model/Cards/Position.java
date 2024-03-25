@@ -13,7 +13,7 @@ public class Position {
         this.y = 0;
     }
 
-    public Position computeLinkingPosition(CornerEnum linkedCorner){
+    public Position computeLinkingPosition(CornerPosition linkedCorner){
         return switch (linkedCorner) {
             case UP_LEFT -> new Position(x - 1, y + 1);
             case UP_RIGHT -> new Position(x + 1, y + 1);
@@ -28,6 +28,6 @@ public class Position {
 
     @Override
     public int hashCode() {
-        return
+        return 0; // TODO actually return something
     }
 }
