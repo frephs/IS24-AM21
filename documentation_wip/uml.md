@@ -7,7 +7,7 @@ A rough view of the UML of Model View Controller:
   - _Player_: can play a turn (try to play a card on the player board given as parameter to their constructor and receive drawn cards), has points,
     - _Player Board_: enforces rules for card placement and keeps tracks of resources, objets the geometry of the cards placed onto it
   - _Cards hierarchy_: The uml is pretty self explanatory
-  - _GameBoard_: composed of (composition class to keep things tidy (is it necessary tho?)
+  - _GameBoard_: composed of composition class to keep things tidy (is it necessary tho?)
     - _Score Board_: hashmap with buckets, of (lists of) player tokens (optional utility to useful for the GUI development eventually)
     - _Common Board_: common cards for everyone to use, methods to get and draw cards from here (the latter also draws a new card from the deck) (card retrieval methods comprehend common goals retrival for point calculation).
     - _Card's Decks_ : methods to shuffle and retrieve cards from the decks.
@@ -242,6 +242,9 @@ class Lobby{
     extractedCards: HashMap~SocketId;CardPair~ObjectiveCard~~
     %% We store the extracted objective cards in a HashMap along with the socket id, ensuring they can be restored to the deck if the player disconnects.
 
+    -tokens: TokenColor[4]
+    %% arraylist of available tokens
+
     setNickname(UUID socketId, String nickname) void
     setToken(UUID socketId, TokenColor token) void
 
@@ -252,7 +255,7 @@ class Lobby{
 }
 
 class Game {
-    -tokens: TokenColor[8] 
+
     -players: Player[2..4] 
     -gameBoard: GameBoard
     
