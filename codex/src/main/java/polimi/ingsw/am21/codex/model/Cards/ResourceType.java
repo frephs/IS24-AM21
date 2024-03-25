@@ -8,7 +8,7 @@ public enum ResourceType {
     FUNGI_KINGDOM,
     INSECT_KINGDOM;
 
-    public static <T> boolean has(T enumObject){
+    public static boolean has(Object enumObject){
         return Arrays.stream(ResourceType.values()).anyMatch(
                 value -> value == enumObject
         );

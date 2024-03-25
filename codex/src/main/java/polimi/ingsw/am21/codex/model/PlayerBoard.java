@@ -56,10 +56,10 @@ public class PlayerBoard {
      * @param playedSide of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    void placeCard(PlayableCard playedCard, CardSidesType playedSide, Position position){
+    void placeCard(PlayableCard playedCard, CardSideType playedSide, Position position){
         this.hand.remove(playedCard);
 
-        playedCard.setPlayedSide(CardSidesType);
+        playedCard.setPlayedSide(CardSideType);
         this.playedCards.put(position, playedCard);
 
         updateAvailableSpots(position);

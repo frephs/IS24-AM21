@@ -7,9 +7,12 @@ public enum ObjectType {
     INKWELL,
     MANUSCRIPT;
 
-    public static <T> boolean has(T enumObject){
+    /**
+     * Determines whether the given value is part of this enum
+     */
+    public static boolean has(Object value) {
         return Arrays.stream(ObjectType.values()).anyMatch(
-               value -> value == enumObject
+                objectType -> objectType == value
         );
     }
 }
