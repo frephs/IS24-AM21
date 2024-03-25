@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
 
-public enum ResourceType {
+public enum ResourceType implements CornerContentType {
     PLANT_KINGDOM,
     ANIMAL_KINGDOM,
     FUNGI_KINGDOM,

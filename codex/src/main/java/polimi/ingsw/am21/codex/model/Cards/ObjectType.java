@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
 
-public enum ObjectType {
+public enum ObjectType implements CornerContentType {
     QUILL,
     INKWELL,
     MANUSCRIPT;
