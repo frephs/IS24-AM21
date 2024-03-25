@@ -34,7 +34,7 @@ class PlayableBackSideTest {
     }
 
     @Test
-    void evaluate() {
+    void getEvaluator() {
         List<ResourceType> resources = new ArrayList<>();
         resources.add(ResourceType.ANIMAL_KINGDOM);
         PlayableBackSide a = new PlayableBackSide(resources);
@@ -42,10 +42,10 @@ class PlayableBackSideTest {
         resources.add(ResourceType.PLANT_KINGDOM);
         PlayableBackSide b = new PlayableBackSide(resources);
 
-        PlayerBoard pb = new PlayerBoard(new ArrayList<>(), new PlayableCard(), new ObjectiveCard());
+        PlayerBoard pb = new PlayerBoard(new ArrayList<>(), new PlayableCard(123, null, null), new ObjectiveCard());
 
-        // .equals() should always return 0
-        assertEquals(a.evaluate(pb), 0);
-        assertEquals(a.evaluate(pb), 0);
+        // evaluator should always return 0
+        assertEquals(a.getEvaluator().apply(pb, 123), 0);
+        assertEquals(b.getEvaluator().apply(pb, 123), 0);
     }
 }

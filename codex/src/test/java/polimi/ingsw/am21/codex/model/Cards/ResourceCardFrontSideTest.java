@@ -11,15 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class ResourceCardFrontSideTest {
 
     @Test
-    void evaluate() {
-        PlayerBoard pb = new PlayerBoard(new ArrayList<>(), new PlayableCard(), new ObjectiveCard());
+    void getEvaluator() {
+        PlayerBoard pb = new PlayerBoard(new ArrayList<>(), new PlayableCard(456, null, null), new ObjectiveCard());
 
-        List<Integer> testInts = List.of(0, 123, Integer.MAX_VALUE);
+        List<Integer> testIntegers = List.of(0, 123, Integer.MAX_VALUE);
 
-        testInts.forEach(e -> {
+        testIntegers.forEach(e -> {
             ResourceCardFrontSide a = new ResourceCardFrontSide(e);
 
-            assertEquals(a.evaluate(pb), e);
+            assertEquals(a.getEvaluator().apply(pb, 789), e);
         });
     }
 }

@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class StarterCardFrontSideTest {
 
     @Test
-    void evaluate() {
-        PlayerBoard pb = new PlayerBoard(new ArrayList<>(), new PlayableCard(), new ObjectiveCard());
+    void getEvaluator() {
+        PlayerBoard pb = new PlayerBoard(new ArrayList<>(), new PlayableCard(123, null, null), new ObjectiveCard());
 
         StarterCardFrontSide a = new StarterCardFrontSide();
-        // .evaluate() should always return 0
-        assertEquals(a.evaluate(pb), 0);
+        // evaluator should always return 0
+        assertEquals(a.getEvaluator().apply(pb, 123), 0);
     }
 }
