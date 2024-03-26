@@ -79,7 +79,7 @@ class Card {
     Card(int id)
 
     getId() int
-    evaluate(PlayerBoard playerBoard) int*
+    getEvaluator() Function~PlayerBoard; Integer points~ *
 }
 
 class Corner~T~ {
@@ -108,14 +108,14 @@ class ObjectiveCard {
 
     ObjectiveCard(int id, int points, Objective objective)
 
-    evaluate(PlayerBoard playerBoard) int
     %% return points * objective.evaluate()
+    getEvaluator() Function~PlayerBoard pb; Integer points~ 
+    %% implements the abstract method in Card
 }
 
 class Objective {
     <<Abstract>>
-    evaluate(PlayerBoard playerBoard) int*
-    %% lo realizzeremo dentro evaluate count: int
+    getEvaluator() Function~PlayerBoard pb; Integer points~ *
 }
 ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization 
@@ -125,7 +125,7 @@ class GeometricObjective {
 
     GeometricObjective(ResourceType[3][3] geometry)
 
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() Function~PlayerBoard pb; Integer points~
 }
 Objective <|.. GeometricObjective : realization
 %% ResourceType "3..n" <-- "n" GeometricObjective: dependency
@@ -137,7 +137,7 @@ class CountingObjective {
     
     CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
     
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() Function~PlayerBoard pb; Integer points~
 }
 Objective <|.. CountingObjective : realization
 %% ResourceType "0..4" <-- "n" CountingObjective: dependency
@@ -158,7 +158,7 @@ class PlayableCard {
     setPlayedSide(CardSideType sideType) void
     getCoveredCorners() int
     setCoveredCorners(int n) void
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() Function~PlayerBoard pb; Integer points~
 }
 Card <|.. PlayableCard: realization
 %% CardSideType "0..1" <-- "n" PlayableCard: dependency
@@ -170,7 +170,7 @@ class PlayableSide {
     getCorners() Corner[1..4]
     setCorner(CornerPosition position, ResourceType resource)
     setCorner(CornerPosition position, ObjectType object)
-    evaluate(PlayerBoard playerBoard) int*
+    getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -182,7 +182,7 @@ class PlayableBackSide {
     PlayableBackSide(ResourceType[1..3] permanentResources)
 
     getResources() ResourceType[1..3]
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
@@ -190,6 +190,8 @@ PlayableCard "1" *-- "1"  PlayableBackSide: composition
 
 class PlayableFrontSide {
     <<Abstract>>
+    getEvaluator() BiFunction~PlayerBoard pb; Integer CoveredCorners; Integer points~ *
+
 }
 PlayableSide <-- PlayableFrontSide: inheritance
 PlayableCard "1" *-- "1" PlayableFrontSide: composition
@@ -197,7 +199,7 @@ PlayableCard "1" *-- "1" PlayableFrontSide: composition
 class StarterCardFrontSide {
     StarterCardFrontSide()
 
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
 }
 PlayableFrontSide <|.. StarterCardFrontSide: realization
 
@@ -206,7 +208,8 @@ class ResourceCardFrontSide {
 
     ResourceCardFrontSide(int points)
 
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
+
 }
 PlayableFrontSide <|.. ResourceCardFrontSide: realization
 
@@ -217,12 +220,92 @@ class GoldCardFrontSide {
 
     GoldCardFrontSide(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
 
-    evaluate(PlayerBoard playerBoard) int
+    getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
+    %%implements the abstract method in PlayableSide
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
 %% PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
 %% ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
+
+class CardBuilder {
+    -id: int
+    %% Resource | Starter | Gold | Objective
+    -type: CardType 
+
+    %% Objective | Resource | Gold
+    -points: int[0..1]
+
+    %% Objective
+    -objectiveType: ObjectiveType[0..1]
+    -objectiveGeometry: ResourceType[3][3][0..1]
+    -objectiveResources: HashMap~ResourceType, int~[0..1]
+    -objectiveObjects: HashMap~ObjectType, int~[0..1]
+
+    %% Resource | Starter | Gold
+    -backPermanentResources: ResourceType[1..3][0..1]
+
+    %% Gold
+    -placementCondition: ResourceType[1..5][0..1]
+    -pointCondition: PointConditionType[0..1]
+    -pointConditionObject: ObjectType[0..1]
+
+    CardBuilder(int id, CardType type)
+
+    setPoints(int points) CardBuilder ~~throws~~ WrongCardTypeException
+
+    setObjectiveType(ObjectiveType objectiveType) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveGeometry(ResourceType[3][3] objectiveGeometry) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveResources(HashMap~ResourceType, int~ objectiveResources) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveObjects(HashMap~ObjectType, int~ objectiveObjects) CardBuilder ~~throws~~ WrongCardTypeException
+
+    setBackPermanentResources(ResourceType[1..3] backPermanentResources) CardBuilder ~~throws~~ WrongCardTypeException
+
+    setPlacementCondition(ResourceType[1..5] placementCondition) CardBuilder ~~throws~~ WrongCardTypeException
+    setPointCondition(PointConditionType pointCondition) CardBuilder ~~throws~~ WrongCardTypeException
+    setPointConditionObject(ObjectType pointConditionObject) CardBuilder ~~throws~~ WrongCardTypeException
+
+    build() Card ~~throws~~ MissingParametersException
+}
+Card "1" *-- "1" CardBuilder: composition
+ObjectiveCard "0..1" <-- "1" CardBuilder: dependency
+GeometricObjective "0..1" <-- "1" CardBuilder: dependency
+CountingObjective "0..1" <-- "1" CardBuilder: dependency
+PlayableCard "0..1" <-- "1" CardBuilder: dependency
+StarterCardFrontSide "0..1" <-- "1" CardBuilder: dependency
+ResourceCardFrontSide "0..1" <-- "1" CardBuilder: dependency
+GoldCardFrontSide "0..1" <-- "1" CardBuilder: dependency
+PlayableBackSide "0..1" <-- "1" CardBuilder: dependency
+
+%% CardType "1" *-- "1" CardBuilder: composition
+%% ObjectType "0..1" <-- "n" CardBuilder: dependency
+%% ResourceType "0..1" <-- "n" CardBuilder: dependency
+%% PointConditionType "0..1" <-- "n" CardBuilder: dependency
+
+
+class CardType {
+    <<Enumeration>>
+    RESOURCE
+    STARTER
+    GOLD
+    OBJECTIVE
+}
+
+class ObjectiveType {
+    <<Enumeration>>
+    GEOMETRIC
+    COUNTING
+}
+
+class WrongCardTypeException {
+    %% should extends IllegalStateException
+    WrontCardTypeException(String expected, String actual)
+}
+
+class MissingParametersException {
+    %% should extends IllegalStateException
+    MissingParametersException(String missing)
+}
 ```
 
 ### Game model
@@ -372,6 +455,8 @@ class PlayerBoard {
     updateAvailableSpots(Position position) void
     %% updats the list of available spots in which card can be placed
 
+    evaluate(Function~PlayerBoard, int,~ cardEvaluationFunction) int
+    evaluate(Lambda~PlayerBoard,int, int~ cardEvaluationFunction) int
     %%evaluate(PlayedCard card) int
     %%evaluate(ObjectiveCard objectiveCard) int
     %% 2 overloads of the evaluate method, the first one is called on Playable cards every turn, the second one is called on the objective card at the end of the game.

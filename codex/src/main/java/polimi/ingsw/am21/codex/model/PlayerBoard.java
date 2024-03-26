@@ -24,7 +24,7 @@ public class PlayerBoard {
      * @param starterCard drawn from the playerboard
      * @param objectiveCard chosen by the client controller (physical player)
      */
-    PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
+    public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.hand = hand;
         this.playedCards.set(new Position(), starterCard);
         this.objectiveCard = objectiveCard;
@@ -56,10 +56,10 @@ public class PlayerBoard {
      * @param playedSide of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    void placeCard(PlayableCard playedCard, CardSidesType playedSide, Position position){
+    void placeCard(PlayableCard playedCard, CardSideType playedSide, Position position){
         this.hand.remove(playedCard);
 
-        playedCard.setPlayedSide(CardSidesType);
+        playedCard.setPlayedSide(CardSideType);
         this.playedCards.put(position, playedCard);
 
         updateAvailableSpots(position);
@@ -76,7 +76,7 @@ public class PlayerBoard {
 
                     if(!availableSpots.contains(linkingCardPosition)){
                         // we need to remove its covered contents
-                        CornerEnum linkingCorner = CornerEnum.getOppositeCorner(cornerPosition);
+                        CornerPosition linkingCorner = CornerPosition.getOppositeCorner(cornerPosition);
                         PlayableCard linkedCard= this.playedCards.get(linkingCardPosition);
                         Corner linkedCorner = linkedCard.getPlayedSide().getCorner(linkingCorner);
 
@@ -100,7 +100,7 @@ public class PlayerBoard {
 
     void updateAvailableSpots(Position position){
         availableSpots.remove(position);
-        for (CornerEnum adjacentCorner : CornerEnum.values()) {
+        for (CornerPosition adjacentCorner : CornerPosition.values()) {
             Position adjacentCardPosition = position.computeLinkingPosition((adjacentCorner));
             if(!availableSpots.contains(adjacentCardPosition)){
                 if(! playedCards.containsKey(adjacentCardPosition)){
@@ -110,6 +110,10 @@ public class PlayerBoard {
                 }
             }
         }
+    }
+
+    public HashMap<ObjectType, Integer> getObjects() {
+        return this.objects;
     }
 }
 

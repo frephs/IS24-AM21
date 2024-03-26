@@ -2,14 +2,17 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
 
-public enum ObjectType {
+public enum ObjectType implements CornerContentType {
     QUILL,
     INKWELL,
     MANUSCRIPT;
 
-    public static <T> boolean has(T enumObject){
+    /**
+     * Determines whether the given value is part of this enum
+     */
+    public static boolean has(Object value) {
         return Arrays.stream(ObjectType.values()).anyMatch(
-               value -> value == enumObject
+                objectType -> objectType == value
         );
     }
 }
