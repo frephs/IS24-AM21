@@ -470,7 +470,7 @@ class Player {
 
     %% the player constructor takes the bulder, that is used to get necessary information to build the player
     %% and the board that is initialized inside the build() function drawing and setting the necessary cards in hand
-    Player(PlayerBuilder builder, PlayerBoard board)
+    Player(PlayerBuilder builder)
 
     getNickname() String
     getToken() TokenColor
@@ -525,6 +525,7 @@ class PlayerBoard {
     PlayerBoard(PlayableCard[3] cards, PlayableCard starterCard, objectiveCard: ObjectiveCard)
     %% constructor: initializes the player board with the player hand, the starter card in (0,0) and the objective card
 
+    receiveDrawnCard(PlayableCard card) void
     placeCard(PlayableCard card, cardSidesType side, Position position) void
     %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
 
@@ -621,7 +622,7 @@ Player --* PlayerBoard: composition
 
 Player <-- DrawingSourceType : uses
 Player <-- DrawingDeckType : uses
-Player --> PlayerActions : offers
+%% Player --> PlayerActions : offers
 
 GameBoard --|> EmptyDeckException : composition
 Deck --|> EmptyDeckException : composition
