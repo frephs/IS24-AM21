@@ -75,7 +75,7 @@ class Corner~T~ {
     %%set in the constructor
     -content: Optional~T~
     -isCovered: boolean
-    
+
     Corner()
     Corner(T content)
 
@@ -107,7 +107,7 @@ class Objective {
     %% lo realizzeremo dentro evaluate count: int
 }
 ObjectiveCard "1" *-- "1" Objective: composition
-Card <|.. ObjectiveCard: realization 
+Card <|.. ObjectiveCard: realization
 
 class GeometricObjective {
     -geometry: ResourceType[3][3]
@@ -123,9 +123,9 @@ Objective <|.. GeometricObjective : realization
 class CountingObjective {
     -resources: HashMap~ResourceType; int~
     -objects: HashMap~ObjectType; int~
-    
+
     CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
-    
+
     evaluate(PlayerBoard playerBoard) int
 }
 Objective <|.. CountingObjective : realization
@@ -233,84 +233,97 @@ class TokenColor{
 
     +toString() String
 }
- 
+
 
 class Lobby{
-    lobbyPlayers: HashMap~SocketId; PlayerBuilder~
     %% the lobby players are stored in a hashmap with the socket id as key and the player builder as value, while the players are being constructed the player builder is updated with the player's attributes
-    
-    extractedCards: HashMap~SocketId;CardPair~ObjectiveCard~~
-    %% We store the extracted objective cards in a HashMap along with the socket id, ensuring they can be restored to the deck if the player disconnects.
+    lobbyPlayers: HashMap~SocketId; PlayerBuilder~
 
-    -tokens: TokenColor[4]
+    %% We store the extracted objective cards in a HashMap along with the socket id, ensuring they can be restored to the deck if the player disconnects.
+    extractedCards: HashMap~SocketId;CardPair~ObjectiveCard~~
+
     %% arraylist of available tokens
+    -tokens: TokenColor[4]
 
     setNickname(UUID socketId, String nickname) void
     setToken(UUID socketId, TokenColor token) void
 
 
-    finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
     %% sets the objectiveCard in the player builder, draws the player hand from the respective decks and returns the player object
+    finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
 
 }
 
 class Game {
 
-    -players: Player[2..4] 
+    -players: Player[2..4]
     -gameBoard: GameBoard
-    
-    -state: GameStates[0..1]
-    -scores: HashMap~string, int~
-    
-    -currentPlayer: int
-    -remainingTurns: int
-    %%initially set to 0 by the constructor game.over() sets it to the number of players 
+    -lobby: Lobby
+    -state: GameState[0..1]
 
+    %% Initially set to Optional.empty() if not empty it means the game is will be played [remainingRounds] rounds
+    %% eg.
+    %% if you the second player while playing reaches 20 points we will set the remaining rounds to 2
+    %% everytime the round ends we will decrement the remaining rounds if the value is 0 we will end the game
+    -remainingRounds: Optional~int~
+
+    %% returns the current game lobby
+    +getLobby(): Lobby
 
     %% index of the player list
+    -currentPlayer: int
 
     %% contstructor: creates all the game assets.
     Game(int players)
-    
-    %%game init
+
+    %% initializes the game by extracting the cards from the decks and setting the game state to GAME_INIT
     init() void
 
-    %% subprocedures of init comprehend:
-    extractFirstPlayer() void 
-    %% extracts the first player from the list of players
-    setGameboardCommonCards() void 
     %% extracts the card pairs to be placed in the common area of the GameBoard
+    setGameboardCommonCards() void ~~throws~~ GameOverException
 
     %% useful getters
     getGameState() GameState
+
+    %% returns player state of the nickname based on the current player index
     getPlayerState(String nickname) PlayerState
-    
-    getPlayerNicknames() String[2..4]
+
+    %% returns the scoreboard
     getScoreBoard() HashMap~String, int~
 
-    getCurrentPlayerNickname() String
+    %% returns the current player
+    getCurrentPlayer() Player
 
-    addPlayer(Player player) void 
     %% method that will be called by the lobby when the player building process is finalized
+    addPlayer(Player player) void ~~throws~~
 
-    %%TODO: this has to have parameters
-    playTurn() void
-    %% changes the current player index
+    %% changes the current player index after checking if the current player has 20+ points therefore setting remainingRounds to 2
+    nextTurn() void ~~throws~~ GameOverException
 
-    isGameOver() boolean
-    
-    setGameOver() void 
-    %% sets the game state to GAME_OVER, sets the number of remaining turns to the number of players
-    
-    over()
-    %%evaluates the objectives and finalizes the scores.
-    
-    getRemainingTurns() Optional~int~
-    %% returns the number of remaining turns if the game is over (a player has 20+ points), othewise returns an empty optional
+    %% returns true if the game state is GAME_OVER
+    getGameOver() boolean
 
+    %% sets the game state to GAME_OVER
+    setGameOver() void ~~throws~~ GameOverException
+
+    %% returns the remaining rounds including the current one
+    getRemainingRounds() Optional<int>
+
+    isResourceDeckEmpty() boolean
+    isGoldDeckEmpty() boolean
+
+    areDecksEmpty() boolean
+
+    %% draw a card from the respective deck and adds it to the player's hand
+    drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
+
+    %% draw a card from the common board and adds it to the player hans, if the first is true the first card in the pair is drawn, otherwise the second
+    drawCurrentPlayerCardFromPair(DrawingDeckType deckType, boolean first) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
 }
 
-class GameState{
+Game --|> Lobby : composition
+
+class GameState {
     <<Enumeration>>
     GAME_INIT
     %%WAITING
@@ -338,31 +351,37 @@ class Deck~T~ {
 }
 
 class Player {
-    -nickname: String 
+    -nickname: String
     -points: int
     -token: TokenColor
     -board: PlayerBoard
 
-    Player(PlayerBukder builder)
-    
+    %% the player constructor takes the bulder, that is used to get necessary information to build the player
+    %% and the board that is initialized inside the build() function drawing and setting the necessary cards in hand
+    Player(PlayerBuilder builder, PlayerBoard board)
+
     getNickname() String
     getToken() TokenColor
     getPoints() int
     getBoard() PlayerBoard
-    
-    drawCard(PlayableCard card) void
+
+    %% increments player points
+    incrementPlayerPoints(int points) void
+
     %% receive card and put it in the player's hand
+    receiveDrawnCard(PlayableCard card) void
 
-    placeCard(PlayableCard card, CardSidesType side, Position position) void
     %% calls the player board placeCard method with the card as parameter and updates the player's points calling the evaluate method on the played card
+    placeCard(PlayableCard card, CardSidesType side, Position position) void
 
+    %% evaluate takes objective card, given that the objective card returns a Function that can be called against the player board to check if the requirements are met
+    %% if the requirements are met the points are added to the player
     evaluate(ObjectiveCard objectiveCard) void
-    %% calls the player board evaluate method with the objective card as parameter
 }
 
 Player *-- PlayerBuilder : composition
 
-class PlayerBuilder{
+class PlayerBuilder {
     -nickname: String
     -token: TokenColor
     -objectiveCard: ObjectiveCard
@@ -374,7 +393,7 @@ class PlayerBuilder{
     objectiveCard(ObjectiveCard) PlayerBuilder
     starterCard(PlayableCard) PlayerBuilder
     hand(PlayableCard[3]) PlayerBuilder
-    
+
     build() Player
 }
 
@@ -382,10 +401,10 @@ class PlayerBoard {
     %%FIXME: type of cards
     -cards: SidedCard[3]
     -objectiveCard: ObjectiveCard
-    
+
     -playedCards: HashMap~Position, PlayableCard~
     %% the geometry is an hashmap of positions and played cards
-    
+
     -availableSpots: Set~Position~
     %% the available spots for the player to place a card on the board
 
@@ -398,7 +417,7 @@ class PlayerBoard {
 
     placeCard(PlayableCard card, cardSidesType side, Position position) void
     %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
-    
+
     updateResourcesandObjects(PlayableCard playedCard, Position position) void
     %% updates the player's resources and objects after a card has been placed on the board
 
@@ -440,7 +459,7 @@ class Position{
     -y: int
 
     Position(int x, int y)
-    
+
     %% Overriding default hashmap key methods
     equals(Position position) boolean
     computeLinkingPosition(CornerEnum linkedCorner) Position
@@ -455,7 +474,7 @@ class GameBoard {
     -resourceDeck: Deck~PlayableCard~
     -resourceCards: CardPair~PlayableCard~
     -objectiveCards: CardPair~ObjectiveCard~
-    
+
     %% the game board has two constructors, one with parameters and one without
     %% the constructor with parameters is used to restore a game from a save file
     GameBoard(CardPair~Goldcards~ goldCards, CardPair~PlayableCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~PlayableCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~PlayableCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
@@ -469,7 +488,7 @@ class GameBoard {
 
     drawStarterCard() PlayableCard ~~throws~~ EmptyDeckException
     getStarterCardsLeft() int
-    
+
     drawObjectiveCardFromDeck() ObjectiveCard ~~throws~~ EmptyDeckException
     drawObjectiveCardFromPair(boolean first) ObjectiveCard ~~throws~~ EmptyDeckException
     getObjectiveCards() CardPair~ObjectiveCard~
@@ -482,7 +501,7 @@ class GameBoard {
 }
 
 class EmptyDeckException {
-    
+
 }
 
 Game "2"*--"4" Player : is composed of
