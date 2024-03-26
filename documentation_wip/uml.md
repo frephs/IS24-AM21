@@ -20,6 +20,17 @@ A rough view of the UML of Model View Controller:
   - Server: will instantiate the game and handle the communications with all the clients.
 
 ## Model
+As a team, we made the choice to implement part of the game logic in our model because we wanted the controller layer in the server, to be as light as possible. This way the role of the controller layer is to parse the inputs coming from the client controller (communications), calling the model methods to update the game, player, gameboard and playerboard statuses with the parsed data and finally to signal the views to update. 
+
+For development and accessability purposes we split the model class diagram in two parts: the card hierarchy and the rest of the model, so that the most meaningful connections would be easily visibile in the diagram.
+
+#### Documenting choices 
+Some design choices we took that we think are worth documenting into detail are:
+1. The hybrid approach to evaluating objectives and card placement points: to reflect actual game dynamics we decided to make the cards return Functions which will populated with the playerBoard attributes in the playerBoard context. This way we avoid sending around the playerBoard instancies, which we considered a bad security practice, and avoid duplicating it just to have the cards evaluate the points with their specificity, which we obtain nonetheless with this approach.      
+
+2. The use of the Builder pattern for the Player class: since the player attributes are all final once chosen by the client, we decided to store PlayerBuilder instancies in a hashmap in the Lobby class as the controller layer handles the parsing of the client inputs. This way a player is added to the Game's Player list only when finalized (once they have chosen their Secret Objective).
+
+3. Some classes can be considered redundant as they could be easily implemented as part of the class they are a composition to. We decided to keep them separate to keep the code more readable and to make the implementation of the GUI easier as these entities are effectively functional on their own and can be considered "Drawable". 
 
 ### Cards
 
