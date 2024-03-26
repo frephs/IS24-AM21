@@ -257,9 +257,9 @@ class CardBuilder {
     setPoints(int points) CardBuilder ~~throws~~ WrongCardTypeException
 
     setObjectiveType(ObjectiveType objectiveType) CardBuilder ~~throws~~ WrongCardTypeException
-    setObjectiveGeometry(ResourceType[3][3] objectiveGeometry) CardBuilder ~~throws~~ WrongCardTypeException
-    setObjectiveResources(HashMap~ResourceType, int~ objectiveResources) CardBuilder ~~throws~~ WrongCardTypeException
-    setObjectiveObjects(HashMap~ObjectType, int~ objectiveObjects) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveGeometry(ResourceType[3][3] objectiveGeometry) CardBuilder ~~throws~~ WrongCardTypeException, MissingParametersException
+    setObjectiveResources(HashMap~ResourceType, int~ objectiveResources) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
+    setObjectiveObjects(HashMap~ObjectType, int~ objectiveObjects) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
 
     setBackPermanentResources(ResourceType[1..3] backPermanentResources) CardBuilder ~~throws~~ WrongCardTypeException
 
@@ -278,6 +278,9 @@ StarterCardFrontSide "0..1" <-- "1" CardBuilder: dependency
 ResourceCardFrontSide "0..1" <-- "1" CardBuilder: dependency
 GoldCardFrontSide "0..1" <-- "1" CardBuilder: dependency
 PlayableBackSide "0..1" <-- "1" CardBuilder: dependency
+CardBuilder --> WrongCardTypeException : throws
+CardBuilder --> MissingParametersException : throws
+CardBuilder --> ConflictingParameterException : throws
 
 %% CardType "1" *-- "1" CardBuilder: composition
 %% ObjectType "0..1" <-- "n" CardBuilder: dependency
@@ -300,17 +303,20 @@ class ObjectiveType {
 }
 
 class WrongCardTypeException {
-    %% should extends IllegalStateException
     WrontCardTypeException(String expected, String actual)
 }
+IllegalStateException <|-- WrongCardTypeException: inheritance
 
 class MissingParametersException {
-    %% should extends IllegalStateException
     MissingParametersException(String missing)
 }
+IllegalStateException <|-- MissingParametersException: inheritance
 
-CardBuilder --> WrongCardTypeException : throws
-CardBuilder --> MissingParametersException : throws
+class ConflictingParameterException {
+    ConflictingParameterException(String paramName, String expectedValue, String currValue)
+}
+IllegalStateException <|-- ConflictingParameterException: inheritance
+
 ```
 
 ### Game model
