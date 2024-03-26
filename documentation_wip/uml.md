@@ -325,11 +325,11 @@ class PlayerBuilder{
     -starterCard: PlayableCard
     -hand: PlayableCard[3]
 
-    nickname(String) PlayerBuilder
-    token(TokenColor) PlayerBuilder
-    objectiveCard(ObjectiveCard) PlayerBuilder
-    starterCard(PlayableCard) PlayerBuilder
-    hand(PlayableCard[3]) PlayerBuilder
+    setNickname(String) PlayerBuilder
+    setToken(TokenColor) PlayerBuilder
+    setObjectiveCard(ObjectiveCard) PlayerBuilder
+    setStarterCard(PlayableCard) PlayerBuilder
+    setHand(PlayableCard[3]) PlayerBuilder
     
     build() Player
 }
