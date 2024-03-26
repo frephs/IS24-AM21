@@ -369,7 +369,7 @@ class Game {
     %% index of the player list
     -currentPlayer: int
 
-    %% contstructor: creates all the game assets. initially "state" is set to GAME_INIT 
+    %% constructor: creates all the game assets. initially "state" is set to GAME_INIT 
     Game(int players)
 
     %% initializes the game by extracting the cards from the decks and setting the state to PLAYING
@@ -413,7 +413,7 @@ class Game {
     %% draw a card from the respective deck and adds it to the player's hand
     drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
 
-    %% draw a card from the common board and adds it to the player hans, if the first is true the first card in the pair is drawn, otherwise the second
+    %% draw a card from the common board and adds it to the player hands, if the first is true the first card in the pair is drawn, otherwise the second
     drawCurrentPlayerCardFromPair(DrawingDeckType deckType, boolean first) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
 }
 
