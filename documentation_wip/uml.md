@@ -273,11 +273,11 @@ class Game {
     %% index of the player list
     -currentPlayer: int
 
-    %% contstructor: creates all the game assets.
+    %% contstructor: creates all the game assets. initially "state" is set to GAME_INIT 
     Game(int players)
 
-    %% initializes the game by extracting the cards from the decks and setting the game state to GAME_INIT
-    init() void
+    %% initializes the game by extracting the cards from the decks and setting the state to PLAYING
+    start() void
 
     %% extracts the card pairs to be placed in the common area of the GameBoard
     setGameboardCommonCards() void ~~throws~~ GameOverException
@@ -295,9 +295,9 @@ class Game {
     getCurrentPlayer() Player
 
     %% method that will be called by the lobby when the player building process is finalized
-    addPlayer(Player player) void ~~throws~~
+    addPlayer(Player player) void
 
-    %% changes the current player index after checking if the current player has 20+ points therefore setting remainingRounds to 2
+    %% changes the current player index after checking if the current player has 20+ points we set remainingRounds to 2
     nextTurn() void ~~throws~~ GameOverException
 
     %% returns true if the game state is GAME_OVER
