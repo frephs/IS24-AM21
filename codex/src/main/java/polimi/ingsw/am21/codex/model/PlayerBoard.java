@@ -12,8 +12,8 @@ public class PlayerBoard {
     Map <Position, PlayableCard> playedCards = new HashMap<>();
     
    // Hashmaps to keep track of resources
-    private HashMap<ResourceTypes, Integer> resources = new HashMap<>(ResourceTypes.values().lenght);
-    private HashMap<ObjectTypes, Integer> objects = new HashMap<>(ObjectTypes.values().lenght);
+    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().lenght);
+    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().lenght);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
@@ -24,7 +24,7 @@ public class PlayerBoard {
      * @param starterCard drawn from the playerboard
      * @param objectiveCard chosen by the client controller (physical player)
      */
-    PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
+    public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.hand = hand;
         this.playedCards.set(new Position(), starterCard);
         this.objectiveCard = objectiveCard;
@@ -56,10 +56,10 @@ public class PlayerBoard {
      * @param playedSide of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    void placeCard(PlayableCard playedCard, CardSidesTypes playedSide, Position position){
+    void placeCard(PlayableCard playedCard, CardSideType playedSide, Position position){
         this.hand.remove(playedCard);
 
-        playedCard.setPlayedSide(CardSidesTypes);
+        playedCard.setPlayedSide(CardSideType);
         this.playedCards.put(position, playedCard);
 
         updateAvailableSpots(position);
@@ -76,7 +76,7 @@ public class PlayerBoard {
 
                     if(!availableSpots.contains(linkingCardPosition)){
                         // we need to remove its covered contents
-                        CornerEnum linkingCorner = CornerEnum.getOppositeCorner(cornerPosition);
+                        CornerPosition linkingCorner = CornerPosition.getOppositeCorner(cornerPosition);
                         PlayableCard linkedCard= this.playedCards.get(linkingCardPosition);
                         Corner linkedCorner = linkedCard.getPlayedSide().getCorner(linkingCorner);
 
@@ -87,12 +87,12 @@ public class PlayerBoard {
     }
 
     void updateResourcesAndObjectsMaps(Corner corner, int update){
-        if(ResourceTypes.has(Corner.getContent())){
-            ResourceTypes resource = Corner.getContent();
+        if(ResourceType.has(Corner.getContent())){
+            ResourceType resource = Corner.getContent();
             int prevVal = this.resources.get(resource);
             this.resources.put(resource, prevVal+update);
-        }else if(ObjectTypes.has(Corner.getContent())) {
-            ObjectTypes object = Corner.getContent();
+        }else if(ObjectType.has(Corner.getContent())) {
+            ObjectType object = Corner.getContent();
             int prevVal = this.objects.get(object);
             this.objects.put(object, prevVal+update);
         }
@@ -100,7 +100,7 @@ public class PlayerBoard {
 
     void updateAvailableSpots(Position position){
         availableSpots.remove(position);
-        for (CornerEnum adjacentCorner : CornerEnum.values()) {
+        for (CornerPosition adjacentCorner : CornerPosition.values()) {
             Position adjacentCardPosition = position.computeLinkingPosition((adjacentCorner));
             if(!availableSpots.contains(adjacentCardPosition)){
                 if(! playedCards.containsKey(adjacentCardPosition)){
@@ -110,6 +110,10 @@ public class PlayerBoard {
                 }
             }
         }
+    }
+
+    public HashMap<ObjectType, Integer> getObjects() {
+        return this.objects;
     }
 }
 
