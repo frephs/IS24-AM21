@@ -417,7 +417,14 @@ class Game {
     drawCurrentPlayerCardFromPair(DrawingDeckType deckType, boolean first) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
 }
 
+
+class GameOverException {
+    +GameOverException()
+}
+
 Game --|> Lobby : composition
+Game --|> GameOverException : composition
+Game --|> EmptyDeckException : composition
 
 class GameState {
     <<Enumeration>>
@@ -598,7 +605,7 @@ class GameBoard {
 }
 
 class EmptyDeckException {
-
+    +EmptyDeckException()
 }
 
 Game "2"*--"4" Player : composition
