@@ -22,7 +22,8 @@ A rough view of the UML of Model View Controller:
 ## Model
 As a team, we made the choice to implement part of the game logic in our model because we wanted the controller layer in the server, to be as light as possible. This way the role of the controller layer is to parse the inputs coming from the client controller (communications), calling the model methods to update the game, player, gameboard and playerboard statuses with the parsed data and finally to signal the views to update. 
 
-For development and accessability purposes we split the model class diagram in two parts: the card hierarchy and the rest of the model, so that the most meaningful connections would be easily visibile in the diagram.
+#### Note on the uml
+For development and accessability purposes we split the model class diagram in two parts: the card hierarchy and the rest of the model, so that the most meaningful connections would be easily visibile in the diagram. For the same purpose we deliberately omitted some of the connections between some classes(notably enums) to avoid the graph getting super busy.
 
 #### Documenting choices 
 Some design choices we took that we think are worth documenting into detail are:
