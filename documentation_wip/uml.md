@@ -212,6 +212,85 @@ ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
 %% PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
 %% ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
+
+class CardBuilder {
+    -id: int
+    %% Resource | Starter | Gold | Objective
+    -type: CardType 
+
+    %% Objective | Resource | Gold
+    -points: int[0..1]
+
+    %% Objective
+    -objectiveType: ObjectiveType[0..1]
+    -objectiveGeometry: ResourceType[3][3][0..1]
+    -objectiveResources: HashMap~ResourceType, int~[0..1]
+    -objectiveObjects: HashMap~ObjectType, int~[0..1]
+
+    %% Resource | Starter | Gold
+    -backPermanentResources: ResourceType[1..3][0..1]
+
+    %% Gold
+    -placementCondition: ResourceType[1..5][0..1]
+    -pointCondition: PointConditionType[0..1]
+    -pointConditionObject: ObjectType[0..1]
+
+    CardBuilder(int id, CardType type)
+
+    setPoints(int points) CardBuilder ~~throws~~ WrongCardTypeException
+
+    setObjectiveType(ObjectiveType objectiveType) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveGeometry(ResourceType[3][3] objectiveGeometry) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveResources(HashMap~ResourceType, int~ objectiveResources) CardBuilder ~~throws~~ WrongCardTypeException
+    setObjectiveObjects(HashMap~ObjectType, int~ objectiveObjects) CardBuilder ~~throws~~ WrongCardTypeException
+
+    setBackPermanentResources(ResourceType[1..3] backPermanentResources) CardBuilder ~~throws~~ WrongCardTypeException
+
+    setPlacementCondition(ResourceType[1..5] placementCondition) CardBuilder ~~throws~~ WrongCardTypeException
+    setPointCondition(PointConditionType pointCondition) CardBuilder ~~throws~~ WrongCardTypeException
+    setPointConditionObject(ObjectType pointConditionObject) CardBuilder ~~throws~~ WrongCardTypeException
+
+    build() Card ~~throws~~ MissingParametersException
+}
+Card "1" *-- "1" CardBuilder: composition
+ObjectiveCard "0..1" <-- "1" CardBuilder: dependency
+GeometricObjective "0..1" <-- "1" CardBuilder: dependency
+CountingObjective "0..1" <-- "1" CardBuilder: dependency
+PlayableCard "0..1" <-- "1" CardBuilder: dependency
+StarterCardFrontSide "0..1" <-- "1" CardBuilder: dependency
+ResourceCardFrontSide "0..1" <-- "1" CardBuilder: dependency
+GoldCardFrontSide "0..1" <-- "1" CardBuilder: dependency
+PlayableBackSide "0..1" <-- "1" CardBuilder: dependency
+
+%% CardType "1" *-- "1" CardBuilder: composition
+%% ObjectType "0..1" <-- "n" CardBuilder: dependency
+%% ResourceType "0..1" <-- "n" CardBuilder: dependency
+%% PointConditionType "0..1" <-- "n" CardBuilder: dependency
+
+
+class CardType {
+    <<Enumeration>>
+    RESOURCE
+    STARTER
+    GOLD
+    OBJECTIVE
+}
+
+class ObjectiveType {
+    <<Enumeration>>
+    GEOMETRIC
+    COUNTING
+}
+
+class WrongCardTypeException {
+    %% should extends IllegalStateException
+    WrontCardTypeException(String expected, String actual)
+}
+
+class MissingParametersException {
+    %% should extends IllegalStateException
+    MissingParametersException(String missing)
+}
 ```
 
 ### Game model
