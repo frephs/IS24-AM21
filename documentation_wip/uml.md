@@ -308,6 +308,9 @@ class MissingParametersException {
     %% should extends IllegalStateException
     MissingParametersException(String missing)
 }
+
+CardBuilder --> WrongCardTypeException : throws
+CardBuilder --> MissingParametersException : throws
 ```
 
 ### Game model
@@ -474,11 +477,10 @@ class Player {
     %% receive card and put it in the player's hand
     receiveDrawnCard(PlayableCard card) void
 
-    %% calls the player board placeCard method with the card as parameter and updates the player's points calling the evaluate method on the played card
+    %% calls the player board placeCard method with the card as parameter and updates the player's points calling the getEvaluator method of the played card 
     placeCard(PlayableCard card, CardSidesType side, Position position) void
 
-    %% evaluate takes objective card, given that the objective card returns a Function that can be called against the player board to check if the requirements are met
-    %% if the requirements are met the points are added to the player
+    %% evaluate takes objective card (calls the getEvaluator method of the objective card) and increments the player points. called by Game.setGameOver() which will pass the player's secret objective and the game common objectives. 
     evaluate(ObjectiveCard objectiveCard) void
 }
 
@@ -526,25 +528,20 @@ class PlayerBoard {
     updateAvailableSpots(Position position) void
     %% updats the list of available spots in which card can be placed
 
-    evaluate(Function~PlayerBoard, int,~ cardEvaluationFunction) int
-    evaluate(Lambda~PlayerBoard,int, int~ cardEvaluationFunction) int
-    %%evaluate(PlayedCard card) int
-    %%evaluate(ObjectiveCard objectiveCard) int
-    %% 2 overloads of the evaluate method, the first one is called on Playable cards every turn, the second one is called on the objective card at the end of the game.
 }
 
-class PlayerActions {
-    <<Interface>>
-    chooseTokenColor(int choice) TokenColor
-    chooseObjectiveCard(int choice) ObjectiveCard
-
-    chooseDrawingSource(int choice) DrawingSourceType
-    chooseDrawingDeck(int choice) DrawingDeckType
-
-    choosePlayingCard(int choice) PlayableCard
-    choosePlayingCardSide(int choice) CardSidesType
-    choosePlayingCardPosition(int choice) Position
-}
+%%class PlayerActions {
+%%    <<Interface>>
+%%    chooseTokenColor(int choice) TokenColor
+%%    chooseObjectiveCard(int choice) ObjectiveCard
+%%
+%%    chooseDrawingSource(int choice) DrawingSourceType
+%%    chooseDrawingDeck(int choice) DrawingDeckType
+%%
+%%    choosePlayingCard(int choice) PlayableCard
+%%    choosePlayingCardSide(int choice) CardSidesType
+%%    choosePlayingCardPosition(int choice) Position
+%%}
 
 class DrawingDeckType {
     <<Enumeration>>
