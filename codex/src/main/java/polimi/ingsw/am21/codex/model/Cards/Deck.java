@@ -10,7 +10,7 @@ public class Deck<T extends  Card> {
      * Constructor
      * @param cards list of cards
      */
-    Deck(List<T> cards){
+    public Deck(List<T> cards){
         this.cards = cards;
     }
 

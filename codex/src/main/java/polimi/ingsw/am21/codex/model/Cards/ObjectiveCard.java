@@ -1,4 +1,16 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-public class ObjectiveCard {
+import polimi.ingsw.am21.codex.model.PlayerBoard;
+
+import java.util.function.Function;
+
+public class ObjectiveCard extends Card{
+    public ObjectiveCard(int id){
+        super(id);
+    }
+
+    @Override
+    public Function<PlayerBoard, Integer> getEvaluator() {
+        return null;
+    }
 }
