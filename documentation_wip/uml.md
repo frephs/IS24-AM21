@@ -170,8 +170,7 @@ class PlayableSide {
     -corners: Corner[1..4]
 
     getCorners() Corner[1..4]
-    setCorner(CornerPosition position, ResourceType resource)
-    setCorner(CornerPosition position, ObjectType object)
+    setCorner(CornerPosition position, Corner corner)
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
