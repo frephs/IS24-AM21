@@ -2,21 +2,22 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
-
-/** TODO: NOT ACTUALLY IMPLEMENTED, FIX IN MERGE */
 public abstract class PlayableSide {
     /**
-     * The list of corners on the card side
+     * The Map of the CornerPosition and the corner on the side of the card
      */
-    List<Corner<ResourceType>> corners;
+    private HashMap<CornerPosition, Corner> corners;
 
-    public List<Corner<ResourceType>> getCorners() {
+    public HashMap<CornerPosition, Corner> getCorners() {
         return corners;
     }
 
-    public void setCorner();
+    public void setCorners(CornerPosition position, Corner corner) {
+        corners.put(position, corner);
+    }
 
     /**
      * Generates a function that should be called to get the points that should be
