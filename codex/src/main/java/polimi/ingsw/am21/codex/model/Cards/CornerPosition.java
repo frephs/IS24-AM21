@@ -12,4 +12,9 @@ public enum CornerPosition {
         this.index = index;
     }
 
+    public CornerPosition getOppositeCornerPosition() {
+        return values()[(this.ordinal() + 2) % 4];
+    }
+
+
 }
