@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 import java.util.List;
-import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 public class Player {
     private final String nickname;
@@ -31,7 +30,7 @@ public class Player {
         /**
          * @param nickname the player's chose nickname, its uni
          */
-        public PlayerBuilder nickname(String nickname){
+        public PlayerBuilder setNickname(String nickname){
             this.nickname = nickname;
             return this;
         }
@@ -39,7 +38,7 @@ public class Player {
         /**
          * @param token chosen by the client controller (physical player)
          */
-        public PlayerBuilder tokenColor(TokenColors token){
+        public PlayerBuilder setTokenColor(TokenColors token){
             this.token = token;
             return this;
         }
@@ -47,7 +46,7 @@ public class Player {
         /**
          * @param cards list drawn from the GameBoard
          */
-        public PlayerBuilder hand(List<PlayableCard> cards){
+        public PlayerBuilder setHand(List<PlayableCard> cards){
             this.cards = cards;
             return this;
         }
@@ -55,7 +54,7 @@ public class Player {
         /**
          * @param starterCard drawn from the GameBoard
          */
-        public PlayerBuilder starterCard(PlayableCard starterCard){
+        public PlayerBuilder setStarterCard(PlayableCard starterCard){
             this.starterCard = starterCard;
             return this;
         }
@@ -63,7 +62,7 @@ public class Player {
         /**
          * @param objectiveCard chosen by the client controller (physical player)
          */
-        public PlayerBuilder objectiveCard(ObjectiveCard objectiveCard){
+        public PlayerBuilder setObjectiveCard(ObjectiveCard objectiveCard){
             this.objectiveCard = objectiveCard;
             return this;
         }
@@ -72,10 +71,9 @@ public class Player {
          * @return a functioning player
          */
         public Player build(){
-            return new Player(this);
+                return new Player(this);
         }
     }
-
 
 
     /**
@@ -110,7 +108,7 @@ public class Player {
     /**
      * @param card drawn from the GameBoard which is added to the players hand
      */
-    private void drawCard(PlayableCard card){
+    public void drawCard(PlayableCard card){
         board.drawCard(card);
     }
 
@@ -119,19 +117,17 @@ public class Player {
      * @param side of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    private void placeCard(PlayableCard card, CardSidesTypes side, Position position){
+    public void placeCard(PlayableCard card, CardSideType side, Position position){
         board.placeCard(card, side, position);
-        this.points += card.evaluate(board);
+        this.points += card.getEvaluator().apply(board);
     }
 
     /**
      * @param objectiveCard to be evaluated at the end of the game
      */
-    private void evaluate(ObjectiveCard objectiveCard){
-        this.points += objectiveCard.evaluate(board);
+    public void evaluate(ObjectiveCard objectiveCard){
+        this.points += objectiveCard.getEvaluator().apply(board);
     }
-
-
 }
 
 
