@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
+
 import java.util.*;
 
 public class PlayerBoard {
@@ -9,24 +10,27 @@ public class PlayerBoard {
     private List<PlayableCard> hand = new ArrayList<PlayableCard>(MAX_CARDS);
     private ObjectiveCard objectiveCard;
 
-    Map <Position, PlayableCard> playedCards = new HashMap<>();
-    
+    Map<Position, PlayableCard> playedCards = new HashMap<>();
+
    // Hashmaps to keep track of resources
     private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().lenght);
     private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().lenght);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
+    Set<Position> forbiddenSpots = new HashSet<>();
+
     HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
 
     /**
-     * @param hand the player's cards drawn from the GameBoard (2 resources and 1 goldcard)
-     * @param starterCard drawn from the playerboard
+     * @param hand the player's cards drawn from the GameBoard (2 resources and 1 GoldCard)
+     * @param starterCard drawn from the PlayerBoard
      * @param objectiveCard chosen by the client controller (physical player)
      */
+
     public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.hand = hand;
-        this.playedCards.set(new Position(), starterCard);
+        this.playedCards.put(new Position(), starterCard);
         this.objectiveCard = objectiveCard;
     }
 
@@ -44,6 +48,10 @@ public class PlayerBoard {
         return this.hand;
     }
 
+    public HashMap<ObjectType, Integer> getObjects() {
+        return this.objects;
+    }
+
     /**
      * @param card which is added to the player's hand
      * */
@@ -53,40 +61,48 @@ public class PlayerBoard {
 
     /**
      * @param playedCard chosen from the player's hand, will be evaluated after placement
-     * @param playedSide of the card chosen to be placed on the PlayerBoard
+     * @param playedSideType of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    void placeCard(PlayableCard playedCard, CardSideType playedSide, Position position){
-        this.hand.remove(playedCard);
+    void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position){
 
-        playedCard.setPlayedSide(CardSideType);
+        this.hand.remove(playedCard);
+        playedCard.setPlayedSide(playedSideType);
+        PlayableSide playedSide = playedCard.getPlayedSide().get();
+
         this.playedCards.put(position, playedCard);
 
-        updateAvailableSpots(position);
-        updateResourcesAndObjects(playedCard, position);
+        updateAvailableSpots(playedSide, position);
+        updateResourcesAndObjects(playedSide, position);
 
     }
-    
-    //FIXME: maybe order it a little, maybe iterate over the corners once int the placecard method
-    void updateResourcesAndObjects(PlayableCard playedCard, Position position) {
-        playedCard.getPlayedSide().getCorners().foreach(
-                (cornerPosition, corner) ->{
+
+      private void updateResourcesAndObjects(PlayableSide playedSide, Position position) {
+        HashMap<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
+
+        //let's add the resources of the card just placed
+        enabledCorners.forEach(
+                (cornerPosition, corner) -> {
                     updateResourcesAndObjectsMaps(corner, +1);
-                    Position linkingCardPosition = cornerPosition.computeLinkingPosition(cornerPosition);
+                }
+        );
 
-                    if(!availableSpots.contains(linkingCardPosition)){
-                        // we need to remove its covered contents
-                        CornerPosition linkingCorner = CornerPosition.getOppositeCorner(cornerPosition);
-                        PlayableCard linkedCard= this.playedCards.get(linkingCardPosition);
-                        Corner linkedCorner = linkedCard.getPlayedSide().getCorner(linkingCorner);
-
-                        updateResourcesAndObjectsMaps(linkedCorner, -1);
+        //let's remove the resources of the cards that are covered.
+        Arrays.stream(CornerPosition.values()).forEach(
+                cornerPosition -> {
+                    Position adjacentCardPosition = position.computeAdjacentPosition(cornerPosition);
+                    if (this.playedCards.containsKey((adjacentCardPosition))) {
+                        CornerPosition oppositeCornerPosition = cornerPosition.getOppositeCornerPosition();
+                        PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().get();
+                        HashMap<CornerPosition, Corner> enabledOppositeCorners = oppositeCard.getCorners();
+                        Corner oppositeCorner = enabledOppositeCorners.get(oppositeCornerPosition);
+                        updateResourcesAndObjectsMaps(oppositeCorner, -1);
                     }
                 }
         );
     }
 
-    void updateResourcesAndObjectsMaps(Corner corner, int update){
+    private void updateResourcesAndObjectsMaps(Corner corner, int update){
         if(ResourceType.has(Corner.getContent())){
             ResourceType resource = Corner.getContent();
             int prevVal = this.resources.get(resource);
@@ -98,22 +114,24 @@ public class PlayerBoard {
         }
     }
 
-    void updateAvailableSpots(Position position){
-        availableSpots.remove(position);
-        for (CornerPosition adjacentCorner : CornerPosition.values()) {
-            Position adjacentCardPosition = position.computeLinkingPosition((adjacentCorner));
-            if(!availableSpots.contains(adjacentCardPosition)){
-                if(! playedCards.containsKey(adjacentCardPosition)){
-                    availableSpots.add(adjacentCardPosition);
-                }else{
-                    availableSpots.remove(adjacentCardPosition);
+    private void updateAvailableSpots(PlayableSide playedSide, Position position){
+        this.availableSpots.remove(position);
+        HashMap<CornerPosition,Corner> enabledCorners = playedSide.getCorners();
+
+        for (CornerPosition cornerPosition : CornerPosition.values()) {
+            Position adjacentCardPosition = position.computeAdjacentPosition(cornerPosition);
+            //if the spot is nor forbidden nor occupied, we add it to the available ones
+            //if the corner is disabled, aka it's not in the HashMap, we add it to the forbidden ones.
+            if(enabledCorners.containsKey(cornerPosition)){
+                if(!forbiddenSpots.contains(adjacentCardPosition)){
+                    if(!playedCards.containsKey(adjacentCardPosition)){
+                        availableSpots.add(adjacentCardPosition);
+                    }
                 }
+            }else{
+                forbiddenSpots.add(adjacentCardPosition);
             }
         }
-    }
-
-    public HashMap<ObjectType, Integer> getObjects() {
-        return this.objects;
     }
 }
 

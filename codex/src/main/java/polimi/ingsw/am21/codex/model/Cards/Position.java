@@ -13,12 +13,12 @@ public class Position {
         this.y = 0;
     }
 
-    public Position computeLinkingPosition(CornerPosition linkedCorner) {
+    public Position computeAdjacentPosition(CornerPosition linkedCorner) {
         return switch (linkedCorner) {
-            case UP_LEFT -> new Position(x - 1, y + 1);
-            case UP_RIGHT -> new Position(x + 1, y + 1);
-            case DOWN_LEFT -> new Position(x - 1, y - 1);
-            case DOWN_RIGHT -> new Position(x + 1, y - 1);
+            case TOP_LEFT -> new Position(x - 1, y + 1);
+            case TOP_RIGHT -> new Position(x + 1, y + 1);
+            case BOTTOM_LEFT -> new Position(x - 1, y - 1);
+            case BOTTOM_RIGHT -> new Position(x + 1, y - 1);
         };
     }
 
