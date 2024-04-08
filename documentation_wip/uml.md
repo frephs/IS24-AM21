@@ -67,10 +67,10 @@ class CardSideType {
 
 class CornerPosition {
     <<Enumeration>>
-    UP_LEFT
-    DOWN_LEFT
-    UP_RIGHT
-    DOWN_RIGHT
+    TOP_LEFT
+    BOTTOM_LEFT
+    TOP_RIGHT
+    BOTTOM_RIGHT
 }
 
 class Card {
@@ -122,7 +122,7 @@ ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization
 
 class GeometricObjective {
-    -geometry: ResourceType[3][3]
+    -geometry: ResourceType[7]
 
     GeometricObjective(ResourceType[3][3] geometry)
 
@@ -167,10 +167,11 @@ Card <|.. PlayableCard: realization
 
 class PlayableSide {
     <<Abstract>>
-    -corners: Corner[1..4]
+    -corners: HashMap~CornerPosition, Corner~
 
-    getCorners() Corner[1..4]
-    setCorner(CornerPosition position, Corner corner)
+    getCorners() HashMap~CornerPosition, Corner~
+    setCorner(CornerPosition position, ResourceType resource)
+    setCorner(CornerPosition position, ObjectType object)
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
@@ -345,9 +346,12 @@ class Lobby{
 
     %% We store the extracted objective cards in a HashMap along with the socket id, ensuring they can be restored to the deck if the player disconnects.
     extractedCards: HashMap~SocketId;CardPair~ObjectiveCard~~
+    remainingPlayers: int 
+    %% counts how many players you can still add to the game
 
     %% arraylist of available tokens
     -tokens: TokenColor[4]
+    Lobby(int players)
 
     setNickname(UUID socketId, String nickname) void
     setToken(UUID socketId, TokenColor token) void
@@ -508,13 +512,14 @@ class PlayerBuilder {
 
 class PlayerBoard {
     %%FIXME: type of cards
-    -cards: SidedCard[3]
+    -cards: PlayableCard[3]
     -objectiveCard: ObjectiveCard
 
     -playedCards: HashMap~Position, PlayableCard~
     %% the geometry is an hashmap of positions and played cards
 
     -availableSpots: Set~Position~
+    -forbiddenSpots: Set~Position~
     %% the available spots for the player to place a card on the board
 
     -resources: HashMap~ResourceType, int~
@@ -527,6 +532,11 @@ class PlayerBoard {
     receiveDrawnCard(PlayableCard card) void
     placeCard(PlayableCard card, cardSidesType side, Position position) void
     %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
+
+    getPlayedCards() HashMap~Position, PlayableCard~
+
+    getAvailableSpots() Set~Position~
+    getForbiddenSpots() Set~Position~
 
     updateResourcesandObjects(PlayableCard playedCard, Position position) void
     %% updates the player's resources and objects after a card has been placed on the board
