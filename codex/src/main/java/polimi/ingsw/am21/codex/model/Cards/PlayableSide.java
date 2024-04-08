@@ -1,7 +1,8 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
