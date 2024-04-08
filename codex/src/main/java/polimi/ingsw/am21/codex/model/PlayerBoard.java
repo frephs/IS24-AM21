@@ -13,8 +13,8 @@ public class PlayerBoard {
     Map<Position, PlayableCard> playedCards = new HashMap<>();
 
    // Hashmaps to keep track of resources
-    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().lenght);
-    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().lenght);
+    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
+    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
@@ -67,7 +67,7 @@ public class PlayerBoard {
     void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position){
 
         this.hand.remove(playedCard);
-        playedCard.setPlayedSide(playedSideType);
+        playedCard.setPlayedSideType(playedSideType);
         PlayableSide playedSide = playedCard.getPlayedSide().get();
 
         this.playedCards.put(position, playedCard);
@@ -102,14 +102,16 @@ public class PlayerBoard {
         );
     }
 
+    //TODO: maybe make this functional
     private void updateResourcesAndObjectsMaps(Corner corner, int update){
+        int prevVal;
         if(ResourceType.has(Corner.getContent())){
             ResourceType resource = Corner.getContent();
-            int prevVal = this.resources.get(resource);
+            prevVal = this.resources.get(resource);
             this.resources.put(resource, prevVal+update);
         }else if(ObjectType.has(Corner.getContent())) {
             ObjectType object = Corner.getContent();
-            int prevVal = this.objects.get(object);
+            prevVal = this.objects.get(object);
             this.objects.put(object, prevVal+update);
         }
     }
