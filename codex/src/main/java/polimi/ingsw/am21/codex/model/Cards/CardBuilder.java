@@ -21,6 +21,8 @@ public class CardBuilder {
 
   // Resource | Starter | Gold
   Optional<List<ResourceType>> backPermanentResources;
+  Optional<HashMap<CornerPosition, CornerContentType>> frontCorners;
+  Optional<HashMap<CornerPosition, CornerContentType>> backCorners;
 
   // Gold
   Optional<List<ResourceType>> placementCondition;
@@ -40,6 +42,8 @@ public class CardBuilder {
     this.placementCondition = Optional.empty();
     this.pointCondition = Optional.empty();
     this.pointConditionObject = Optional.empty();
+    this.frontCorners = Optional.empty();
+    this.backCorners = Optional.empty();
   }
 
   private void checkType(CardType... expected) throws WrongCardTypeException {
@@ -170,6 +174,23 @@ public class CardBuilder {
     return this;
   }
 
+  public CardBuilder setCorners(
+    CardSideType side,
+    HashMap<CornerPosition, CornerContentType> cornerMap
+  ) throws WrongCardTypeException {
+    checkType(CardType.STARTER, CardType.RESOURCE, CardType.GOLD);
+
+    if (side == CardSideType.FRONT) frontCorners = Optional.of(
+      new HashMap<>(cornerMap)
+    );
+    else if (side == CardSideType.BACK) backCorners = Optional.of(
+      new HashMap<>(cornerMap)
+    );
+    else throw new NullPointerException();
+
+    return this;
+  }
+
   public Card build() throws MissingParametersException {
     switch (this.type) {
       case OBJECTIVE -> {
@@ -208,11 +229,7 @@ public class CardBuilder {
               () -> new MissingParametersException("backPermanentResources")
             );
 
-        return new PlayableCard(
-          this.id,
-          new StarterCardFrontSide(),
-          new PlayableBackSide(permanentResources)
-        );
+        return getPlayableCard(permanentResources, new StarterCardFrontSide());
       }
       case RESOURCE -> {
         List<ResourceType> permanentResources =
@@ -224,10 +241,9 @@ public class CardBuilder {
               () -> new MissingParametersException("points")
             );
 
-        return new PlayableCard(
-          this.id,
-          new ResourceCardFrontSide(points),
-          new PlayableBackSide(permanentResources)
+        return getPlayableCard(
+          permanentResources,
+          new ResourceCardFrontSide(points)
         );
       }
       case GOLD -> {
@@ -244,27 +260,36 @@ public class CardBuilder {
               () -> new MissingParametersException("placementCondition")
             );
 
-        return new PlayableCard(
-          this.id,
+        return getPlayableCard(
+          permanentResources,
           new GoldCardFrontSide(
             points,
             placementCondition,
             this.pointCondition.orElse(null),
             this.pointConditionObject.orElse(null)
-          ),
-          new PlayableBackSide(permanentResources)
+          )
         );
       }
-      default -> {
-        throw new ConflictingParameterException(
-          "type",
-          String.join(
-            "|",
-            Arrays.stream(CardType.values()).map(CardType::toString).toList()
-          ),
-          this.type.toString()
-        );
-      }
+      default -> throw new ConflictingParameterException(
+        "type",
+        String.join(
+          "|",
+          Arrays.stream(CardType.values()).map(CardType::toString).toList()
+        ),
+        this.type.toString()
+      );
     }
+  }
+
+  private Card getPlayableCard(
+    List<ResourceType> permanentResources,
+    PlayableFrontSide frontSide
+  ) {
+    this.frontCorners.orElse(new HashMap<>()).forEach(frontSide::setCorners);
+
+    PlayableBackSide backSide = new PlayableBackSide(permanentResources);
+    this.backCorners.orElse(new HashMap<>()).forEach(backSide::setCorners);
+
+    return new PlayableCard(this.id, frontSide, backSide);
   }
 }
