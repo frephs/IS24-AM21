@@ -5,19 +5,39 @@
   "type": "array",
   "definitions": {
     "cardType": {
-      "enum": ["RESOURCE", "STARTER", "GOLD", "OBJECTIVE"]
+      "enum": [
+        "RESOURCE",
+        "STARTER",
+        "GOLD",
+        "OBJECTIVE"
+      ]
     },
     "objectiveType": {
-      "enum": ["GEOMETRIC", "COUNTING"]
+      "enum": [
+        "GEOMETRIC",
+        "COUNTING"
+      ]
     },
     "resourceType": {
-      "enum": ["PLANT", "ANIMAL", "FUNGI", "INSECT"]
+      "enum": [
+        "PLANT",
+        "ANIMAL",
+        "FUNGI",
+        "INSECT"
+      ]
     },
     "objectType": {
-      "enum": ["QUILL", "INKWELL", "MANUSCRIPT"]
+      "enum": [
+        "QUILL",
+        "INKWELL",
+        "MANUSCRIPT"
+      ]
     },
     "pointConditionType": {
-      "enum": ["OBJECTS", "CORNERS"]
+      "enum": [
+        "OBJECTS",
+        "CORNERS"
+      ]
     }
   },
   "items": {
@@ -39,15 +59,17 @@
       },
       "objectiveGeometry": {
         "type": "array",
-        "minItems": 3,
-        "maxItems": 3,
+        "minItems": 7,
+        "maxItems": 7,
         "items": {
-          "type": "array",
-          "minItems": 3,
-          "maxItems": 3,
-          "items": {
-            "$ref": "#/definitions/resourceType"
-          }
+          "anyOf": [
+            {
+              "$ref": "#/definitions/resourceType"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "objectiveResources": {
@@ -93,9 +115,28 @@
       },
       "pointConditionObject": {
         "$ref": "#/definitions/objectType"
+      },
+      "corners": {
+        "type": "object",
+        "patternProperties": {
+          "^(TOP|RIGHT|BOTTOM|LEFT)$": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/resourceType"
+              },
+              {
+                "$ref": "#/definitions/objectType"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
       }
     },
     "additionalProperties": false,
-    "required": ["id", "type"]
+    "required": [
+      "id",
+      "type"
+    ]
   }
 }
