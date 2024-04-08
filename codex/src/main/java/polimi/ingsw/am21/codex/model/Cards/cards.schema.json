@@ -119,15 +119,19 @@
       "corners": {
         "type": "object",
         "patternProperties": {
-          "^(TOP|RIGHT|BOTTOM|LEFT)$": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/resourceType"
-              },
-              {
-                "$ref": "#/definitions/objectType"
+          "^(front|back)$": {
+            "patternProperties": {
+              "^(TOP|RIGHT|BOTTOM|LEFT)$": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/resourceType"
+                  },
+                  {
+                    "$ref": "#/definitions/objectType"
+                  }
+                ]
               }
-            ]
+            }
           }
         },
         "additionalProperties": false
