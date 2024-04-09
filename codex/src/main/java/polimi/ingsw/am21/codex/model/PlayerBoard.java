@@ -1,7 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
-
 import java.util.*;
 
 public class PlayerBoard {
@@ -46,10 +45,6 @@ public class PlayerBoard {
      * */
     public List<PlayableCard> getHand(){
         return this.hand;
-    }
-
-    public HashMap<ObjectType, Integer> getObjects() {
-        return this.objects;
     }
 
     /**
@@ -132,6 +127,14 @@ public class PlayerBoard {
                 forbiddenSpots.add(adjacentCardPosition);
             }
         }
+    }
+
+    public HashMap<ObjectType, Integer> getObjects() {
+        return this.objects;
+    }
+
+    public HashMap<ResourceType, Integer> getResources() {
+        return this.resources;
     }
 }
 

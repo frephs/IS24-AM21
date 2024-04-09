@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GoldCardFrontSide extends ResourceCardFrontSide {
     /**
@@ -61,4 +62,23 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
 
         return this.pointCondition.map(mapper).orElse((playerBoard, coveredCorners) -> points);
     }
+
+    @Override
+    public Function<PlayerBoard, Boolean> getPlaceabilityChecker() {
+        return (playerBoard) -> {
+
+            // let's collect resources
+            Map<ResourceType, Integer> placementResources = placementCondition.stream().collect(
+              Collectors.groupingBy(
+                    resource->resource,
+                    Collectors.summingInt(element -> 1)
+            ));
+
+            //let's return if all conditions are satisfied in the playerboard.
+            return placementResources.entrySet().stream()
+              .map(resource -> resource.getValue() > playerBoard.getResources().getOrDefault(resource.getKey(), 0))
+              .reduce(true, (a, b) -> a && b);
+        };
+    }
+
 }

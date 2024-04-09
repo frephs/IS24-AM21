@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 import java.util.HashMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
@@ -16,7 +17,7 @@ public abstract class PlayableSide {
   public HashMap<CornerPosition, Corner> getCorners() {
     return corners;
   }
-
+  
   public void setCorners(CornerPosition position, CornerContentType content) {
     corners.put(position, new Corner(content));
   }
@@ -28,4 +29,14 @@ public abstract class PlayableSide {
    * the card is covering.
    */
   public abstract BiFunction<PlayerBoard, Integer, Integer> getEvaluator();
+
+  /**
+   * Generates a function that should be called to get whether a side is placeable or not
+   * given a certain PlayerBoard.
+  */
+  public Function<PlayerBoard, Boolean> getPlaceabilityChecker(){
+      return (playerBoard) -> {
+          return true;
+      };
+  }
 }

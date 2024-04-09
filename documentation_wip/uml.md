@@ -173,6 +173,7 @@ class PlayableSide {
     setCorner(CornerPosition position, ResourceType resource)
     setCorner(CornerPosition position, ObjectType object)
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
+    getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -224,6 +225,9 @@ class GoldCardFrontSide {
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
     %%implements the abstract method in PlayableSide
+
+    getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
+    %%overrides the method in PlayableSide
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
