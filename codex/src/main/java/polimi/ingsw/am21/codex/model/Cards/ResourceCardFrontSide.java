@@ -15,6 +15,7 @@ public class ResourceCardFrontSide extends PlayableFrontSide {
    * @param points The points the card should attribute to the player
    */
   public ResourceCardFrontSide(int points) {
+    super();
     this.points = points;
   }
 

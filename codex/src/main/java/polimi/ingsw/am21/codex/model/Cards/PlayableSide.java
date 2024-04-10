@@ -1,25 +1,29 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.HashMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
+
+// TODO investigate "Raw use of parameterized class 'Corner'" warning
 
 public abstract class PlayableSide {
 
   /**
    * The Map of the CornerPosition and the corner on the side of the card
    */
-  private HashMap<CornerPosition, Corner> corners;
+  private final HashMap<CornerPosition, Corner> corners;
+
+  public PlayableSide() {
+    this.corners = new HashMap<>();
+  }
 
   public HashMap<CornerPosition, Corner> getCorners() {
     return corners;
   }
-  
+
   public void setCorners(CornerPosition position, CornerContentType content) {
-    corners.put(position, new Corner(content));
+    corners.put(position, new Corner<>(content));
   }
 
   /**
@@ -33,10 +37,8 @@ public abstract class PlayableSide {
   /**
    * Generates a function that should be called to get whether a side is placeable or not
    * given a certain PlayerBoard.
-  */
-  public Function<PlayerBoard, Boolean> getPlaceabilityChecker(){
-      return (playerBoard) -> {
-          return true;
-      };
+   */
+  public Function<PlayerBoard, Boolean> getPlaceabilityChecker() {
+    return playerBoard -> true;
   }
 }

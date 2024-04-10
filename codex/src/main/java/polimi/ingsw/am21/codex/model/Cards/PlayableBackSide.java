@@ -17,6 +17,7 @@ public class PlayableBackSide extends PlayableSide {
    * @param permanentResources The list of permanent resources on the side
    */
   public PlayableBackSide(List<ResourceType> permanentResources) {
+    super();
     this.permanentResources = new ArrayList<>(permanentResources);
   }
 

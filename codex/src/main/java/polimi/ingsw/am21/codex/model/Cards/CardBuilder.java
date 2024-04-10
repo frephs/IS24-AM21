@@ -47,6 +47,9 @@ public class CardBuilder {
     this.backCorners = Optional.empty();
   }
 
+  /**
+   * Checks whether the current card type matches any oof the provided types
+   */
   private void checkType(CardType... expected) throws WrongCardTypeException {
     List<CardType> list = Arrays.stream(expected).toList();
     if (!list.contains(this.type)) throw new WrongCardTypeException(
@@ -284,7 +287,13 @@ public class CardBuilder {
     }
   }
 
-  private Card getPlayableCard(
+  /**
+   * Creates a playable card, handling corners and back side creation
+   * @param permanentResources The permanent resources on the back side
+   * @param frontSide The front side of the card
+   * @return The resulting PlayableCard
+   */
+  private PlayableCard getPlayableCard(
     List<ResourceType> permanentResources,
     PlayableFrontSide frontSide
   ) {
