@@ -1,90 +1,102 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-import polimi.ingsw.am21.codex.model.PlayerBoard;
-
 import java.util.Optional;
 import java.util.function.Function;
+import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 public class PlayableCard extends Card {
-    /**
-     * The front side of the card
-     */
-    PlayableFrontSide frontSide;
 
-    /**
-     * The back side of the card
-     */
-    PlayableBackSide backSide;
+  /**
+   * The front side of the card
+   */
+  private final PlayableFrontSide frontSide;
 
-    /**
-     * The type of the side that has been played by the player, if any
-     */
-    Optional<CardSideType> playedSideType;
+  /**
+   * The back side of the card
+   */
+  private final PlayableBackSide backSide;
 
-    /**
-     * The number of corners this card is currently covering
-     */
-    int coveredCorners;
+  /**
+   * The type of the side that has been played by the player, if any
+   */
+  private Optional<CardSideType> playedSideType;
 
-    /**
-     * The kingdom this card is part of, if any
-     */
-    Optional<ResourceType> kingdom;
+  /**
+   * The number of corners this card is currently covering
+   */
+  private int coveredCorners;
 
-    /**
-     * Constructor
-     *
-     * @param id        A unique identifier for the card
-     * @param frontSide The front side
-     * @param backSide  The back side
-     * @param kingdom   The kingdom this card is part of, if any (use null otherwise)
-     */
-    public PlayableCard(int id, PlayableFrontSide frontSide, PlayableBackSide backSide, ResourceType kingdom) {
-        super(id);
-        this.frontSide = frontSide;
-        this.backSide = backSide;
-        this.kingdom = Optional.ofNullable(kingdom);
-    }
+  /**
+   * The kingdom this card is part of, if any
+   */
+  private final Optional<ResourceType> kingdom;
 
-    public PlayableCard(int id, PlayableFrontSide frontSide, PlayableBackSide backSide) {
-        this(id, frontSide, backSide, null);
-    }
+  /**
+   * Constructor
+   *
+   * @param id        A unique identifier for the card
+   * @param frontSide The front side
+   * @param backSide  The back side
+   * @param kingdom   The kingdom this card is part of, if any (use null otherwise)
+   */
+  public PlayableCard(
+    int id,
+    PlayableFrontSide frontSide,
+    PlayableBackSide backSide,
+    ResourceType kingdom
+  ) {
+    super(id);
+    this.frontSide = frontSide;
+    this.backSide = backSide;
+    this.kingdom = Optional.ofNullable(kingdom);
+  }
 
-    public Optional<ResourceType> getKingdom() {
-        return kingdom;
-    }
+  public PlayableCard(
+    int id,
+    PlayableFrontSide frontSide,
+    PlayableBackSide backSide
+  ) {
+    this(id, frontSide, backSide, null);
+  }
 
-    public Optional<CardSideType> getPlayedSideType() {
-        return playedSideType;
-    }
+  public Optional<ResourceType> getKingdom() {
+    return kingdom;
+  }
 
-    /**
-     * Gets the currently played side, if any
-     */
-    public Optional<PlayableSide> getPlayedSide() {
-        return playedSideType.map(type -> {
-            if (type == CardSideType.FRONT) return frontSide;
-            return backSide;
-        });
-    }
+  public Optional<CardSideType> getPlayedSideType() {
+    return playedSideType;
+  }
 
-    /**
-     * @param playedSideType The type of the side that has been played by the player
-     */
-    public void setPlayedSideType(CardSideType playedSideType) {
-        this.playedSideType = Optional.of(playedSideType);
-    }
+  /**
+   * Gets the currently played side, if any
+   */
+  public Optional<PlayableSide> getPlayedSide() {
+    return playedSideType.map(type -> {
+      if (type == CardSideType.FRONT) return frontSide;
+      return backSide;
+    });
+  }
 
-    public int getCoveredCorners() {
-        return coveredCorners;
-    }
+  /**
+   * @param playedSideType The type of the side that has been played by the player
+   */
+  public void setPlayedSideType(CardSideType playedSideType) {
+    this.playedSideType = Optional.of(playedSideType);
+  }
 
-    public void setCoveredCorners(int coveredCorners) {
-        this.coveredCorners = coveredCorners;
-    }
+  public int getCoveredCorners() {
+    return coveredCorners;
+  }
 
-    @Override
-    public Function<PlayerBoard, Integer> getEvaluator() {
-        return (playerBoard) -> this.getPlayedSide().map(side -> side.getEvaluator().apply(playerBoard, coveredCorners)).orElse(0);
-    }
+  public void setCoveredCorners(int coveredCorners) {
+    this.coveredCorners = coveredCorners;
+  }
+
+  @Override
+  public Function<PlayerBoard, Integer> getEvaluator() {
+    return playerBoard ->
+      this.getPlayedSide()
+        .map(side -> side.getEvaluator().apply(playerBoard, coveredCorners))
+        .orElse(0);
+  }
 }
