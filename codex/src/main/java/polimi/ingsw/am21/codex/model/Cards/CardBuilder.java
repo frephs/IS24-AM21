@@ -10,7 +10,7 @@ public class CardBuilder {
   int id;
   CardType type;
 
-  // Resource | Gold
+  // Resource | Gold | Objective
   Optional<Integer> points;
 
   // Objective
@@ -31,6 +31,7 @@ public class CardBuilder {
 
   public CardBuilder(int id, CardType type) {
     this.id = id;
+    if (type == null) throw new NullPointerException();
     this.type = type;
 
     this.points = Optional.empty();
@@ -55,19 +56,21 @@ public class CardBuilder {
   }
 
   public CardBuilder setPoints(int points) throws WrongCardTypeException {
+    checkType(CardType.RESOURCE, CardType.GOLD, CardType.OBJECTIVE);
     this.points = Optional.of(points);
     return this;
   }
 
   public CardBuilder setObjectiveType(ObjectiveType objectiveType)
     throws WrongCardTypeException {
+    checkType(CardType.OBJECTIVE);
     this.objectiveType = Optional.ofNullable(objectiveType);
     return this;
   }
 
   public CardBuilder setObjectiveGeometry(
     List<List<ResourceType>> objectiveGeometry
-  ) throws WrongCardTypeException, MissingParametersException {
+  ) throws WrongCardTypeException, ConflictingParameterException {
     checkType(CardType.OBJECTIVE);
     if (
       this.objectiveType.map(t -> t != ObjectiveType.GEOMETRIC).orElse(true)
@@ -160,7 +163,7 @@ public class CardBuilder {
   }
 
   public CardBuilder setPointConditionObject(ObjectType pointConditionObject)
-    throws WrongCardTypeException {
+    throws WrongCardTypeException, ConflictingParameterException {
     checkType(CardType.GOLD);
     if (
       this.pointCondition.map(t -> t != PointConditionType.OBJECTS).orElse(true)
