@@ -7,27 +7,27 @@ import java.util.Optional;
 
 public class CardBuilder {
 
-  int id;
-  CardType type;
+  private final int id;
+  private final CardType type;
 
   // Resource | Gold | Objective
-  Optional<Integer> points;
+  private Optional<Integer> points;
 
   // Objective
-  Optional<ObjectiveType> objectiveType;
-  Optional<List<List<ResourceType>>> objectiveGeometry;
-  Optional<HashMap<ResourceType, Integer>> objectiveResources;
-  Optional<HashMap<ObjectType, Integer>> objectiveObjects;
+  private Optional<ObjectiveType> objectiveType;
+  private Optional<List<List<ResourceType>>> objectiveGeometry;
+  private Optional<HashMap<ResourceType, Integer>> objectiveResources;
+  private Optional<HashMap<ObjectType, Integer>> objectiveObjects;
 
   // Resource | Starter | Gold
-  Optional<List<ResourceType>> backPermanentResources;
-  Optional<HashMap<CornerPosition, CornerContentType>> frontCorners;
-  Optional<HashMap<CornerPosition, CornerContentType>> backCorners;
+  private Optional<List<ResourceType>> backPermanentResources;
+  private Optional<HashMap<CornerPosition, CornerContentType>> frontCorners;
+  private Optional<HashMap<CornerPosition, CornerContentType>> backCorners;
 
   // Gold
-  Optional<List<ResourceType>> placementCondition;
-  Optional<PointConditionType> pointCondition;
-  Optional<ObjectType> pointConditionObject;
+  private Optional<List<ResourceType>> placementCondition;
+  private Optional<PointConditionType> pointCondition;
+  private Optional<ObjectType> pointConditionObject;
 
   public CardBuilder(int id, CardType type) {
     this.id = id;
