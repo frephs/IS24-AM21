@@ -3,7 +3,7 @@ package polimi.ingsw.am21.codex.model.GameBoard;
 import polimi.ingsw.am21.codex.model.Cards.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Player;
-import polimi.ingsw.am21.codex.model.TokenColors;
+import polimi.ingsw.am21.codex.model.TokenColor;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -15,11 +15,11 @@ public class Lobby {
 
     int remaingPlayerSlots = 0;
 
-    TokenColors[] tokenColors;
+    TokenColor[] tokenColors;
 
     public Lobby(int maxPlayers){
         this.remaingPlayerSlots = maxPlayers;
-        this.tokenColors = TokenColors.values();
+        this.tokenColors = TokenColor.values();
     }
 
     public Lobby(){
@@ -60,7 +60,7 @@ public class Lobby {
         }
         lobbyPlayers.get(playerID).setNickname(nickname);
     }
-    public void setToken(UUID playerID, TokenColors tokenColor) throws PlayerNotFoundException, TokenAlreadyTakenException {
+    public void setToken(UUID playerID, TokenColor tokenColor) throws PlayerNotFoundException, TokenAlreadyTakenException {
         if(!lobbyPlayers.containsKey(playerID)){
             throw new PlayerNotFoundException(playerID);
         }
