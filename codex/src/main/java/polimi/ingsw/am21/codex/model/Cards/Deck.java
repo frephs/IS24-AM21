@@ -3,7 +3,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 import java.util.Collections;
 import java.util.List;
 
-public class Deck<T extends  Card> {
+public class Deck<T> {
     private List<T> cards;
 
     /**

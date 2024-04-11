@@ -143,4 +143,8 @@ public class Game {
         }
     }
 
+    protected List<String> getPlayersOrder() {
+        return this.players.stream().map(Player::getNickname).toList();
+    }
+
 }
