@@ -36,11 +36,26 @@ public class Player {
         }
 
         /**
+         * @return the player nickname color
+         */
+        public String getNickname(){
+            return this.nickname;
+        }
+
+
+        /**
          * @param token chosen by the client controller (physical player)
          */
         public PlayerBuilder setTokenColor(TokenColors token){
             this.token = token;
             return this;
+        }
+
+        /**
+         * @return the player token color
+         */
+        public TokenColors getTokenColor(){
+            return this.token;
         }
 
         /**

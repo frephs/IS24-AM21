@@ -55,7 +55,7 @@ public class Lobby {
         if(!lobbyPlayers.containsKey(playerID)){
             throw new PlayerNotFoundException(playerID);
         }
-        if(lobbyPlayers.keySet().stream().anyMatch(playerId -> !playerId.equals(playerID) && lobbyPlayers.get(playerId).getNickName().equals(nickname))){
+        if(lobbyPlayers.keySet().stream().anyMatch(playerId -> !playerId.equals(playerID) && lobbyPlayers.get(playerId).getNickname().equals(nickname))){
             throw new NicknameAlreadyTakenException(nickname);
         }
         lobbyPlayers.get(playerID).setNickname(nickname);
