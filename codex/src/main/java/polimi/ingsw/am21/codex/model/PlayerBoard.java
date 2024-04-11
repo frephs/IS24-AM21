@@ -19,14 +19,11 @@ public class PlayerBoard {
     Set<Position> availableSpots = new HashSet<>();
     Set<Position> forbiddenSpots = new HashSet<>();
 
-    HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
-
     /**
      * @param hand the player's cards drawn from the GameBoard (2 resources and 1 GoldCard)
      * @param starterCard drawn from the PlayerBoard
      * @param objectiveCard chosen by the client controller (physical player)
      */
-
     public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.hand = hand;
         this.playedCards.put(new Position(), starterCard);
@@ -88,9 +85,7 @@ public class PlayerBoard {
 
         //let's add the resources of the card just placed
         enabledCorners.forEach(
-                (cornerPosition, corner) -> {
-                    updateResourcesAndObjectsMaps(corner, +1);
-                }
+                (cornerPosition, corner) -> updateResourcesAndObjectsMaps(corner, +1)
         );
 
         //let's remove the resources of the cards that are covered.
