@@ -1,8 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
-import polimi.ingsw.am21.codex.model.Cards.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 
@@ -11,11 +9,11 @@ import java.util.*;
 import org.json.JSONArray;
 
 public class Game {
-    List<Player> players;
-    GameBoard gameBoard;
-    Lobby lobby;
-    GameState state;
-    Optional<Integer> remainingRounds;
+    private final List<Player> players;
+    private final GameBoard gameBoard;
+    private Lobby lobby;
+    private GameState state;
+    private Integer remainingRounds = null;
     Integer currentPlayer;
 
 
@@ -70,8 +68,17 @@ public class Game {
     }
 
     public void nextTurn() throws GameOverException {
+
         if (this.state == GameState.GAME_OVER) throw new GameOverException();
         currentPlayer = (currentPlayer + 1) % players.size();
+        if (this.currentPlayer == 0 && this.remainingRounds != null) {
+            this.remainingRounds--;
+            if (this.remainingRounds == 0) {
+                this.state = GameState.GAME_OVER;
+                throw new GameOverException();
+            }
+        }
+
     }
 
     public Boolean isGameOver() {
@@ -83,8 +90,10 @@ public class Game {
     }
 
     public Optional<Integer> getRemainingRounds() {
-        return this.remainingRounds;
+        if (this.remainingRounds == null) return Optional.empty();
+        return Optional.of(this.remainingRounds);
     }
+
 
     public Boolean isResourceDeckEmpty() {
         return this.gameBoard.resourceCardsLeft() == 0;
@@ -100,19 +109,37 @@ public class Game {
 
     public PlayableCard drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) throws EmptyDeckException, GameOverException {
         if (this.state == GameState.GAME_OVER) throw new GameOverException();
-        if (deckType == DrawingDeckType.RESOURCE) {
-            return this.gameBoard.drawResourceCardFromDeck();
-        } else {
-            return this.gameBoard.drawGoldCardFromDeck();
+        try {
+            if (deckType == DrawingDeckType.RESOURCE) {
+                return this.gameBoard.drawResourceCardFromDeck();
+            } else {
+                return this.gameBoard.drawGoldCardFromDeck();
+            }
+        } catch (EmptyDeckException e) {
+            if (this.remainingRounds == null) {
+                this.remainingRounds = 2;
+
+            }
+            throw e;
         }
     }
 
     public PlayableCard drawPlayerCardFromPair(DrawingDeckType deckType, boolean first) throws EmptyDeckException, GameOverException {
-        if (this.state == GameState.GAME_OVER) throw new GameOverException();
-        if (deckType == DrawingDeckType.RESOURCE) {
-            return this.gameBoard.drawResourceCardFromPair(first);
-        } else {
-            return this.gameBoard.drawGoldCardFromPair(first);
+        if (this.state == GameState.GAME_OVER) {
+            throw new GameOverException();
+        }
+        try {
+            if (deckType == DrawingDeckType.RESOURCE) {
+                return this.gameBoard.drawResourceCardFromPair(first);
+            } else {
+                return this.gameBoard.drawGoldCardFromPair(first);
+            }
+
+        } catch (EmptyDeckException e) {
+            if (this.remainingRounds == null) {
+                this.remainingRounds = 2;
+            }
+            throw e;
         }
     }
 
