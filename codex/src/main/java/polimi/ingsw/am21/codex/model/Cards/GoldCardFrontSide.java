@@ -91,7 +91,7 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
         .stream()
         .map(
           resource ->
-            resource.getValue() >
+            resource.getValue() <=
             playerBoard.getResources().getOrDefault(resource.getKey(), 0)
         )
         .reduce(true, (a, b) -> a && b);
