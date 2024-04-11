@@ -24,10 +24,10 @@ public class GameBoard {
      * Initializes the decks using a JSONArray
      */
     public static GameBoard fromJSON(JSONArray cards) {
-        List<PlayableCard> goldDeck = new ArrayList<PlayableCard>();
-        List<PlayableCard> starterDeck = new ArrayList<PlayableCard>();
-        List<ObjectiveCard> objectiveDeck = new ArrayList<ObjectiveCard>();
-        List<PlayableCard> resourceDeck = new ArrayList<PlayableCard>();
+        List<PlayableCard> goldDeck = new ArrayList<>();
+        List<PlayableCard> starterDeck = new ArrayList<>();
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>();
+        List<PlayableCard> resourceDeck = new ArrayList<>();
 
         for (int i = 0; i < cards.length(); i++) {
             JSONObject card = cards.getJSONObject(i);
@@ -42,11 +42,11 @@ public class GameBoard {
             builder.setCost(card.getInt("cost"));
             builder.setObjectiveType(ObjectiveType.fromString(card.getString("objectiveType")));
 
-            List<List<ResourceType>> geometryObjectives = new ArrayList<List<ResourceType>>();
+            List<List<ResourceType>> geometryObjectives = new ArrayList<>();
 
             JSONArray geometryObjectivesArray = card.getJSONArray("objectiveGeometry");
             for (int j = 0; j < geometryObjectivesArray.length(); j++) {
-                List<ResourceType> geometryObjective = new ArrayList<ResourceType>();
+                List<ResourceType> geometryObjective = new ArrayList<>();
                 JSONArray geometryObjectiveArray = geometryObjectivesArray.getJSONArray(j);
                 for (int k = 0; k < geometryObjectiveArray.length(); k++) {
                     geometryObjective.add(ResourceType.fromString(geometryObjectiveArray.getString(k)));
@@ -70,7 +70,7 @@ public class GameBoard {
 
             if (card.has("backPermanentResources")) {
 
-                List<String> backPermanentResources = new ArrayList<String>();
+                List<String> backPermanentResources = new ArrayList<>();
                 JSONArray backPermanentResourcesStr = card.getJSONArray("backPermanentResources");
                 for (int r = 0; r < backPermanentResourcesStr.length(); r++) {
                     backPermanentResources.add(backPermanentResourcesStr.getString(r));
@@ -80,7 +80,7 @@ public class GameBoard {
 
 
             if (card.has("placementCondition")) {
-                List<String> placementCondition = new ArrayList<String>();
+                List<String> placementCondition = new ArrayList<>();
                 JSONArray placementConditionStr = card.getJSONArray("placementCondition");
                 for (int p = 0; p < placementConditionStr.length(); p++) {
                     placementCondition.add(placementConditionStr.getString(p));
@@ -90,7 +90,7 @@ public class GameBoard {
 
             if (card.has("pointCondition")) {
                 String pointConditionStr = card.getString("pointCondition");
-                builder.setPointCondition(PointConditionType.fromString(pointConditionStr))
+                builder.setPointCondition(PointConditionType.fromString(pointConditionStr));
             }
 
             if (card.has("pointConditionObject")) {
@@ -128,14 +128,14 @@ public class GameBoard {
      * Initializes the decks and draws the first cards
      */
     public GameBoard(List<PlayableCard> goldCardsList, List<PlayableCard> starterCardsList, List<ObjectiveCard> objectiveCardsList, List<PlayableCard> resourceCardsList) {
-        this.goldDeck = new Deck<PlayableCard>(goldCardsList);
-        this.starterDeck = new Deck<PlayableCard>(starterCardsList);
-        this.objectiveDeck = new Deck<ObjectiveCard>(objectiveCardsList);
-        this.resourceDeck = new Deck<PlayableCard>(resourceCardsList);
+        this.goldDeck = new Deck<>(goldCardsList);
+        this.starterDeck = new Deck<>(starterCardsList);
+        this.objectiveDeck = new Deck<>(objectiveCardsList);
+        this.resourceDeck = new Deck<>(resourceCardsList);
         try {
-            this.goldCards = new CardPair<PlayableCard>(this.drawGoldCardFromDeck(), this.drawGoldCardFromDeck());
-            this.objectiveCards = new CardPair<ObjectiveCard>(this.drawObjectiveCardFromDeck(), this.drawObjectiveCardFromDeck());
-            this.resourceCards = new CardPair<PlayableCard>(this.drawResourceCardFromDeck(), this.drawResourceCardFromDeck());
+            this.goldCards = new CardPair<>(this.drawGoldCardFromDeck(), this.drawGoldCardFromDeck());
+            this.objectiveCards = new CardPair<>(this.drawObjectiveCardFromDeck(), this.drawObjectiveCardFromDeck());
+            this.resourceCards = new CardPair<>(this.drawResourceCardFromDeck(), this.drawResourceCardFromDeck());
         } catch (EmptyDeckException ignored) {
             // This will never happen as we just seeded the decks
         }
