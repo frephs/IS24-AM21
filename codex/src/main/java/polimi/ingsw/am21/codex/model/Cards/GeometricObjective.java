@@ -1,14 +1,16 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 public class GeometricObjective extends Objective {
 
-  private List<List<ResourceType>> geometry;
+  private Map<AdjacentPosition, ResourceType> geometry = new HashMap<>();
 
-  public GeometricObjective(List<List<ResourceType>> geometry) {
+  public GeometricObjective(Map<AdjacentPosition, ResourceType> geometry) {
     this.geometry = geometry;
   }
 

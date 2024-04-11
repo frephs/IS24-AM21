@@ -65,12 +65,26 @@ class CardSideType {
     BACK
 }
 
+class AdjacentPosition {
+    <<Interface>>
+}
+
+AdjacentPosition <|.. CornerPosition : Realization
+AdjacentPosition <|.. EdgePosition : Realization
+
+
 class CornerPosition {
     <<Enumeration>>
     TOP_LEFT
     BOTTOM_LEFT
     TOP_RIGHT
     BOTTOM_RIGHT
+}
+
+class EdgePosition{
+    TOP
+    CENTER
+    BOTTOM
 }
 
 class Card {
@@ -122,7 +136,7 @@ ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization
 
 class GeometricObjective {
-    -geometry: ResourceType[7]
+    -geometry: HashMap~AdjacentPosition, ResourceType~
 
     GeometricObjective(ResourceType[3][3] geometry)
 

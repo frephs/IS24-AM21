@@ -1,9 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class CardBuilder {
 
@@ -15,7 +12,7 @@ public class CardBuilder {
 
   // Objective
   private Optional<ObjectiveType> objectiveType;
-  private Optional<List<List<ResourceType>>> objectiveGeometry;
+  private Optional<Map<AdjacentPosition, ResourceType>> objectiveGeometry;
   private Optional<HashMap<ResourceType, Integer>> objectiveResources;
   private Optional<HashMap<ObjectType, Integer>> objectiveObjects;
 
@@ -72,8 +69,8 @@ public class CardBuilder {
   }
 
   public CardBuilder setObjectiveGeometry(
-    List<List<ResourceType>> objectiveGeometry
-  ) throws WrongCardTypeException, ConflictingParameterException {
+    Map<AdjacentPosition, ResourceType> objectiveGeometry
+    ) throws WrongCardTypeException, ConflictingParameterException {
     checkType(CardType.OBJECTIVE);
     if (
       this.objectiveType.map(t -> t != ObjectiveType.GEOMETRIC).orElse(true)
@@ -84,7 +81,7 @@ public class CardBuilder {
     );
 
     this.objectiveGeometry = Optional.ofNullable(
-      List.copyOf(objectiveGeometry)
+      Map.copyOf(objectiveGeometry)
     );
     return this;
   }
