@@ -88,12 +88,12 @@ public class GameBoard {
                 builder.setPlacementCondition(placementCondition.stream().map(ResourceType::fromString).collect(Collectors.toList()));
             }
 
-            if(card.has("pointCondition")){
+            if (card.has("pointCondition")) {
                 String pointConditionStr = card.getString("pointCondition");
                 builder.setPointCondition(PointConditionType.fromString(pointConditionStr))
             }
 
-            if(card.has("pointConditionObject")){
+            if (card.has("pointConditionObject")) {
                 ObjectType.from(card.getString("pointConditionObject"));
                 builder.setPointConditionObject(ObjectType.from(card.getString("pointConditionObject")));
             }
@@ -275,6 +275,4 @@ public class GameBoard {
     public int resourceCardsLeft() {
         return this.resourceDeck.cardsLeft();
     }
-
-
 }
