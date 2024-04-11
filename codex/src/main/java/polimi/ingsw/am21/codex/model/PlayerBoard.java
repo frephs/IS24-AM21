@@ -5,32 +5,37 @@ import java.util.*;
 
 public class PlayerBoard {
 
-    private final int MAX_CARDS = 3;
-    private List<PlayableCard> hand = new ArrayList<PlayableCard>(MAX_CARDS);
-    private ObjectiveCard objectiveCard;
+    //private final int MAX_CARDS = 3;
+    private final List<PlayableCard> hand;
+    private final ObjectiveCard objectiveCard;
 
     Map<Position, PlayableCard> playedCards = new HashMap<>();
 
    // Hashmaps to keep track of resources
-    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().lenght);
-    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().lenght);
+    private final HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
+    private final HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
     Set<Position> forbiddenSpots = new HashSet<>();
-
-    HashMap<Position, PlayableCard>  placedCards = new HashMap<Position, PlayableCard>();
 
     /**
      * @param hand the player's cards drawn from the GameBoard (2 resources and 1 GoldCard)
      * @param starterCard drawn from the PlayerBoard
      * @param objectiveCard chosen by the client controller (physical player)
      */
-
     public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.hand = hand;
         this.playedCards.put(new Position(), starterCard);
         this.objectiveCard = objectiveCard;
+        
+        // let's initialize the maps with resources to 0
+        Arrays.stream(ResourceType.values()).forEach(
+            (resourceType) -> resources.put(resourceType, 0)
+        );
+        Arrays.stream(ObjectType.values()).forEach(
+            (objectType) -> objects.put(objectType, 0)
+        );
     }
 
     /**
@@ -62,7 +67,7 @@ public class PlayerBoard {
     void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position){
 
         this.hand.remove(playedCard);
-        playedCard.setPlayedSide(playedSideType);
+        playedCard.setPlayedSideType(playedSideType);
         PlayableSide playedSide = playedCard.getPlayedSide().get();
 
         this.playedCards.put(position, playedCard);
@@ -72,14 +77,15 @@ public class PlayerBoard {
 
     }
 
+      /**
+       * Helper method called by PlayerBoard.placeCard() to update the player's available resources and objects
+       * */
       private void updateResourcesAndObjects(PlayableSide playedSide, Position position) {
         HashMap<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
 
         //let's add the resources of the card just placed
         enabledCorners.forEach(
-                (cornerPosition, corner) -> {
-                    updateResourcesAndObjectsMaps(corner, +1);
-                }
+                (cornerPosition, corner) -> updateResourcesAndObjectsMaps(corner, +1)
         );
 
         //let's remove the resources of the cards that are covered.
@@ -97,15 +103,20 @@ public class PlayerBoard {
         );
     }
 
+    /*
+    * Helper method called by by PlayerBoard.updateResourcesAndObjects() to
+    * update the stored data structures of player's resources and obbjects
+    * */
     private void updateResourcesAndObjectsMaps(Corner corner, int update){
-        if(ResourceType.has(Corner.getContent())){
-            ResourceType resource = Corner.getContent();
-            int prevVal = this.resources.get(resource);
-            this.resources.put(resource, prevVal+update);
-        }else if(ObjectType.has(Corner.getContent())) {
-            ObjectType object = Corner.getContent();
-            int prevVal = this.objects.get(object);
-            this.objects.put(object, prevVal+update);
+        Optional content = corner.getContent();
+        if(content.isPresent()){
+          if(ResourceType.has(content.get())){
+              ResourceType resource = (ResourceType) content.get();
+              this.resources.computeIfPresent(resource, (k, val) -> val + update);
+          }else if(ObjectType.has(content.get())) {
+            ObjectType object = (ObjectType) content.get();
+            this.objects.computeIfPresent(object, (k, val) -> val + update);
+          }
         }
     }
 
