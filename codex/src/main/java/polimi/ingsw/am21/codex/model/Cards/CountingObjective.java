@@ -3,7 +3,10 @@ package polimi.ingsw.am21.codex.model.Cards;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
 public class CountingObjective extends Objective{
     /**
@@ -21,8 +24,25 @@ public class CountingObjective extends Objective{
     }
 
     @Override
-    public Function<PlayerBoard, Integer> getEvaluator() {
-        return ((playerBoard, ))
+    public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
+        return (playerBoard, points) -> {
+            return resources
+              .entrySet()
+              .stream()
+              .map(
+                (resource) -> {
+                  return playerBoard.getResources().get(resource.getKey()) / resource.getValue();
+                }
+              ).reduce(Integer::min).get() * points
+              + (objects
+                .entrySet()
+                .stream()
+                .map(
+                  (object) -> {
+                      return playerBoard.getObjects().get(object.getKey()) / object.getValue();
+                  }
+                ).reduce(Integer::min).get() * points);
+        };
     }
 
 }
