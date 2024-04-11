@@ -80,6 +80,9 @@ public class PlayerBoard {
 
     }
 
+      /**
+       * Helper method called by PlayerBoard.placeCard() to update the player's available resources and objects
+       * */
       private void updateResourcesAndObjects(PlayableSide playedSide, Position position) {
         HashMap<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
 
@@ -105,6 +108,10 @@ public class PlayerBoard {
         );
     }
 
+    /*
+    * Helper method called by by PlayerBoard.updateResourcesAndObjects() to
+    * update the stored data structures of player's resources and obbjects
+    * */
     private void updateResourcesAndObjectsMaps(Corner corner, int update){
         Optional content = corner.getContent();
         if(content.isPresent()){
