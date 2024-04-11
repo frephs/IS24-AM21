@@ -5,15 +5,15 @@ import java.util.*;
 
 public class PlayerBoard {
 
-    private final int MAX_CARDS = 3;
-    private List<PlayableCard> hand = new ArrayList<PlayableCard>(MAX_CARDS);
-    private ObjectiveCard objectiveCard;
+    //private final int MAX_CARDS = 3;
+    private final List<PlayableCard> hand;
+    private final ObjectiveCard objectiveCard;
 
     Map<Position, PlayableCard> playedCards = new HashMap<>();
 
    // Hashmaps to keep track of resources
-    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
-    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
+    private final HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
+    private final HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
@@ -31,6 +31,14 @@ public class PlayerBoard {
         this.hand = hand;
         this.playedCards.put(new Position(), starterCard);
         this.objectiveCard = objectiveCard;
+        
+        // let's initialize the maps with resources to 0
+        Arrays.stream(ResourceType.values()).forEach(
+            (resourceType) -> resources.put(resourceType, 0)
+        );
+        Arrays.stream(ObjectType.values()).forEach(
+            (objectType) -> objects.put(objectType, 0)
+        );
     }
 
     /**
@@ -62,7 +70,7 @@ public class PlayerBoard {
     void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position){
 
         this.hand.remove(playedCard);
-        playedCard.setPlayedSide(playedSideType);
+        playedCard.setPlayedSideType(playedSideType);
         PlayableSide playedSide = playedCard.getPlayedSide().get();
 
         this.playedCards.put(position, playedCard);
@@ -98,14 +106,15 @@ public class PlayerBoard {
     }
 
     private void updateResourcesAndObjectsMaps(Corner corner, int update){
-        if(ResourceType.has(Corner.getContent())){
-            ResourceType resource = Corner.getContent();
-            int prevVal = this.resources.get(resource);
-            this.resources.put(resource, prevVal+update);
-        }else if(ObjectType.has(Corner.getContent())) {
-            ObjectType object = Corner.getContent();
-            int prevVal = this.objects.get(object);
-            this.objects.put(object, prevVal+update);
+        Optional content = corner.getContent();
+        if(content.isPresent()){
+          if(ResourceType.has(content.get())){
+              ResourceType resource = (ResourceType) content.get();
+              this.resources.computeIfPresent(resource, (k, val) -> val + update);
+          }else if(ObjectType.has(content.get())) {
+            ObjectType object = (ObjectType) content.get();
+            this.objects.computeIfPresent(object, (k, val) -> val + update);
+          }
         }
     }
 
