@@ -32,7 +32,7 @@ public class Deck<T extends  Card> {
 
     /**
      * Draws a card from the deck
-     * @param N number of cards to draw
+     * @param n number of cards to draw
      * @return the card drawn
      */
     public List<T> draw(int n) throws EmptyDeckException {

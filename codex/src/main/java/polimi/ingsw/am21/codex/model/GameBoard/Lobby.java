@@ -34,7 +34,7 @@ public class Lobby {
         return lobbyPlayers.size();
     }
 
-    void addPlayer(UUID socketId) throws LobbyFullException {
+    public void addPlayer(UUID socketId) throws LobbyFullException {
         if(lobbyPlayers.size()>=remaingPlayerSlots){
             throw new LobbyFullException();
         }
@@ -42,7 +42,7 @@ public class Lobby {
         remaingPlayerSlots--;
     }
 
-    CardPair<ObjectiveCard> removePlayer(UUID socketId) throws PlayerNotFoundException {
+    public CardPair<ObjectiveCard> removePlayer(UUID socketId) throws PlayerNotFoundException {
         if(!lobbyPlayers.containsKey(socketId)){
             throw new PlayerNotFoundException(socketId);
         }
@@ -51,27 +51,33 @@ public class Lobby {
         return extractedCards.remove(socketId);
     }
 
-    void setNickname(UUID playerID, String nickname) throws PlayerNotFoundException {
+    public void setNickname(UUID playerID, String nickname) throws PlayerNotFoundException, NicknameAlreadyTakenException {
         if(!lobbyPlayers.containsKey(playerID)){
             throw new PlayerNotFoundException(playerID);
         }
-        lobbyPlayers.get(playerID).nickname(nickname);
+        if(lobbyPlayers.keySet().stream().anyMatch(playerId -> !playerId.equals(playerID) && lobbyPlayers.get(playerId).getNickName().equals(nickname))){
+            throw new NicknameAlreadyTakenException(nickname);
+        }
+        lobbyPlayers.get(playerID).setNickname(nickname);
     }
-    void setToken(UUID playerID, TokenColors tokenColor) throws PlayerNotFoundException {
+    public void setToken(UUID playerID, TokenColors tokenColor) throws PlayerNotFoundException, TokenAlreadyTakenException {
         if(!lobbyPlayers.containsKey(playerID)){
             throw new PlayerNotFoundException(playerID);
         }
-        lobbyPlayers.get(playerID).tokenColor(tokenColor);
+        if(lobbyPlayers.keySet().stream().anyMatch(playerId -> !playerId.equals(playerID) && lobbyPlayers.get(playerId).getTokenColor().equals(tokenColor))){
+            throw new TokenAlreadyTakenException(tokenColor);
+        }
+        lobbyPlayers.get(playerID).setTokenColor(tokenColor);
     }
 
-    void setExtractedCard(UUID playerID, CardPair<ObjectiveCard> extractedCard) throws PlayerNotFoundException {
+    public void setExtractedCard(UUID playerID, CardPair<ObjectiveCard> extractedCard) throws PlayerNotFoundException {
         if(!lobbyPlayers.containsKey(playerID)){
             throw new PlayerNotFoundException(playerID);
         }
         extractedCards.put(playerID, extractedCard);
     }
 
-    Player finalizePlayer(UUID socketId,  ObjectiveCard objectiveCard) throws PlayerNotFoundException {
+    public Player finalizePlayer(UUID socketId,  ObjectiveCard objectiveCard) throws PlayerNotFoundException {
         if(!lobbyPlayers.containsKey(socketId)){
             throw new PlayerNotFoundException(socketId);
         }

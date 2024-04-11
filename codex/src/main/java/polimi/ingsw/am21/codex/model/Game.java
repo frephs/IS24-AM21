@@ -4,11 +4,10 @@ import polimi.ingsw.am21.codex.model.Cards.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.PlayableCard;
-import polimi.ingsw.am21.codex.model.GameBoard.GameBoard;
-import polimi.ingsw.am21.codex.model.GameBoard.Lobby;
-import polimi.ingsw.am21.codex.model.GameBoard.PlayerNotFoundException;
+import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 import java.util.*;
+
 import org.json.JSONArray;
 
 public class Game {
@@ -38,31 +37,31 @@ public class Game {
 
     }
 
-    public GameState getState(){
+    public GameState getState() {
         return this.state;
     }
 
     public PlayerState getPlayerState(String nickname) {
-        int i =0;
-        while(i< players.size() && !players.get(i).getNickname().equals(nickname)){
+        int i = 0;
+        while (i < players.size() && !players.get(i).getNickname().equals(nickname)) {
             i++;
         }
 
-        if(i >= players.size()) throw new PlayerNotFoundException(nickname);
+        if (i >= players.size()) throw new PlayerNotFoundException(nickname);
 
-        if(i == currentPlayer) return PlayerState.PLAYING;
+        if (i == currentPlayer) return PlayerState.PLAYING;
         return PlayerState.WAITING;
     }
 
-    public HashMap<String, Integer> getScoreBoard(){
+    public HashMap<String, Integer> getScoreBoard() {
         HashMap<String, Integer> scoreBoard = new HashMap<>();
-        for(Player player : players){
+        for (Player player : players) {
             scoreBoard.put(player.getNickname(), player.getPoints());
         }
         return scoreBoard;
     }
 
-    public Player getCurrentPlayer(){
+    public Player getCurrentPlayer() {
         return this.players.get(currentPlayer);
     }
 
@@ -71,37 +70,37 @@ public class Game {
     }
 
     public void nextTurn() throws GameOverException {
-        if(this.state == GameState.GAME_OVER) throw new GameOverException();
+        if (this.state == GameState.GAME_OVER) throw new GameOverException();
         currentPlayer = (currentPlayer + 1) % players.size();
     }
 
-    public Boolean getGameOver(){
+    public Boolean getGameOver() {
         return this.state == GameState.GAME_OVER;
     }
 
-    public void setGameOver(){
+    public void setGameOver() {
         this.state = GameState.GAME_OVER;
     }
 
-    public Optional<Integer> getRemainingRounds(){
+    public Optional<Integer> getRemainingRounds() {
         return this.remainingRounds;
     }
 
-    public Boolean isResourceDeckEmpty(){
+    public Boolean isResourceDeckEmpty() {
         return this.gameBoard.resourceCardsLeft() == 0;
     }
 
-    public Boolean isGoldDeckEmpty(){
+    public Boolean isGoldDeckEmpty() {
         return this.gameBoard.goldCardsLeft() == 0;
     }
 
-    public Boolean areDecksEmpty(){
+    public Boolean areDecksEmpty() {
         return this.isResourceDeckEmpty() && this.isGoldDeckEmpty();
     }
 
     public PlayableCard drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) throws EmptyDeckException, GameOverException {
-        if(this.state == GameState.GAME_OVER) throw new GameOverException();
-        if(deckType == DrawingDeckType.RESOURCE){
+        if (this.state == GameState.GAME_OVER) throw new GameOverException();
+        if (deckType == DrawingDeckType.RESOURCE) {
             return this.gameBoard.drawResourceCardFromDeck();
         } else {
             return this.gameBoard.drawGoldCardFromDeck();
@@ -109,8 +108,8 @@ public class Game {
     }
 
     public PlayableCard drawPlayerCardFromPair(DrawingDeckType deckType, boolean first) throws EmptyDeckException, GameOverException {
-        if(this.state == GameState.GAME_OVER) throw new GameOverException();
-        if(deckType == DrawingDeckType.RESOURCE){
+        if (this.state == GameState.GAME_OVER) throw new GameOverException();
+        if (deckType == DrawingDeckType.RESOURCE) {
             return this.gameBoard.drawResourceCardFromPair(first);
         } else {
             return this.gameBoard.drawGoldCardFromPair(first);
