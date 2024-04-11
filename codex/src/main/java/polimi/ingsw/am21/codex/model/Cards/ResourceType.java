@@ -8,9 +8,9 @@ public enum ResourceType implements CornerContentType {
     FUNGI_KINGDOM,
     INSECT_KINGDOM;
 
-    public static boolean has(Object enumObject){
+    public static boolean has(Object value){
         return Arrays.stream(ResourceType.values()).anyMatch(
-                value -> value == enumObject
+                resourceType -> resourceType == value
         );
     }
 }
