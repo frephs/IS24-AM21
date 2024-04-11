@@ -2,9 +2,8 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public abstract class Objective {
-    //cosa fa?
-    abstract public Function<PlayerBoard, Integer> getEvaluator();
+    abstract public BiFunction<PlayerBoard, Integer, Integer>  getEvaluator();
 }
