@@ -12,8 +12,8 @@ public class PlayerBoard {
     Map<Position, PlayableCard> playedCards = new HashMap<>();
 
    // Hashmaps to keep track of resources
-    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().lenght);
-    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().lenght);
+    private HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
+    private HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
