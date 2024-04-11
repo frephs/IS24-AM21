@@ -147,7 +147,7 @@ public class Lobby {
     }
 
     /**
-     * Finalizes a player in the lobby, constructing the Player object.
+     * Finalizes a player in the lobby, constructing the Player object and removing the PlayerBuilder from the map
      *
      * @param socketId the socket ID of the player to finalize
      * @param objectiveCard the objective card associated with the player
@@ -158,6 +158,8 @@ public class Lobby {
         if(!lobbyPlayers.containsKey(socketId)){
             throw new PlayerNotFoundException(socketId);
         }
-        return lobbyPlayers.get(socketId).build();
+        Player player = lobbyPlayers.get(socketId).build();
+        lobbyPlayers.remove(socketId);
+        return player;
     }
 }
