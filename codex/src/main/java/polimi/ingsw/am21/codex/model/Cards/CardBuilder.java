@@ -232,7 +232,11 @@ public class CardBuilder {
               () -> new MissingParametersException("backPermanentResources")
             );
 
-        return getPlayableCard(permanentResources, new StarterCardFrontSide());
+        return getPlayableCard(
+          permanentResources,
+          new StarterCardFrontSide(),
+          CardType.STARTER
+        );
       }
       case RESOURCE -> {
         List<ResourceType> permanentResources =
@@ -246,7 +250,8 @@ public class CardBuilder {
 
         return getPlayableCard(
           permanentResources,
-          new ResourceCardFrontSide(points)
+          new ResourceCardFrontSide(points),
+          CardType.RESOURCE
         );
       }
       case GOLD -> {
@@ -270,7 +275,8 @@ public class CardBuilder {
             placementCondition,
             this.pointCondition.orElse(null),
             this.pointConditionObject.orElse(null)
-          )
+          ),
+          CardType.GOLD
         );
       }
       default -> throw new ConflictingParameterException(
@@ -292,13 +298,23 @@ public class CardBuilder {
    */
   private PlayableCard getPlayableCard(
     List<ResourceType> permanentResources,
-    PlayableFrontSide frontSide
+    PlayableFrontSide frontSide,
+    CardType cardType
   ) {
     this.frontCorners.orElse(new HashMap<>()).forEach(frontSide::setCorners);
 
     PlayableBackSide backSide = new PlayableBackSide(permanentResources);
     this.backCorners.orElse(new HashMap<>()).forEach(backSide::setCorners);
 
-    return new PlayableCard(this.id, frontSide, backSide);
+    if (cardType == CardType.STARTER) {
+      return new PlayableCard(this.id, frontSide, backSide);
+    } else {
+      return new PlayableCard(
+        this.id,
+        frontSide,
+        backSide,
+        permanentResources.getFirst()
+      );
+    }
   }
 }
