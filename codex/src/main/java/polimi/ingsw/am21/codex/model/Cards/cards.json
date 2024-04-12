@@ -1661,5 +1661,85 @@
         "TOP_RIGHT": ""
       }
     }
+  },
+  {
+    "id": 87,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "GEOMETRIC",
+  },
+  {
+    "id": 95,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveResources": {
+      "FUNGI": 3
+    }
+  },
+  {
+    "id": 96,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveResources": {
+      "PLANT": 3
+    }
+  },
+  {
+    "id": 97,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveResources": {
+      "ANIMAL": 3
+    }
+  },
+  {
+    "id": 98,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveResources": {
+      "INSECT": 3
+    }
+  },
+  {
+    "id": 99,
+    "type": "OBJECTIVE",
+    "points": 3,
+    "objectiveType": "COUNTING",
+    "objectiveObjects": {
+      "QUILL": 1,
+      "INKWELL": 1,
+      "MANUSCRIPT": 1
+    }
+  },
+  {
+    "id": 100,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveObjects": {
+      "MANUSCRIPT": 2
+    }
+  },
+  {
+    "id": 101,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveObjects": {
+      "INKWELL": 3
+    }
+  },
+  {
+    "id": 102,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "COUNTING",
+    "objectiveObjects": {
+      "QUILL": 2
+    }
   }
 ]
