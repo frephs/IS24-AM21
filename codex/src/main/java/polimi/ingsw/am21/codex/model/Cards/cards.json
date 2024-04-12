@@ -1667,6 +1667,56 @@
     "type": "OBJECTIVE",
     "points": 2,
     "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": [null, null, "FUNGI", "FUNGI", "FUNGI", null, null]
+  },
+  {
+    "id": 88,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": ["PLANT", null, null, "PLANT", null, null, "PLANT"]
+  },
+  {
+    "id": 89,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": [null, null, "ANIMAL", "ANIMAL", "ANIMAL", null, null]
+  },
+  {
+    "id": 90,
+    "type": "OBJECTIVE",
+    "points": 2,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": ["INSECT", null, null, "INSECT", null, null, "INSECT"]
+  },
+  {
+    "id": 91,
+    "type": "OBJECTIVE",
+    "points": 3,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": [null, "FUNGI", null, "FUNGI", null, null, "PLANT"]
+  },
+  {
+    "id": 92,
+    "type": "OBJECTIVE",
+    "points": 3,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": [null, "PLANT", null, "PLANT", "INSECT", null, null]
+  },
+  {
+    "id": 93,
+    "type": "OBJECTIVE",
+    "points": 3,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": [null, null, "FUNGI", "ANIMAL", null, "ANIMAL", null]
+  },
+  {
+    "id": 94,
+    "type": "OBJECTIVE",
+    "points": 3,
+    "objectiveType": "GEOMETRIC",
+    "objectiveGeometry": ["ANIMAL", null, null, "INSECT", null, "INSECT", null]
   },
   {
     "id": 95,
