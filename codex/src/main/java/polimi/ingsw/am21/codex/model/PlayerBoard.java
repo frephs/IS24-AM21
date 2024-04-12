@@ -147,6 +147,11 @@ public class PlayerBoard {
     public HashMap<ResourceType, Integer> getResources() {
         return this.resources;
     }
+
+    public Map<Position, PlayableCard> getPlayedCards() {
+      return playedCards;
+    }
+
 }
 
 
