@@ -70,7 +70,8 @@
               "type": "null"
             }
           ]
-        }
+        },
+        "$comment": "The position of the array start from TOP_LEFT, moving to TOP_RIGHT then the center and the same way for the bottom"
       },
       "objectiveResources": {
         "type": "object",
