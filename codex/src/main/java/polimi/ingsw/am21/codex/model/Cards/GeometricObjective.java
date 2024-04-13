@@ -1,7 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
@@ -21,10 +20,14 @@ public class GeometricObjective extends Objective {
         .entrySet()
         .stream()
         // let's get all the cards which match which the center one (which is always present)
-        .filter(card ->
-          //FIXME: better way which doesn't use Optional.of
-          Optional.of(geometry.get(EdgePosition.CENTER)) ==
-          card.getValue().getKingdom())
+        .filter(
+          card ->
+            card
+              .getValue()
+              .getKingdom()
+              .map(kingdom -> kingdom == geometry.get(EdgePosition.CENTER))
+              .orElse(false)
+        )
         // let's see if for every card the objective applies
         .map(card ->
           geometry
@@ -42,12 +45,13 @@ public class GeometricObjective extends Objective {
                 playerBoard
                     .getPlayedCards()
                     .get(adjacentPlayedCardPosition)
-                    .getKingdom() ==
-                  Optional.of(adjacentPosition.getValue())
+                    .getKingdom()
+                    .orElse(null) ==
+                  adjacentPosition.getValue()
               );
             })
             .reduce((a, b) -> a && b))
-        .map(Optional::get)
+        .map(e -> e.orElse(false))
         .filter(Boolean::booleanValue)
         .mapToInt(element -> 1)
         .sum();
