@@ -30,11 +30,11 @@ class CardBuilderTest {
 
   @Test
   void setObjectiveType() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-          type -> new CardBuilder(123, type).setObjectiveType(null)
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setObjectiveType(null)
         )
     );
 
@@ -48,11 +48,11 @@ class CardBuilderTest {
 
   @Test
   void setObjectiveGeometry() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-          type -> new CardBuilder(123, type).setObjectiveGeometry(null)
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setObjectiveGeometry(null)
         )
     );
 
@@ -68,11 +68,11 @@ class CardBuilderTest {
 
   @Test
   void setObjectiveResources() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-          type -> new CardBuilder(123, type).setObjectiveResources(null)
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setObjectiveResources(null)
         )
     );
 
@@ -94,11 +94,11 @@ class CardBuilderTest {
 
   @Test
   void setObjectiveObjects() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-          type -> new CardBuilder(123, type).setObjectiveObjects(null)
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setObjectiveObjects(null)
         )
     );
 
@@ -126,11 +126,9 @@ class CardBuilderTest {
         new CardBuilder(123, CardType.OBJECTIVE).setBackPermanentResources(null)
     );
 
-    assertDoesNotThrow(
-      () ->
-        List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-          type -> new CardBuilder(123, type).setPoints(123)
-        )
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertDoesNotThrow(() -> new CardBuilder(123, type).setPoints(123))
     );
 
     assertInstanceOf(
@@ -143,15 +141,11 @@ class CardBuilderTest {
 
   @Test
   void setPlacementCondition() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(
-          CardType.OBJECTIVE,
-          CardType.RESOURCE,
-          CardType.STARTER
-        ).forEach(
-          type -> new CardBuilder(123, type).setPlacementCondition(null)
+    List.of(CardType.OBJECTIVE, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setPlacementCondition(null)
         )
     );
 
@@ -165,14 +159,12 @@ class CardBuilderTest {
 
   @Test
   void setPointCondition() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(
-          CardType.OBJECTIVE,
-          CardType.RESOURCE,
-          CardType.STARTER
-        ).forEach(type -> new CardBuilder(123, type).setPointCondition(null))
+    List.of(CardType.OBJECTIVE, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setPointCondition(null)
+        )
     );
 
     assertInstanceOf(
@@ -185,15 +177,11 @@ class CardBuilderTest {
 
   @Test
   void setPointConditionObject() {
-    assertThrows(
-      WrongCardTypeException.class,
-      () ->
-        List.of(
-          CardType.OBJECTIVE,
-          CardType.RESOURCE,
-          CardType.STARTER
-        ).forEach(
-          type -> new CardBuilder(123, type).setPointConditionObject(null)
+    List.of(CardType.OBJECTIVE, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertThrows(
+          WrongCardTypeException.class,
+          () -> new CardBuilder(123, type).setPointConditionObject(null)
         )
     );
 
@@ -220,10 +208,10 @@ class CardBuilderTest {
       () -> new CardBuilder(123, CardType.OBJECTIVE).setCorners(null, null)
     );
 
-    assertDoesNotThrow(
-      () ->
-        List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-          type -> new CardBuilder(123, type).setCorners(null, null)
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertDoesNotThrow(
+          () -> new CardBuilder(123, type).setCorners(null, null)
         )
     );
 
