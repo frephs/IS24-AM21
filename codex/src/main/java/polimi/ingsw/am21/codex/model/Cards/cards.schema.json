@@ -122,7 +122,7 @@
         "patternProperties": {
           "^(front|back)$": {
             "patternProperties": {
-              "^(TOP|RIGHT|BOTTOM|LEFT)$": {
+              "^(TOP_RIGHT|BOTTOM_RIGHT|BOTTOM_RIGHT|BOTTOM_LEFT)$": {
                 "anyOf": [
                   {
                     "$ref": "#/definitions/resourceType"
