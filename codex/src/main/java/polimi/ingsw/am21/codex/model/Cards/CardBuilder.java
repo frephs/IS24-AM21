@@ -70,7 +70,7 @@ public class CardBuilder {
 
   public CardBuilder setObjectiveGeometry(
     Map<AdjacentPosition, ResourceType> objectiveGeometry
-    ) throws WrongCardTypeException, ConflictingParameterException {
+  ) throws WrongCardTypeException, ConflictingParameterException {
     checkType(CardType.OBJECTIVE);
     if (
       this.objectiveType.map(t -> t != ObjectiveType.GEOMETRIC).orElse(true)
@@ -80,9 +80,11 @@ public class CardBuilder {
       this.objectiveType.map(Enum::toString).orElse("empty")
     );
 
-    this.objectiveGeometry = Optional.ofNullable(
+    if (objectiveGeometry != null) this.objectiveGeometry = Optional.of(
       Map.copyOf(objectiveGeometry)
     );
+    else this.objectiveGeometry = Optional.empty();
+
     return this;
   }
 
@@ -137,9 +139,10 @@ public class CardBuilder {
   ) throws WrongCardTypeException {
     checkType(CardType.RESOURCE, CardType.STARTER, CardType.GOLD);
 
-    this.backPermanentResources = Optional.ofNullable(
-      List.copyOf(backPermanentResources)
-    );
+    if (backPermanentResources != null) this.backPermanentResources =
+      Optional.of(List.copyOf(backPermanentResources));
+    else this.backPermanentResources = Optional.empty();
+
     return this;
   }
 
@@ -148,9 +151,10 @@ public class CardBuilder {
   ) throws WrongCardTypeException {
     checkType(CardType.GOLD);
 
-    this.placementCondition = Optional.ofNullable(
+    if (placementCondition != null) this.placementCondition = Optional.of(
       List.copyOf(placementCondition)
     );
+    else this.placementCondition = Optional.empty();
     return this;
   }
 
