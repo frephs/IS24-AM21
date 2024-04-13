@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class CardBuilderTest {
@@ -63,7 +64,15 @@ class CardBuilderTest {
           ObjectiveType.COUNTING
         )
     );
-    //    TODO wait for objectiveGeometry type to be defined, then test that as well
+
+    assertInstanceOf(
+      CardBuilder.class,
+      new CardBuilder(123, CardType.OBJECTIVE)
+        .setObjectiveType(ObjectiveType.GEOMETRIC)
+        .setObjectiveGeometry(
+          Map.of(CornerPosition.BOTTOM_LEFT, ResourceType.INSECT_KINGDOM)
+        )
+    );
   }
 
   @Test
@@ -259,7 +268,9 @@ class CardBuilderTest {
       new CardBuilder(123, CardType.OBJECTIVE)
         .setPoints(123)
         .setObjectiveType(ObjectiveType.GEOMETRIC)
-        .setObjectiveGeometry(List.of(List.of(ResourceType.FUNGI_KINGDOM)))
+        .setObjectiveGeometry(
+          Map.of(EdgePosition.BOTTOM, ResourceType.FUNGI_KINGDOM)
+        )
         .build();
       new CardBuilder(123, CardType.OBJECTIVE)
         .setPoints(123)
