@@ -99,7 +99,7 @@ class LobbyTest {
         try {
             this.lobby.removePlayer(socketID);
         } catch (PlayerNotFoundException e) {
-            fail("Player not found")
+            fail("Player not found");
         }
         assertThrows(PlayerNotFoundException.class, () -> this.lobby.removePlayer(fakeUUID));
     }
