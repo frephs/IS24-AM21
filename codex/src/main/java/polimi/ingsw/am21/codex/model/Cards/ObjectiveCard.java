@@ -21,6 +21,8 @@ public class ObjectiveCard extends Card{
 
     @Override
     public Function<PlayerBoard, Integer> getEvaluator() {
-        //deve ritornare quanti punti fa piazzandola?
+        return playerBoard -> {
+            return objective.getEvaluator().apply(playerBoard, points);
+        };
     }
 }
