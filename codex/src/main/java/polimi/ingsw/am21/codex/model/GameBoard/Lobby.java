@@ -24,7 +24,7 @@ public class Lobby {
     /**
      * The remaining slots for players in the lobby. ( how many player can still join the game )
      */
-    int remainingPlayerSlots = 0;
+    int remainingPlayerSlots;
 
     /**
      * The array of all the token colors.
