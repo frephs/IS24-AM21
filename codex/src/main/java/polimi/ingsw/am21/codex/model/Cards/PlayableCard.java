@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
@@ -65,6 +66,10 @@ public class PlayableCard extends Card {
 
   public Optional<CardSideType> getPlayedSideType() {
     return playedSideType;
+  }
+
+  public List<PlayableSide> getSides(){
+    return List.of(frontSide, backSide);
   }
 
   /**

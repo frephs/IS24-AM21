@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlayerBoard {
 
@@ -46,10 +47,21 @@ public class PlayerBoard {
     }
 
     /**
-     * return the player's hand
+     * @return the player's hand
      * */
     public List<PlayableCard> getHand(){
         return this.hand;
+    }
+
+    /**
+     * @return a list of sides that pass the are both playable and placeable
+     * */
+    public List<PlayableSide> getPlaceableCardSides(){
+      return getHand().stream().flatMap(
+        card -> card.getSides().stream()
+      ).filter(
+        side -> side.getPlaceabilityChecker().apply(this)
+      ).collect(Collectors.toList());
     }
 
     /**
@@ -105,8 +117,8 @@ public class PlayerBoard {
     }
 
     /*
-    * Helper method called by by PlayerBoard.updateResourcesAndObjects() to
-    * update the stored data structures of player's resources and obbjects
+    * Helper method called by PlayerBoard.updateResourcesAndObjects() to
+    * update the stored data structures of player's resources and objects
     * */
     private void updateResourcesAndObjectsMaps(Corner corner, int update){
         Optional content = corner.getContent();
