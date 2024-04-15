@@ -15,21 +15,21 @@ public class Lobby {
     /**
      * The map of players in the lobby, with their socket ID as the key and PlayerBuilder as the value used to progressively create the player;
      */
-    HashMap<UUID, Player.PlayerBuilder> lobbyPlayers;
+    private HashMap<UUID, Player.PlayerBuilder> lobbyPlayers;
     /**
      * The map of extracted cards associated with each player's socket ID.
      */
-    HashMap<UUID, CardPair<ObjectiveCard>> extractedCards;
+    private HashMap<UUID, CardPair<ObjectiveCard>> extractedCards;
 
     /**
      * The remaining slots for players in the lobby. ( how many player can still join the game )
      */
-    int remainingPlayerSlots;
+    private int remainingPlayerSlots;
 
     /**
      * The array of all the token colors.
      */
-    TokenColor[] tokenColors;
+    private TokenColor[] tokenColors;
 
     /**
      * Constructs a lobby with the specified maximum number of players.
@@ -136,14 +136,14 @@ public class Lobby {
      * Sets the extracted card for a player in the lobby.
      *
      * @param socketId      the socket ID of the player
-     * @param extractedCard the extracted card to set
+     * @param playerExtractedCards the extracted card to set
      * @throws PlayerNotFoundException if the socket ID is not found in the lobby
      */
-    public void setExtractedCard(UUID socketId, CardPair<ObjectiveCard> extractedCard) throws PlayerNotFoundException {
+    public void setExtractedCard(UUID socketId, CardPair<ObjectiveCard> playerExtractedCards) throws PlayerNotFoundException {
         if (!lobbyPlayers.containsKey(socketId)) {
             throw new PlayerNotFoundException(socketId);
         }
-        extractedCards.put(socketId, extractedCard);
+        extractedCards.put(socketId, playerExtractedCards);
     }
 
     /**
@@ -154,11 +154,16 @@ public class Lobby {
      * @return the finalized Player object
      * @throws PlayerNotFoundException if the socked ID is not found in the lobby
      */
-    public Player finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) throws PlayerNotFoundException {
+    public Player finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) throws PlayerNotFoundException, IncompletePlayerBuilderException {
         if (!lobbyPlayers.containsKey(socketId)) {
             throw new PlayerNotFoundException(socketId);
         }
-        Player player = lobbyPlayers.get(socketId).build();
+        Player.PlayerBuilder playerBuilder = lobbyPlayers.get(socketId);
+
+        IncompletePlayerBuilderException.checkPlayerBuilder(playerBuilder);
+
+        playerBuilder.setObjectiveCard(objectiveCard);
+        Player player = playerBuilder.build();
         lobbyPlayers.remove(socketId);
         return player;
     }
@@ -171,5 +176,43 @@ public class Lobby {
      */
     public CardPair<ObjectiveCard> getPlayerObjectiveCards(UUID socketId) {
         return this.extractedCards.get(socketId);
+    }
+
+    /**
+     * Checks if a player with the given socket ID is already in the lobby.
+     *
+     * @param socketId the socket ID of the player to check
+     * @return true if the player is already in the lobby, otherwise false
+     */
+    public boolean containsSocketID(UUID socketId) {
+        return lobbyPlayers.containsKey(socketId);
+    }
+
+    /**
+     * Gets the nickname of the player in the lobby.
+     *
+     * @param socketId the socket ID of the player
+     * @return the nickname of the player
+     * @throws PlayerNotFoundException if the player is not found in the lobby
+     */
+    public String getPlayerNickname(UUID socketId) throws PlayerNotFoundException {
+        if (!lobbyPlayers.containsKey(socketId)) {
+            throw new PlayerNotFoundException(socketId);
+        }
+        return lobbyPlayers.get(socketId).getNickname();
+    }
+
+    /**
+     * Gets the token color of the player in the lobby.
+     *
+     * @param socketId the socket ID of the player
+     * @return the token color of the player
+     * @throws PlayerNotFoundException if the player is not found in the lobby
+     */
+    public TokenColor getPlayerTokenColor(UUID socketId) throws PlayerNotFoundException {
+        if (!lobbyPlayers.containsKey(socketId)) {
+            throw new PlayerNotFoundException(socketId);
+        }
+        return lobbyPlayers.get(socketId).getTokenColor();
     }
 }
