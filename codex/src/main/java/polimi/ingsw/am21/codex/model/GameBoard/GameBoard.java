@@ -39,7 +39,6 @@ public class GameBoard {
 
 
             builder.setPoints(card.getInt("points"));
-            builder.setCost(card.getInt("cost"));
             builder.setObjectiveType(ObjectiveType.fromString(card.getString("objectiveType")));
 
             List<List<ResourceType>> geometryObjectives = new ArrayList<>();
