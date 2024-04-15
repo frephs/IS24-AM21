@@ -305,10 +305,10 @@ public class CardBuilder {
     PlayableFrontSide frontSide,
     CardType cardType
   ) {
-    this.frontCorners.orElse(new HashMap<>()).forEach(frontSide::setCorners);
+    this.frontCorners.orElse(new HashMap<>()).forEach(frontSide::setCorner);
 
     PlayableBackSide backSide = new PlayableBackSide(permanentResources);
-    this.backCorners.orElse(new HashMap<>()).forEach(backSide::setCorners);
+    this.backCorners.orElse(new HashMap<>()).forEach(backSide::setCorner);
 
     if (cardType == CardType.STARTER) {
       return new PlayableCard(this.id, frontSide, backSide);

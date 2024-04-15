@@ -22,7 +22,7 @@ public abstract class PlayableSide {
     return corners;
   }
 
-  public void setCorners(CornerPosition position, CornerContentType content) {
+  public void setCorner(CornerPosition position, CornerContentType content) {
     corners.put(position, new Corner<>(content));
   }
 
