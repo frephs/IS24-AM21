@@ -3,9 +3,6 @@ package polimi.ingsw.am21.codex.model.Cards;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.function.BiFunction;
 
 public class CountingObjective extends Objective{
