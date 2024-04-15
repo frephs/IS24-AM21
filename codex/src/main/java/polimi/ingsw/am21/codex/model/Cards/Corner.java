@@ -24,7 +24,7 @@ public class Corner<T extends CornerContentType> {
   }
 
   public boolean isEmpty() {
-    return content.isEmpty();
+    return content.isPresent();
   }
 
   public Optional<T> getContent() {
