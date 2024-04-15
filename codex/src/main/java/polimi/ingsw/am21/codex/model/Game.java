@@ -107,14 +107,16 @@ public class Game {
         return this.isResourceDeckEmpty() && this.isGoldDeckEmpty();
     }
 
-    public PlayableCard drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) throws EmptyDeckException, GameOverException {
+    public void drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) throws EmptyDeckException, GameOverException {
         if (this.state == GameState.GAME_OVER) throw new GameOverException();
         try {
+            PlayableCard card;
             if (deckType == DrawingDeckType.RESOURCE) {
-                return this.gameBoard.drawResourceCardFromDeck();
+                card = this.gameBoard.drawResourceCardFromDeck();
             } else {
-                return this.gameBoard.drawGoldCardFromDeck();
+                card = this.gameBoard.drawGoldCardFromDeck();
             }
+            this.players.get(this.currentPlayer).drawCard(card);
         } catch (EmptyDeckException e) {
             if (this.remainingRounds == null) {
                 this.remainingRounds = 2;
