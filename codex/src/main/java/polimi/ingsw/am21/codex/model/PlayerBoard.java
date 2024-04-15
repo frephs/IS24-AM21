@@ -97,6 +97,7 @@ public class PlayerBoard {
                         PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().get();
                         HashMap<CornerPosition, Corner> enabledOppositeCorners = oppositeCard.getCorners();
                         Corner oppositeCorner = enabledOppositeCorners.get(oppositeCornerPosition);
+                        oppositeCorner.cover();
                         updateResourcesAndObjectsMaps(oppositeCorner, -1);
                     }
                 }
