@@ -22,8 +22,8 @@ class CornerTest {
   @Test
   void cover() {
     Corner corner = new Corner<>();
-    assertEquals(corner.isEmpty(), true);
+    assertEquals(corner.isCovered(), false);
     corner.cover();
-    assertEquals(corner.isEmpty(), false);
+    assertEquals(corner.isCovered(), true);
   }
 }
