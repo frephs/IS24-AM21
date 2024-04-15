@@ -15,7 +15,7 @@ public class GeometricObjective extends Objective {
   @Override
   public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
     return (playerBoard, points) ->
-      (Integer) playerBoard
+      playerBoard
         .getPlayedCards()
         .entrySet()
         .stream()
