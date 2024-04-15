@@ -8,7 +8,9 @@ import java.util.*;
 
 import org.json.JSONArray;
 
+
 public class Game {
+    static final int WINNING_POINTS = 20;
     private final List<Player> players;
     private final GameBoard gameBoard;
     private Lobby lobby;
@@ -77,6 +79,10 @@ public class Game {
                 this.state = GameState.GAME_OVER;
                 throw new GameOverException();
             }
+        }
+        if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
+            this.state = GameState.GAME_OVER;
+            throw new GameOverException();
         }
 
     }
