@@ -74,7 +74,7 @@ public class Game {
         currentPlayer = (currentPlayer + 1) % players.size();
     }
 
-    public Boolean getGameOver() {
+    public Boolean isGameOver() {
         return this.state == GameState.GAME_OVER;
     }
 
