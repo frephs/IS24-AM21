@@ -31,6 +31,10 @@ public class Corner<T extends CornerContentType> {
     return content;
   }
 
+  public boolean isCovered() {
+    return isCovered;
+  }
+
   /**
    * Cover the corner when another card is placed on
    */
