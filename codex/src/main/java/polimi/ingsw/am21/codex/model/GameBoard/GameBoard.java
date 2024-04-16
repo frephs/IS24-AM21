@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +19,21 @@ public class GameBoard {
     private CardPair<ObjectiveCard> objectiveCards;
     final private Deck<PlayableCard> resourceDeck;
     private CardPair<PlayableCard> resourceCards;
+
+    /**
+     * @param index the index of the ge
+     * @return AdjacentPosition the parsed adjacent position
+     */
+    private static AdjacentPosition cardGeometryPositionFromJSONIndex(int index) {
+        if (index == 0) return CornerPosition.TOP_LEFT;
+        if (index == 1) return EdgePosition.TOP;
+        if (index == 2) return CornerPosition.TOP_RIGHT;
+        if (index == 3) return EdgePosition.CENTER;
+        if (index == 4) return CornerPosition.BOTTOM_LEFT;
+        if (index == 5) return EdgePosition.BOTTOM;
+        if (index == 6) return CornerPosition.BOTTOM_RIGHT;
+        throw new RuntimeException("Invalid AdjacentPosition value");
+    }
 
     /**
      * Constructor
@@ -41,19 +57,18 @@ public class GameBoard {
             builder.setPoints(card.getInt("points"));
             builder.setObjectiveType(ObjectiveType.fromString(card.getString("objectiveType")));
 
-            List<List<ResourceType>> geometryObjectives = new ArrayList<>();
 
             JSONArray geometryObjectivesArray = card.getJSONArray("objectiveGeometry");
+            Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<AdjecentPosition, ResourceType>();
+
             for (int j = 0; j < geometryObjectivesArray.length(); j++) {
-                List<ResourceType> geometryObjective = new ArrayList<>();
-                JSONArray geometryObjectiveArray = geometryObjectivesArray.getJSONArray(j);
-                for (int k = 0; k < geometryObjectiveArray.length(); k++) {
-                    geometryObjective.add(ResourceType.fromString(geometryObjectiveArray.getString(k)));
+                if (!geometryObjectivesArray.isNull(i)) {
+                    AdjacentPosition position = GameBoard.cardGeometryPositionFromJSONIndex(j);
+                    ResourceType resource = ResourceType.fromString(geometryObjectivesArray.getString(j));
+                    objectiveGeometry.put(position, resource);
                 }
-                geometryObjectives.add(geometryObjective);
             }
 
-            builder.setObjectiveGeometry(geometryObjectives);
 
             Set<String> objectiveResources = card.getJSONObject("objectiveResources").keySet();
             for (String resourceTypeStr : objectiveResources) {
