@@ -3,7 +3,7 @@ package polimi.ingsw.am21.codex.model;
 public interface PlayerActions {
     // will be implemented by the controller
     // player init
-    TokenColors chooseTokenColor(TokenColor availableColors, int choice);
+    TokenColor chooseTokenColor(TokenColor availableColors, int choice);
     ObjectiveCard chooseObjectiveCard(ObjectiveCard[] cards, int choice);
 
     // player plays a card

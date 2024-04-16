@@ -3,14 +3,14 @@ package polimi.ingsw.am21.codex.model.Cards;
 import java.util.Collections;
 import java.util.List;
 
-public class Deck<T extends  Card> {
+public class Deck<T> {
     private List<T> cards;
 
     /**
      * Constructor
      * @param cards list of cards
      */
-    Deck(List<T> cards){
+    public Deck(List<T> cards){
         this.cards = cards;
     }
 
@@ -32,7 +32,7 @@ public class Deck<T extends  Card> {
 
     /**
      * Draws a card from the deck
-     * @param N number of cards to draw
+     * @param n number of cards to draw
      * @return the card drawn
      */
     public List<T> draw(int n) throws EmptyDeckException {
