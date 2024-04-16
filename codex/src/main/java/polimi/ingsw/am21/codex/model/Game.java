@@ -36,6 +36,15 @@ public class Game {
 
   }
 
+  /**
+   * @return a card pair with objective cards drawn from the deck
+   * @throws EmptyDeckException when the deck we are drawing form is empty
+   */
+  public CardPair<ObjectiveCard> drawObjectiveCardPair()
+  throws EmptyDeckException {
+    return this.gameBoard.drawObjectiveCardPair();
+  }
+
   public GameState getState() {
     return this.state;
   }

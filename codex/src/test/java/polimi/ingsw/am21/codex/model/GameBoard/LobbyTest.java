@@ -1,8 +1,9 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
+import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Player;
+import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
 import java.util.Optional;
@@ -16,9 +17,13 @@ class LobbyTest {
 
   Lobby lobby;
 
+  GameBoard mockGameboard;
+
   @BeforeEach
   void prepareLobbyTest() {
     this.lobby = new Lobby(MAX_PLAYERS);
+    // TODO: parse real JSON
+    this.mockGameboard = GameBoard.fromJSON(new JSONArray());
   }
 
   UUID generateNewSocketID() {
@@ -37,11 +42,14 @@ class LobbyTest {
     for (int i = 0; i < MAX_PLAYERS; i++) {
       UUID socketID = generateNewSocketID();
       try {
-        this.lobby.addPlayer(socketID);
+        this.lobby.addPlayer(socketID,
+          this.mockGameboard.drawObjectiveCardPair());
       } catch (LobbyFullException e) {
         fail("Failed adding a new player in the lobby while testing " +
           "getRemainingPlayerSlots, player number: " + (i) + " of max " +
           "players: " + MAX_PLAYERS);
+      } catch (EmptyDeckException e) {
+        fail("Invalid mock GameBoard, the decks are empty");
       }
       assertEquals(MAX_PLAYERS - i - 1, this.lobby.getRemainingPlayerSlots());
     }
@@ -53,10 +61,13 @@ class LobbyTest {
     for (int i = 0; i < MAX_PLAYERS; ++i) {
       UUID socketID = generateNewSocketID();
       try {
-        this.lobby.addPlayer(socketID);
+        this.lobby.addPlayer(socketID,
+          this.mockGameboard.drawObjectiveCardPair());
       } catch (LobbyFullException e) {
         fail("Failed adding a new player in the lobby while testing " +
           "getRemainingPlayerSlots");
+      } catch (EmptyDeckException e) {
+        fail("Invalid mock GameBoard, the decks are empty");
       }
       assertEquals(i + 1, this.lobby.getPlayersCount());
     }
@@ -69,15 +80,19 @@ class LobbyTest {
     UUID lastAdded = socketID;
     for (int i = 0; i < MAX_PLAYERS; ++i) {
       try {
-        this.lobby.addPlayer(socketID);
+        this.lobby.addPlayer(socketID,
+          this.mockGameboard.drawObjectiveCardPair());
       } catch (LobbyFullException e) {
         fail("Lobby full");
+      } catch (EmptyDeckException e) {
+        fail("Invalid mock GameBoard, the decks are empty");
       }
       lastAdded = socketID;
       socketID = generateNewSocketID();
     }
     assertThrows(LobbyFullException.class,
-      () -> this.lobby.addPlayer(generateNewSocketID()));
+      () -> this.lobby.addPlayer(generateNewSocketID(),
+        this.mockGameboard.drawObjectiveCardPair()));
 
 
     try {
@@ -97,10 +112,14 @@ class LobbyTest {
   void removePlayer() {
     UUID socketID = generateNewSocketID();
     try {
-      this.lobby.addPlayer(socketID);
+      this.lobby.addPlayer(socketID,
+        this.mockGameboard.drawObjectiveCardPair());
     } catch (LobbyFullException e) {
       fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
     }
+
     UUID fakeUUID = generateNewSocketID();
     try {
       this.lobby.removePlayer(socketID);
@@ -115,9 +134,12 @@ class LobbyTest {
   void setNickname() {
     UUID socketID = generateNewSocketID();
     try {
-      this.lobby.addPlayer(socketID);
+      this.lobby.addPlayer(socketID,
+        this.mockGameboard.drawObjectiveCardPair());
     } catch (LobbyFullException e) {
       fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
     }
 
     this.lobby.setNickname(socketID, "test");
@@ -128,9 +150,12 @@ class LobbyTest {
 
     UUID socketID2 = generateNewSocketID();
     try {
-      this.lobby.addPlayer(socketID2);
+      this.lobby.addPlayer(socketID2,
+        this.mockGameboard.drawObjectiveCardPair());
     } catch (LobbyFullException e) {
       fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
     }
 
     assertThrows(NicknameAlreadyTakenException.class,
@@ -148,9 +173,12 @@ class LobbyTest {
   void setToken() {
     UUID socketID = generateNewSocketID();
     try {
-      this.lobby.addPlayer(socketID);
+      this.lobby.addPlayer(socketID,
+        this.mockGameboard.drawObjectiveCardPair());
     } catch (LobbyFullException e) {
       fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
     }
 
     this.lobby.setToken(socketID, TokenColor.GREEN);
@@ -162,9 +190,12 @@ class LobbyTest {
 
     UUID socketID2 = generateNewSocketID();
     try {
-      this.lobby.addPlayer(socketID2);
+      this.lobby.addPlayer(socketID2,
+        this.mockGameboard.drawObjectiveCardPair());
     } catch (LobbyFullException e) {
       fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
     }
 
     assertThrows(TokenAlreadyTakenException.class,
@@ -185,9 +216,12 @@ class LobbyTest {
   void finalizePlayer() {
     UUID socketID = generateNewSocketID();
     try {
-      this.lobby.addPlayer(socketID);
+      this.lobby.addPlayer(socketID,
+        this.mockGameboard.drawObjectiveCardPair());
     } catch (LobbyFullException e) {
       fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
     }
 
     this.lobby.setNickname(socketID, "test");
@@ -197,7 +231,7 @@ class LobbyTest {
       fail("could not find player with socket id" + socketID);
     assertEquals(playerNickname.get(), "test");
 
-    UUID socketID2 = generateNewSocketID();
+//    UUID socketID2 = generateNewSocketID();
 
 
   }

@@ -70,11 +70,13 @@ public class Lobby {
    * @throws LobbyFullException if the lobby is full and cannot accept more
    *                            players
    */
-  public void addPlayer(UUID socketId) throws LobbyFullException {
+  public void addPlayer(UUID socketId, CardPair<ObjectiveCard> objectiveCards)
+  throws LobbyFullException {
     if (remainingPlayerSlots <= 0) {
       throw new LobbyFullException();
     }
     lobbyPlayers.put(socketId, new Player.PlayerBuilder());
+    extractedCards.put(socketId, objectiveCards);
     remainingPlayerSlots--;
   }
 
@@ -154,8 +156,8 @@ public class Lobby {
    * @param playerExtractedCards the extracted card to set
    * @throws PlayerNotFoundException if the socket ID is not found in the lobby
    */
-  public void setExtractedCard(UUID socketId,
-                               CardPair<ObjectiveCard> playerExtractedCards)
+  public void setExtractedCards(UUID socketId,
+                                CardPair<ObjectiveCard> playerExtractedCards)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
@@ -193,8 +195,8 @@ public class Lobby {
    * @param socketId the socket ID of the player
    * @return the CardPair containing the objective cards of the player
    */
-  public CardPair<ObjectiveCard> getPlayerObjectiveCards(UUID socketId) {
-    return this.extractedCards.get(socketId);
+  public Optional<CardPair<ObjectiveCard>> getPlayerObjectiveCards(UUID socketId) {
+    return Optional.ofNullable(this.extractedCards.get(socketId));
   }
 
   /**

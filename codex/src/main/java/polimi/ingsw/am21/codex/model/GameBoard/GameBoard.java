@@ -334,4 +334,11 @@ public class GameBoard {
   public int resourceCardsLeft() {
     return this.resourceDeck.cardsLeft();
   }
+
+
+  public CardPair<ObjectiveCard> drawObjectiveCardPair()
+  throws EmptyDeckException {
+    return new CardPair<>(this.drawObjectiveCardFromDeck(),
+      this.drawObjectiveCardFromDeck());
+  }
 }
