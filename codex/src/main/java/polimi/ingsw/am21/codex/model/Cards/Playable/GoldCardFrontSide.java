@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,10 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 public class GoldCardFrontSide extends ResourceCardFrontSide {

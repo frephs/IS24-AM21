@@ -3,6 +3,11 @@ package polimi.ingsw.am21.codex.model.GameBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Builder.CardType;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveType;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 
 import java.util.*;
 import java.util.stream.Collectors;

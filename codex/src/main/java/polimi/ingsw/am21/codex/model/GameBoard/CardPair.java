@@ -1,4 +1,6 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.GameBoard;
+
+import polimi.ingsw.am21.codex.model.Cards.Card;
 
 public class CardPair<T extends Card> {
     private T first;

@@ -1,10 +1,11 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
+import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 import java.util.function.Function;
 
-public class ObjectiveCard extends Card{
+public class ObjectiveCard extends Card {
     /**
      * The points that the objective can give
      */

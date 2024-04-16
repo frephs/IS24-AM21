@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 class PlayableBackSideTest {

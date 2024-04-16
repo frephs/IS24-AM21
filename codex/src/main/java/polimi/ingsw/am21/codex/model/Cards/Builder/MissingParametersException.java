@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Builder;
 
 public class MissingParametersException extends IllegalStateException {
     MissingParametersException(String missingAttribute) {

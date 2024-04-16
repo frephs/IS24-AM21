@@ -1,8 +1,10 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 public class PlayableCard extends Card {

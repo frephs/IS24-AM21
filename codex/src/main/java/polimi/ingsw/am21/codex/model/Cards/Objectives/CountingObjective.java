@@ -1,12 +1,14 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
+import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class CountingObjective extends Objective{
+public class CountingObjective extends Objective {
     /**
      * The map of which resources and how many to complete the objective
      */

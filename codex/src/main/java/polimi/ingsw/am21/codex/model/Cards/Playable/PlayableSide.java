@@ -1,10 +1,14 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import polimi.ingsw.am21.codex.model.Cards.Corner;
+import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
+import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 // TODO investigate "Raw use of parameterized class 'Corner'" warning

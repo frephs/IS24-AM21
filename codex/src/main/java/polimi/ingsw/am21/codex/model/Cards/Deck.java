@@ -1,5 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
+import polimi.ingsw.am21.codex.model.GameBoard.EmptyDeckException;
+
 import java.util.Collections;
 import java.util.List;
 

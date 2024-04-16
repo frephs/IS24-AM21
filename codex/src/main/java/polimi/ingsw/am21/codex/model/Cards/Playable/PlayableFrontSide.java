@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 public abstract class PlayableFrontSide extends PlayableSide {
 

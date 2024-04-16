@@ -1,6 +1,11 @@
 package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableSide;
+
 import java.util.*;
 import java.util.stream.Collectors;
 

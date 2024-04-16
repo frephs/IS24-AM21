@@ -1,6 +1,7 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.function.BiFunction;
+
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 public class ResourceCardFrontSide extends PlayableFrontSide {

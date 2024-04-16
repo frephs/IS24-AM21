@@ -1,4 +1,8 @@
-package polimi.ingsw.am21.codex.model.Cards;
+package polimi.ingsw.am21.codex.model.Cards.Builder;
+
+import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.*;
+import polimi.ingsw.am21.codex.model.Cards.Playable.*;
 
 import java.util.*;
 
