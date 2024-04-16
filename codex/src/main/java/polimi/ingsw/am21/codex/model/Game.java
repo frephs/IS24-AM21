@@ -1,7 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
-import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Cards.PlayableCard;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 import java.util.*;
@@ -77,6 +76,12 @@ public class Game {
             this.remainingRounds--;
             if (this.remainingRounds == 0) {
                 this.state = GameState.GAME_OVER;
+                for (Player player : players) {
+                    player.evaluateSecretObjective();
+                    CardPair<ObjectiveCard> objectiveCards = gameBoard.getObjectiveCards();
+                    player.evaluate(objectiveCards.getFirst());
+                    player.evaluate(objectiveCards.getSecond());
+                }
                 throw new GameOverException();
             }
         }
