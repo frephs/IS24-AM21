@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 import java.util.List;
+import java.util.Optional;
 
 public class Player {
     private final String nickname;
@@ -38,8 +39,8 @@ public class Player {
         /**
          * @return the player nickname color
          */
-        public String getNickname(){
-            return this.nickname;
+        public Optional<String> getNickname(){
+            return Optional.ofNullable(this.nickname);
         }
 
 
@@ -54,8 +55,8 @@ public class Player {
         /**
          * @return the player token color
          */
-        public TokenColor getTokenColor(){
-            return this.token;
+        public Optional<TokenColor> getTokenColor(){
+            return Optional.ofNullable(this.token);
         }
 
         /**
