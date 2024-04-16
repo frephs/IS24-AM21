@@ -74,13 +74,13 @@ public class GameBoard {
       builder.setObjectiveGeometry(objectiveGeometry);
 
       Set<String> objectiveResourcesSet = card.getJSONObject(
-        "objectiveResources")
+          "objectiveResources")
         .keySet();
       Map<ResourceType, Integer> objectiveResources = new HashMap<>();
       for (String resourceTypeStr : objectiveResourcesSet) {
         ResourceType resourceType = ResourceType.fromString(resourceTypeStr);
         objectiveResources.put(resourceType, card.getJSONObject(
-          "objectiveResources")
+            "objectiveResources")
           .getInt(resourceTypeStr));
       }
       builder.setObjectiveResources(objectiveResources);
@@ -91,7 +91,7 @@ public class GameBoard {
       for (String objectiveTypeStr : objectiveObjectsSet) {
         ObjectType objectiveType = ObjectType.fromString(objectiveTypeStr);
         objectiveObjects.put(objectiveType, card.getJSONObject(
-          "objectiveObjects")
+            "objectiveObjects")
           .getInt(objectiveTypeStr));
       }
       builder.setObjectiveObjects(objectiveObjects);

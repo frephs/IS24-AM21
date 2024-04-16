@@ -6,21 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IncompletePlayerBuilderException extends RuntimeException {
-    public IncompletePlayerBuilderException(String message) {
-        super(message);
-    }
+  public IncompletePlayerBuilderException(String message) {
+    super(message);
+  }
 
-    /**
-     * @
-     *
-     */
-    public static void checkPlayerBuilder(Player.PlayerBuilder playerBuilder) {
-        List<String> missingParams = new ArrayList<>();
-        if (playerBuilder.getNickname() == null)
-            missingParams.add("nickname");
-        if (playerBuilder.getTokenColor() == null)
-            missingParams.add("tokenColor");
+  /**
+   * @
+   */
+  public static void checkPlayerBuilder(Player.PlayerBuilder playerBuilder) {
+    List<String> missingParams = new ArrayList<>();
+    if (playerBuilder.getNickname() == null)
+      missingParams.add("nickname");
+    if (playerBuilder.getTokenColor() == null)
+      missingParams.add("tokenColor");
 
-        throw new IncompletePlayerBuilderException("Incomplete PlayerBuilder: missing ");
-    }
+    throw new IncompletePlayerBuilderException("Incomplete PlayerBuilder: " +
+      "missing ");
+  }
 }
