@@ -13,8 +13,8 @@ public class PlayerBoard {
     Map<Position, PlayableCard> playedCards = new HashMap<>();
 
    // Hashmaps to keep track of resources
-    private final HashMap<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
-    private final HashMap<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
+    private final Map<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
+    private final Map<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
@@ -93,7 +93,7 @@ public class PlayerBoard {
        * Helper method called by PlayerBoard.placeCard() to update the player's available resources and objects
        * */
       private void updateResourcesAndObjects(PlayableSide playedSide, Position position) {
-        HashMap<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
+        Map<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
 
         //let's add the resources of the card just placed
         enabledCorners.forEach(
@@ -107,7 +107,7 @@ public class PlayerBoard {
                     if (this.playedCards.containsKey((adjacentCardPosition))) {
                         CornerPosition oppositeCornerPosition = cornerPosition.getOppositeCornerPosition();
                         PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().get();
-                        HashMap<CornerPosition, Corner> enabledOppositeCorners = oppositeCard.getCorners();
+                        Map<CornerPosition, Corner> enabledOppositeCorners = oppositeCard.getCorners();
                         Corner oppositeCorner = enabledOppositeCorners.get(oppositeCornerPosition);
                         oppositeCorner.cover();
                         updateResourcesAndObjectsMaps(oppositeCorner, -1);
@@ -135,7 +135,7 @@ public class PlayerBoard {
 
     private void updateAvailableSpots(PlayableSide playedSide, Position position){
         this.availableSpots.remove(position);
-        HashMap<CornerPosition,Corner> enabledCorners = playedSide.getCorners();
+        Map<CornerPosition,Corner> enabledCorners = playedSide.getCorners();
 
         for (CornerPosition cornerPosition : CornerPosition.values()) {
             Position adjacentCardPosition = position.computeAdjacentPosition(cornerPosition);
@@ -153,11 +153,11 @@ public class PlayerBoard {
         }
     }
 
-    public HashMap<ObjectType, Integer> getObjects() {
+    public Map<ObjectType, Integer> getObjects() {
         return this.objects;
     }
 
-    public HashMap<ResourceType, Integer> getResources() {
+    public Map<ResourceType, Integer> getResources() {
         return this.resources;
     }
 

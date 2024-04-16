@@ -13,13 +13,13 @@ public class CardBuilder {
   // Objective
   private Optional<ObjectiveType> objectiveType;
   private Optional<Map<AdjacentPosition, ResourceType>> objectiveGeometry;
-  private Optional<HashMap<ResourceType, Integer>> objectiveResources;
-  private Optional<HashMap<ObjectType, Integer>> objectiveObjects;
+  private Optional<Map<ResourceType, Integer>> objectiveResources;
+  private Optional<Map<ObjectType, Integer>> objectiveObjects;
 
   // Resource | Starter | Gold
   private Optional<List<ResourceType>> backPermanentResources;
-  private Optional<HashMap<CornerPosition, CornerContentType>> frontCorners;
-  private Optional<HashMap<CornerPosition, CornerContentType>> backCorners;
+  private Optional<Map<CornerPosition, CornerContentType>> frontCorners;
+  private Optional<Map<CornerPosition, CornerContentType>> backCorners;
 
   // Gold
   private Optional<List<ResourceType>> placementCondition;
@@ -89,7 +89,7 @@ public class CardBuilder {
   }
 
   public CardBuilder setObjectiveResources(
-    HashMap<ResourceType, Integer> objectiveResources
+    Map<ResourceType, Integer> objectiveResources
   ) throws WrongCardTypeException, ConflictingParameterException {
     checkType(CardType.OBJECTIVE);
     if (
@@ -112,7 +112,7 @@ public class CardBuilder {
   }
 
   public CardBuilder setObjectiveObjects(
-    HashMap<ObjectType, Integer> objectiveObjects
+    Map<ObjectType, Integer> objectiveObjects
   ) throws WrongCardTypeException, ConflictingParameterException {
     checkType(CardType.OBJECTIVE);
     if (
@@ -183,7 +183,7 @@ public class CardBuilder {
 
   public CardBuilder setCorners(
     CardSideType side,
-    HashMap<CornerPosition, CornerContentType> cornerMap
+    Map<CornerPosition, CornerContentType> cornerMap
   ) throws WrongCardTypeException {
     checkType(CardType.STARTER, CardType.RESOURCE, CardType.GOLD);
 
@@ -214,11 +214,11 @@ public class CardBuilder {
                     () -> new MissingParametersException("objectiveGeometry")
                   );
               } else {
-                HashMap<ResourceType, Integer> res =
+                Map<ResourceType, Integer> res =
                   this.objectiveResources.orElseThrow(
                       () -> new MissingParametersException("objectiveResources")
                     );
-                HashMap<ObjectType, Integer> obj =
+                Map<ObjectType, Integer> obj =
                   this.objectiveObjects.orElseThrow(
                       () -> new MissingParametersException("objectiveObjects")
                     );

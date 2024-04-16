@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
@@ -12,13 +13,13 @@ public abstract class PlayableSide {
   /**
    * The Map of the CornerPosition and the corner on the side of the card
    */
-  private final HashMap<CornerPosition, Corner> corners;
+  private final Map<CornerPosition, Corner> corners;
 
   public PlayableSide() {
     this.corners = new HashMap<>();
   }
 
-  public HashMap<CornerPosition, Corner> getCorners() {
+  public Map<CornerPosition, Corner> getCorners() {
     return corners;
   }
 
