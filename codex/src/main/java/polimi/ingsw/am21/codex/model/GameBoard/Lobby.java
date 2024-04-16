@@ -6,6 +6,7 @@ import polimi.ingsw.am21.codex.model.Player;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -15,11 +16,11 @@ public class Lobby {
     /**
      * The map of players in the lobby, with their socket ID as the key and PlayerBuilder as the value used to progressively create the player;
      */
-    private HashMap<UUID, Player.PlayerBuilder> lobbyPlayers;
+    private Map<UUID, Player.PlayerBuilder> lobbyPlayers;
     /**
      * The map of extracted cards associated with each player's socket ID.
      */
-    private HashMap<UUID, CardPair<ObjectiveCard>> extractedCards;
+    private Map<UUID, CardPair<ObjectiveCard>> extractedCards;
 
     /**
      * The remaining slots for players in the lobby. ( how many player can still join the game )

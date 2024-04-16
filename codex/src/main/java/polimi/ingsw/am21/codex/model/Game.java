@@ -52,8 +52,8 @@ public class Game {
         return PlayerState.WAITING;
     }
 
-    public HashMap<String, Integer> getScoreBoard() {
-        HashMap<String, Integer> scoreBoard = new HashMap<>();
+    public Map<String, Integer> getScoreBoard() {
+        Map<String, Integer> scoreBoard = new HashMap<>();
         for (Player player : players) {
             scoreBoard.put(player.getNickname(), player.getPoints());
         }

@@ -5,6 +5,7 @@ import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,8 +13,8 @@ class CountingObjectiveTest {
 
   @Test
   void getEvaluator() {
-    HashMap<ResourceType, Integer> resources = new HashMap<>();
-    resources.put(ResourceType.PLANT_KINGDOM, 3);
+    Map<ResourceType, Integer> resources = new HashMap<>();
+  resources.put(ResourceType.PLANT_KINGDOM, 3);
     CountingObjective countingObjective = new CountingObjective(resources, null);
 
     PlayerBoard pb = new PlayerBoard(

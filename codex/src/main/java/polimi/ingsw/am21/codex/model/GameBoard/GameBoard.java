@@ -4,10 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -51,7 +48,7 @@ public class GameBoard {
             String typeStr = card.getString("type");
 
             CardType type = CardType.fromString(typeStr);
-            Card.CardBuilder builder = new Card.CardBuilder(id, type);
+            CardBuilder builder = new CardBuilder(id, type);
 
 
             builder.setPoints(card.getInt("points"));
@@ -59,7 +56,7 @@ public class GameBoard {
 
 
             JSONArray geometryObjectivesArray = card.getJSONArray("objectiveGeometry");
-            Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<AdjecentPosition, ResourceType>();
+            Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<AdjacentPosition, ResourceType>();
 
             for (int j = 0; j < geometryObjectivesArray.length(); j++) {
                 if (!geometryObjectivesArray.isNull(i)) {
@@ -69,18 +66,23 @@ public class GameBoard {
                 }
             }
 
+            builder.setObjectiveGeometry(objectiveGeometry);
 
-            Set<String> objectiveResources = card.getJSONObject("objectiveResources").keySet();
-            for (String resourceTypeStr : objectiveResources) {
+            Set<String> objectiveResourcesSet = card.getJSONObject("objectiveResources").keySet();
+            Map<ResourceType,Integer> objectiveResources = new HashMap<>();
+            for (String resourceTypeStr : objectiveResourcesSet) {
                 ResourceType resourceType = ResourceType.fromString(resourceTypeStr);
-                builder.addResourceType(resourceType, card.getJSONObject("objectiveResources").getInt(resourceTypeStr));
+                objectiveResources.put(resourceType, card.getJSONObject("objectiveResources").getInt(resourceTypeStr));
             }
+            builder.setObjectiveResources(objectiveResources);
 
-            Set<String> objectiveObjects = card.getJSONObject("objectiveObjects").keySet();
-            for (String objectiveTypeStr : objectiveObjects) {
-                ObjectiveType objectiveType = ObjectiveType.fromString(objectiveTypeStr);
-                builder.addObjectiveType(objectiveType, card.getJSONObject("objectiveObjects").getInt(objectiveTypeStr));
+            Map<ObjectType,Integer> objectiveObjects = new HashMap<>();
+            Set<String> objectiveObjectsSet = card.getJSONObject("objectiveObjects").keySet();
+            for (String objectiveTypeStr : objectiveObjectsSet) {
+                ObjectType objectiveType = ObjectType.fromString(objectiveTypeStr);
+                objectiveObjects.put(objectiveType, card.getJSONObject("objectiveObjects").getInt(objectiveTypeStr));
             }
+            builder.setObjectiveObjects(objectiveObjects);
 
             if (card.has("backPermanentResources")) {
 
@@ -108,8 +110,8 @@ public class GameBoard {
             }
 
             if (card.has("pointConditionObject")) {
-                ObjectType.from(card.getString("pointConditionObject"));
-                builder.setPointConditionObject(ObjectType.from(card.getString("pointConditionObject")));
+                ObjectType.fromString(card.getString("pointConditionObject"));
+                builder.setPointConditionObject(ObjectType.fromString(card.getString("pointConditionObject")));
             }
         }
 
