@@ -5,9 +5,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Player;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Represents the lobby where players join before starting the game.
@@ -17,11 +15,11 @@ public class Lobby {
    * The map of players in the lobby, with their socket ID as the key and
    * PlayerBuilder as the value used to progressively create the player;
    */
-  private Map<UUID, Player.PlayerBuilder> lobbyPlayers;
+  private final Map<UUID, Player.PlayerBuilder> lobbyPlayers;
   /**
    * The map of extracted cards associated with each player's socket ID.
    */
-  private Map<UUID, CardPair<ObjectiveCard>> extractedCards;
+  private final Map<UUID, CardPair<ObjectiveCard>> extractedCards;
 
   /**
    * The remaining slots for players in the lobby. ( how many player can
@@ -30,18 +28,14 @@ public class Lobby {
   private int remainingPlayerSlots;
 
   /**
-   * The array of all the token colors.
-   */
-  private TokenColor[] tokenColors;
-
-  /**
    * Constructs a lobby with the specified maximum number of players.
    *
    * @param maxPlayers the maximum number of players allowed in the lobby
    */
   public Lobby(int maxPlayers) {
     this.remainingPlayerSlots = maxPlayers;
-    this.tokenColors = TokenColor.values();
+    this.lobbyPlayers = new HashMap<>();
+    this.extractedCards = new HashMap<>();
   }
 
   /**
@@ -74,10 +68,10 @@ public class Lobby {
    *
    * @param socketId the socket ID of the player to add
    * @throws LobbyFullException if the lobby is full and cannot accept more
-   * players
+   *                            players
    */
   public void addPlayer(UUID socketId) throws LobbyFullException {
-    if (lobbyPlayers.size() >= remainingPlayerSlots) {
+    if (remainingPlayerSlots <= 0) {
       throw new LobbyFullException();
     }
     lobbyPlayers.put(socketId, new Player.PlayerBuilder());
@@ -107,9 +101,9 @@ public class Lobby {
    * @param socketId the socket ID of the player
    * @param nickname the nickname to set
    * @throws PlayerNotFoundException       if the socket ID is not found in
-   * the lobby
+   *                                       the lobby
    * @throws NicknameAlreadyTakenException if the nickname is already taken
-   * by another player
+   *                                       by another player
    */
   public void setNickname(UUID socketId, String nickname)
   throws PlayerNotFoundException, NicknameAlreadyTakenException {
@@ -120,7 +114,7 @@ public class Lobby {
       .stream()
       .anyMatch(id -> !id.equals(socketId) && lobbyPlayers.get(id)
         .getNickname()
-        .equals(nickname))) {
+        .map(nick -> nick.equals(nickname)).orElse(false))) {
       throw new NicknameAlreadyTakenException(nickname);
     }
     lobbyPlayers.get(socketId).setNickname(nickname);
@@ -132,9 +126,9 @@ public class Lobby {
    * @param socketId   the socket ID of the player
    * @param tokenColor the token color to set
    * @throws PlayerNotFoundException    if the socket ID is not found in the
-   * lobby
+   *                                    lobby
    * @throws TokenAlreadyTakenException if the token color is already taken
-   * by another player
+   *                                    by another player
    */
   public void setToken(UUID socketId, TokenColor tokenColor)
   throws PlayerNotFoundException, TokenAlreadyTakenException {
@@ -145,7 +139,9 @@ public class Lobby {
       .stream()
       .anyMatch(id -> !id.equals(socketId) && lobbyPlayers.get(id)
         .getTokenColor()
-        .equals(tokenColor))) {
+        .map(t -> t.equals(tokenColor))
+        .orElse(false)
+      )) {
       throw new TokenAlreadyTakenException(tokenColor);
     }
     lobbyPlayers.get(socketId).setTokenColor(tokenColor);
@@ -218,7 +214,7 @@ public class Lobby {
    * @return the nickname of the player
    * @throws PlayerNotFoundException if the player is not found in the lobby
    */
-  public String getPlayerNickname(UUID socketId)
+  public Optional<String> getPlayerNickname(UUID socketId)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
@@ -233,7 +229,7 @@ public class Lobby {
    * @return the token color of the player
    * @throws PlayerNotFoundException if the player is not found in the lobby
    */
-  public TokenColor getPlayerTokenColor(UUID socketId)
+  public Optional<TokenColor> getPlayerTokenColor(UUID socketId)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
