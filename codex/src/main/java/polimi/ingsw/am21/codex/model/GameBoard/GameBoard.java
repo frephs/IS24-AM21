@@ -1,24 +1,121 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
-import polimi.ingsw.am21.codex.model.Cards.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Deck;
-import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Cards.GoldCard;
-import polimi.ingsw.am21.codex.model.Cards.ResourceCard;
-import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.Cards.StarterCard;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import polimi.ingsw.am21.codex.model.Cards.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class GameBoard {
-    private Deck<GoldCard> goldDeck;
-    private CardPair<GoldCard> goldCards;
-    private Deck<StarterCard> starterDeck;
-    private Deck<ObjectiveCard> objectiveDeck;
+    final private Deck<PlayableCard> goldDeck;
+    private CardPair<PlayableCard> goldCards;
+    final private Deck<PlayableCard> starterDeck;
+    final private Deck<ObjectiveCard> objectiveDeck;
     private CardPair<ObjectiveCard> objectiveCards;
-    private Deck<ResourceCard> resourceDeck;
-    private CardPair<ResourceCard> resourceCards;
+    final private Deck<PlayableCard> resourceDeck;
+    private CardPair<PlayableCard> resourceCards;
+
+    /**
+     * @param index the index of the ge
+     * @return AdjacentPosition the parsed adjacent position
+     */
+    private static AdjacentPosition cardGeometryPositionFromJSONIndex(int index) {
+        if (index == 0) return CornerPosition.TOP_LEFT;
+        if (index == 1) return EdgePosition.TOP;
+        if (index == 2) return CornerPosition.TOP_RIGHT;
+        if (index == 3) return EdgePosition.CENTER;
+        if (index == 4) return CornerPosition.BOTTOM_LEFT;
+        if (index == 5) return EdgePosition.BOTTOM;
+        if (index == 6) return CornerPosition.BOTTOM_RIGHT;
+        throw new RuntimeException("Invalid AdjacentPosition value");
+    }
+
+    /**
+     * Constructor
+     * Initializes the decks using a JSONArray
+     */
+    public static GameBoard fromJSON(JSONArray cards) {
+        List<PlayableCard> goldDeck = new ArrayList<>();
+        List<PlayableCard> starterDeck = new ArrayList<>();
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>();
+        List<PlayableCard> resourceDeck = new ArrayList<>();
+
+        for (int i = 0; i < cards.length(); i++) {
+            JSONObject card = cards.getJSONObject(i);
+            int id = card.getInt("id");
+            String typeStr = card.getString("type");
+
+            CardType type = CardType.fromString(typeStr);
+            Card.CardBuilder builder = new Card.CardBuilder(id, type);
+
+
+            builder.setPoints(card.getInt("points"));
+            builder.setObjectiveType(ObjectiveType.fromString(card.getString("objectiveType")));
+
+
+            JSONArray geometryObjectivesArray = card.getJSONArray("objectiveGeometry");
+            Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<AdjecentPosition, ResourceType>();
+
+            for (int j = 0; j < geometryObjectivesArray.length(); j++) {
+                if (!geometryObjectivesArray.isNull(i)) {
+                    AdjacentPosition position = GameBoard.cardGeometryPositionFromJSONIndex(j);
+                    ResourceType resource = ResourceType.fromString(geometryObjectivesArray.getString(j));
+                    objectiveGeometry.put(position, resource);
+                }
+            }
+
+
+            Set<String> objectiveResources = card.getJSONObject("objectiveResources").keySet();
+            for (String resourceTypeStr : objectiveResources) {
+                ResourceType resourceType = ResourceType.fromString(resourceTypeStr);
+                builder.addResourceType(resourceType, card.getJSONObject("objectiveResources").getInt(resourceTypeStr));
+            }
+
+            Set<String> objectiveObjects = card.getJSONObject("objectiveObjects").keySet();
+            for (String objectiveTypeStr : objectiveObjects) {
+                ObjectiveType objectiveType = ObjectiveType.fromString(objectiveTypeStr);
+                builder.addObjectiveType(objectiveType, card.getJSONObject("objectiveObjects").getInt(objectiveTypeStr));
+            }
+
+            if (card.has("backPermanentResources")) {
+
+                List<String> backPermanentResources = new ArrayList<>();
+                JSONArray backPermanentResourcesStr = card.getJSONArray("backPermanentResources");
+                for (int r = 0; r < backPermanentResourcesStr.length(); r++) {
+                    backPermanentResources.add(backPermanentResourcesStr.getString(r));
+                }
+                builder.setBackPermanentResources(backPermanentResources.stream().map(ResourceType::fromString).collect(Collectors.toList()));
+            }
+
+
+            if (card.has("placementCondition")) {
+                List<String> placementCondition = new ArrayList<>();
+                JSONArray placementConditionStr = card.getJSONArray("placementCondition");
+                for (int p = 0; p < placementConditionStr.length(); p++) {
+                    placementCondition.add(placementConditionStr.getString(p));
+                }
+                builder.setPlacementCondition(placementCondition.stream().map(ResourceType::fromString).collect(Collectors.toList()));
+            }
+
+            if (card.has("pointCondition")) {
+                String pointConditionStr = card.getString("pointCondition");
+                builder.setPointCondition(PointConditionType.fromString(pointConditionStr));
+            }
+
+            if (card.has("pointConditionObject")) {
+                ObjectType.from(card.getString("pointConditionObject"));
+                builder.setPointConditionObject(ObjectType.from(card.getString("pointConditionObject")));
+            }
+        }
+
+        return new GameBoard(goldDeck, resourceDeck, objectiveDeck, starterDeck);
+
+    }
 
     /**
      * Constructor with the decks
@@ -30,7 +127,7 @@ public class GameBoard {
      * @param resourceCards  The pair of resource cards
      * @param objectiveCards The pair of common objective cards
      */
-    public GameBoard(Deck<GoldCard> goldDeck, Deck<ResourceCard> resourceDeck, Deck<StarterCard> starterDeck, Deck<ObjectiveCard> objectiveDeck, CardPair<ResourceCard> resourceCards, CardPair<ObjectiveCard> objectiveCards, CardPair<GoldCard> goldCards) {
+    public GameBoard(Deck<PlayableCard> goldDeck, Deck<PlayableCard> resourceDeck, Deck<PlayableCard> starterDeck, Deck<ObjectiveCard> objectiveDeck, CardPair<PlayableCard> resourceCards, CardPair<ObjectiveCard> objectiveCards, CardPair<PlayableCard> goldCards) {
         this.goldDeck = goldDeck;
         this.goldCards = goldCards;
         this.starterDeck = starterDeck;
@@ -44,15 +141,15 @@ public class GameBoard {
      * Constructor
      * Initializes the decks and draws the first cards
      */
-    public GameBoard(List<GoldCard> goldCardsList, List<StarterCard> starterCardsList, List<ObjectiveCard> objectiveCardsList, List<ResourceCard> resourceCardsList) {
-        this.goldDeck = new Deck<GoldCard>(goldCardsList);
-        this.starterDeck = new Deck<StarterCard>(starterCardsList);
-        this.objectiveDeck = new Deck<ObjectiveCard>(objectiveCardsList);
-        this.resourceDeck = new Deck<ResourceCard>(resourceCardsList);
+    public GameBoard(List<PlayableCard> goldCardsList, List<PlayableCard> starterCardsList, List<ObjectiveCard> objectiveCardsList, List<PlayableCard> resourceCardsList) {
+        this.goldDeck = new Deck<>(goldCardsList);
+        this.starterDeck = new Deck<>(starterCardsList);
+        this.objectiveDeck = new Deck<>(objectiveCardsList);
+        this.resourceDeck = new Deck<>(resourceCardsList);
         try {
-            this.goldCards = new CardPair<GoldCard>(this.drawGoldCardFromDeck(), this.drawGoldCardFromDeck());
-            this.objectiveCards = new CardPair<ObjectiveCard>(this.drawObjectiveCardFromDeck(), this.drawObjectiveCardFromDeck());
-            this.resourceCards = new CardPair<ResourceCard>(this.drawResourceCardFromDeck(), this.drawResourceCardFromDeck());
+            this.goldCards = new CardPair<>(this.drawGoldCardFromDeck(), this.drawGoldCardFromDeck());
+            this.objectiveCards = new CardPair<>(this.drawObjectiveCardFromDeck(), this.drawObjectiveCardFromDeck());
+            this.resourceCards = new CardPair<>(this.drawResourceCardFromDeck(), this.drawResourceCardFromDeck());
         } catch (EmptyDeckException ignored) {
             // This will never happen as we just seeded the decks
         }
@@ -65,7 +162,7 @@ public class GameBoard {
      * @return a gold card drawn from the gold cards deck
      * @throws EmptyDeckException there are no objective cards left in the deck
      */
-    public GoldCard drawGoldCardFromDeck() throws EmptyDeckException {
+    public PlayableCard drawGoldCardFromDeck() throws EmptyDeckException {
         return this.goldDeck.draw();
     }
 
@@ -76,7 +173,7 @@ public class GameBoard {
      * @return the gold card drawn
      * @throws EmptyDeckException there are no gold cards left in the deck
      */
-    public GoldCard drawGoldCardFromPair(Boolean first) throws EmptyDeckException {
+    public PlayableCard drawGoldCardFromPair(Boolean first) throws EmptyDeckException {
         if (first) {
             return this.goldCards.replaceFirst(this.drawGoldCardFromDeck());
         } else {
@@ -87,7 +184,7 @@ public class GameBoard {
     /**
      * @return the 2 gold cards
      */
-    public CardPair<GoldCard> getGoldCards() {
+    public CardPair<PlayableCard> getGoldCards() {
         return this.goldCards;
     }
 
@@ -104,7 +201,7 @@ public class GameBoard {
      * @return the starterDeck
      * @throws EmptyDeckException there are no objective cards left in the deck
      */
-    public StarterCard drawStarterCardFromDeck() throws EmptyDeckException {
+    public PlayableCard drawStarterCardFromDeck() throws EmptyDeckException {
         return this.starterDeck.draw();
     }
 
@@ -150,16 +247,6 @@ public class GameBoard {
         return this.objectiveDeck.cardsLeft();
     }
 
-    // TBF this is probably not needed since you cannot draw multiple cards at once
-    // /**
-    // * Draws N resource cards from the deck
-    //  *
-    //  * @param N number of cards to draw
-    // * @return N resource cards drawn from the resource cards deck
-    // */
-    // public List<ResourceCard> drawResourceCardsFromDeck(int n) {
-    //     return this.resourceDeck.draw(n);
-    // }
 
     /**
      * Draws a resource card from the deck
@@ -167,16 +254,18 @@ public class GameBoard {
      * @return a resource card drawn from the resource cards deck
      * @throws EmptyDeckException there are no resource cards left in the deck
      */
-    public ResourceCard drawResourceCardFromDeck() throws EmptyDeckException {
+    public PlayableCard drawResourceCardFromDeck() throws EmptyDeckException {
         return this.resourceDeck.draw();
     }
+
     /**
      * Draws a resource card from the deck
+     *
      * @param n number of cards to extract
      * @return a resource card drawn from the resource cards deck
      * @throws EmptyDeckException there are no resource cards left in the deck
      */
-    public List<ResourceCard> drawResourceCardFromDeck(int n) throws EmptyDeckException {
+    public List<PlayableCard> drawResourceCardFromDeck(int n) throws EmptyDeckException {
         return this.resourceDeck.draw(n);
     }
 
@@ -186,7 +275,7 @@ public class GameBoard {
      * @param first if true, the first card is drawn, otherwise the second
      * @return the resource card drawn
      */
-    public ResourceCard drawResourceCardFromPair(Boolean first) throws EmptyDeckException {
+    public PlayableCard drawResourceCardFromPair(Boolean first) throws EmptyDeckException {
         if (first) {
             return this.resourceCards.replaceFirst(this.drawResourceCardFromDeck());
         } else {
@@ -200,6 +289,4 @@ public class GameBoard {
     public int resourceCardsLeft() {
         return this.resourceDeck.cardsLeft();
     }
-
-
 }

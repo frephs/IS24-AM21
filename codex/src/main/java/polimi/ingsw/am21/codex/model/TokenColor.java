@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
-public enum TokenColors {
+public enum TokenColor {
     RED,
     BLUE,
     GREEN,

@@ -6,7 +6,7 @@ import java.util.List;
 public class Player {
     private final String nickname;
     private final PlayerBoard board;
-    private final TokenColors token;
+    private final TokenColor token;
     private int points;
 
     Player(PlayerBuilder builder){
@@ -22,7 +22,7 @@ public class Player {
 
     public static class PlayerBuilder{
         private String nickname;
-        private TokenColors token;
+        private TokenColor token;
         private List<PlayableCard> cards;
         private PlayableCard starterCard;
         private ObjectiveCard objectiveCard;
@@ -36,11 +36,26 @@ public class Player {
         }
 
         /**
+         * @return the player nickname color
+         */
+        public String getNickname(){
+            return this.nickname;
+        }
+
+
+        /**
          * @param token chosen by the client controller (physical player)
          */
-        public PlayerBuilder setTokenColor(TokenColors token){
+        public PlayerBuilder setTokenColor(TokenColor token){
             this.token = token;
             return this;
+        }
+
+        /**
+         * @return the player token color
+         */
+        public TokenColor getTokenColor(){
+            return this.token;
         }
 
         /**
@@ -93,7 +108,7 @@ public class Player {
     /**
      * @return player's token
      */
-    public TokenColors getToken(){
+    public TokenColor getToken(){
         return this.token;
     }
 
