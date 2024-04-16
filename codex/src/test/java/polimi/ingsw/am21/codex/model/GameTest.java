@@ -7,8 +7,6 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 import polimi.ingsw.am21.codex.model.GameBoard.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.GameBoard.Lobby;
-import polimi.ingsw.am21.codex.model.GameBoard.LobbyFullException;
 import polimi.ingsw.am21.codex.model.GameBoard.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.TokenAlreadyTakenException;
 
