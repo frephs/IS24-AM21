@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-public enum CornerPosition {
+public enum CornerPosition implements AdjacentPosition{
     TOP_LEFT(0),
     BOTTOM_LEFT(1),
     TOP_RIGHT(2),

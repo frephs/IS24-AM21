@@ -65,12 +65,26 @@ class CardSideType {
     BACK
 }
 
+class AdjacentPosition {
+    <<Interface>>
+}
+
+AdjacentPosition <|.. CornerPosition : Realization
+AdjacentPosition <|.. EdgePosition : Realization
+
+
 class CornerPosition {
     <<Enumeration>>
     TOP_LEFT
     BOTTOM_LEFT
     TOP_RIGHT
     BOTTOM_RIGHT
+}
+
+class EdgePosition{
+    TOP
+    CENTER
+    BOTTOM
 }
 
 class Card {
@@ -122,7 +136,7 @@ ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization
 
 class GeometricObjective {
-    -geometry: ResourceType[7]
+    -geometry: HashMap~AdjacentPosition, ResourceType~
 
     GeometricObjective(ResourceType[3][3] geometry)
 
@@ -173,6 +187,7 @@ class PlayableSide {
     setCorner(CornerPosition position, ResourceType resource)
     setCorner(CornerPosition position, ObjectType object)
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
+    getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -224,6 +239,9 @@ class GoldCardFrontSide {
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
     %%implements the abstract method in PlayableSide
+
+    getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
+    %%overrides the method in PlayableSide
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
@@ -544,7 +562,6 @@ class PlayerBoard {
     updateAvailableSpots(Position position) void
     %% updats the list of available spots in which card can be placed
 
-    
 }
 
 %%class PlayerActions {

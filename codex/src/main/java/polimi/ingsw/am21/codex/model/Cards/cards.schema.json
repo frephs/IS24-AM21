@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Cards",
+  "description": "The file used to generate cards",
+  "type": "array",
+  "definitions": {
+    "cardType": {
+      "enum": [
+        "RESOURCE",
+        "STARTER",
+        "GOLD",
+        "OBJECTIVE"
+      ]
+    },
+    "objectiveType": {
+      "enum": [
+        "GEOMETRIC",
+        "COUNTING"
+      ]
+    },
+    "resourceType": {
+      "enum": [
+        "PLANT",
+        "ANIMAL",
+        "FUNGI",
+        "INSECT"
+      ]
+    },
+    "objectType": {
+      "enum": [
+        "QUILL",
+        "INKWELL",
+        "MANUSCRIPT"
+      ]
+    },
+    "pointConditionType": {
+      "enum": [
+        "OBJECTS",
+        "CORNERS"
+      ]
+    }
+  },
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "type": {
+        "$ref": "#/definitions/cardType"
+      },
+      "points": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "objectiveType": {
+        "$ref": "#/definitions/objectiveType"
+      },
+      "objectiveGeometry": {
+        "type": "array",
+        "minItems": 7,
+        "maxItems": 7,
+        "items": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/resourceType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "$comment": "The position of the array start from TOP_LEFT, moving to TOP_RIGHT then the center and the same way for the bottom"
+      },
+      "objectiveResources": {
+        "type": "object",
+        "patternProperties": {
+          "^(PLANT|ANIMAL|FUNGI|INSECT)$": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "objectiveObjects": {
+        "type": "object",
+        "patternProperties": {
+          "^(QUILL|INKWELL|MANUSCRIPT)$": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "backPermanentResources": {
+        "type": "array",
+        "$comment": "If there are none, just omit the array",
+        "minItems": 1,
+        "maxItems": 3,
+        "items": {
+          "$ref": "#/definitions/resourceType"
+        }
+      },
+      "placementCondition": {
+        "type": "array",
+        "$comment": "If there are none, just omit the array",
+        "minItems": 1,
+        "maxItems": 5,
+        "items": {
+          "$ref": "#/definitions/resourceType"
+        }
+      },
+      "pointCondition": {
+        "$ref": "#/definitions/pointConditionType"
+      },
+      "pointConditionObject": {
+        "$ref": "#/definitions/objectType"
+      },
+      "corners": {
+        "type": "object",
+        "patternProperties": {
+          "^(front|back)$": {
+            "patternProperties": {
+              "^(TOP_RIGHT|BOTTOM_RIGHT|BOTTOM_RIGHT|BOTTOM_LEFT)$": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/resourceType"
+                  },
+                  {
+                    "$ref": "#/definitions/objectType"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "type"
+    ]
+  }
+}

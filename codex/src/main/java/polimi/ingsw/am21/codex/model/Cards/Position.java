@@ -1,33 +1,43 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 public class Position {
-    final int x, y;
 
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+  private final int x, y;
 
-    public Position() {
-        this.x = 0;
-        this.y = 0;
-    }
+  public Position(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
 
-    public Position computeAdjacentPosition(CornerPosition linkedCorner) {
-        return switch (linkedCorner) {
-            case TOP_LEFT -> new Position(x - 1, y + 1);
-            case TOP_RIGHT -> new Position(x + 1, y + 1);
-            case BOTTOM_LEFT -> new Position(x - 1, y - 1);
-            case BOTTOM_RIGHT -> new Position(x + 1, y - 1);
-        };
-    }
+  public Position() {
+    this.x = 0;
+    this.y = 0;
+  }
 
-    public boolean equals(Position p) {
-        return p.x == this.x && p.y == this.y;
-    }
+  public Position computeAdjacentPosition(AdjacentPosition adjacentPosition) {
+    return switch (adjacentPosition) {
+      case CornerPosition.TOP_LEFT -> new Position(x - 1, y + 1);
+      case CornerPosition.TOP_RIGHT -> new Position(x + 1, y + 1);
+      case CornerPosition.BOTTOM_LEFT -> new Position(x - 1, y - 1);
+      case CornerPosition.BOTTOM_RIGHT -> new Position(x + 1, y - 1);
+      case EdgePosition.TOP -> new Position(x, y + 1);
+      case EdgePosition.CENTER -> new Position(x, y);
+      case EdgePosition.BOTTOM -> new Position(x,y-1);
+      default ->
+        throw new IllegalStateException("Unexpected value: " + adjacentPosition);
+    };
+  }
 
-    @Override
-    public int hashCode() {
-        return 0; // TODO actually return something
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Position position = (Position) o;
+    return x == position.x && y == position.y;
+  }
+
+  @Override
+  public int hashCode() {
+    return 0; // TODO actually return something
+  }
 }

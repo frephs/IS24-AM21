@@ -143,6 +143,15 @@ public class Player {
     public void evaluate(ObjectiveCard objectiveCard){
         this.points += objectiveCard.getEvaluator().apply(board);
     }
+
+    /**
+     * Evaluates the player secret objective, called by the Game class when Game overs
+     * */
+    public void evaluateSecretObjective(){
+        this.evaluate(
+            this.board.getObjectiveCard()
+        );
+    }
 }
 
 
