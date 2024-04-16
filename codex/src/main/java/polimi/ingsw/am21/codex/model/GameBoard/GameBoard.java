@@ -176,6 +176,13 @@ public class GameBoard {
     this.starterDeck = new Deck<>(starterCardsList);
     this.objectiveDeck = new Deck<>(objectiveCardsList);
     this.resourceDeck = new Deck<>(resourceCardsList);
+
+    // shuffle all the cards
+    this.goldDeck.shuffle();
+    this.starterDeck.shuffle();
+    this.resourceDeck.shuffle();
+    this.objectiveDeck.shuffle();
+
     try {
       this.goldCards = new CardPair<>(this.drawGoldCardFromDeck(),
         this.drawGoldCardFromDeck());
