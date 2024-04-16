@@ -180,11 +180,7 @@ class GameTest {
 
       this.game = new Game(4, this.cardsJSON);
       preparePlayers();
-      game.start();
       List<String> order = this.game.getPlayersOrder();
-      // there is no need to test for player_3 since for player_3 to be out
-      // of order we need another player must be in
-      if (order.get(0).compareTo("Player_0") != 0
         || order.get(1).compareTo("Player_1") != 0
         || order.get(2).compareTo("Player_2") != 0) {
         isDifferent = true;
