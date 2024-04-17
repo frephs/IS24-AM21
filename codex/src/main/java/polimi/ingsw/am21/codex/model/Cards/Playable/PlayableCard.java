@@ -76,6 +76,13 @@ public class PlayableCard extends Card {
     return List.of(frontSide, backSide);
   }
 
+  public PlayableSide getSide(CardSideType side){
+    return switch (side) {
+      case FRONT -> frontSide;
+      case BACK -> backSide;
+    };
+  }
+
   /**
    * Gets the currently played side, if any
    */

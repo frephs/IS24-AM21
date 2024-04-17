@@ -80,12 +80,28 @@ public class PlayerBoard {
      * @param playedCard chosen from the player's hand, will be evaluated after placement
      * @param playedSideType of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
-     */
-    void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position){
+    void placeCard(int playedCardIndex, CardSideType playedSideType, Position position) throws
+      IllegalPlacingPositionException, IndexOutOfBoundsException, IllegalCardSideChoiceException {
+
+        if(! availableSpots.contains(position)){
+          throw new IllegalPlacingPositionException();
+        }
+
+        PlayableCard playedCard;
+
+        try{
+          playedCard= hand.get(playedCardIndex);
+        }catch (IndexOutOfBoundsException e){
+          throw new IndexOutOfBoundsException("You tried to place a played card which either doesn't exist or is not in your hand");
+        }
+
+        if(! getPlaceableCardSides().contains(playedCard.getSide(playedSideType))){
+          throw new IllegalCardSideChoiceException();
+        }
 
         this.hand.remove(playedCard);
         playedCard.setPlayedSideType(playedSideType);
-        PlayableSide playedSide = playedCard.getPlayedSide().get();
+        PlayableSide playedSide = playedCard.getPlayedSide().orElseThrow();
 
         this.playedCards.put(position, playedCard);
 

@@ -152,8 +152,12 @@ public class Player {
      * @param side of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
-    public void placeCard(PlayableCard card, CardSideType side, Position position){
-        board.placeCard(card, side, position);
+    public void placeCard(int cardIndex, CardSideType side, Position position) throws
+      IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException
+      {
+        board.placeCard(cardIndex, side, position);
+
+        PlayableCard card = board.getHand().get(cardIndex);
         this.points += card.getEvaluator().apply(board);
     }
 
