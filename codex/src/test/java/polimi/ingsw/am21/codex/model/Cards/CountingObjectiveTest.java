@@ -14,7 +14,7 @@ class CountingObjectiveTest {
   @Test
   void getEvaluator() {
     Map<ResourceType, Integer> resources = new HashMap<>();
-  resources.put(ResourceType.PLANT_KINGDOM, 3);
+  resources.put(ResourceType.PLANT, 3);
     CountingObjective countingObjective = new CountingObjective(resources, null);
 
     PlayerBoard pb = new PlayerBoard(

@@ -5,11 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.GameBoard.Lobby;
-import polimi.ingsw.am21.codex.model.GameBoard.LobbyFullException;
-import polimi.ingsw.am21.codex.model.GameBoard.PlayerNotFoundException;
-import polimi.ingsw.am21.codex.model.GameBoard.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.GameBoard.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +20,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
   Game game;
-  JSONArray mockJSONArray;
+  JSONArray cardsJSON;
 
   GameTest() {
-    this.mockJSONArray = new JSONArray();
+
+
+    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
+      "/cards.json";
+    File file = new File(jsonLocation);
+    try {
+      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
+      this.cardsJSON = new JSONArray(content);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("could not read cards file");
+    }
   }
 
   @BeforeEach
   void initTest() {
-    this.game = new Game(2, mockJSONArray);
+    this.game = new Game(2, this.cardsJSON);
   }
 
 
@@ -42,6 +54,7 @@ class GameTest {
     try {
       lobby.addPlayer(firstPlayer, this.game.drawObjectiveCardPair());
     } catch (Exception e) {
+      e.printStackTrace();
       fail("Exception thrown while adding first player");
     }
     // the maximum number of players is 2, one slot is taken so the number of
@@ -151,7 +164,7 @@ class GameTest {
     boolean isDifferent = false;
     for (int i = 0; i < 10000 && !isDifferent; ++i) {
 
-      this.game = new Game(4, mockJSONArray);
+      this.game = new Game(4, this.cardsJSON);
       preparePlayers();
       game.start();
       List<String> order = this.game.getPlayersOrder();

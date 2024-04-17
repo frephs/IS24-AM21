@@ -1,11 +1,19 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,8 +30,18 @@ class LobbyTest {
   @BeforeEach
   void prepareLobbyTest() {
     this.lobby = new Lobby(MAX_PLAYERS);
-    // TODO: parse real JSON
-    this.mockGameboard = GameBoard.fromJSON(new JSONArray());
+
+
+    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards/cards.json";
+    File file = new File(jsonLocation);
+    try {
+      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
+      JSONArray cards = new JSONArray(content);
+      this.mockGameboard = GameBoard.fromJSON(cards);
+    } catch (IOException e) {
+      e.printStackTrace();
+      fail("could not read cards file");
+    }
   }
 
   UUID generateNewSocketID() {

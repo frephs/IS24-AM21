@@ -15,7 +15,7 @@ class GeometricObjectiveTest {
   @Test
   void getEvaluator() {
     Map<AdjacentPosition, ResourceType> geometry = new HashMap<>();
-    geometry.put(BOTTOM_LEFT, ResourceType.FUNGI_KINGDOM);
+    geometry.put(BOTTOM_LEFT, ResourceType.FUNGI);
     GeometricObjective geometricObjective = new GeometricObjective(geometry);
 
     PlayerBoard pb = new PlayerBoard(
