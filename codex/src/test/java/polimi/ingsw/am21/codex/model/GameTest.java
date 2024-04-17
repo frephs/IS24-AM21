@@ -12,6 +12,7 @@ import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 import java.io.File;
 import java.io.IOException;

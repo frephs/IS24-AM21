@@ -1,5 +1,7 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
 import org.json.JSONArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,8 @@ import polimi.ingsw.am21.codex.model.LobbyFullException;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
