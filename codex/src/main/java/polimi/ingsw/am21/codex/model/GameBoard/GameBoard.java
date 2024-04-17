@@ -190,9 +190,9 @@ public class GameBoard {
         objectiveDeck.add(builder.buildObjectiveCard());
       } else {
         PlayableCard playableCard = builder.buildPlayableCard();
-        if (type == CardType.GOLD) goldDeck.add(playableCard);
-        else if (type == CardType.RESOURCE) resourceDeck.add(playableCard);
-        else if (type == CardType.STARTER) starterDeck.add(playableCard);
+        if (cardType == CardType.GOLD) goldDeck.add(playableCard);
+        else if (cardType == CardType.RESOURCE) resourceDeck.add(playableCard);
+        else if (cardType == CardType.STARTER) starterDeck.add(playableCard);
       }
     }
 
