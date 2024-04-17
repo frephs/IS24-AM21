@@ -132,7 +132,7 @@ public class PlayerBoard {
                     Position adjacentCardPosition = position.computeAdjacentPosition(cornerPosition);
                     if (this.playedCards.containsKey((adjacentCardPosition))) {
                         CornerPosition oppositeCornerPosition = cornerPosition.getOppositeCornerPosition();
-                        PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().get();
+                        PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().orElseThrow();
                         Map<CornerPosition, Corner> enabledOppositeCorners = oppositeCard.getCorners();
                         Corner oppositeCorner = enabledOppositeCorners.get(oppositeCornerPosition);
                         oppositeCorner.cover();
