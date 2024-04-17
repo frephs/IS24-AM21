@@ -59,7 +59,7 @@ public class PlayerBoard {
     }
 
     /**
-     * @return a list of sides that pass the are both playable and placeable
+     * @return a list of sides that are both playable and placeable
      * */
     public List<PlayableSide> getPlaceableCardSides(){
       return getHand().stream().flatMap(
@@ -77,9 +77,14 @@ public class PlayerBoard {
     }
 
     /**
-     * @param playedCard chosen from the player's hand, will be evaluated after placement
+     * Places a card on the playerBoard,
+     * @param playedCardIndex of the card to be played chosen from the player's hand, the card will be evaluated after placement
      * @param playedSideType of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
+     * @throws IllegalPlacingPositionException if the position is either not reachable or forbidden
+     * @throws IndexOutOfBoundsException if the card index exceeds the hand size
+     * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of card placing conditions.
+     */
     void placeCard(int playedCardIndex, CardSideType playedSideType, Position position) throws
       IllegalPlacingPositionException, IndexOutOfBoundsException, IllegalCardSideChoiceException {
 

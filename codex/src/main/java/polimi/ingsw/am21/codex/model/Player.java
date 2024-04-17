@@ -148,7 +148,8 @@ public class Player {
     }
 
     /**
-     * @param card chosen from the player's hand, which will be evaluated
+     * Asks the PlayerBoard to position the card and then evaluates
+     * @param cardIndex of the card chosen from the player's hand,
      * @param side of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      */
@@ -162,6 +163,8 @@ public class Player {
     }
 
     /**
+     * Asks the PlayerBoard to evaluate the points of the objective card passed as argument
+     * adds the point to the player score.
      * @param objectiveCard to be evaluated at the end of the game
      */
     public void evaluate(ObjectiveCard objectiveCard){
