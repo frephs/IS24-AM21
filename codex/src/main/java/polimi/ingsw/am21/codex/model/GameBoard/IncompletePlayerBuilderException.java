@@ -20,7 +20,8 @@ public class IncompletePlayerBuilderException extends RuntimeException {
     if (playerBuilder.getTokenColor() == null)
       missingParams.add("tokenColor");
 
-    throw new IncompletePlayerBuilderException("Incomplete PlayerBuilder: " +
-      "missing ");
+    if (!missingParams.isEmpty())
+      throw new IncompletePlayerBuilderException("Incomplete PlayerBuilder: " +
+        "missing " + missingParams.toString());
   }
 }
