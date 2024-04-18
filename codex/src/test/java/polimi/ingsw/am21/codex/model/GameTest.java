@@ -69,7 +69,7 @@ class GameTest {
     try {
       lobby.addPlayer(secondPlayer, this.game.drawObjectiveCardPair());
     } catch (Exception e) {
-      // we pray you don't get a collision 🙏
+      // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions )
       fail("Exception thrown while adding second player");
     }
     // the lobby had a maximum number of 2 players, the remaining player
@@ -78,7 +78,7 @@ class GameTest {
     // we added 2 players so the player count shall be 2
     assertEquals(2, lobby.getPlayersCount());
     lobby.setNickname(secondPlayer, "SecondPlayer");
-    // hopefully we don't have a collision 🙏
+    // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions )
     UUID randomId = UUID.randomUUID();
     // the blue token was already taken by firstPlayer and therefore cannot
     // be selected by SecondPlayer
