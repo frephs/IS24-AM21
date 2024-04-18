@@ -199,10 +199,6 @@ public class CardBuilder {
     return this;
   }
 
-  public CardType getType() {
-    return this.type;
-  }
-
   public ObjectiveCard buildObjectiveCard() throws MissingParametersException {
     Integer points =
       this.points.orElseThrow(

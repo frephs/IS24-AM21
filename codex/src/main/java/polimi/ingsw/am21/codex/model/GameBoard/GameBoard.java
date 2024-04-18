@@ -141,14 +141,13 @@ public class GameBoard {
           "pointConditionObject")));
       }
 
-      CardType cardType = builder.getType();
-      if (cardType == CardType.OBJECTIVE) {
+      if (type == CardType.OBJECTIVE) {
         objectiveDeck.add(builder.buildObjectiveCard());
       } else {
         PlayableCard playableCard = builder.buildPlayableCard();
-        if (cardType == CardType.GOLD) goldDeck.add(playableCard);
-        else if (cardType == CardType.RESOURCE) resourceDeck.add(playableCard);
-        else if (cardType == CardType.STARTER) starterDeck.add(playableCard);
+        if (type == CardType.GOLD) goldDeck.add(playableCard);
+        else if (type == CardType.RESOURCE) resourceDeck.add(playableCard);
+        else if (type == CardType.STARTER) starterDeck.add(playableCard);
       }
     }
 
