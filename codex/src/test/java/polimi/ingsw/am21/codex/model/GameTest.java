@@ -104,6 +104,7 @@ class GameTest {
       () -> lobby.finalizePlayer(firstPlayer, objectiveCard));
   }
 
+@Test
   void preparePlayers() {
     assertNotNull(this.game);
     // the lobby should be created in the game constructor
