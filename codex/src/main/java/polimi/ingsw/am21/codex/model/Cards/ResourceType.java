@@ -25,4 +25,14 @@ public enum ResourceType implements CornerContentType {
             resourceType -> resourceType.equals(value)
           );
     }
+    @Override
+    public void acceptVisitor(CornerContentVisitor visitor) {
+        CornerContentType.super.acceptVisitor(visitor);
+    }
+
+    @Override
+    public void acceptVisitor(CornerContentVisitor visitor, int arg) {
+        visitor.visit(this, arg);
+    }
+
 }

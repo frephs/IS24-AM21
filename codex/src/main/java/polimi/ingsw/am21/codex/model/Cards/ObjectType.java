@@ -28,4 +28,15 @@ public enum ObjectType implements CornerContentType {
         objectType -> objectType.equals(value)
       );
   }
+    @Override
+    public void acceptVisitor(CornerContentVisitor visitor) {
+        CornerContentType.super.acceptVisitor(visitor);
+    }
+
+    @Override
+     public void acceptVisitor(CornerContentVisitor visitor, int arg) {
+        visitor.visit(this, arg);
+    }
+
+
 }

@@ -20,6 +20,7 @@ public class PlayerBoard {
    // Hashmaps to keep track of resources
     private final Map<ResourceType, Integer> resources = new HashMap<>(ResourceType.values().length);
     private final Map<ObjectType, Integer> objects = new HashMap<>(ObjectType.values().length);
+    private final MapUpdater mapUpdater = new MapUpdater();
 
     // List of all available spots in which a card can be placed
     Set<Position> availableSpots = new HashSet<>();
@@ -142,22 +143,52 @@ public class PlayerBoard {
         );
     }
 
-    /*
-    * Helper method called by PlayerBoard.updateResourcesAndObjects() to
-    * update the stored data structures of player's resources and objects
-    * */
-    private void updateResourcesAndObjectsMaps(Corner corner, int update){
-        Optional content = corner.getContent();
-        if(content.isPresent()){
-          if(ResourceType.has(content.get())){
-              ResourceType resource = (ResourceType) content.get();
-              this.resources.computeIfPresent(resource, (k, val) -> val + update);
-          }else if(ObjectType.has(content.get())) {
-            ObjectType object = (ObjectType) content.get();
-            this.objects.computeIfPresent(object, (k, val) -> val + update);
-          }
-        }
+
+  /* Old Implementation
+  private <T extends CornerContentType> void updateResourcesAndObjectsMaps(Corner<T> corner, int update) {
+      corner.getContent().ifPresent(
+         content -> {
+           if (ResourceType.has(content)) {
+             this.objects.computeIfPresent((ResourceType) content, (key, val) -> val + update);
+           } else if (ObjectType.has(content)) {
+             this.objects.computeIfPresent((ObjectType) content, (key, val) -> val + update);
+           }
+         }
+         );
+    }*/
+
+  /**
+   * Helper method called by PlayerBoard.updateResourcesAndObjects() to
+   * update the stored data structures of player's resources and objects
+   * */
+  private <T extends CornerContentType> void updateResourcesAndObjectsMaps(Corner<T> corner, int update){
+    corner.getContent().ifPresent(
+      content ->
+        content.acceptVisitor(mapUpdater, update)
+    );
+  }
+
+  private void updateMap(ObjectType object, int update){
+    mapUpdater.visit(object,update);
+  }
+
+  private void updateMap(ResourceType resource, int update){
+    mapUpdater.visit(resource,update);
+
+  }
+
+  private class MapUpdater implements CornerContentVisitor{
+    MapUpdater(){}
+    @Override
+    public void visit(ObjectType object, int arg) {
+      objects.computeIfPresent(object, (key, value) -> value + arg);
     }
+
+    @Override
+    public void visit(ResourceType resource, int arg) {
+      resources.computeIfPresent(resource, (key, value) -> value + arg);
+    }
+  }
 
     private void updateAvailableSpots(PlayableSide playedSide, Position position){
         this.availableSpots.remove(position);
