@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.*;
 import polimi.ingsw.am21.codex.model.GameBoard.GameBoard;
 
@@ -13,52 +14,72 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PlayerBoardTest {
   GameBoard gameBoard;
+  PlayerBoard pb;
+  Method updateMap_1;
+  Method updateMap_2;
+  Method updateResourcesAndObjectsMaps;
 
+  PlayableCard card;
+  PlayableBackSide cb;
+  PlayableFrontSide cf;
+  ObjectiveCard objectiveCard;
 
-  @BeforeEach
-  void initTest() {
-    /*JSONArray cardJson = new JSONArray("polimi/ingsw/am21/codex/model/Cards/Resources/cards.json");
-    gameBoard = GameBoard.fromJSON(cardJson);*/
-  }
-
-  @Test
-  void mapUpdateTest() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-    PlayableFrontSide cf =  new ResourceCardFrontSide(12);
+  PlayerBoardTest() throws NoSuchMethodException{
+    PlayableFrontSide cf =  new GoldCardFrontSide(12,
+      List.of(
+        ResourceType.FUNGI_KINGDOM, ResourceType.FUNGI_KINGDOM
+      ),
+      PointConditionType.OBJECTS,
+      ObjectType.QUILL
+    );
     PlayableBackSide cb =  new PlayableBackSide(List.of());
+    cf.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL_KINGDOM);
     cb.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL_KINGDOM);
+    cb.setCorner(CornerPosition.TOP_RIGHT, ResourceType.FUNGI_KINGDOM);
     PlayableCard card = new PlayableCard(12, cf,cb);
 
     ObjectiveCard objectiveCard = new ObjectiveCard(12,12, new ConcreteObjective());
 
-    PlayerBoard pb = new PlayerBoard(List.of(card,card,card),
+    pb = new PlayerBoard(List.of(card,card,card),
       card,
       objectiveCard
-      );
+    );
 
     // let's make private methods public
     Method updateMap_1 = pb.getClass().getDeclaredMethod(
       "updateMap", ResourceType.class, int.class
     );
 
-    Method updateMap_2 = pb.getClass().getDeclaredMethod(
+    updateMap_2 = pb.getClass().getDeclaredMethod(
       "updateMap", ObjectType.class, int.class
     );
 
-    Method updateResourcesAndObjectsMaps = pb.getClass().getDeclaredMethod(
-        "updateResourcesAndObjectsMaps", Corner.class, int.class
-      );
+    updateResourcesAndObjectsMaps = pb.getClass().getDeclaredMethod(
+      "updateResourcesAndObjectsMaps", Corner.class, int.class
+    );
 
     updateMap_1.setAccessible(true);
     updateMap_2.setAccessible(true);
     updateResourcesAndObjectsMaps.setAccessible(true);
+  }
 
+
+  @BeforeEach
+  void initTest() {
+    /*JSONArray cardJson = new JSONArray("polimi/ingsw/am21/codex/model/Cards/Resources/cards.json");
+    gameBoard = GameBoard.fromJSON(cardJson);*/
+
+  }
+
+  @Test
+  void mapUpdateTest() throws IllegalAccessException, InvocationTargetException {
 
     card.setPlayedSideType(CardSideType.BACK);
     Corner corner = card.getPlayedSide().get().getCorners().get(CornerPosition.BOTTOM_LEFT);
-
 
     // let's call this private methods
     updateResourcesAndObjectsMaps.invoke(pb,   corner,+1);
@@ -87,14 +108,7 @@ class PlayerBoardTest {
 
   @Test
   void getPlaceableCardSides() {
-    /*PlayableCard card = new PlayableCard() ;
-    do{
-      try{
-        card = gameBoard.drawGoldCardFromDeck();
-      }catch(EmptyDeckException ignored){}
-    }while(
-      card.get
-    );*/
+    assertEquals(pb.getPlaceableCardSides().size(), 3);
   }
 
   @Test
@@ -104,6 +118,10 @@ class PlayerBoardTest {
 
   @Test
   void placeCard() {
+
+    IllegalPlacingPositionException e = assertThrows(IllegalPlacingPositionException.class,
+      () -> pb.placeCard(0, CardSideType.FRONT,new Position(1,1))
+    );
 
 
   }
