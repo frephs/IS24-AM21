@@ -31,15 +31,15 @@ class PlayerBoardTest {
   PlayerBoardTest() throws NoSuchMethodException{
     PlayableFrontSide cf =  new GoldCardFrontSide(12,
       List.of(
-        ResourceType.FUNGI_KINGDOM, ResourceType.FUNGI_KINGDOM
+        ResourceType.FUNGI, ResourceType.FUNGI
       ),
       PointConditionType.OBJECTS,
       ObjectType.QUILL
     );
     PlayableBackSide cb =  new PlayableBackSide(List.of());
-    cf.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL_KINGDOM);
-    cb.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL_KINGDOM);
-    cb.setCorner(CornerPosition.TOP_RIGHT, ResourceType.FUNGI_KINGDOM);
+    cf.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL);
+    cb.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL);
+    cb.setCorner(CornerPosition.TOP_RIGHT, ResourceType.FUNGI);
     PlayableCard card = new PlayableCard(12, cf,cb);
 
     ObjectiveCard objectiveCard = new ObjectiveCard(12,12, new ConcreteObjective());
@@ -50,7 +50,8 @@ class PlayerBoardTest {
     );
 
     // let's make private methods public
-    Method updateMap_1 = pb.getClass().getDeclaredMethod(
+
+    updateMap_1 = pb.getClass().getDeclaredMethod(
       "updateMap", ResourceType.class, int.class
     );
 
@@ -72,7 +73,6 @@ class PlayerBoardTest {
   void initTest() {
     /*JSONArray cardJson = new JSONArray("polimi/ingsw/am21/codex/model/Cards/Resources/cards.json");
     gameBoard = GameBoard.fromJSON(cardJson);*/
-
   }
 
   @Test
@@ -84,13 +84,13 @@ class PlayerBoardTest {
     // let's call this private methods
     updateResourcesAndObjectsMaps.invoke(pb,   corner,+1);
 
-    updateMap_1.invoke(pb, ResourceType.PLANT_KINGDOM, +1);
-    updateMap_1.invoke(pb, ResourceType.PLANT_KINGDOM, +1);
+    updateMap_1.invoke(pb, ResourceType.PLANT, +1);
+    updateMap_1.invoke(pb, ResourceType.PLANT, +1);
     updateMap_2.invoke(pb, ObjectType.INKWELL,+3);
 
-    int a = pb.getResources().get(ResourceType.PLANT_KINGDOM);
+    int a = pb.getResources().get(ResourceType.PLANT);
     int b = pb.getObjects().get(ObjectType.INKWELL);
-    int c = pb.getResources().get(ResourceType.ANIMAL_KINGDOM);
+    int c = pb.getResources().get(ResourceType.ANIMAL);
 
     assertEquals(a,2);
     assertEquals(b,3);
@@ -100,9 +100,9 @@ class PlayerBoardTest {
 
   @Test
   void testEquals(){
-    Object o = (Object) ResourceType.ANIMAL_KINGDOM;
+    Object o = (Object) ResourceType.ANIMAL;
     Optional<Object> oo =  Optional.of(o);
-    ResourceType r = ResourceType.ANIMAL_KINGDOM;
+    ResourceType r = ResourceType.ANIMAL;
     assert(r.equals(oo.get()));
   }
 
