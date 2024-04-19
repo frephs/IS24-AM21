@@ -1,9 +1,11 @@
-package polimi.ingsw.am21.codex.model.GameBoard;
+package polimi.ingsw.am21.codex.model;
 
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.Player;
-import polimi.ingsw.am21.codex.model.TokenColor;
+import polimi.ingsw.am21.codex.model.Player.Player;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 import java.util.*;
 

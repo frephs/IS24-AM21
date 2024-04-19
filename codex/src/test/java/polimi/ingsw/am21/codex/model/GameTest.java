@@ -5,6 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
+import polimi.ingsw.am21.codex.model.GameBoard.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.GameBoard.PlayerNotFoundException;
+import polimi.ingsw.am21.codex.model.GameBoard.TokenAlreadyTakenException;
 
 import java.io.File;
 import java.io.IOException;
