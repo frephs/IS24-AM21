@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.model.GameBoard;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Builder.CardBuilder;
 import polimi.ingsw.am21.codex.model.Cards.Builder.CardType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveType;

@@ -1,6 +1,9 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.GeometricObjective;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 import java.util.ArrayList;
