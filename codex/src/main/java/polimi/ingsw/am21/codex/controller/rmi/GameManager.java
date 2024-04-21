@@ -12,6 +12,6 @@ public interface GameManager extends Remote {
   void drawCard(String nickname, PlayableCard playableCard) throws RemoteException;
   void chooseObjective(String nickname, ObjectiveCard objectiveCard) throws RemoteException;
   void showOtherBoard(String nickname) throws RemoteException;
-  void point() throws RemoteException;
-  
+  void getPoint() throws RemoteException;
+
 }
