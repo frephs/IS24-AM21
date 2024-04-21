@@ -26,6 +26,9 @@ jobs:
     name: JUnit 5
     runs-on: ubuntu-latest
     needs: [build]
+    permissions:
+      checks: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,4 +45,3 @@ jobs:
         if: success() || failure() # always run even if the previous step fails
         with:
           report_paths: '**/target/surefire-reports/TEST-*.xml'
-          token: ${{ secrets.REPORTER_TOKEN }}
