@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
+import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
