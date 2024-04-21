@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.util.function.Function;
 

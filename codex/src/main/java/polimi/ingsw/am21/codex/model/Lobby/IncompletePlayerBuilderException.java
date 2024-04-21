@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.GameBoard;
+package polimi.ingsw.am21.codex.model.Lobby;
 
 import polimi.ingsw.am21.codex.model.Cards.PlayableSide;
 import polimi.ingsw.am21.codex.model.Player;

@@ -2,6 +2,8 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.Cards.Commons.Deck;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.GameBoard.EmptyDeckException;
 
 import java.util.ArrayList;

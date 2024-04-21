@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model;
+package polimi.ingsw.am21.codex.model.Player;
 
 public class IllegalCardSideChoiceException extends IllegalArgumentException{
  public IllegalCardSideChoiceException(){

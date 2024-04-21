@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 public class PlayableBackSide extends PlayableSide {
 

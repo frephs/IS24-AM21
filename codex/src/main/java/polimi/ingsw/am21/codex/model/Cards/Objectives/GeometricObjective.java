@@ -7,7 +7,7 @@ import polimi.ingsw.am21.codex.model.Cards.AdjacentPosition;
 import polimi.ingsw.am21.codex.model.Cards.EdgePosition;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 public class GeometricObjective extends Objective {
 

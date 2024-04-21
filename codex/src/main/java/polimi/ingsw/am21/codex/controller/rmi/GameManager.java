@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.controller.rmi;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.TokenColor;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

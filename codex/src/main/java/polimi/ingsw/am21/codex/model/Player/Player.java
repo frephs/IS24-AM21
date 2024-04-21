@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model;
+package polimi.ingsw.am21.codex.model.Player;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -72,13 +72,17 @@ public class Player {
         }
 
         /**
-         * @param starterCard The starter card drawn from the GameBoard
-         * @return the player starter card
+         * @param starterCard drawn from the GameBoard
+         * @throws StarterCardPlayedSideNotSetException if the played side of the starter card is not set before player construction.
          */
-        public PlayerBuilder setStarterCard(PlayableCard starterCard){
+        public PlayerBuilder setStarterCard(PlayableCard starterCard) throws StarterCardPlayedSideNotSetException{
+            if(starterCard.getPlayedSide().isEmpty()){
+                throw new StarterCardPlayedSideNotSetException();
+            }
             this.starterCard = starterCard;
             return this;
         }
+
 
         /**
          * @param side chosen by the client controller (physical player)

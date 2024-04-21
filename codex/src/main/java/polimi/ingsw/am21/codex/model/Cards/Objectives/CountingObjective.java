@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.util.HashMap;
 import java.util.Map;

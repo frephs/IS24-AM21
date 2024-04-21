@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model;
+package polimi.ingsw.am21.codex.model.Player;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -33,9 +33,8 @@ public class PlayerBoard {
      */
     public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
         this.hand = hand;
-        this.playedCards.put(new Position(), starterCard);
         this.objectiveCard = objectiveCard;
-        
+
         // let's initialize the maps with resources to 0
         Arrays.stream(ResourceType.values()).forEach(
             (resourceType) -> resources.put(resourceType, 0)
@@ -43,6 +42,11 @@ public class PlayerBoard {
         Arrays.stream(ObjectType.values()).forEach(
             (objectType) -> objects.put(objectType, 0)
         );
+
+        // let's add the starterCard to the playerBoard
+        this.hand.add(starterCard);
+        placeCard(3, starterCard.getPlayedSideType().orElseThrow(), new Position());
+
     }
 
     /**

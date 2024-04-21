@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 public class PlayableCard extends Card {
 

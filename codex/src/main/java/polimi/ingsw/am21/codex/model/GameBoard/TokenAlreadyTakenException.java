@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
-import polimi.ingsw.am21.codex.model.TokenColor;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class TokenAlreadyTakenException extends RuntimeException {
   TokenColor tokenColor;

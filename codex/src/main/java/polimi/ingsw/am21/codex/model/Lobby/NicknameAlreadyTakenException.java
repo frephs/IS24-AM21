@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.GameBoard;
+package polimi.ingsw.am21.codex.model.Lobby;
 
 public class NicknameAlreadyTakenException extends RuntimeException {
   String nickname;

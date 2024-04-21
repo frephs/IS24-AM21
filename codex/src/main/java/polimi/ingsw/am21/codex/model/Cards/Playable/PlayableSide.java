@@ -9,7 +9,7 @@ import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.Cards.Corner;
 import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
 import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 // TODO investigate "Raw use of parameterized class 'Corner'" warning
 

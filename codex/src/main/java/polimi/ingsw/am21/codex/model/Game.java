@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model;
 
-import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
@@ -8,6 +9,9 @@ import polimi.ingsw.am21.codex.model.GameBoard.*;
 import java.util.*;
 
 import org.json.JSONArray;
+import polimi.ingsw.am21.codex.model.Lobby.Lobby;
+import polimi.ingsw.am21.codex.model.Player.Player;
+import polimi.ingsw.am21.codex.model.Player.PlayerState;
 
 
 public class Game {

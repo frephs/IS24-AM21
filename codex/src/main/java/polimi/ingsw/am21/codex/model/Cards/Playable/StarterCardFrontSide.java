@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards.Playable;
 
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.util.function.BiFunction;
 

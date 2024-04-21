@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import polimi.ingsw.am21.codex.model.Cards.Objectives.Objective;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.util.function.BiFunction;
 
