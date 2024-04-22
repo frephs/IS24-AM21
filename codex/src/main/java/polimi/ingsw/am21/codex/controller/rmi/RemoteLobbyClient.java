@@ -1,9 +1,9 @@
 package polimi.ingsw.am21.codex.controller.rmi;
 
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.GameBoard.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Lobby.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameBoard.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.TokenColor;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 import java.rmi.RemoteException;
 
