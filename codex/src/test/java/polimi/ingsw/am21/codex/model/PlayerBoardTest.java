@@ -7,6 +7,8 @@ import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.*;
 import polimi.ingsw.am21.codex.model.GameBoard.GameBoard;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

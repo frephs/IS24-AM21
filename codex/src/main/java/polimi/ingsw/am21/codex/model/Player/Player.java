@@ -75,10 +75,10 @@ public class Player {
          * @param starterCard drawn from the GameBoard
          * @throws StarterCardPlayedSideNotSetException if the played side of the starter card is not set before player construction.
          */
-        public PlayerBuilder setStarterCard(PlayableCard starterCard) throws StarterCardPlayedSideNotSetException{
-            if(starterCard.getPlayedSide().isEmpty()){
+        public PlayerBuilder setStarterCard(PlayableCard starterCard) /*throws StarterCardPlayedSideNotSetException*/{
+            /*if(starterCard.getPlayedSide().isEmpty()){
                 throw new StarterCardPlayedSideNotSetException();
-            }
+            }*/
             this.starterCard = starterCard;
             return this;
         }
