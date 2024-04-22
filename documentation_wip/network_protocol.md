@@ -101,10 +101,22 @@ sequenceDiagram
         loop for each objective card 
             Server -) All clients : PlayerScoreUpdateMessage
         end 
+        Server -) All clients : WinningPlayerMessage  
     end
 
-    Server -) All clients : WinningPlayerMessage  
 
+## Not-allowed messages handling
+In the event a player tries to place cards or draw in a turn that isn't his or in the event a client might be modified or 'enhanced' in a way the server nor the game contemplate, we have messages in place to send to the  aforesaid client. 
+
+
+```mermaid
+sequenceDiagram
+    Note over client,server: Client is not the current player 
+    client -) server: placeCardMessage
+    server --) client: requestNotAllowedMessage 
+    Note over client,server: Client sends a message which <br>is not recognized by the server
+    client -) server: unknownTypeMessage
+    server --)  client : unknownMessageTypeMessage
 
 ```
 
@@ -119,5 +131,3 @@ sequenceDiagram
         Server -) Recipient: newMessageInChat
     end
 ```
-
-
