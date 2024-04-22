@@ -5,9 +5,6 @@ Both client and server are equipped with a message parser and a set of RMI inter
 ## Notes on RMI 
 In this documentation, only Socket Messages are rapresented as there is duality in the two approaches since every message corresponds to a remote method invocation.
 
-### General Flow for non-permitted requests
-
-
 ### Player Lobby Flow
 As the Player building process is divided in essential and sequantial steps, every message different from the last one received is meant to be accepted as a confirm the last phase was successful and that the client can move forward.
 
@@ -22,8 +19,8 @@ sequenceDiagram
     Client --) Server : PlayerNicknameSetMessage 
     end
     
-    loop to all the other clients
-    Server --) Other clients in the lobby:  PlayerNicknameSet
+    loop for each client in the lobby
+    Server --) Other client in the lobby:  PlayerNicknameSet
     end
 
     # Player Token color 
@@ -33,8 +30,8 @@ sequenceDiagram
     Client --) Server : TokenColorSetMessage 
     end
     
-    loop to all the other clients
-    Server --) Other clients in the lobby:  RemoveTokenColorMessage
+    loop for each client in the lobby
+    Server --) Other client in the lobby:  RemoveTokenColorMessage
     end
 
 
@@ -47,8 +44,8 @@ sequenceDiagram
     Client --) Server : SelectFromPairMessage
     Server ->> Client : GameJoinMessage
     
-    loop to all the other clients
-    Server --) Other clients already in game:  PlayerGameJoinMessage
+    loop for each client in the game
+    Server --) Other client already in game:  PlayerGameJoinMessage
     end
 
 ```
@@ -62,21 +59,29 @@ After every player move, the server, as a confirm to the client who sent the mes
 sequenceDiagram
     # Game Start
     autonumber
-    Server ->> All clients : GameStatusChangeMessage (START)
+    Server ->> Client : GameStatusChangeMessage (START)
     
-    Server -) All clients : PlayerStatusChange (populated with nickname)
+    Server -) Client : PlayerStatusChange (populated with nickname)
     
     loop until a confirm is received 
         Playing client --) Server : PlaceCardMessage
-        Server --) All clients : CardPlacedMessage (CONFIRMS)
     end
-
-    Note right of All clients : conferming the card placement and updating views 
-    Server --) All clients : PlayerScoreUpdateMessage
-    Server --) All clients : NextPlayerActionMessage
+    loop for each client
+        Server --) Client : CardPlacedMessage (CONFIRMS)
+    Note over Client: updating views,  conferming the card placement.
+    opt only if the player's score is updated
+    Server --) Client : PlayerScoreUpdateMessage
+    end
+    Server --) Client : NextPlayerActionMessage
+    end 
+    
 
     Playing client -) Server : DeckDrawMessage OR CardPairMessage
-    Server --) All clients : DeckCardDrawMessage OR CardPairDrawMessage
+    loop for each client
+    Server --) Client : DeckCardDrawMessage OR CardPairDrawMessage
+    end 
+    Note over Client: updating views,  conferming the card draw.
+
 
 
 
