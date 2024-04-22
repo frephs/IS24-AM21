@@ -107,3 +107,16 @@ sequenceDiagram
 
 ```
 
+## Chat
+This comunication happen when a player want to write a message in the chat. They send the postMessage to the Server that will notify the player that the message has been received and posted; later it will send a notification to all the other players that there is a new message in the chat.
+```mermaid
+sequenceDiagram
+    Client -) Server: postMessage
+    Server -) Client: messagePosted
+
+    loop for each recipient
+        Server -) Recipient: newMessageInChat
+    end
+```
+
+
