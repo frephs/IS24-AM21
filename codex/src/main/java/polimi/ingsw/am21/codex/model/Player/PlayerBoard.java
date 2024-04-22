@@ -90,7 +90,7 @@ public class PlayerBoard {
      * @throws IndexOutOfBoundsException if the card index exceeds the hand size
      * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of card placing conditions.
      */
-    void placeCard(int playedCardIndex, CardSideType playedSideType, Position position) throws
+    public void placeCard(int playedCardIndex, CardSideType playedSideType, Position position) throws
       IllegalPlacingPositionException, IndexOutOfBoundsException, IllegalCardSideChoiceException {
 
         if(! availableSpots.contains(position)){
