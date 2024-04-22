@@ -81,29 +81,31 @@ sequenceDiagram
 
 
 ```
-
-
 ## Game over flow
+The game flows until an GameOverexception is caught by the controller. In that case the game flow overs as reported.
 ```mermaid
 sequenceDiagram
-    Note over Server, All clients : Normal Turn flow interactions
+    Note over Server, client : Normal Turn flow interactions
     loop until a GameOverException is thrown
-    Server --> All clients: turn flow messages 
+    Server --> client: turn flow messages 
     end 
-    Note over Server, All clients: A Game Over Exception <br> is thrown in the model
-    Server -) All clients : RemainingTurnsMessage 
-    loop for all players 
-        Server -> All clients: normal turn interactions 
+    Note over Server, client: A Game Over Exception <br> is thrown in the model
+    Server -) client : RemainingTurnsMessage 
+    loop for each client 
+        Server -> client: normal turn interactions 
     end 
-    Server -) All clients : GameOverMessage
     
-    loop for all the players 
-        loop for each objective card 
-            Server -) All clients : PlayerScoreUpdateMessage
-        end 
-        Server -) All clients : WinningPlayerMessage  
+    loop for each client 
+        Server -) client : GameOverMessage
+        loop for each player
+            loop for each objective card 
+                Server -) client : PlayerScoreUpdateMessage
+            end 
+        end
+        Server -) client : WinningPlayerMessage  
     end
 
+```
 
 ## Not-allowed messages handling
 In the event a player tries to place cards or draw in a turn that isn't his or in the event a client might be modified or 'enhanced' in a way the server nor the game contemplate, we have messages in place to send to the  aforesaid client. 
