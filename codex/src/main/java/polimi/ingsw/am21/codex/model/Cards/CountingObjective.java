@@ -31,7 +31,7 @@ public class CountingObjective extends Objective{
                 (resource) -> {
                   return playerBoard.getResources().get(resource.getKey()) / resource.getValue();
                 }
-              ).reduce(Integer::min).get() * points
+              ).reduce(Integer::min).orElse(0) * points
               + (objects
                 .entrySet()
                 .stream()
@@ -39,7 +39,7 @@ public class CountingObjective extends Objective{
                   (object) -> {
                       return playerBoard.getObjects().get(object.getKey()) / object.getValue();
                   }
-                ).reduce(Integer::min).get() * points);
+                ).reduce(Integer::min).orElse(0) * points);
         };
     }
 
