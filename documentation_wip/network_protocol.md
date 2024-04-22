@@ -54,7 +54,7 @@ sequenceDiagram
 ```
 
 ## Normal game turns flow 
-During the game, every Game and Player status change is notified to all clients so that a popup message can appear in the view and the client can better follow the flow of the game. 
+here is duality in the two approaches.During the game, every Game and Player status change is notified to all clients so that a popup or a text message can appear in the view and the client can better follow the flow of the game. 
 
 After every player move, the server, as a confirm to the client who sent the message and as a notification to the clients to update the view,sends a message to all the clients.   
 
