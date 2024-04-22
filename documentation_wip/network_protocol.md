@@ -8,7 +8,7 @@ In this documentation, we're going to represent only the Socket messages since e
 ### General Flow for non-permitted requests
 
 
-### Player Login Flow
+### Player Lobby Flow
 the Player Building Process in the Game Lobby, being it divided into sequential essential steps,
 a different message from the last one received is meant as a confirm message 
 
@@ -55,7 +55,7 @@ sequenceDiagram
 
 ```
 
-## Game turns 
+## Normal game turns flow 
 
 ```mermaid
 sequenceDiagram
@@ -82,14 +82,16 @@ sequenceDiagram
 ```
 
 
-## Game over
+## Game over flow
 ```mermaid
 sequenceDiagram
-    alt no GameOverexception is thrown in the model 
-    Server --> All clients: Normal turn flow interactions 
-    else a Game Over Exception is thrown in the model
+    Note over Server, All clients : Normal Turn flow interactions
+    loop until a GameOverException is thrown
+    Server --> All clients: turn flow messages 
+    end 
+    Note over Server, All clients: A Game Over Exception <br> is thrown in the model
     Server -) All clients : RemainingTurnsMessage 
-    loop
+    loop for all players 
         Server -> All clients: normal turn interactions 
     end 
     Server -) All clients : GameOverMessage
@@ -99,8 +101,9 @@ sequenceDiagram
             Server -) All clients : PlayerScoreUpdateMessage
         end 
     end
-    end 
+
     Server -) All clients : WinningPlayerMessage  
+
 
 ```
 
