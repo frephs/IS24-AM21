@@ -58,6 +58,7 @@ public class PlayableCard extends Card {
     PlayableBackSide backSide
   ) {
     this(id, frontSide, backSide, null);
+    this.playedSideType = Optional.empty();
   }
 
   public Optional<ResourceType> getKingdom() {
