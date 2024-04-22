@@ -1,17 +1,15 @@
 # Network Protocol
-The network protocol we designed will implement both RMI and Socket functionality.
-Both client and server are equipped with a message parser and RMI interfaces which are meant to update the views in the client side and call controller methods in the server side.
+The network protocol we designed is meant to be implemented with both RMI and Client-Server Socket functionality.
+Both client and server are equipped with a message parser and a set of RMI interfaces which are meant to update the views in the client and call controller methods to update the model in the server.
 
 ## Notes on RMI 
-In this documentation, we're going to represent only the Socket messages since every message corresponds to a remote method invocation as there is duality in the approaches.
+In this documentation, only Socket Messages are rapresented as there is duality in the two approaches since every message corresponds to a remote method invocation.
 
 ### General Flow for non-permitted requests
 
 
 ### Player Lobby Flow
-the Player Building Process in the Game Lobby, being it divided into sequential essential steps,
-a different message from the last one received is meant as a confirm message 
-
+As the Player building process is divided in essential and sequantial steps, every message different from the last one received is meant to be accepted as a confirm the last phase was successful and that the client can move forward.
 
 ```mermaid
 sequenceDiagram
