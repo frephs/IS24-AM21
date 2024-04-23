@@ -146,23 +146,26 @@ public class GameBoard {
         CornerPosition[] cornerPositions = CornerPosition.values();
         JSONObject cardSidesCorners = card.getJSONObject("corners");
         for (CardSideType side : sides) {
-          Map<CornerPosition, CornerContentType> corners =
+          Map<CornerPosition, Optional<CornerContentType>> corners =
             new HashMap<>();
-          if (cardSidesCorners.has(side.toString().toLowerCase())) {
-            JSONObject jsonCorners = cardSidesCorners.getJSONObject(
-              side.toString().toLowerCase());
+          String sideStr = side.toString().toLowerCase();
+          if (cardSidesCorners.has(sideStr)) {
+            JSONObject jsonCorners = cardSidesCorners.getJSONObject(sideStr);
             for (CornerPosition cornerPosition : cornerPositions) {
-              if (jsonCorners.has(cornerPosition.toString())) {
+              String cornerPositionStr = cornerPosition.toString();
+              if (jsonCorners.has(cornerPositionStr)) {
                 String cornerInfo =
-                  jsonCorners.getString(cornerPosition.toString());
+                  jsonCorners.getString(cornerPositionStr);
                 if (ResourceType.isResourceType(cornerInfo)) {
                   corners.put(cornerPosition,
-                    ResourceType.fromString(cornerInfo));
+                    Optional.of(ResourceType.fromString((cornerInfo))));
                 } else if (ObjectType.isObjectType(cornerInfo)) {
                   corners.put(cornerPosition,
-                    ObjectType.fromString(cornerInfo));
+                    Optional.of(ObjectType.fromString(cornerInfo)));
+                } else if (cornerInfo.equals("EMPTY")) {
+                  corners.put(cornerPosition, Optional.empty());
                 } else {
-                  throw new RuntimeException("Invalid corner content type");
+                  throw new RuntimeException("Invalid corner content type: " + cornerInfo);
                 }
               }
             }
