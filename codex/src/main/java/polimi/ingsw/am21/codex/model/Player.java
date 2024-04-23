@@ -68,11 +68,19 @@ public class Player {
         }
 
         /**
-         * @param starterCard drawn from the GameBoard
+         * @param starterCard The starter card drawn from the GameBoard
+         * @return the player starter card
          */
         public PlayerBuilder setStarterCard(PlayableCard starterCard){
             this.starterCard = starterCard;
             return this;
+        }
+
+        /**
+         * @param side chosen by the client controller (physical player)
+         */
+        public void setStarterCardSide(CardSideType side){
+            this.starterCard.setPlayedSideType(side);
         }
 
         /**
@@ -88,6 +96,13 @@ public class Player {
          */
         public Player build(){
                 return new Player(this);
+        }
+
+        /**
+         * @return the player's starter card
+         */
+        public Optional<PlayableCard> getStarterCard() {
+            return Optional.ofNullable(starterCard);
         }
     }
 
