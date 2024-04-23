@@ -5,7 +5,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.Cards.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
 import java.io.File;
@@ -267,6 +269,25 @@ class LobbyTest {
 
   @Test
   void getPlayerObjectiveCards() {
+    UUID playerId = generateNewSocketID();
+    try {
+      CardPair<ObjectiveCard> objectiveCards =
+        this.mockGameboard.drawObjectiveCardPair();
+      this.lobby.addPlayer(playerId,
+        objectiveCards,
+        this.mockGameboard.drawStarterCardFromDeck());
+      Optional<CardPair<ObjectiveCard>> returnedObjectiveCards =
+        this.lobby.getPlayerObjectiveCards(playerId);
+
+      if (returnedObjectiveCards.isPresent())
+        assertEquals(returnedObjectiveCards.get(),
+          objectiveCards);
+      else fail("Could not find player with socket id" + playerId);
+    } catch (LobbyFullException e) {
+      fail("Lobby full");
+    } catch (EmptyDeckException e) {
+      fail("Invalid mock GameBoard, the decks are empty");
+    }
   }
 
 }
