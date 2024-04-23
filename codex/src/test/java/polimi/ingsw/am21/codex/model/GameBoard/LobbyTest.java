@@ -3,11 +3,13 @@ package polimi.ingsw.am21.codex.model.GameBoard;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import org.json.JSONArray;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.PlayableCard;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
 import java.io.File;
@@ -290,4 +292,90 @@ class LobbyTest {
     }
   }
 
+  @Test
+  void setObjectiveCard() {
+
+  }
+
+  @Test
+  void containsSocketID() {
+    UUID existingID = UUID.randomUUID();
+    UUID nonExistingID = UUID.randomUUID();
+    while (nonExistingID == existingID) nonExistingID = UUID.randomUUID();
+    try {
+      lobby.addPlayer(existingID, mockGameboard.drawObjectiveCardPair(),
+        mockGameboard.drawStarterCardFromDeck());
+    } catch (Exception e) {
+      fail("Failed to add player", e);
+    }
+
+    assertTrue(this.lobby.containsSocketID(existingID));
+    assertFalse(this.lobby.containsSocketID(nonExistingID));
+
+  }
+
+  @Test
+  void getPlayerNickname() {
+    UUID firstPlayerID = UUID.randomUUID();
+    try {
+      lobby.addPlayer(firstPlayerID, mockGameboard.drawObjectiveCardPair(),
+        mockGameboard.drawStarterCardFromDeck());
+    } catch (Exception e) {
+      fail("Failed to add player", e);
+    }
+
+    Optional<String> playerNickname = lobby.getPlayerNickname(firstPlayerID);
+    assertEquals(Optional.empty(), playerNickname);
+
+    lobby.setNickname(firstPlayerID, "firstPlayer");
+    playerNickname = lobby.getPlayerNickname(firstPlayerID);
+    if (playerNickname.isEmpty()) {
+      fail("Empty player nickname");
+    }
+    assertEquals("firstPlayer", playerNickname.get());
+  }
+
+  @Test
+  void getPlayerTokenColor() {
+    UUID firstPlayerID = UUID.randomUUID();
+    try {
+      lobby.addPlayer(firstPlayerID, mockGameboard.drawObjectiveCardPair(),
+        mockGameboard.drawStarterCardFromDeck());
+    } catch (Exception e) {
+      fail("Failed to add player", e);
+    }
+
+    Optional<TokenColor> playerTokenColor =
+      lobby.getPlayerTokenColor(firstPlayerID);
+    assertEquals(Optional.empty(), playerTokenColor);
+
+    lobby.setToken(firstPlayerID, TokenColor.RED);
+    playerTokenColor = lobby.getPlayerTokenColor(firstPlayerID);
+    if (playerTokenColor.isEmpty()) {
+      fail("Empty player token");
+    }
+    assertEquals(TokenColor.RED, playerTokenColor.get());
+
+  }
+
+  @Test
+  void getStarterCard() {
+
+    UUID firstPlayerID = UUID.randomUUID();
+    try {
+      lobby.addPlayer(firstPlayerID, mockGameboard.drawObjectiveCardPair(),
+        mockGameboard.drawStarterCardFromDeck());
+    } catch (Exception e) {
+      fail("Failed to add player", e);
+    }
+
+    Optional<PlayableCard> starterCard =
+      lobby.getStarterCard(firstPlayerID);
+
+    assertNotNull(starterCard);
+
+    assertNotEquals(Optional.empty(), starterCard);
+
+    starterCard.ifPresent(Assertions::assertNotNull);
+  }
 }

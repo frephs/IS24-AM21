@@ -33,8 +33,9 @@ public class GameBoard {
   }
 
   /**
-   * Constructor
+   * static method to create a GameBoard from a JSON array
    * Initializes the decks using a JSONArray
+   * @param cards the full list
    */
   public static GameBoard fromJSON(JSONArray cards) {
     List<PlayableCard> goldDeck = new ArrayList<>();
@@ -388,6 +389,10 @@ public class GameBoard {
   }
 
 
+  /**
+   * @return a card pair with objective cards from the deck
+   * @throws EmptyDeckException if the objective cards deck is empty
+   */
   public CardPair<ObjectiveCard> drawObjectiveCardPair()
   throws EmptyDeckException {
     return new CardPair<>(this.drawObjectiveCardFromDeck(),

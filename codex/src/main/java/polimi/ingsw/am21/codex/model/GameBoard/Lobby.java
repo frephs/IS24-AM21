@@ -258,6 +258,11 @@ public class Lobby {
     return lobbyPlayers.get(socketId).getTokenColor();
   }
 
+  /**
+   * @param socketId the socked ID of the player
+   * @return the starter card of the player
+   * @throws PlayerNotFoundException if the player is not found in the lobby
+   */
   public Optional<PlayableCard> getStarterCard(UUID socketId)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
