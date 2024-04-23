@@ -15,17 +15,17 @@ sequenceDiagram
     loop until the value is acceptable
     
     # Player Nickname
-    Server ->> Client : SetPlayerNicknameMessage
-    Client --) Server : PlayerNicknameSetMessage 
+    Server ->> Client : SetNicknameMessage
+    Client --) Server : NicknameSetMessage 
     end
     
     loop for each client in the lobby
-    Server --) Other client in the lobby:  PlayerNicknameSet
+    Server --) Other client in the lobby:  PlayerNicknameSetMessage
     end
 
     # Player Token color 
     loop until the value is acceptable
-    Server ->> Client : SetTokenColorMessages (populated with the available ones)
+    Server ->> Client : SetTokenColorMessage (populated with the available ones)
     
     Client --) Server : TokenColorSetMessage 
     end
