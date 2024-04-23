@@ -160,7 +160,14 @@ public class Player {
     public void placeCard(int cardIndex, CardSideType side, Position position) throws
       IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException
       {
-        board.placeCard(cardIndex, side, position);
+          PlayableCard playedCard;
+          try{
+              playedCard= board.getHand().get(cardIndex);
+          }catch (IndexOutOfBoundsException e){
+              throw new IndexOutOfBoundsException("You tried to place a played card which either doesn't exist or is not in your hand");
+          }
+
+        board.placeCard(playedCard, side, position);
 
         PlayableCard card = board.getHand().get(cardIndex);
         this.points += card.getEvaluator().apply(board);

@@ -21,10 +21,11 @@ class CountingObjectiveTest {
     resources.put(ResourceType.PLANT, 3);
     Map<ObjectType, Integer> objects = new HashMap<>();
     CountingObjective countingObjective = new CountingObjective(resources, objects);
-
+    PlayableCard card = new PlayableCard(123, null, null);
+    card.setPlayedSideType(CardSideType.BACK);
     PlayerBoard pb = new PlayerBoard(
       new ArrayList<>(),
-      new PlayableCard(123, null, null),
+      card,
       new ObjectiveCard(123, 123, null)
     );
 

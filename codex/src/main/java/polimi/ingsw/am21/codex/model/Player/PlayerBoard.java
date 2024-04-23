@@ -44,8 +44,9 @@ public class PlayerBoard {
         );
 
         // let's add the starterCard to the playerBoard
-        this.hand.add(starterCard);
-        placeCard(3, starterCard.getPlayedSideType().orElseThrow(), new Position());
+      availableSpots.add(new Position());
+      this.hand.add(starterCard);
+      placeCard(starterCard, starterCard.getPlayedSideType().orElseThrow(), new Position());
 
     }
 
@@ -90,19 +91,11 @@ public class PlayerBoard {
      * @throws IndexOutOfBoundsException if the card index exceeds the hand size
      * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of card placing conditions.
      */
-    public void placeCard(int playedCardIndex, CardSideType playedSideType, Position position) throws
+    public void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position) throws
       IllegalPlacingPositionException, IndexOutOfBoundsException, IllegalCardSideChoiceException {
 
         if(! availableSpots.contains(position)){
           throw new IllegalPlacingPositionException();
-        }
-
-        PlayableCard playedCard;
-
-        try{
-          playedCard= hand.get(playedCardIndex);
-        }catch (IndexOutOfBoundsException e){
-          throw new IndexOutOfBoundsException("You tried to place a played card which either doesn't exist or is not in your hand");
         }
 
         if(! getPlaceableCardSides().contains(playedCard.getSide(playedSideType))){
