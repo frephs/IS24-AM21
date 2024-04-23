@@ -141,6 +141,37 @@ public class GameBoard {
           "pointConditionObject")));
       }
 
+      if (card.has("corners")) {
+        CardSideType[] sides = CardSideType.values();
+        CornerPosition[] cornerPositions = CornerPosition.values();
+        JSONObject cardSidesCorners = card.getJSONObject("corners");
+        for (CardSideType side : sides) {
+          Map<CornerPosition, CornerContentType> corners =
+            new HashMap<>();
+          if (cardSidesCorners.has(side.toString().toLowerCase())) {
+            JSONObject jsonCorners = cardSidesCorners.getJSONObject(
+              side.toString().toLowerCase());
+            for (CornerPosition cornerPosition : cornerPositions) {
+              if (jsonCorners.has(cornerPosition.toString())) {
+                String cornerInfo =
+                  jsonCorners.getString(cornerPosition.toString());
+                if (ResourceType.isResourceType(cornerInfo)) {
+                  corners.put(cornerPosition,
+                    ResourceType.fromString(cornerInfo));
+                } else if (ObjectType.isObjectType(cornerInfo)) {
+                  corners.put(cornerPosition,
+                    ObjectType.fromString(cornerInfo));
+                } else {
+                  throw new RuntimeException("Invalid corner content type");
+                }
+              }
+            }
+
+          }
+          builder.setCorners(side, corners);
+        }
+      }
+
       if (type == CardType.OBJECTIVE) {
         objectiveDeck.add(builder.buildObjectiveCard());
       } else {
