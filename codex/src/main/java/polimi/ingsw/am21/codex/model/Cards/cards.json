@@ -6,14 +6,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "FUNGI",
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -24,13 +24,13 @@
       "front": {
         "TOP_LEFT": "FUNGI",
         "TOP_RIGHT": "FUNGI",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -40,15 +40,15 @@
     "backPermanentResources": ["FUNGI"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "FUNGI",
         "BOTTOM_RIGHT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -59,14 +59,14 @@
     "corners": {
       "front": {
         "TOP_RIGHT": "FUNGI",
-        "BOTTOM_LEFT": "",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -81,10 +81,10 @@
         "BOTTOM_RIGHT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -99,10 +99,10 @@
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -115,13 +115,13 @@
         "TOP_LEFT": "FUNGI",
         "TOP_RIGHT": "INSECT",
         "BOTTOM_LEFT": "MANUSCRIPT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -132,15 +132,15 @@
     "backPermanentResources": ["FUNGI"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "FUNGI",
-        "BOTTOM_LEFT": ""
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -152,14 +152,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "FUNGI",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -170,15 +170,15 @@
     "backPermanentResources": ["FUNGI"],
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "FUNGI",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -189,14 +189,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "PLANT",
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -208,13 +208,13 @@
       "front": {
         "TOP_LEFT": "PLANT",
         "TOP_RIGHT": "PLANT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -224,15 +224,15 @@
     "backPermanentResources": ["PLANT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "PLANT",
         "BOTTOM_RIGHT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -243,14 +243,14 @@
     "corners": {
       "front": {
         "TOP_RIGHT": "PLANT",
-        "BOTTOM_LEFT": "",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -265,10 +265,10 @@
         "BOTTOM_RIGHT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -283,10 +283,10 @@
         "BOTTOM_RIGHT": "INKWELL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -301,10 +301,10 @@
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -315,15 +315,15 @@
     "backPermanentResources": ["PLANT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -334,15 +334,15 @@
     "backPermanentResources": ["PLANT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_RIGHT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -354,14 +354,14 @@
     "corners": {
       "front": {
         "TOP_RIGHT": "PLANT",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -373,13 +373,13 @@
       "front": {
         "TOP_LEFT": "ANIMAL",
         "TOP_RIGHT": "ANIMAL",
-        "BOTTOM_LEFT": ""
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -389,15 +389,15 @@
     "backPermanentResources": ["ANIMAL"],
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "ANIMAL",
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -409,13 +409,13 @@
       "front": {
         "TOP_LEFT": "ANIMAL",
         "BOTTOM_LEFT": "ANIMAL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -425,15 +425,15 @@
     "backPermanentResources": ["ANIMAL"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "ANIMAL",
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -448,10 +448,10 @@
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -466,10 +466,10 @@
         "BOTTOM_RIGHT": "MANUSCRIPT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -484,10 +484,10 @@
         "BOTTOM_RIGHT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -498,15 +498,15 @@
     "backPermanentResources": ["ANIMAL"],
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "ANIMAL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -517,15 +517,15 @@
     "backPermanentResources": ["ANIMAL"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "BOTTOM_LEFT": "",
+        "TOP_LEFT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -536,15 +536,15 @@
     "backPermanentResources": ["ANIMAL"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "ANIMAL",
-        "BOTTOM_LEFT": ""
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -556,13 +556,13 @@
       "front": {
         "TOP_LEFT": "INSECT",
         "TOP_RIGHT": "INSECT",
-        "BOTTOM_LEFT": ""
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -572,15 +572,15 @@
     "backPermanentResources": ["INSECT"],
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_LEFT": "INSECT",
         "BOTTOM_RIGHT": "INSECT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -592,13 +592,13 @@
       "front": {
         "TOP_LEFT": "INSECT",
         "BOTTOM_LEFT": "INSECT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -608,15 +608,15 @@
     "backPermanentResources": ["INSECT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "INSECT",
         "BOTTOM_RIGHT": "INSECT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -631,10 +631,10 @@
         "BOTTOM_RIGHT": "INSECT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -649,10 +649,10 @@
         "BOTTOM_RIGHT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -667,10 +667,10 @@
         "BOTTOM_LEFT": "INKWELL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -682,14 +682,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "INSECT",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -700,15 +700,15 @@
     "backPermanentResources": ["INSECT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_RIGHT": "INSECT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -720,14 +720,14 @@
     "corners": {
       "front": {
         "TOP_RIGHT": "INSECT",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -741,15 +741,15 @@
     "pointConditionObject": "QUILL",
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "QUILL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -763,15 +763,15 @@
     "pointConditionObject": "INKWELL",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "INKWELL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -786,14 +786,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "MANUSCRIPT",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -806,15 +806,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -827,15 +827,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -848,15 +848,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -868,14 +868,14 @@
     "placementCondition": ["FUNGI", "FUNGI", "FUNGI"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "INKWELL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -888,13 +888,13 @@
     "corners": {
       "front": {
         "TOP_LEFT": "QUILL",
-        "TOP_RIGHT": ""
+        "TOP_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -907,13 +907,13 @@
     "corners": {
       "front": {
         "TOP_RIGHT": "MANUSCRIPT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -925,14 +925,14 @@
     "placementCondition": ["FUNGI", "FUNGI", "FUNGI", "FUNGI", "FUNGI"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_LEFT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -947,14 +947,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "QUILL",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -968,15 +968,15 @@
     "pointConditionObject": "MANUSCRIPT",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "MANUSCRIPT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -990,15 +990,15 @@
     "pointConditionObject": "INKWELL",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "INKWELL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1011,15 +1011,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1032,15 +1032,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1053,15 +1053,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1073,14 +1073,14 @@
     "placementCondition": ["PLANT", "PLANT", "PLANT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "QUILL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1093,13 +1093,13 @@
     "corners": {
       "front": {
         "TOP_LEFT": "MANUSCRIPT",
-        "TOP_RIGHT": ""
+        "TOP_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1112,13 +1112,13 @@
     "corners": {
       "front": {
         "TOP_RIGHT": "INKWELL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1130,14 +1130,14 @@
     "placementCondition": ["PLANT", "PLANT", "PLANT", "PLANT", "PLANT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1152,14 +1152,14 @@
     "corners": {
       "front": {
         "TOP_LEFT": "INKWELL",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1173,15 +1173,15 @@
     "pointConditionObject": "MANUSCRIPT",
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "MANUSCRIPT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1195,15 +1195,15 @@
     "pointConditionObject": "QUILL",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "QUILL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1216,15 +1216,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1237,15 +1237,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1259,15 +1259,15 @@
     "pointConditionObject": "INKWELL",
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1279,14 +1279,14 @@
     "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "MANUSCRIPT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1298,14 +1298,14 @@
     "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "INKWELL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1317,14 +1317,14 @@
     "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL"],
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
+        "TOP_RIGHT": "EMPTY",
         "BOTTOM_RIGHT": "QUILL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1336,14 +1336,14 @@
     "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL", "ANIMAL", "ANIMAL"],
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1357,15 +1357,15 @@
     "pointConditionObject": "QUILL",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "QUILL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1379,15 +1379,15 @@
     "pointConditionObject": "MANUSCRIPT",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "BOTTOM_LEFT": "MANUSCRIPT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1401,15 +1401,15 @@
     "pointConditionObject": "INKWELL",
     "corners": {
       "front": {
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "INKWELL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1422,15 +1422,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1443,15 +1443,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1464,15 +1464,15 @@
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "BOTTOM_RIGHT": "",
-        "BOTTOM_LEFT": ""
+        "TOP_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1485,13 +1485,13 @@
     "corners": {
       "front": {
         "TOP_LEFT": "INKWELL",
-        "BOTTOM_LEFT": ""
+        "BOTTOM_LEFT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1503,14 +1503,14 @@
     "placementCondition": ["INSECT", "INSECT", "INSECT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "MANUSCRIPT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1523,13 +1523,13 @@
     "corners": {
       "front": {
         "BOTTOM_LEFT": "QUILL",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1541,14 +1541,14 @@
     "placementCondition": ["INSECT", "INSECT", "INSECT", "INSECT", "INSECT"],
     "corners": {
       "front": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1564,10 +1564,10 @@
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
+        "TOP_LEFT": "EMPTY",
         "TOP_RIGHT": "PLANT",
         "BOTTOM_LEFT": "INSECT",
-        "BOTTOM_RIGHT": ""
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1584,8 +1584,8 @@
       },
       "back": {
         "TOP_LEFT": "ANIMAL",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
         "BOTTOM_RIGHT": "FUNGI"
       }
     }
@@ -1602,10 +1602,10 @@
         "BOTTOM_RIGHT": "PLANT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1621,10 +1621,10 @@
         "BOTTOM_RIGHT": "FUNGI"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": "",
-        "BOTTOM_LEFT": "",
-        "BOTTOM_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY",
+        "BOTTOM_LEFT": "EMPTY",
+        "BOTTOM_RIGHT": "EMPTY"
       }
     }
   },
@@ -1640,8 +1640,8 @@
         "BOTTOM_RIGHT": "ANIMAL"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY"
       }
     }
   },
@@ -1657,8 +1657,8 @@
         "BOTTOM_RIGHT": "INSECT"
       },
       "back": {
-        "TOP_LEFT": "",
-        "TOP_RIGHT": ""
+        "TOP_LEFT": "EMPTY",
+        "TOP_RIGHT": "EMPTY"
       }
     }
   },

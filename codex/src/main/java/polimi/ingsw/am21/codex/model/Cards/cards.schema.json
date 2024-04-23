@@ -33,6 +33,11 @@
         "MANUSCRIPT"
       ]
     },
+    "emptyCorner": {
+      "enum": [
+        "EMPTY"
+      ]
+    },
     "pointConditionType": {
       "enum": [
         "OBJECTS",
@@ -129,6 +134,9 @@
                   },
                   {
                     "$ref": "#/definitions/objectType"
+                  },
+                  {
+                    "$ref": "#/definitions/emptyCorner"
                   }
                 ]
               }
