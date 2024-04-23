@@ -19,6 +19,10 @@ public class ObjectiveCard extends Card{
         this.objective = objective;
     }
 
+    /**
+     * Take the PlayerBoard of player
+     * @return The points of the objective card
+     */
     @Override
     public Function<PlayerBoard, Integer> getEvaluator() {
         return playerBoard -> {

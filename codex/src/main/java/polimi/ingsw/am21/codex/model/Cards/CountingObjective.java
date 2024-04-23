@@ -21,7 +21,11 @@ public class CountingObjective extends Objective{
         this.objects = new HashMap<>(objects);
     }
 
-    @Override
+  /**
+   * The function get the PlayerBoard and the points of the objective card you are evaluating
+   * @return the point that you get from that objective card
+   */
+  @Override
     public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
         return (playerBoard, points) -> {
             return resources
