@@ -217,12 +217,13 @@ class CardBuilderTest {
       () -> new CardBuilder(123, CardType.OBJECTIVE).setCorners(null, null)
     );
 
-//    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-//      type ->
-//        assertDoesNotThrow(
-//          () -> new CardBuilder(123, type).setCorners(null, null)
-//        )
-//    );
+    // TODO: FIX
+    //List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+    //  type ->
+    //    assertDoesNotThrow(
+    //      () -> new CardBuilder(123, type).setCorners(null, null)
+    //    )
+    //);
 
     assertInstanceOf(
       CardBuilder.class,
