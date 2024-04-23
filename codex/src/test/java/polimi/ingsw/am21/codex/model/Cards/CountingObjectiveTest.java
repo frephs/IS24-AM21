@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.CountingObjective;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 

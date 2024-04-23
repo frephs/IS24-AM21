@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.Lobby;
 
-import polimi.ingsw.am21.codex.model.Cards.PlayableSide;
-import polimi.ingsw.am21.codex.model.Player;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableSide;
+import polimi.ingsw.am21.codex.model.Player.Player;
 
 import java.util.ArrayList;
 import java.util.List;

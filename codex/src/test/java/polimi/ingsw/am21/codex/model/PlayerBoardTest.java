@@ -39,9 +39,9 @@ class PlayerBoardTest {
       ObjectType.QUILL
     );
     PlayableBackSide cb =  new PlayableBackSide(List.of());
-    cf.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL);
-    cb.setCorner(CornerPosition.BOTTOM_LEFT, ResourceType.ANIMAL);
-    cb.setCorner(CornerPosition.TOP_RIGHT, ResourceType.FUNGI);
+    cf.setCorner(CornerPosition.BOTTOM_LEFT, Optional.of(ResourceType.ANIMAL));
+    cb.setCorner(CornerPosition.BOTTOM_LEFT, Optional.of(ResourceType.ANIMAL));
+    cb.setCorner(CornerPosition.TOP_RIGHT, Optional.of(ResourceType.FUNGI));
     PlayableCard card = new PlayableCard(12, cf,cb);
 
     ObjectiveCard objectiveCard = new ObjectiveCard(12,12, new ConcreteObjective());
@@ -122,7 +122,7 @@ class PlayerBoardTest {
   void placeCard() {
 
     IllegalPlacingPositionException e = assertThrows(IllegalPlacingPositionException.class,
-      () -> pb.placeCard(0, CardSideType.FRONT,new Position(1,1))
+      () -> pb.placeCard(card, CardSideType.FRONT,new Position(1,1))
     );
 
 

@@ -6,16 +6,14 @@ import org.json.JSONArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Cards.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.Cards.PlayableCard;
-import polimi.ingsw.am21.codex.model.Lobby;
-import polimi.ingsw.am21.codex.model.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Cards.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Lobby;
-import polimi.ingsw.am21.codex.model.LobbyFullException;
-import polimi.ingsw.am21.codex.model.TokenColor;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Lobby.Lobby;
+import polimi.ingsw.am21.codex.model.Lobby.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,7 +40,7 @@ class LobbyTest {
 
 
     String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/cards.json";
+      "/Resources/cards.json";
     File file = new File(jsonLocation);
     try {
       String content = new String(Files.readAllBytes(Paths.get(file.toURI())));

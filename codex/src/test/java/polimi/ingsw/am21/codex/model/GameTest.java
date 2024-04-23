@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.GameBoard.PlayerNotFoundException;
@@ -185,6 +187,7 @@ class GameTest {
       this.game = new Game(4, this.cardsJSON);
       preparePlayers();
       List<String> order = this.game.getPlayersOrder();
+      if(order.get(0).compareTo("Player_0") != 0
         || order.get(1).compareTo("Player_1") != 0
         || order.get(2).compareTo("Player_2") != 0) {
         isDifferent = true;
