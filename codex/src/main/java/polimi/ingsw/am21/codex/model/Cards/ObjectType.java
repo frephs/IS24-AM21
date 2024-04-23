@@ -20,4 +20,12 @@ public enum ObjectType implements CornerContentType {
     return ObjectType.valueOf(str);
   }
 
+
+  public static Boolean isObjectType(String value) {
+    return Arrays.stream(Arrays.stream(ObjectType.values()).toArray())
+      .map(Object::toString)
+      .anyMatch(
+        objectType -> objectType.equals(value)
+      );
+  }
 }

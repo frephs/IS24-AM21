@@ -17,4 +17,12 @@ public enum ResourceType implements CornerContentType {
     public static ResourceType fromString(String resourceTypeStr){
         return ResourceType.valueOf(resourceTypeStr);
     }
+
+    public static Boolean isResourceType(String value) {
+        return Arrays.stream(Arrays.stream(ResourceType.values()).toArray())
+          .map(Object::toString)
+          .anyMatch(
+            resourceType -> resourceType.equals(value)
+          );
+    }
 }
