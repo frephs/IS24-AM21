@@ -18,8 +18,8 @@ public class CardBuilder {
 
   // Resource | Starter | Gold
   private Optional<List<ResourceType>> backPermanentResources;
-  private Optional<Map<CornerPosition, CornerContentType>> frontCorners;
-  private Optional<Map<CornerPosition, CornerContentType>> backCorners;
+  private Optional<Map<CornerPosition, Optional<CornerContentType>>> frontCorners;
+  private Optional<Map<CornerPosition, Optional<CornerContentType>>> backCorners;
 
   // Gold
   private Optional<List<ResourceType>> placementCondition;
@@ -183,7 +183,7 @@ public class CardBuilder {
 
   public CardBuilder setCorners(
     CardSideType side,
-    Map<CornerPosition, CornerContentType> cornerMap
+    Map<CornerPosition, Optional<CornerContentType>> cornerMap
   ) throws WrongCardTypeException {
     checkType(CardType.STARTER, CardType.RESOURCE, CardType.GOLD);
 

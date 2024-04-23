@@ -38,7 +38,8 @@ public class PlayableCard extends Card {
    * @param id        A unique identifier for the card
    * @param frontSide The front side
    * @param backSide  The back side
-   * @param kingdom   The kingdom this card is part of, if any (use null otherwise)
+   * @param kingdom   The kingdom this card is part of, if any (use null
+   *                  otherwise)
    */
   public PlayableCard(
     int id,
@@ -50,6 +51,7 @@ public class PlayableCard extends Card {
     this.frontSide = frontSide;
     this.backSide = backSide;
     this.kingdom = Optional.ofNullable(kingdom);
+    this.playedSideType = Optional.empty();
   }
 
   public PlayableCard(
@@ -58,7 +60,6 @@ public class PlayableCard extends Card {
     PlayableBackSide backSide
   ) {
     this(id, frontSide, backSide, null);
-    this.playedSideType = Optional.empty();
   }
 
   public Optional<ResourceType> getKingdom() {
@@ -69,7 +70,7 @@ public class PlayableCard extends Card {
     return playedSideType;
   }
 
-  public List<PlayableSide> getSides(){
+  public List<PlayableSide> getSides() {
     return List.of(frontSide, backSide);
   }
 
@@ -84,7 +85,8 @@ public class PlayableCard extends Card {
   }
 
   /**
-   * @param playedSideType The type of the side that has been played by the player
+   * @param playedSideType The type of the side that has been played by the
+   *                       player
    */
   public void setPlayedSideType(CardSideType playedSideType) {
     this.playedSideType = Optional.of(playedSideType);
