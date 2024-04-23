@@ -3,8 +3,7 @@ package polimi.ingsw.am21.codex.model;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Cards.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 import java.io.File;
@@ -52,7 +51,8 @@ class GameTest {
     assertEquals(0, lobby.getPlayersCount());
     UUID firstPlayer = UUID.randomUUID();
     try {
-      lobby.addPlayer(firstPlayer, this.game.drawObjectiveCardPair());
+      lobby.addPlayer(firstPlayer, this.game.drawObjectiveCardPair(),
+        this.game.drawStarterCard());
     } catch (Exception e) {
       e.printStackTrace();
       fail("Exception thrown while adding first player");
@@ -67,9 +67,11 @@ class GameTest {
 
     UUID secondPlayer = UUID.randomUUID();
     try {
-      lobby.addPlayer(secondPlayer, this.game.drawObjectiveCardPair());
+      lobby.addPlayer(secondPlayer, this.game.drawObjectiveCardPair(),
+        this.game.drawStarterCard());
     } catch (Exception e) {
-      // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions )
+      // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions
+      // )
       fail("Exception thrown while adding second player");
     }
     // the lobby had a maximum number of 2 players, the remaining player
@@ -78,7 +80,8 @@ class GameTest {
     // we added 2 players so the player count shall be 2
     assertEquals(2, lobby.getPlayersCount());
     lobby.setNickname(secondPlayer, "SecondPlayer");
-    // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions )
+    // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions
+    // )
     UUID randomId = UUID.randomUUID();
     // the blue token was already taken by firstPlayer and therefore cannot
     // be selected by SecondPlayer
@@ -92,19 +95,22 @@ class GameTest {
       () -> lobby.setNickname(randomId, "test"));
     // the lobby is already full cannot add another player
     assertThrows(LobbyFullException.class, () -> lobby.addPlayer(randomId,
-      this.game.drawObjectiveCardPair()));
-    Optional<CardPair<ObjectiveCard>> objectiveCards =
-      lobby.getPlayerObjectiveCards(firstPlayer);
-    if (objectiveCards.isEmpty()) fail("Found empty empty objective cards");
-    ObjectiveCard objectiveCard = objectiveCards.get().getFirst();
+      this.game.drawObjectiveCardPair(), this.game.drawStarterCard()));
 
-    lobby.finalizePlayer(firstPlayer, objectiveCard);
+
+    assertThrows(PlayerNotFoundException.class,
+      () -> lobby.setNickname(randomId, "test"));
+
+
+    lobby.setObjectiveCard(firstPlayer, true);
+
+    lobby.finalizePlayer(firstPlayer, CardSideType.BACK);
     // player was already finalized cannot finalize twice
     assertThrows(PlayerNotFoundException.class,
-      () -> lobby.finalizePlayer(firstPlayer, objectiveCard));
+      () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT));
   }
 
-@Test
+  @Test
   void preparePlayers() {
     assertNotNull(this.game);
     // the lobby should be created in the game constructor
@@ -117,7 +123,8 @@ class GameTest {
 
       try {
         this.game.getLobby()
-          .addPlayer(playerSocketID, this.game.drawObjectiveCardPair());
+          .addPlayer(playerSocketID, this.game.drawObjectiveCardPair(),
+            this.game.drawStarterCard());
       } catch (Exception e) {
         fail("Failed creating player in lobby");
       }
@@ -134,9 +141,11 @@ class GameTest {
       if (firstPlayerObjectiveCards.isEmpty())
         fail("The first player objective cards are null, this should never " +
           "happened 💀");
+
+      this.game.getLobby().setObjectiveCard(playerSocketID, true);
+
       Player player = this.game.getLobby()
-        .finalizePlayer(playerSocketID, firstPlayerObjectiveCards.get()
-          .getFirst());
+        .finalizePlayer(playerSocketID, CardSideType.FRONT);
 
       this.game.addPlayer(player);
     }

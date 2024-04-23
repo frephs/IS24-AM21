@@ -32,7 +32,8 @@ class LobbyTest {
     this.lobby = new Lobby(MAX_PLAYERS);
 
 
-    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards/cards.json";
+    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
+      "/cards.json";
     File file = new File(jsonLocation);
     try {
       String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
@@ -61,7 +62,8 @@ class LobbyTest {
       UUID socketID = generateNewSocketID();
       try {
         this.lobby.addPlayer(socketID,
-          this.mockGameboard.drawObjectiveCardPair());
+          this.mockGameboard.drawObjectiveCardPair(),
+          this.mockGameboard.drawStarterCardFromDeck());
       } catch (LobbyFullException e) {
         fail("Failed adding a new player in the lobby while testing " +
           "getRemainingPlayerSlots, player number: " + (i) + " of max " +
@@ -80,7 +82,8 @@ class LobbyTest {
       UUID socketID = generateNewSocketID();
       try {
         this.lobby.addPlayer(socketID,
-          this.mockGameboard.drawObjectiveCardPair());
+          this.mockGameboard.drawObjectiveCardPair(),
+          this.mockGameboard.drawStarterCardFromDeck());
       } catch (LobbyFullException e) {
         fail("Failed adding a new player in the lobby while testing " +
           "getRemainingPlayerSlots");
@@ -99,7 +102,8 @@ class LobbyTest {
     for (int i = 0; i < MAX_PLAYERS; ++i) {
       try {
         this.lobby.addPlayer(socketID,
-          this.mockGameboard.drawObjectiveCardPair());
+          this.mockGameboard.drawObjectiveCardPair(),
+          this.mockGameboard.drawStarterCardFromDeck());
       } catch (LobbyFullException e) {
         fail("Lobby full");
       } catch (EmptyDeckException e) {
@@ -110,7 +114,8 @@ class LobbyTest {
     }
     assertThrows(LobbyFullException.class,
       () -> this.lobby.addPlayer(generateNewSocketID(),
-        this.mockGameboard.drawObjectiveCardPair()));
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck()));
 
 
     try {
@@ -131,7 +136,8 @@ class LobbyTest {
     UUID socketID = generateNewSocketID();
     try {
       this.lobby.addPlayer(socketID,
-        this.mockGameboard.drawObjectiveCardPair());
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck());
     } catch (LobbyFullException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
@@ -153,7 +159,8 @@ class LobbyTest {
     UUID socketID = generateNewSocketID();
     try {
       this.lobby.addPlayer(socketID,
-        this.mockGameboard.drawObjectiveCardPair());
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck());
     } catch (LobbyFullException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
@@ -169,7 +176,8 @@ class LobbyTest {
     UUID socketID2 = generateNewSocketID();
     try {
       this.lobby.addPlayer(socketID2,
-        this.mockGameboard.drawObjectiveCardPair());
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck());
     } catch (LobbyFullException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
@@ -192,7 +200,8 @@ class LobbyTest {
     UUID socketID = generateNewSocketID();
     try {
       this.lobby.addPlayer(socketID,
-        this.mockGameboard.drawObjectiveCardPair());
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck());
     } catch (LobbyFullException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
@@ -209,7 +218,8 @@ class LobbyTest {
     UUID socketID2 = generateNewSocketID();
     try {
       this.lobby.addPlayer(socketID2,
-        this.mockGameboard.drawObjectiveCardPair());
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck());
     } catch (LobbyFullException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
@@ -235,7 +245,8 @@ class LobbyTest {
     UUID socketID = generateNewSocketID();
     try {
       this.lobby.addPlayer(socketID,
-        this.mockGameboard.drawObjectiveCardPair());
+        this.mockGameboard.drawObjectiveCardPair(),
+        this.mockGameboard.drawStarterCardFromDeck());
     } catch (LobbyFullException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {

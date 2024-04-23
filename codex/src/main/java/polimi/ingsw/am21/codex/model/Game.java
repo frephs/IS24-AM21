@@ -175,4 +175,9 @@ public class Game {
     return this.players.stream().map(Player::getNickname).toList();
   }
 
+  public PlayableCard drawStarterCard()
+  throws EmptyDeckException {
+    return this.gameBoard.drawStarterCardFromDeck();
+  }
+
 }
