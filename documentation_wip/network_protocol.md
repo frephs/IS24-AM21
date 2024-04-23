@@ -51,9 +51,9 @@ sequenceDiagram
 ```
 
 ## Normal game turns flow 
-here is duality in the two approaches.During the game, every Game and Player status change is notified to all clients so that a popup or a text message can appear in the view and the client can better follow the flow of the game. 
-
-After every player move, the server, as a confirm to the client who sent the message and as a notification to the clients to update the view,sends a message to all the clients.   
+During the game, every Game and Player status change is notified to all clients so that a popup or a text message can appear in the view and the client can better follow the flow of the game. 
+After every player move, the server sends a message to all the clients.
+This message confirms to the client that the previous message has been handled correctly and notifies all the other clients of the update
 
 ```mermaid
 sequenceDiagram
@@ -76,7 +76,7 @@ sequenceDiagram
     end 
     
 
-    Playing client -) Server : DeckDrawMessage OR CardPairMessage
+    Playing client -) Server : DeckDrawMessage OR CardPairDrawMessage
     loop for each client
     Server --) Client : DeckCardDrawMessage OR CardPairDrawMessage
     end 
@@ -87,7 +87,7 @@ sequenceDiagram
 
 ```
 ## Game over flow
-The game flows until an GameOverexception is caught by the controller. In that case the game flow overs as reported.
+The game flows until an GameOverException is caught by the controller. In that case the game enters a GameOver state;
 ```mermaid
 sequenceDiagram
     Note over Server, client : Normal Turn flow interactions
