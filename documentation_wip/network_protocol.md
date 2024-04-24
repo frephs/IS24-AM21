@@ -36,42 +36,50 @@ sequenceDiagram
 
 
 ### Player Lobby Flow
-As the Player building process is divided in essential and sequantial steps, every message different from the last one received is meant to be accepted as a confirm the last phase was successful and that the client can move forward.
+The player building process requires a series of essential steps, we report them in the following sequence diagram.
+
+Other than `ConfirmMessage`, which is required by the client to confirm the message has been received and handled correctly, we added a series of messages whose recipients are all the clients in the lobby or in the game. They are used to update the views of the clients and to notify them of the status of the lobby, to make the lobby experience more interactive and to make player attributes validation by the user a possibility.
 
 ```mermaid
 sequenceDiagram
     actor Client
     autonumber
+    
     # Get the available lobbies
     Note over Client,Server : Client is in the lobby view
     Client ->> Server : GetAvailableLobbiesMessage
     Server -->> Client : AvailableLobbiesMessage
     
     # Join the Game Lobby
-    Note over Client,Server : Client selects a lobby
+    Note over Client,Server : Client selects a game lobby
+    loop until the selected lobby is not full
     Client -) Server : JoinLobbyMessage
-    Server -->> Client : LobbyJoinedMessage
+    alt Lobby is full
+        Server -->> Client : LobbyFullMessage
+    else Lobby is not full
+        Server -->> Client : ConfirmMessage
+    end
+    end
 
     # Player Nickname
     Note over Client,Server : Client selects a nickname
-    loop until the value is acceptable
+    loop until the selected nickname is not taken
     Client ->> Server : SetNicknameMessage
     alt Nickname is already taken   
         Server --) Client : NicknameAlreadyTakenMessage
     else Nickname is accepted
+        Server --) Client : ConfirmMessage
+    end    
+    end
         loop for each client in the lobby
-        Server --) Client in the lobby:  PlayerNicknameSetMessage
-    end
-    end
-
-    
+        Server --) Client in the lobby view:  PlayerNicknameSetMessage
     end
 
     # Player Token color 
     Note over Client,Server : Client selects a token color
     
-    loop until the value is acceptable
-        loop every 2 seconds
+    loop until the selected token color is not taken
+        loop until the player has not selected a token color
             Client ->> Server : GetAvailableTokenColorsMessage
             Server -->> Client : AvailableTokenColorsMessage
         end
@@ -81,12 +89,13 @@ sequenceDiagram
             Client ->> Server : GetAvailableTokenColorsMessage
             Server -->> Client : AvailableTokenColorsMessage
             else Token color is accepted
-                loop for each client in the lobby
-                    Server --) Client in the lobby:  PlayerTokenColorSetMessage
-                end
+                Server --) Client : ConfirmMessage
         end
     end
   
+    loop for each client in the lobby
+        Server --) Client in the lobby view:  PlayerTokenColorSetMessage
+    end
     
 
 
@@ -104,11 +113,19 @@ sequenceDiagram
     Client ->> Server : GetStarterCardSidesMessage
     Server -->> Client : StarterCardSidesMessage
     Client --) Server : SelectFromPairMessage
-    Destroy Client
-    Server ->> Client : ConfirmMessage
-    Note over Client,Server: Client now joins the game.
+    Server -->> Client : ConfirmMessage
+
     loop for each client in the game
-    Server --) Client already in game:  PlayerGameJoinMessage
+    Server --) Client in the game view:  PlayerGameJoinMessage
+    end
+    Note over Client,Server: The player in now in the game view
+    loop every 5 seconds until all players are in the game
+        Client ->> Server : GetGameStatusMessage
+        alt Not all players are in the game
+            Server --) Client: GameStatusMessage (GAME_INIT)
+        else All players are in the game
+            Server -) Client: GameStatusMessage (GAME_START)
+        end
     end
 
 ```
