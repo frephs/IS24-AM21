@@ -5,6 +5,36 @@ Both client and server are equipped with a message parser and a set of RMI inter
 ## Notes on RMI 
 In this documentation, only Socket Messages are rapresented as there is duality in the two approaches since every message corresponds to a remote method invocation.
 
+## General Message Handling 
+## Failed Connection Handling
+After a connection is enstablished, if the servers fails to respond to a message before the timeout, the clients will try to resend the message for a maximum of 3 times. If the server still fails to respond, the client will close the connection and notify the user that the connection has been lost.
+
+```mermaid
+sequenceDiagram
+    actor Client
+    Client -x Server: Message (timed out)
+    Client -x Server: Message (timed out)
+    Client -x Server: Message (timed out)
+    Client --> Client : Log (Connection Lost)
+    Destroy Client
+
+```
+
+## Not-allowed messages handling
+In the event a player tries to place cards or draw in a turn that isn't his or in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the  aforesaid client. 
+
+
+```mermaid
+sequenceDiagram
+    Note over client,server: Client is not the current player 
+    client -) server: UntimelyActionMessage
+    server --) client: ActionNotAllowedMessage 
+    Note over client,server: Client sends a message which <br>is not recognized by the server
+    client -) server: unknownTypeMessage
+    server --)  client : unknownMessageTypeMessage
+```
+
+
 ### Player Lobby Flow
 As the Player building process is divided in essential and sequantial steps, every message different from the last one received is meant to be accepted as a confirm the last phase was successful and that the client can move forward.
 
@@ -145,20 +175,7 @@ sequenceDiagram
 
 ```
 
-## Not-allowed messages handling
-In the event a player tries to place cards or draw in a turn that isn't his or in the event a client might be modified or 'enhanced' in a way the server nor the game contemplate, we have messages in place to send to the  aforesaid client. 
 
-
-```mermaid
-sequenceDiagram
-    Note over client,server: Client is not the current player 
-    client -) server: placeCardMessage
-    server --) client: requestNotAllowedMessage 
-    Note over client,server: Client sends a message which <br>is not recognized by the server
-    client -) server: unknownTypeMessage
-    server --)  client : unknownMessageTypeMessage
-
-```
 
 ## Chat
 This comunication happen when a player(Client) want to write a message in the chat. They send the postMessage to the Server that will notify the player that the message has been received and posted; later it will send a notification to all the other players(Recipient) that there is a new message in the chat.
