@@ -10,42 +10,75 @@ As the Player building process is divided in essential and sequantial steps, eve
 
 ```mermaid
 sequenceDiagram
+    actor Client
     autonumber
+    # Get the available lobbies
+    Note over Client,Server : Client is in the lobby view
+    Client ->> Server : GetAvailableLobbiesMessage
+    Server -->> Client : AvailableLobbiesMessage
+    
+    # Join the Game Lobby
+    Note over Client,Server : Client selects a lobby
     Client -) Server : JoinLobbyMessage
-    loop until the value is acceptable
-    
+    Server -->> Client : LobbyJoinedMessage
+
     # Player Nickname
-    Server ->> Client : SetNicknameMessage
-    Client --) Server : NicknameSetMessage 
+    Note over Client,Server : Client selects a nickname
+    loop until the value is acceptable
+    Client ->> Server : SetNicknameMessage
+    alt Nickname is already taken   
+        Server --) Client : NicknameAlreadyTakenMessage
+    else Nickname is accepted
+        loop for each client in the lobby
+        Server --) Client in the lobby:  PlayerNicknameSetMessage
     end
+    end
+
     
-    loop for each client in the lobby
-    Server --) Other client in the lobby:  PlayerNicknameSetMessage
     end
 
     # Player Token color 
+    Note over Client,Server : Client selects a token color
+    
     loop until the value is acceptable
-    Server ->> Client : SetTokenColorMessage (populated with the available ones)
-    
-    Client --) Server : TokenColorSetMessage 
+        loop every 2 seconds
+            Client ->> Server : GetAvailableTokenColorsMessage
+            Server -->> Client : AvailableTokenColorsMessage
+        end
+            Client ->> Server : SetTokenColorMessage (populated with the available ones)
+            alt Token color is already taken
+            Server --) Client : TokenColorAlreadyTakenMessage 
+            Client ->> Server : GetAvailableTokenColorsMessage
+            Server -->> Client : AvailableTokenColorsMessage
+            else Token color is accepted
+                loop for each client in the lobby
+                    Server --) Client in the lobby:  PlayerTokenColorSetMessage
+                end
+        end
     end
+  
     
-    loop for each client in the lobby
-    Server --) Other client in the lobby:  RemoveTokenColorMessage
-    end
 
 
     # Player Secret Objective 
-    Server ->> Client : SetObjectiveCardMessage (populated with the available ones)
-    Client --) Server : SelectFromPairMessage
+    Note over Client,Server: Client selects a secret objective
+    Client ->> Server : GetObjectiveCardsMessage
+    Server -->> Client : ObjectiveCardsMessage 
+    Client -) Server : SelectFromPairMessage 
+    Server ->> Client : ConfirmMessage
+    
 
     #Player Starter Card Side to place
-    Server ->> Client : SetStarterCardSide (populated with the available ones)
+    Note over Client,Server: Client selects a starter card side to play
+
+    Client ->> Server : GetStarterCardSidesMessage
+    Server -->> Client : StarterCardSidesMessage
     Client --) Server : SelectFromPairMessage
-    Server ->> Client : GameJoinMessage
-    
+    Destroy Client
+    Server ->> Client : ConfirmMessage
+    Note over Client,Server: Client now joins the game.
     loop for each client in the game
-    Server --) Other client already in game:  PlayerGameJoinMessage
+    Server --) Client already in game:  PlayerGameJoinMessage
     end
 
 ```
