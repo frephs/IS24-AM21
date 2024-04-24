@@ -188,7 +188,6 @@ After the final rounds are played, the server will send a series of messages to 
 
 ```mermaid
 sequenceDiagram
-    Actor Client
     Note over Server, Client : Normal Turn flow interactions
     loop until game.remainingTurns is set
     Server --> Client: turn flow messages 
@@ -218,9 +217,10 @@ sequenceDiagram
 This comunication happen when a player(Client) want to write a message in the chat. They send the postMessage to the Server that will notify the player that the message has been received and posted; later it will send a notification to all the other players(Recipient) that there is a new message in the chat.
 ```mermaid
 sequenceDiagram
+Actor Client
     Client -) Server: postMessage
     Server --) Client: confirmMessage
-
+Actor Recipient
     loop for each recipient
         Server -) Recipient: newMessageInChat
     end
