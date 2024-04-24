@@ -45,7 +45,7 @@ sequenceDiagram
             Client ->> Server : GetAvailableTokenColorsMessage
             Server -->> Client : AvailableTokenColorsMessage
         end
-            Client ->> Server : SetTokenColorMessage (populated with the available ones)
+            Client ->> Server : SetTokenColorMessage 
             alt Token color is already taken
             Server --) Client : TokenColorAlreadyTakenMessage 
             Client ->> Server : GetAvailableTokenColorsMessage
