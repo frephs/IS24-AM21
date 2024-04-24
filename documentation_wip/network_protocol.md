@@ -1,11 +1,12 @@
 # Network Protocol
 The network protocol we designed is meant to be implemented with both RMI and Client-Server Socket functionality.
-Both client and server are equipped with a message parser and a set of RMI interfaces which are meant to update the views in the client and call controller methods to update the model in the server.
+Both client and server are equipped with a message parser for serialized java objects sent through the network and a set of RMI interfaces which are meant to update the views in the client and call controller methods to update the model in the server.
 
 ## Notes on RMI 
 In this documentation, only Socket Messages are rapresented as there is duality in the two approaches since every message corresponds to a remote method invocation.
 
 ## General Message Handling 
+
 ## Failed Connection Handling
 After a connection is enstablished, if the servers fails to respond to a message before the timeout, the clients will try to resend the message for a maximum of 3 times. If the server still fails to respond, the client will close the connection and notify the user that the connection has been lost.
 
@@ -14,6 +15,7 @@ sequenceDiagram
     actor Client
     Client -x Server: Message (timed out)
     Client -x Server: Message (timed out)
+    Server -x Client: ConfirmMessage (lost)
     Client -x Server: Message (timed out)
     Client --> Client : Log (Connection Lost)
     Destroy Client
