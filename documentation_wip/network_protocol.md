@@ -7,14 +7,14 @@ In this documentation, only Socket Messages are rapresented as there is duality 
 
 ## General Message Handling 
 
-## Failed Connection Handling
+### Failed Connection Handling
 After a connection is enstablished, if the servers fails to respond to a message before the timeout, the clients will try to resend the message for a maximum of 3 times. If the server still fails to respond, the client will close the connection and notify the user that the connection has been lost.
 
 ```mermaid
 sequenceDiagram
     actor Client
     Client -x Server: Message (timed out)
-    Client -x Server: Message (timed out)
+    Client ->> Server: Message (timed out)
     Server -x Client: ConfirmMessage (lost)
     Client -x Server: Message (timed out)
     Client --> Client : Log (Connection Lost)
@@ -22,22 +22,22 @@ sequenceDiagram
 
 ```
 
-## Not-allowed messages handling
-In the event a player tries to place cards or draw in a turn that isn't his or in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the  aforesaid client. 
+### Not allowed message handling
+In the event a client sends a message for an action that the server doesn't expect or that they cannot perform in that moment and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the  aforesaid client. 
 
 
 ```mermaid
 sequenceDiagram
-    Note over client,server: Client is not the current player 
-    client -) server: UntimelyActionMessage
+    Note over client,server: Client sends a type of message <br> that is not expected 
+    client ->> server: UntimelyActionMessage
     server --) client: ActionNotAllowedMessage 
     Note over client,server: Client sends a message which <br>is not recognized by the server
-    client -) server: unknownTypeMessage
+    client ->> server: unknownTypeMessage
     server --)  client : unknownMessageTypeMessage
 ```
 
-
-### Player Lobby Flow
+## Game Dynamics' Flows
+### Lobby Flow
 The player building process requires a series of essential steps, we report them in the following sequence diagram.
 
 Other than `ConfirmMessage`, which is required by the client to confirm the message has been received and handled correctly, we added a series of messages whose recipients are all the clients in the lobby or in the game. They are used to update the views of the clients and to notify them of the status of the lobby, to make the lobby experience more interactive and to make player attributes validation by the user a possibility.
@@ -132,25 +132,36 @@ sequenceDiagram
 
 ```
 
-## Normal game turns flow 
-During the game, every Game and Player status change is notified to all clients so that a popup or a text message can appear in the view and the client can better follow the flow of the game. 
-After every player move, the server sends a message to all the clients.
-This message confirms to the client that the previous message has been handled correctly and notifies all the other clients of the update
+### Normal game turns flow 
+Until `Game.nextTurn()` detects that a player has a winning score, the messages between the server and the clients are exchanged as follows.
+
+ As before, other than the `ConfirmMessage`, we have a series of messages whose recipients are all the clients in the game. They are used to update the views of the clients and to notify them of the status of the player turn.
 
 ```mermaid
 sequenceDiagram
-    # Game Start
-    autonumber
-    Server ->> Client : GameStatusChangeMessage (START)
+    Actor Playing client
+    loop until the game is over
+    # New turn 
+    Note over Server,Client:Current Player Changes
+    loop for each client
+        autonumber
+        Server -) Client : PlayerStateUpdateMessage 
+    end
     
-    Server -) Client : PlayerStatusChange (populated with nickname)
-    
-    loop until a confirm is received 
-        Playing client --) Server : PlaceCardMessage
+    #Place card  
+    Note over Playing client,Server: The playing client can place a card  
+    loop until the card placement is valid
+        Playing client ->> Server : PlaceCardMessage
+        alt card placement is not valid
+            Server --) Playing client : InvalidCardPlacementMessage
+        else card placement is valid
+            Server --) Playing client : ConfirmMessage
+    end
     end
     loop for each client
-        Server --) Client : CardPlacedMessage (CONFIRMS)
-    Note over Client: updating views,  conferming the card placement.
+        Server --) Client : CardPlacedMessage 
+
+
     opt only if the player's score is updated
     Server --) Client : PlayerScoreUpdateMessage
     end
@@ -158,50 +169,57 @@ sequenceDiagram
     end 
     
 
+    Note over Playing client,Server: The playing client can draw a card
+    ## Draw card 
     Playing client -) Server : DeckDrawMessage OR CardPairDrawMessage
+    Server --) Playing client : ConfirmMessage
     loop for each client
     Server --) Client : DeckCardDrawMessage OR CardPairDrawMessage
     end 
-    Note over Client: updating views,  conferming the card draw.
-
+    end
 
 
 
 ```
-## Game over flow
-The game flows until an GameOverException is caught by the controller. In that case the game enters a GameOver state;
+### Game over flow
+When `Game.nextTurn()` detects that a player has a winning score or a `EmptyDeckException` is Caught by the controller, a message is sent to all the clients to notify them the number of remaining rounds.
+
+After the final rounds are played, the server will send a series of messages to all the clients to notify them that the game is over and update the final scores of the players after adding the objective cards' points.
+
 ```mermaid
 sequenceDiagram
-    Note over Server, client : Normal Turn flow interactions
-    loop until a GameOverException is thrown
-    Server --> client: turn flow messages 
+    Actor Client
+    Note over Server, Client : Normal Turn flow interactions
+    loop until game.remainingTurns is set
+    Server --> Client: turn flow messages 
     end 
-    Note over Server, client: A Game Over Exception <br> is thrown in the model
-    Server -) client : RemainingTurnsMessage 
+    Note over Server, Client: Last turn interactions
+    Server -) Client : RemainingTurnsMessage 
     loop for each client 
-        Server -> client: normal turn interactions 
+        Server -> Client: normal turn interactions 
     end 
     
+    Note over Server, Client: Game overs
     loop for each client 
-        Server -) client : GameOverMessage
+        Server -) Client : GameOverMessage
         loop for each player
-            loop for each objective card 
-                Server -) client : PlayerScoreUpdateMessage
-            end 
+            opt if the player's score is updated
+                Server -) Client : PlayerScoreUpdateMessage
+            end
         end
-        Server -) client : WinningPlayerMessage  
+        Server -) Client : WinningPlayerMessage  
     end
 
 ```
 
 
-
-## Chat
+## Advanced Features
+### Chat
 This comunication happen when a player(Client) want to write a message in the chat. They send the postMessage to the Server that will notify the player that the message has been received and posted; later it will send a notification to all the other players(Recipient) that there is a new message in the chat.
 ```mermaid
 sequenceDiagram
     Client -) Server: postMessage
-    Server -) Client: messagePosted
+    Server --) Client: confirmMessage
 
     loop for each recipient
         Server -) Recipient: newMessageInChat
