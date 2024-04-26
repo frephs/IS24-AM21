@@ -14,7 +14,7 @@ After a connection is enstablished, if the servers fails to respond to a message
 sequenceDiagram
     actor Client
     Client -x Server: Message (timed out)
-    Client ->> Server: Message (timed out)
+    Client ->> Server: Message (no response)
     Server -x Client: ConfirmMessage (lost)
     Client -x Server: Message (timed out)
     Client --> Client : Log (Connection Lost)
