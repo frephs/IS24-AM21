@@ -10,7 +10,7 @@ public class ConflictingParameterException extends IllegalStateException {
     super(
       "Parameter " +
       paramName +
-      "is expected to be " +
+      " is expected to be " +
       expectedValue +
       ", but is currently " +
       currValue

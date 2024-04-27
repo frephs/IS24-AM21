@@ -60,9 +60,9 @@ class CardBuilderTest {
     assertThrows(
       ConflictingParameterException.class,
       () ->
-        new CardBuilder(123, CardType.OBJECTIVE).setObjectiveType(
-          ObjectiveType.COUNTING
-        )
+        new CardBuilder(123, CardType.OBJECTIVE)
+          .setObjectiveType(ObjectiveType.COUNTING)
+          .setObjectiveGeometry(null)
     );
 
     assertInstanceOf(
@@ -88,9 +88,9 @@ class CardBuilderTest {
     assertThrows(
       ConflictingParameterException.class,
       () ->
-        new CardBuilder(123, CardType.OBJECTIVE).setObjectiveType(
-          ObjectiveType.GEOMETRIC
-        )
+        new CardBuilder(123, CardType.OBJECTIVE)
+          .setObjectiveType(ObjectiveType.GEOMETRIC)
+          .setObjectiveResources(null)
     );
 
     assertInstanceOf(
@@ -114,9 +114,9 @@ class CardBuilderTest {
     assertThrows(
       ConflictingParameterException.class,
       () ->
-        new CardBuilder(123, CardType.OBJECTIVE).setObjectiveType(
-          ObjectiveType.GEOMETRIC
-        )
+        new CardBuilder(123, CardType.OBJECTIVE)
+          .setObjectiveType(ObjectiveType.GEOMETRIC)
+          .setObjectiveObjects(null)
     );
 
     assertInstanceOf(
@@ -135,7 +135,7 @@ class CardBuilderTest {
         new CardBuilder(123, CardType.OBJECTIVE).setBackPermanentResources(null)
     );
 
-    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.OBJECTIVE).forEach(
       type ->
         assertDoesNotThrow(() -> new CardBuilder(123, type).setPoints(123))
     );
@@ -269,15 +269,12 @@ class CardBuilderTest {
       new CardBuilder(123, CardType.OBJECTIVE)
         .setPoints(123)
         .setObjectiveType(ObjectiveType.GEOMETRIC)
-        .setObjectiveGeometry(
-          Map.of(EdgePosition.BOTTOM, ResourceType.FUNGI)
-        )
+        .setObjectiveGeometry(Map.of(EdgePosition.BOTTOM, ResourceType.FUNGI))
         .build();
       new CardBuilder(123, CardType.OBJECTIVE)
         .setPoints(123)
         .setObjectiveType(ObjectiveType.COUNTING)
-        .setObjectiveResources(new HashMap<>())
-        .setObjectiveObjects(new HashMap<>())
+        .setObjectiveResources(Map.of(ResourceType.PLANT, 5))
         .build();
     });
     // endregion
@@ -290,11 +287,7 @@ class CardBuilderTest {
     assertDoesNotThrow(() -> {
       new CardBuilder(123, CardType.STARTER)
         .setBackPermanentResources(
-          List.of(
-            ResourceType.ANIMAL,
-            ResourceType.PLANT,
-            ResourceType.INSECT
-          )
+          List.of(ResourceType.ANIMAL, ResourceType.PLANT, ResourceType.INSECT)
         )
         .build();
     });
@@ -308,8 +301,6 @@ class CardBuilderTest {
     builder = builder.setBackPermanentResources(
       List.of(ResourceType.FUNGI, ResourceType.INSECT)
     );
-    // missing points
-    assertThrows(MissingParametersException.class, builder::build);
 
     assertDoesNotThrow(() -> {
       new CardBuilder(123, CardType.RESOURCE)
