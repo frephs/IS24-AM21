@@ -28,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LobbyTest {
 
-    final int MAX_PLAYERS = 2;
+  final int MAX_PLAYERS = 2;
 
-    Lobby lobby;
+  Lobby lobby;
 
   GameBoard mockGameboard;
 
@@ -136,7 +136,7 @@ class LobbyTest {
       fail("Last player is not in the lobby");
     }
 
-    UUID generateNewSocketID() {
+  }
 
   @Test
   void removePlayer() {
@@ -174,6 +174,11 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
+    this.lobby.setNickname(socketID, "test");
+    Optional<String> playerNickname = this.lobby.getPlayerNickname(socketID);
+    if (playerNickname.isEmpty())
+      fail("could not find player with socket id" + socketID);
+    assertEquals(playerNickname.get(), "test");
 
     UUID socketID2 = generateNewSocketID();
     try {
@@ -186,47 +191,16 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    @Test
-    void getPlayersCount() {
-        assertEquals(0, this.lobby.getPlayersCount());
-        for (int i = 0; i < MAX_PLAYERS; ++i) {
-            UUID socketID = generateNewSocketID();
-            try {
-                this.lobby.addPlayer(socketID);
-            } catch (LobbyFullException e) {
-                fail("Failed adding a new player in the lobby while testing getRemainingPlayerSlots");
-            }
-            assertEquals(i + 1, this.lobby.getPlayersCount());
-        }
+    assertThrows(NicknameAlreadyTakenException.class,
+      () -> this.lobby.setNickname(socketID2, "test"));
+
+    try {
+      this.lobby.setNickname(socketID2, "test2");
+    } catch (NicknameAlreadyTakenException e) {
+      fail("Wrongfully thrown NicknameAlreadyTakenException");
     }
 
-    @Test
-    void addPlayer() {
-        UUID socketID = generateNewSocketID();
-        UUID firstAdded = socketID;
-        UUID lastAdded = socketID;
-        for (int i = 0; i < MAX_PLAYERS; ++i) {
-            try {
-                this.lobby.addPlayer(socketID);
-            } catch (LobbyFullException e) {
-                fail("Lobby full");
-            }
-            lastAdded = socketID;
-            socketID = generateNewSocketID();
-        }
-        assertThrows(LobbyFullException.class, () -> this.lobby.addPlayer(generateNewSocketID()));
-
-
-        try {
-            this.lobby.setNickname(firstAdded, "test1");
-        } catch (PlayerNotFoundException e) {
-            fail("First player is not in the lobby");
-        }
-        try {
-            this.lobby.setNickname(lastAdded, "test2");
-        } catch (PlayerNotFoundException e) {
-            fail("Last player is not in the lobby");
-        }
+  }
 
   @Test
   void setToken() {
@@ -259,32 +233,19 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    @Test
-    void setNickname() {
-        UUID socketID = generateNewSocketID();
-        try {
-            this.lobby.addPlayer(socketID);
-        } catch (LobbyFullException e) {
-            fail("Lobby full");
-        }
+    assertThrows(TokenAlreadyTakenException.class,
+      () -> this.lobby.setToken(socketID2, TokenColor.GREEN));
+    try {
+      this.lobby.setToken(socketID2, TokenColor.RED);
+    } catch (TokenAlreadyTakenException e) {
+      fail("Wrongfully thrown TokenAlreadyTakenException");
+    }
+  }
 
-        this.lobby.setNickname(socketID, "test");
-        assertEquals(this.lobby.getPlayerNickname(socketID), "test");
-
-        UUID socketID2 = generateNewSocketID();
-        try {
-            this.lobby.addPlayer(socketID2);
-        } catch (LobbyFullException e) {
-            fail("Lobby full");
-        }
-
-        assertThrows(NicknameAlreadyTakenException.class, () -> this.lobby.setNickname(socketID2, "test"));
-
-        try {
-            this.lobby.setNickname(socketID2, "test2");
-        } catch (NicknameAlreadyTakenException e) {
-            fail("Wrongfully thrown NicknameAlreadyTakenException");
-        }
+  //@Test
+  //void setExtractedCard() {
+  //TODO
+  // }
 
   @Test
   void finalizePlayer() {
@@ -299,54 +260,17 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    @Test
-    void setToken() {
-        UUID socketID = generateNewSocketID();
-        try {
-            this.lobby.addPlayer(socketID);
-        } catch (LobbyFullException e) {
-            fail("Lobby full");
-        }
+    this.lobby.setNickname(socketID, "test");
 
-        this.lobby.setToken(socketID, TokenColor.GREEN);
-        assertEquals(this.lobby.getPlayerTokenColor(socketID), TokenColor.BLUE);
+    Optional<String> playerNickname = this.lobby.getPlayerNickname(socketID);
+    if (playerNickname.isEmpty())
+      fail("could not find player with socket id" + socketID);
+    assertEquals(playerNickname.get(), "test");
 
-        UUID socketID2 = generateNewSocketID();
-        try {
-            this.lobby.addPlayer(socketID2);
-        } catch (LobbyFullException e) {
-            fail("Lobby full");
-        }
-
-        assertThrows(TokenAlreadyTakenException.class, () -> this.lobby.setToken(socketID2, TokenColor.BLUE));
-        try {
-            this.lobby.setToken(socketID2, TokenColor.RED);
-        } catch (TokenAlreadyTakenException e) {
-            fail("Wrongfully thrown TokenAlreadyTakenException");
-        }
-    }
-
-    //@Test
-    //void setExtractedCard() {
-    //TODO
-    // }
-
-    @Test
-    void finalizePlayer() {
-        UUID socketID = generateNewSocketID();
-        try {
-            this.lobby.addPlayer(socketID);
-        } catch (LobbyFullException e) {
-            fail("Lobby full");
-        }
-
-        this.lobby.setNickname(socketID, "test");
-        assertEquals(this.lobby.getPlayerNickname(socketID), "test");
-
-        UUID socketID2 = generateNewSocketID();
+    UUID socketID2 = generateNewSocketID();
 
 
-    }
+  }
 
   @Test
   void getPlayerObjectiveCards() {
