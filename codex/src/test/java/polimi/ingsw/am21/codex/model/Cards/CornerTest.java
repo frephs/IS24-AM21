@@ -2,8 +2,9 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static polimi.ingsw.am21.codex.model.Cards.ObjectType.QUILL;
 
 class CornerTest {
 
@@ -15,8 +16,8 @@ class CornerTest {
 
   @Test
   void getContent() {
-    Corner corner = new Corner<>(QUILL);
-    assertEquals(corner.getContent(), QUILL);
+    Corner corner = new Corner<>();
+    assertEquals(corner.getContent(), Optional.empty());
   }
 
   @Test

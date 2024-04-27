@@ -12,13 +12,13 @@ class PlayableBackSideTest {
   @Test
   void getPermanentResources() {
     List<ResourceType> resources = new ArrayList<>();
-    resources.add(ResourceType.ANIMAL_KINGDOM);
+    resources.add(ResourceType.ANIMAL);
 
     PlayableBackSide a = new PlayableBackSide(resources);
     // Test that the resources are copied correctly (1 element)
     assertEquals(a.getPermanentResources(), resources);
 
-    resources.add(ResourceType.FUNGI_KINGDOM);
+    resources.add(ResourceType.FUNGI);
     // Test that the internal Set is independent of the given reference
     assertEquals(a.getPermanentResources().size(), resources.size() - 1);
 
@@ -26,7 +26,7 @@ class PlayableBackSideTest {
     // Test that the resources are copied correctly (2 elements)
     assertEquals(b.getPermanentResources(), resources);
 
-    resources.add(ResourceType.INSECT_KINGDOM);
+    resources.add(ResourceType.INSECT);
     PlayableBackSide c = new PlayableBackSide((resources));
     // Test that the resources are copied correctly (3 elements)
     assertEquals(c.getPermanentResources(), resources);
@@ -35,10 +35,10 @@ class PlayableBackSideTest {
   @Test
   void getEvaluator() {
     List<ResourceType> resources = new ArrayList<>();
-    resources.add(ResourceType.ANIMAL_KINGDOM);
+    resources.add(ResourceType.ANIMAL);
     PlayableBackSide a = new PlayableBackSide(resources);
 
-    resources.add(ResourceType.PLANT_KINGDOM);
+    resources.add(ResourceType.PLANT);
     PlayableBackSide b = new PlayableBackSide(resources);
 
     PlayerBoard pb = new PlayerBoard(

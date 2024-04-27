@@ -6,12 +6,19 @@ import polimi.ingsw.am21.codex.model.PlayerBoard;
 
 public class GeometricObjective extends Objective {
 
+  /**
+   * The map of the adjacent card you need to reach the objective
+   */
   private final Map<AdjacentPosition, ResourceType> geometry;
 
   public GeometricObjective(Map<AdjacentPosition, ResourceType> geometry) {
     this.geometry = geometry;
   }
 
+  /**
+   * The function get the PlayerBoard and the points of the objective card you are evaluating
+   * @return the point that you get from that objective card
+   */
   @Override
   public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
     return (playerBoard, points) ->

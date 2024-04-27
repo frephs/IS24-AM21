@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
-import polimi.ingsw.am21.codex.model.Cards.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
+import javafx.util.Pair;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player;
 import polimi.ingsw.am21.codex.model.TokenColor;
 
@@ -70,11 +70,17 @@ public class Lobby {
    * @throws LobbyFullException if the lobby is full and cannot accept more
    *                            players
    */
-  public void addPlayer(UUID socketId) throws LobbyFullException {
+  public void addPlayer(UUID socketId, CardPair<ObjectiveCard> objectiveCards
+    , PlayableCard starterCard)
+  throws LobbyFullException {
     if (remainingPlayerSlots <= 0) {
       throw new LobbyFullException();
     }
-    lobbyPlayers.put(socketId, new Player.PlayerBuilder());
+    Player.PlayerBuilder playerBuilder = new Player.PlayerBuilder();
+    playerBuilder.setStarterCard(starterCard);
+    lobbyPlayers.put(socketId, playerBuilder);
+    extractedCards.put(socketId, objectiveCards);
+
     remainingPlayerSlots--;
   }
 
@@ -82,17 +88,23 @@ public class Lobby {
    * Removes a player from the lobby.
    *
    * @param socketId the socket ID of the player to remove
-   * @return the extracted objective card associated with the removed player
+   * @return the extracted objective card associated and the starter card of
+   * the player
    * @throws PlayerNotFoundException if the player is not found in the lobby
    */
-  public CardPair<ObjectiveCard> removePlayer(UUID socketId)
+  public Pair<CardPair<ObjectiveCard>, Optional<PlayableCard>> removePlayer(UUID socketId)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
     }
+    Optional<PlayableCard> starterCard = lobbyPlayers.get(socketId)
+      .getStarterCard();
     lobbyPlayers.remove(socketId);
     remainingPlayerSlots++;
-    return extractedCards.remove(socketId);
+    return new Pair<>(
+      this.extractedCards.get(socketId),
+      starterCard
+    );
   }
 
   /**
@@ -148,40 +160,49 @@ public class Lobby {
   }
 
   /**
-   * Sets the extracted card for a player in the lobby.
+   * Updates the PlayerBuilder with socketId with the selectedObjectiveCard
    *
-   * @param socketId             the socket ID of the player
-   * @param playerExtractedCards the extracted card to set
+   * @param socketId           the socket ID of the player
+   * @param firstObjectiveCard sets the selectedObjectiveCard card to the
+   *                           first or second from the CardPair
    * @throws PlayerNotFoundException if the socket ID is not found in the lobby
    */
-  public void setExtractedCard(UUID socketId,
-                               CardPair<ObjectiveCard> playerExtractedCards)
+  public void setObjectiveCard(UUID socketId, Boolean firstObjectiveCard)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
     }
-    extractedCards.put(socketId, playerExtractedCards);
+    CardPair<ObjectiveCard> playerExtractedCards = extractedCards.get(socketId);
+
+    ObjectiveCard selectedObjectiveCard;
+    if (firstObjectiveCard) {
+      selectedObjectiveCard = playerExtractedCards.getFirst();
+    } else {
+      selectedObjectiveCard = playerExtractedCards.getSecond();
+    }
+    lobbyPlayers.get(socketId).setObjectiveCard(selectedObjectiveCard);
   }
+
 
   /**
    * Finalizes a player in the lobby, constructing the Player object and
    * removing the PlayerBuilder from the map
    *
-   * @param socketId      the socket ID of the player to finalize
-   * @param objectiveCard the objective card associated with the player
+   * @param socketId the socket ID of the player to finalize
+   * @param cardSide the objective card associated with the player
    * @return the finalized Player object
    * @throws PlayerNotFoundException if the socked ID is not found in the lobby
    */
-  public Player finalizePlayer(UUID socketId, ObjectiveCard objectiveCard)
+  public Player finalizePlayer(UUID socketId, CardSideType cardSide)
   throws PlayerNotFoundException, IncompletePlayerBuilderException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
     }
     Player.PlayerBuilder playerBuilder = lobbyPlayers.get(socketId);
 
+    playerBuilder.setStarterCardSide(cardSide);
     IncompletePlayerBuilderException.checkPlayerBuilder(playerBuilder);
 
-    playerBuilder.setObjectiveCard(objectiveCard);
     Player player = playerBuilder.build();
     lobbyPlayers.remove(socketId);
     return player;
@@ -193,8 +214,8 @@ public class Lobby {
    * @param socketId the socket ID of the player
    * @return the CardPair containing the objective cards of the player
    */
-  public CardPair<ObjectiveCard> getPlayerObjectiveCards(UUID socketId) {
-    return this.extractedCards.get(socketId);
+  public Optional<CardPair<ObjectiveCard>> getPlayerObjectiveCards(UUID socketId) {
+    return Optional.ofNullable(this.extractedCards.get(socketId));
   }
 
   /**
@@ -235,5 +256,18 @@ public class Lobby {
       throw new PlayerNotFoundException(socketId);
     }
     return lobbyPlayers.get(socketId).getTokenColor();
+  }
+
+  /**
+   * @param socketId the socked ID of the player
+   * @return the starter card of the player
+   * @throws PlayerNotFoundException if the player is not found in the lobby
+   */
+  public Optional<PlayableCard> getStarterCard(UUID socketId)
+  throws PlayerNotFoundException {
+    if (!lobbyPlayers.containsKey(socketId)) {
+      throw new PlayerNotFoundException(socketId);
+    }
+    return lobbyPlayers.get(socketId).getStarterCard();
   }
 }

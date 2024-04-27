@@ -18,8 +18,12 @@ public class CardBuilder {
 
   // Resource | Starter | Gold
   private Optional<List<ResourceType>> backPermanentResources;
-  private Optional<Map<CornerPosition, CornerContentType>> frontCorners;
-  private Optional<Map<CornerPosition, CornerContentType>> backCorners;
+  private Optional<
+    Map<CornerPosition, Optional<CornerContentType>>
+  > frontCorners;
+  private Optional<
+    Map<CornerPosition, Optional<CornerContentType>>
+  > backCorners;
 
   // Gold
   private Optional<List<ResourceType>> placementCondition;
@@ -80,10 +84,9 @@ public class CardBuilder {
       this.objectiveType.map(Enum::toString).orElse("empty")
     );
 
-    if (objectiveGeometry != null) this.objectiveGeometry = Optional.of(
-      Map.copyOf(objectiveGeometry)
+    this.objectiveGeometry = Optional.ofNullable(
+      objectiveGeometry == null ? null : new HashMap<>(objectiveGeometry)
     );
-    else this.objectiveGeometry = Optional.empty();
 
     return this;
   }
@@ -107,7 +110,9 @@ public class CardBuilder {
       "set"
     );
 
-    this.objectiveResources = Optional.of(new HashMap<>(objectiveResources));
+    this.objectiveResources = Optional.ofNullable(
+      objectiveResources == null ? null : new HashMap<>(objectiveResources)
+    );
     return this;
   }
 
@@ -130,7 +135,9 @@ public class CardBuilder {
       "set"
     );
 
-    this.objectiveObjects = Optional.of(new HashMap<>(objectiveObjects));
+    this.objectiveObjects = Optional.ofNullable(
+      objectiveObjects == null ? null : new HashMap<>(objectiveObjects)
+    );
     return this;
   }
 
@@ -139,9 +146,11 @@ public class CardBuilder {
   ) throws WrongCardTypeException {
     checkType(CardType.RESOURCE, CardType.STARTER, CardType.GOLD);
 
-    if (backPermanentResources != null) this.backPermanentResources =
-      Optional.of(List.copyOf(backPermanentResources));
-    else this.backPermanentResources = Optional.empty();
+    this.backPermanentResources = Optional.ofNullable(
+      backPermanentResources == null
+        ? null
+        : List.copyOf(backPermanentResources)
+    );
 
     return this;
   }
@@ -151,10 +160,10 @@ public class CardBuilder {
   ) throws WrongCardTypeException {
     checkType(CardType.GOLD);
 
-    if (placementCondition != null) this.placementCondition = Optional.of(
-      List.copyOf(placementCondition)
+    this.placementCondition = Optional.ofNullable(
+      placementCondition == null ? null : List.copyOf(placementCondition)
     );
-    else this.placementCondition = Optional.empty();
+
     return this;
   }
 
@@ -183,53 +192,52 @@ public class CardBuilder {
 
   public CardBuilder setCorners(
     CardSideType side,
-    Map<CornerPosition, CornerContentType> cornerMap
+    Map<CornerPosition, Optional<CornerContentType>> cornerMap
   ) throws WrongCardTypeException {
     checkType(CardType.STARTER, CardType.RESOURCE, CardType.GOLD);
 
-    if (side == CardSideType.FRONT) frontCorners = Optional.of(
-      new HashMap<>(cornerMap)
+    if (side == CardSideType.FRONT) frontCorners = Optional.ofNullable(
+      cornerMap == null ? null : new HashMap<>(cornerMap)
     );
-    else if (side == CardSideType.BACK) backCorners = Optional.of(
-      new HashMap<>(cornerMap)
+    else if (side == CardSideType.BACK) backCorners = Optional.ofNullable(
+      cornerMap == null ? null : new HashMap<>(cornerMap)
     );
     else throw new NullPointerException();
 
     return this;
   }
 
-  public Card build() throws MissingParametersException {
-    switch (this.type) {
-      case OBJECTIVE -> {
-        Integer points =
-          this.points.orElseThrow(
-              () -> new MissingParametersException("points")
-            );
-        Objective objective =
-          this.objectiveType.map(type -> {
-              if (type == ObjectiveType.GEOMETRIC) {
-                return this.objectiveGeometry.map(
-                    GeometricObjective::new
-                  ).orElseThrow(
-                    () -> new MissingParametersException("objectiveGeometry")
-                  );
-              } else {
-                Map<ResourceType, Integer> res =
-                  this.objectiveResources.orElseThrow(
-                      () -> new MissingParametersException("objectiveResources")
-                    );
-                Map<ObjectType, Integer> obj =
-                  this.objectiveObjects.orElseThrow(
-                      () -> new MissingParametersException("objectiveObjects")
-                    );
-                return new CountingObjective(res, obj);
-              }
-            }).orElseThrow(
-              () -> new MissingParametersException("objectiveType")
+  public ObjectiveCard buildObjectiveCard() throws MissingParametersException {
+    Integer points =
+      this.points.orElseThrow(() -> new MissingParametersException("points"));
+    Objective objective =
+      this.objectiveType.map(type -> {
+          if (type == ObjectiveType.GEOMETRIC) {
+            return this.objectiveGeometry.map(
+                GeometricObjective::new
+              ).orElseThrow(
+                () -> new MissingParametersException("objectiveGeometry")
+              );
+          } else {
+            Map<ResourceType, Integer> res =
+              this.objectiveResources.orElse(new HashMap<>());
+            Map<ObjectType, Integer> obj =
+              this.objectiveObjects.orElse(new HashMap<>());
+            if (
+              res.isEmpty() && obj.isEmpty()
+            ) throw new MissingParametersException(
+              "objectiveResources or " + "objectiveObjects"
             );
 
-        return new ObjectiveCard(this.id, points, objective);
-      }
+            return new CountingObjective(res, obj);
+          }
+        }).orElseThrow(() -> new MissingParametersException("objectiveType"));
+
+    return new ObjectiveCard(this.id, points, objective);
+  }
+
+  public PlayableCard buildPlayableCard() throws MissingParametersException {
+    switch (this.type) {
       case STARTER -> {
         List<ResourceType> permanentResources =
           this.backPermanentResources.orElseThrow(
@@ -247,10 +255,7 @@ public class CardBuilder {
           this.backPermanentResources.orElseThrow(
               () -> new MissingParametersException("backPermanentResources")
             );
-        Integer points =
-          this.points.orElseThrow(
-              () -> new MissingParametersException("points")
-            );
+        Integer points = this.points.orElse(0);
 
         return getPlayableCard(
           permanentResources,
@@ -294,10 +299,16 @@ public class CardBuilder {
     }
   }
 
+  public Card build() throws MissingParametersException {
+    if (this.type == CardType.OBJECTIVE) return this.buildObjectiveCard();
+    return this.buildPlayableCard();
+  }
+
   /**
    * Creates a playable card, handling corners and back side creation
+   *
    * @param permanentResources The permanent resources on the back side
-   * @param frontSide The front side of the card
+   * @param frontSide          The front side of the card
    * @return The resulting PlayableCard
    */
   private PlayableCard getPlayableCard(

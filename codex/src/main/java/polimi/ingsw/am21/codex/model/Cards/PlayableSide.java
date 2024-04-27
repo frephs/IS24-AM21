@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.PlayerBoard;
@@ -23,20 +24,27 @@ public abstract class PlayableSide {
     return corners;
   }
 
-  public void setCorner(CornerPosition position, CornerContentType content) {
-    corners.put(position, new Corner<>(content));
+  public void setCorner(CornerPosition position,
+                        Optional<CornerContentType> content) {
+    if (content.isEmpty()) {
+      corners.put(position, new Corner<>());
+    } else {
+      corners.put(position, new Corner<>(content.get()));
+    }
   }
 
   /**
    * Generates a function that should be called to get the points that should be
    * attributed to a player when they place a card on this side. The returned
-   * function requires a PlayerBoard an Integer representing the number of corners
+   * function requires a PlayerBoard an Integer representing the number of
+   * corners
    * the card is covering.
    */
   public abstract BiFunction<PlayerBoard, Integer, Integer> getEvaluator();
 
   /**
-   * Generates a function that should be called to get whether a side is placeable or not
+   * Generates a function that should be called to get whether a side is
+   * placeable or not
    * given a certain PlayerBoard.
    */
   public Function<PlayerBoard, Boolean> getPlaceabilityChecker() {

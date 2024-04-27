@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
+import polimi.ingsw.am21.codex.model.Cards.PlayableSide;
 import polimi.ingsw.am21.codex.model.Player;
 
 import java.util.ArrayList;
@@ -15,12 +16,17 @@ public class IncompletePlayerBuilderException extends RuntimeException {
    */
   public static void checkPlayerBuilder(Player.PlayerBuilder playerBuilder) {
     List<String> missingParams = new ArrayList<>();
-    if (playerBuilder.getNickname() == null)
+    if (playerBuilder.getNickname().isEmpty())
       missingParams.add("nickname");
-    if (playerBuilder.getTokenColor() == null)
+    if (playerBuilder.getTokenColor().isEmpty())
       missingParams.add("tokenColor");
+    if (playerBuilder.getStarterCard().isEmpty())
+      missingParams.add("starterCard");
+    else if (playerBuilder.getStarterCard().get().getPlayedSideType().isEmpty())
+      missingParams.add("starterCardSide");
 
-    throw new IncompletePlayerBuilderException("Incomplete PlayerBuilder: " +
-      "missing ");
+    if (!missingParams.isEmpty())
+      throw new IncompletePlayerBuilderException("Incomplete PlayerBuilder: " +
+        "missing " + missingParams.toString());
   }
 }

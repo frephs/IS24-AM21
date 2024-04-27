@@ -23,8 +23,8 @@ class PlayableCardTest {
     assertTrue(card.getKingdom().isEmpty());
 
     assertEquals(
-      ResourceType.ANIMAL_KINGDOM,
-      new PlayableCard(123, null, null, ResourceType.ANIMAL_KINGDOM)
+      ResourceType.ANIMAL,
+      new PlayableCard(123, null, null, ResourceType.ANIMAL)
         .getKingdom()
         .orElse(null)
     );
@@ -48,7 +48,7 @@ class PlayableCardTest {
 
     PlayableFrontSide front = new ResourceCardFrontSide(123);
     PlayableBackSide back = new PlayableBackSide(
-      List.of(ResourceType.ANIMAL_KINGDOM)
+      List.of(ResourceType.ANIMAL)
     );
     PlayableCard playedCard = new PlayableCard(123, front, back);
 
