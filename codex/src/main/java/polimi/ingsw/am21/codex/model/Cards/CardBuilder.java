@@ -107,7 +107,9 @@ public class CardBuilder {
       "set"
     );
 
-    this.objectiveResources = Optional.ofNullable(objectiveResources);
+    this.objectiveResources = Optional.ofNullable(
+      objectiveResources == null ? null : new HashMap<>(objectiveResources)
+    );
     return this;
   }
 
@@ -188,11 +190,9 @@ public class CardBuilder {
     checkType(CardType.STARTER, CardType.RESOURCE, CardType.GOLD);
 
     if (side == CardSideType.FRONT) frontCorners = Optional.ofNullable(
-      cornerMap
-    );
+      cornerMap == null ? null : new HashMap<>(cornerMap)
     else if (side == CardSideType.BACK) backCorners =Optional.ofNullable(
-      cornerMap
-    );
+      cornerMap == null ? null : new HashMap<>(cornerMap)
 
     else throw new NullPointerException();
 
