@@ -4,6 +4,7 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +69,13 @@ public class Player {
     }
 
     /**
+     * @return the player token color
+     */
+    public Optional<List<PlayableCard>> getHand() {
+      return Optional.ofNullable(this.cards);
+    }
+
+    /**
      * @param cards list drawn from the GameBoard
      */
     public PlayerBuilder setHand(List<PlayableCard> cards) {
@@ -102,7 +110,8 @@ public class Player {
     /**
      * @return a functioning player
      */
-    public Player build() {
+    public Player build() throws IncompletePlayerBuilderException {
+      IncompletePlayerBuilderException.checkPlayerBuilder(this);
       return new Player(this);
     }
 

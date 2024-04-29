@@ -1,17 +1,16 @@
 package polimi.ingsw.am21.codex.model.Lobby;
 
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.*;
-import polimi.ingsw.am21.codex.model.Player;
-import polimi.ingsw.am21.codex.model.TokenColor;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.GameBoard.*;
 
 import java.util.*;
 
@@ -200,7 +199,7 @@ public class Lobby {
    * @return the finalized Player object
    * @throws PlayerNotFoundException if the socked ID is not found in the lobby
    */
-  public Player finalizePlayer(UUID socketId, CardSideType cardSide)
+  public Player finalizePlayer(UUID socketId, CardSideType cardSide, List<PlayableCard> hand)
   throws PlayerNotFoundException, IncompletePlayerBuilderException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
@@ -208,8 +207,7 @@ public class Lobby {
     Player.PlayerBuilder playerBuilder = lobbyPlayers.get(socketId);
 
     playerBuilder.setStarterCardSide(cardSide);
-    IncompletePlayerBuilderException.checkPlayerBuilder(playerBuilder);
-
+    playerBuilder.setHand(hand);
     Player player = playerBuilder.build();
     lobbyPlayers.remove(socketId);
     return player;

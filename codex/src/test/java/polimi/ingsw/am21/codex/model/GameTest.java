@@ -3,19 +3,14 @@ package polimi.ingsw.am21.codex.model;
 import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.GameBoard.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.GameBoard.PlayerNotFoundException;
-import polimi.ingsw.am21.codex.model.GameBoard.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
-import polimi.ingsw.am21.codex.model.Lobby.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.GameBoard.*;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 
@@ -38,7 +33,7 @@ class GameTest {
 
 
     String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/cards.json";
+      "/Resources/cards.json";
     File file = new File(jsonLocation);
     try {
       String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
@@ -117,7 +112,7 @@ class GameTest {
 
     lobby.setObjectiveCard(firstPlayer, true);
 
-    lobby.finalizePlayer(firstPlayer, CardSideType.BACK);
+    lobby.finalizePlayer(firstPlayer, CardSideType.BACK, this.game.drawHand());
     // player was already finalized cannot finalize twice
     assertThrows(PlayerNotFoundException.class,
       () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT));
@@ -190,7 +185,7 @@ class GameTest {
       this.game = new Game(4, this.cardsJSON);
       preparePlayers();
       List<String> order = this.game.getPlayersOrder();
-      if(order.get(0).compareTo("Player_0") != 0
+      if (order.get(0).compareTo("Player_0") != 0
         || order.get(1).compareTo("Player_1") != 0
         || order.get(2).compareTo("Player_2") != 0) {
         isDifferent = true;
@@ -207,4 +202,5 @@ class GameTest {
     if (!isDifferent)
       fail("After 10k tests the player order was never shuffled");
   }
+
 }

@@ -1,9 +1,8 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
-import polimi.ingsw.am21.codex.model.DeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.Player;
+import polimi.ingsw.am21.codex.model.Player.Player;
 
 import java.util.List;
 import java.util.UUID;

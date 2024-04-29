@@ -1,23 +1,17 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
 import org.json.JSONArray;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Cards.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.Cards.PlayableCard;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.TokenColor;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
-import polimi.ingsw.am21.codex.model.Lobby.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 import java.io.File;

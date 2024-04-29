@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model;
 
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
@@ -35,7 +36,7 @@ public class Game {
     this.lobby = new Lobby(players);
 
     String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/cards.json";
+      "/Resources/cards.json";
     File file = new File(jsonLocation);
     JSONArray cards;
     try {
