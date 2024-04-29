@@ -25,14 +25,14 @@ public class IncompletePlayerBuilderException extends RuntimeException {
     if (playerBuilder.getHand().isEmpty()) {
       missingParams.add("hand");
     } else if (playerBuilder.getHand().get().size() != 3) {
-      invalidParams.add("hand cards");
+      invalidParams.add("hand cards (expected 3 cards but found "+playerBuilder.getHand().get().size()+")");
     }
 
     if (!missingParams.isEmpty() || !invalidParams.isEmpty()) {
       String missingPramsStr = !missingParams.isEmpty() ?
-        "\nmissing " + String.join(",", missingParams) : "";
+        "\nmissing: " + String.join(",", missingParams) : "";
       String invalidPramsStr = !invalidParams.isEmpty() ?
-        "\ninvalid" + String.join(",", invalidParams) : "";
+        "\ninvalid: " + String.join(",", invalidParams) : "";
       throw new IncompletePlayerBuilderException("Incomplete/wrong " +
         "PlayerBuilder:" + missingPramsStr + invalidPramsStr
       );

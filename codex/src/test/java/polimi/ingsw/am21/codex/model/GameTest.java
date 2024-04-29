@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
@@ -111,51 +112,59 @@ class GameTest {
 
 
     lobby.setObjectiveCard(firstPlayer, true);
-
-    lobby.finalizePlayer(firstPlayer, CardSideType.BACK, this.game.drawHand());
+    try {
+      lobby.finalizePlayer(firstPlayer, CardSideType.BACK,
+        this.game.drawHand());
+    } catch (EmptyDeckException e) {
+      fail("Empty deck exception");
+    }
     // player was already finalized cannot finalize twice
     assertThrows(PlayerNotFoundException.class,
-      () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT, this.game.drawHand()));
+      () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT,
+        this.game.drawHand()));
   }
 
-  @Test
-  void preparePlayers() {
-    assertNotNull(this.game);
+  void preparePlayers(Game game) {
+    assertNotNull(game);
     // the lobby should be created in the game constructor
-    assertNotNull(this.game.getLobby());
+    assertNotNull(game.getLobby());
 
-    int players = this.game.getLobby().getRemainingPlayerSlots();
+    int players = game.getLobby().getRemainingPlayerSlots();
     int i = 0;
     while (players-- != 0) {
       UUID playerSocketID = UUID.randomUUID();
 
       try {
-        this.game.getLobby()
-          .addPlayer(playerSocketID, this.game.drawObjectiveCardPair(),
-            this.game.drawStarterCard());
+        game.getLobby()
+          .addPlayer(playerSocketID, game.drawObjectiveCardPair(),
+            game.drawStarterCard());
       } catch (Exception e) {
         fail("Failed creating player in lobby");
       }
 
 
-      this.game.getLobby().setNickname(playerSocketID, "Player_" + i++);
+      game.getLobby().setNickname(playerSocketID, "Player_" + i++);
 
-      this.game.getLobby().setToken(playerSocketID, TokenColor.GREEN);
-      this.game.getLobby().setToken(playerSocketID, TokenColor.RED);
+      game.getLobby().setToken(playerSocketID, TokenColor.GREEN);
+      game.getLobby().setToken(playerSocketID, TokenColor.RED);
 
       Optional<CardPair<ObjectiveCard>> firstPlayerObjectiveCards =
-        this.game.getLobby()
+        game.getLobby()
           .getPlayerObjectiveCards(playerSocketID);
       if (firstPlayerObjectiveCards.isEmpty())
         fail("The first player objective cards are null, this should never " +
           "happened 💀");
 
-      this.game.getLobby().setObjectiveCard(playerSocketID, true);
+      game.getLobby().setObjectiveCard(playerSocketID, true);
+      try {
+        Player player = game.getLobby()
+          .finalizePlayer(playerSocketID, CardSideType.FRONT,
+            game.drawHand());
 
-      Player player = this.game.getLobby()
-        .finalizePlayer(playerSocketID, CardSideType.FRONT, this.game.drawHand());
-
-      this.game.addPlayer(player);
+        game.addPlayer(player);
+      } catch (EmptyDeckException e) {
+        fail("Empty deck exception");
+      }
     }
 
   }
@@ -163,7 +172,7 @@ class GameTest {
 
   @Test
   void testGame() {
-    preparePlayers();
+    preparePlayers(this.game);
 
     assertEquals(GameState.GAME_INIT, this.game.getState());
     game.start();
@@ -181,10 +190,10 @@ class GameTest {
   void testPlayerShuffling() {
     boolean isDifferent = false;
     for (int i = 0; i < 10000 && !isDifferent; ++i) {
-
-      this.game = new Game(4, this.cardsJSON);
-      preparePlayers();
-      List<String> order = this.game.getPlayersOrder();
+      this.game = new Game(4);
+      preparePlayers(game);
+      game.start();
+      List<String> order = game.getPlayersOrder();
       if (order.get(0).compareTo("Player_0") != 0
         || order.get(1).compareTo("Player_1") != 0
         || order.get(2).compareTo("Player_2") != 0) {

@@ -89,7 +89,7 @@ public class GameController {
   }
 
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-  throws GameNotFoundException, IncompletePlayerBuilderException {
+  throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException {
     Game game = this.getGame(gameId);
     Player newPlayer = game.getLobby()
       .finalizePlayer(socketID, sideType, game.drawHand());

@@ -315,14 +315,11 @@ public class Game {
     return this.remainingRounds == 1;
   }
 
-  public List<PlayableCard> drawHand() {
+  public List<PlayableCard> drawHand() throws EmptyDeckException {
     List<PlayableCard> hand = new ArrayList<>();
-    try {
-      hand.add(this.gameBoard.drawGoldCardFromDeck());
-      hand.add(this.gameBoard.drawResourceCardFromDeck());
-      hand.add(this.gameBoard.drawResourceCardFromDeck());
-    } catch (EmptyDeckException ignored) {
-    }
+    hand.add(this.gameBoard.drawGoldCardFromDeck());
+    hand.add(this.gameBoard.drawResourceCardFromDeck());
+    hand.add(this.gameBoard.drawResourceCardFromDeck());
     return hand;
   }
 }
