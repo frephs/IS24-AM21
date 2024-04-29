@@ -27,7 +27,7 @@ public class PlayableCard extends Card {
   /**
    * The number of corners this card is currently covering
    */
-  private int coveredCorners;
+  private int coveredCorners = 0;
 
   /**
    * The kingdom this card is part of, if any

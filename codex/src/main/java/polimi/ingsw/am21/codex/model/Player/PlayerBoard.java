@@ -32,7 +32,7 @@ public class PlayerBoard {
      * @param objectiveCard chosen by the client controller (physical player)
      */
     public PlayerBoard(List<PlayableCard> hand, PlayableCard starterCard, ObjectiveCard objectiveCard) {
-        this.hand = hand;
+        this.hand = new LinkedList<>(hand);
         this.objectiveCard = objectiveCard;
 
         // let's initialize the maps with resources to 0
@@ -44,8 +44,8 @@ public class PlayerBoard {
         );
 
         // let's add the starterCard to the playerBoard
+      this.hand.add(starterCard); // the starter card cannot skip the placeability checks
       availableSpots.add(new Position());
-      this.hand.add(starterCard);
       placeCard(starterCard, starterCard.getPlayedSideType().orElseThrow(), new Position());
 
     }
@@ -84,7 +84,7 @@ public class PlayerBoard {
 
     /**
      * Places a card on the playerBoard,
-     * @param playedCardIndex of the card to be played chosen from the player's hand, the card will be evaluated after placement
+     * @param playedCard chosen from the player's hand, the card will be evaluated after placement
      * @param playedSideType of the card chosen to be placed on the PlayerBoard
      * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
      * @throws IllegalPlacingPositionException if the position is either not reachable or forbidden
@@ -94,29 +94,40 @@ public class PlayerBoard {
     public void placeCard(PlayableCard playedCard, CardSideType playedSideType, Position position) throws
       IllegalPlacingPositionException, IndexOutOfBoundsException, IllegalCardSideChoiceException {
 
-        if(! availableSpots.contains(position)){
-          throw new IllegalPlacingPositionException();
+        playedCard.setPlayedSideType(playedSideType);
+        if( playedCards.containsKey(position)){
+          throw new IllegalPlacingPositionException("You tried placing a card in a spot which is already occupied");
         }
 
-        if(! getPlaceableCardSides().contains(playedCard.getSide(playedSideType))){
+        if (forbiddenSpots.contains(position)) {
+          throw new IllegalPlacingPositionException("You tried placing a card in a spot which is forbidden");
+        }
+
+        if(! availableSpots.contains(position)){
+          throw new IllegalPlacingPositionException("You tried placing a card in a spot which is unreachable");
+        }
+
+        if(! getPlaceableCardSides().contains(playedCard.getPlayedSide().orElseThrow(()-> new NoSuchElementException("Side is not present")))){
           throw new IllegalCardSideChoiceException();
         }
 
         this.hand.remove(playedCard);
-        playedCard.setPlayedSideType(playedSideType);
-        PlayableSide playedSide = playedCard.getPlayedSide().orElseThrow();
+
+        PlayableSide playedSide = playedCard.getPlayedSide().orElseThrow(() -> new NoSuchElementException("Side not present"));
+
 
         this.playedCards.put(position, playedCard);
 
         updateAvailableSpots(playedSide, position);
-        updateResourcesAndObjects(playedSide, position);
+        updateResourcesAndObjects(playedCard, position);
 
     }
 
       /**
        * Helper method called by PlayerBoard.placeCard() to update the player's available resources and objects
        * */
-      private void updateResourcesAndObjects(PlayableSide playedSide, Position position) {
+      private void updateResourcesAndObjects(PlayableCard playedCard, Position position) {
+        PlayableSide playedSide =  playedCard.getPlayedSide().orElseThrow(()-> new NoSuchElementException("Side not present"));
         Map<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
 
         //let's add the resources of the card just placed
@@ -130,10 +141,11 @@ public class PlayerBoard {
                     Position adjacentCardPosition = position.computeAdjacentPosition(cornerPosition);
                     if (this.playedCards.containsKey((adjacentCardPosition))) {
                         CornerPosition oppositeCornerPosition = cornerPosition.getOppositeCornerPosition();
-                        PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().orElseThrow();
+                        PlayableSide oppositeCard = playedCards.get(adjacentCardPosition).getPlayedSide().orElseThrow(() -> new NoSuchElementException("Side not present"));
                         Map<CornerPosition, Corner> enabledOppositeCorners = oppositeCard.getCorners();
                         Corner oppositeCorner = enabledOppositeCorners.get(oppositeCornerPosition);
                         oppositeCorner.cover();
+                        playedCard.setCoveredCorners(playedCard.getCoveredCorners() + 1                        );
                         updateResourcesAndObjectsMaps(oppositeCorner, -1);
                     }
                 }
@@ -201,7 +213,7 @@ public class PlayerBoard {
                         availableSpots.add(adjacentCardPosition);
                     }
                 }
-            }else{
+            }else if(! playedCards.containsKey(adjacentCardPosition)){
                 forbiddenSpots.add(adjacentCardPosition);
             }
         }
