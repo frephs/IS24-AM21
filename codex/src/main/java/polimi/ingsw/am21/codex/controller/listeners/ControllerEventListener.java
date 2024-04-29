@@ -18,6 +18,8 @@ public interface ControllerEventListener {
 
   void playerLeftLobby(String gameId, UUID socketID);
 
+  void playerJoinedGame(String gameId, UUID socketID, String nickname);
+
   void gameStarted(List<Player> players);
 
   void changeTurn(Integer nextPlayer, Boolean isLastRound);
@@ -27,6 +29,7 @@ public interface ControllerEventListener {
 
   void nextTurn(DrawingCardSource drawingCardSource,
                 DrawingDeckType drawingDeckType);
+
   void nextTurn();
 
 }

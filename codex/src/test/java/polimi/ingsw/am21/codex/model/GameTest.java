@@ -115,7 +115,7 @@ class GameTest {
     lobby.finalizePlayer(firstPlayer, CardSideType.BACK, this.game.drawHand());
     // player was already finalized cannot finalize twice
     assertThrows(PlayerNotFoundException.class,
-      () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT));
+      () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT, this.game.drawHand()));
   }
 
   @Test
@@ -153,7 +153,7 @@ class GameTest {
       this.game.getLobby().setObjectiveCard(playerSocketID, true);
 
       Player player = this.game.getLobby()
-        .finalizePlayer(playerSocketID, CardSideType.FRONT);
+        .finalizePlayer(playerSocketID, CardSideType.FRONT, this.game.drawHand());
 
       this.game.addPlayer(player);
     }
@@ -202,5 +202,4 @@ class GameTest {
     if (!isDifferent)
       fail("After 10k tests the player order was never shuffled");
   }
-
 }

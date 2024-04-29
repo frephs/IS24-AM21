@@ -8,16 +8,19 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameManager;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
+import java.net.Socket;
 import java.util.*;
 
 public class GameController {
@@ -85,6 +88,15 @@ public class GameController {
     }
   }
 
+  public void joinGame(String gameId, UUID socketID, CardSideType sideType)
+  throws GameNotFoundException, IncompletePlayerBuilderException {
+    Game game = this.getGame(gameId);
+    Player newPlayer = game.getLobby()
+      .finalizePlayer(socketID, sideType, game.drawHand());
+    game.addPlayer(newPlayer);
+    listeners.forEach(listener -> listener.playerJoinedGame(gameId, socketID, newPlayer.getNickname()));
+  }
+
 
   public void createGame(String gameId, Integer players) {
     manager.createGame(gameId, players);
@@ -142,7 +154,7 @@ public class GameController {
   }
 
   // TODO: implement
-  public void placeCard(){
+  public void placeCard() {
 
   }
 }

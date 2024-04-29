@@ -314,4 +314,15 @@ public class Game {
   public Boolean isLastRound() {
     return this.remainingRounds == 1;
   }
+
+  public List<PlayableCard> drawHand() {
+    List<PlayableCard> hand = new ArrayList<>();
+    try {
+      hand.add(this.gameBoard.drawGoldCardFromDeck());
+      hand.add(this.gameBoard.drawResourceCardFromDeck());
+      hand.add(this.gameBoard.drawResourceCardFromDeck());
+    } catch (EmptyDeckException ignored) {
+    }
+    return hand;
+  }
 }

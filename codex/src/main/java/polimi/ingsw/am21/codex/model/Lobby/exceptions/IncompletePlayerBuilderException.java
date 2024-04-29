@@ -24,7 +24,7 @@ public class IncompletePlayerBuilderException extends RuntimeException {
       missingParams.add("starterCardSide");
     if (playerBuilder.getHand().isEmpty()) {
       missingParams.add("hand");
-    } else if (playerBuilder.getHand().get().size() != 4) {
+    } else if (playerBuilder.getHand().get().size() != 3) {
       invalidParams.add("hand cards");
     }
 
