@@ -89,12 +89,14 @@ public class GameController {
   }
 
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-  throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException {
+  throws GameNotFoundException, IncompletePlayerBuilderException,
+         EmptyDeckException {
     Game game = this.getGame(gameId);
     Player newPlayer = game.getLobby()
       .finalizePlayer(socketID, sideType, game.drawHand());
     game.addPlayer(newPlayer);
-    listeners.forEach(listener -> listener.playerJoinedGame(gameId, socketID, newPlayer.getNickname()));
+    listeners.forEach(listener -> listener.playerJoinedGame(gameId, socketID,
+      newPlayer.getNickname()));
   }
 
 
@@ -119,9 +121,10 @@ public class GameController {
       throw new PlayerNotActive();
   }
 
-  private void sendNextTurnEvents(Game game) {
+  private void sendNextTurnEvents(String gameId, Game game) {
     if (game.isLastRound()) {
-      listeners.forEach(listener -> listener.changeTurn(game.getCurrentPlayerIndex(), game.isLastRound()));
+      listeners.forEach(listener -> listener.changeTurn(gameId,
+        game.getCurrentPlayerIndex(), game.isLastRound()));
     }
   }
 
@@ -131,7 +134,7 @@ public class GameController {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     game.nextTurn();
-    this.sendNextTurnEvents(game);
+    this.sendNextTurnEvents(gameId, game);
   }
 
   public void nextTurn(String gameId, String playerNickname,
@@ -142,7 +145,7 @@ public class GameController {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     game.nextTurn(drawingSource, deckType);
-    this.sendNextTurnEvents(game);
+    this.sendNextTurnEvents(gameId, game);
   }
 
   public void addListener(ControllerEventListener listener) {
@@ -153,8 +156,15 @@ public class GameController {
     listeners.remove(listener);
   }
 
-  // TODO: implement
-  public void placeCard() {
-
+  public void placeCard(String gameId, String playerNickname,
+                        Integer playerHandCardNumber, CardSideType side,
+                        Position position)
+  throws GameNotFoundException, PlayerNotActive {
+    Game game = this.getGame(gameId);
+    this.checkIfCurrentPlayer(game, playerNickname);
+    Player currentPlayer = game.getCurrentPlayer();
+    currentPlayer.placeCard(playerHandCardNumber, side, position);
+    listeners.forEach(listener -> listener.cardPlaced(gameId,
+      playerHandCardNumber, side, position));
   }
 }
