@@ -95,6 +95,13 @@ public class PlayableCard extends Card {
   }
 
   /**
+   * @return the card's backPermanentResources
+   * */
+  public List<ResourceType> getBackPermanentResources(){
+    return backSide.getPermanentResources();
+  }
+
+  /**
    * @param playedSideType The type of the side that has been played by the
    *                       player
    */

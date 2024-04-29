@@ -135,6 +135,17 @@ public class PlayerBoard {
                 (cornerPosition, corner) -> updateResourcesAndObjectsMaps(corner, +1)
         );
 
+        //if the played side is CardSideType.back let's add the backPermanentResources too
+        if(playedCard.getPlayedSideType().orElseThrow() == CardSideType.BACK){
+        playedCard.getBackPermanentResources().forEach(
+          resource ->
+            updateResourcesAndObjectsMaps(
+              new Corner<ResourceType>(resource),+1
+            )
+        );
+
+        }
+
         //let's remove the resources of the cards that are covered.
         Arrays.stream(CornerPosition.values()).forEach(
                 cornerPosition -> {
