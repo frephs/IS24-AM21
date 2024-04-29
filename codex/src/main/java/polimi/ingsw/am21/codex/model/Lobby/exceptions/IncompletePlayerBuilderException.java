@@ -30,9 +30,9 @@ public class IncompletePlayerBuilderException extends RuntimeException {
 
     if (!missingParams.isEmpty() || !invalidParams.isEmpty()) {
       String missingPramsStr = !missingParams.isEmpty() ?
-        "\nmissing " + missingParams.toString() : "";
+        "\nmissing " + String.join(",", missingParams) : "";
       String invalidPramsStr = !invalidParams.isEmpty() ?
-        "\ninvalid" + invalidParams.toString() : "";
+        "\ninvalid" + String.join(",", invalidParams) : "";
       throw new IncompletePlayerBuilderException("Incomplete/wrong " +
         "PlayerBuilder:" + missingPramsStr + invalidPramsStr
       );
