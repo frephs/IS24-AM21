@@ -51,10 +51,10 @@ public class GameBoard {
    * @param cards the full list
    */
   public static GameBoard fromJSON(JSONArray cards) {
-    List<PlayableCard> goldDeck = new ArrayList<>();
-    List<PlayableCard> starterDeck = new ArrayList<>();
-    List<ObjectiveCard> objectiveDeck = new ArrayList<>();
-    List<PlayableCard> resourceDeck = new ArrayList<>();
+    List<PlayableCard> goldCardsList = new ArrayList<>();
+    List<PlayableCard> starterCardsList = new ArrayList<>();
+    List<ObjectiveCard> objectiveCardsList = new ArrayList<>();
+    List<PlayableCard> resourceCardsList = new ArrayList<>();
     List<Card> allCards = new ArrayList<>();
 
     for (int i = 0; i < cards.length(); i++) {
@@ -192,20 +192,19 @@ public class GameBoard {
 
       if (type == CardType.OBJECTIVE) {
         ObjectiveCard objectiveCard = builder.buildObjectiveCard();
-        objectiveDeck.add(objectiveCard);
+        objectiveCardsList.add(objectiveCard);
         allCards.add(objectiveCard);
       } else {
         PlayableCard playableCard = builder.buildPlayableCard();
-        if (type == CardType.GOLD) goldDeck.add(playableCard);
-        else if (type == CardType.RESOURCE) resourceDeck.add(playableCard);
-        else if (type == CardType.STARTER) starterDeck.add(playableCard);
+        if (type == CardType.GOLD) goldCardsList.add(playableCard);
+        else if (type == CardType.RESOURCE) resourceCardsList.add(playableCard);
+        else if (type == CardType.STARTER) starterCardsList.add(playableCard);
         allCards.add(playableCard);
       }
     }
 
-
-    return new GameBoard(allCards, goldDeck, resourceDeck, objectiveDeck,
-      starterDeck);
+    return new GameBoard(allCards, goldCardsList, starterCardsList,
+      objectiveCardsList, resourceCardsList);
 
   }
 
@@ -375,7 +374,7 @@ public class GameBoard {
    */
   public void insertObjectiveCard(ObjectiveCard card) {
     this.objectiveDeck.insert(card);
-}
+  }
 
   /**
    * Inserts a starter card in the bottom of the deck
