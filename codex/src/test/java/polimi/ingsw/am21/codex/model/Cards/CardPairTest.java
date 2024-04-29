@@ -21,7 +21,7 @@ class CardPairTest {
 
   @Test
   void getSecond() {
-    assertEquals(pair.getFirst().getId(), 456);
+    assertEquals(pair.getSecond().getId(), 456);
   }
 
   @Test
@@ -39,7 +39,7 @@ class CardPairTest {
   @Test
   void swap() {
     pair.swap();
-    assertEquals(pair.getFirst().getId(), 123);
-    assertEquals(pair.getSecond().getId(), 456);
+    assertEquals(pair.getFirst().getId(), 456);
+    assertEquals(pair.getSecond().getId(), 123);
   }
 }

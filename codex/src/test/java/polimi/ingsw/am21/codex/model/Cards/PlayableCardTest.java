@@ -13,7 +13,7 @@ class PlayableCardTest {
 
   @BeforeEach
   void setup() {
-    this.card = new PlayableCard(123, null, null);
+    this.card = new PlayableCard(123, new ResourceCardFrontSide(456), null);
   }
 
   @Test
@@ -47,9 +47,7 @@ class PlayableCardTest {
     assertTrue(card.getPlayedSide().isEmpty());
 
     PlayableFrontSide front = new ResourceCardFrontSide(123);
-    PlayableBackSide back = new PlayableBackSide(
-      List.of(ResourceType.ANIMAL)
-    );
+    PlayableBackSide back = new PlayableBackSide(List.of(ResourceType.ANIMAL));
     PlayableCard playedCard = new PlayableCard(123, front, back);
 
     assertTrue(playedCard.getPlayedSide().isEmpty());
@@ -80,6 +78,8 @@ class PlayableCardTest {
 
   @Test
   void getEvaluator() {
-    assertEquals(123, card.getEvaluator().apply(null));
+    assertEquals(0, card.getEvaluator().apply(null));
+    card.setPlayedSideType(CardSideType.FRONT);
+    assertEquals(456, card.getEvaluator().apply(null));
   }
 }
