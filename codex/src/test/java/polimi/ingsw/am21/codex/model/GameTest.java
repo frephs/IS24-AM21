@@ -35,7 +35,7 @@ class GameTest {
 
 
     String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/cards.json";
+      "/Resources/cards.json";
     File file = new File(jsonLocation);
     try {
       String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
