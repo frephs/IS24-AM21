@@ -9,147 +9,147 @@ import java.util.List;
 import java.util.Optional;
 
 public class Player {
-    private final String nickname;
-    private final PlayerBoard board;
-    private final TokenColor token;
-    private int points;
+  private final String nickname;
+  private final PlayerBoard board;
+  private final TokenColor token;
+  private int points;
 
-    Player(PlayerBuilder builder){
-        this.nickname = builder.nickname;
-        this.token = builder.token;
-        this.points = 0;
-        this.board = new PlayerBoard(
-                builder.cards,
-                builder.starterCard,
-                builder.objectiveCard
-        );
+  Player(PlayerBuilder builder) {
+    this.nickname = builder.nickname;
+    this.token = builder.token;
+    this.points = 0;
+    this.board = new PlayerBoard(
+      builder.cards,
+      builder.starterCard,
+      builder.objectiveCard
+    );
+  }
+
+  public static class PlayerBuilder {
+    private String nickname;
+    private TokenColor token;
+    private List<PlayableCard> cards;
+    private PlayableCard starterCard;
+    private ObjectiveCard objectiveCard;
+
+    public PlayerBuilder(PlayableCard card) {
+      this.starterCard = card;
     }
 
-    public static class PlayerBuilder{
-        private String nickname;
-        private TokenColor token;
-        private List<PlayableCard> cards;
-        private PlayableCard starterCard;
-        private ObjectiveCard objectiveCard;
+    /**
+     * @param nickname the player's chose nickname, its uni
+     */
+    public PlayerBuilder setNickname(String nickname) {
+      this.nickname = nickname;
+      return this;
+    }
 
-        /**
-         * @param nickname the player's chose nickname, its uni
-         */
-        public PlayerBuilder setNickname(String nickname){
-            this.nickname = nickname;
-            return this;
-        }
-
-        /**
-         * @return the player nickname color
-         */
-        public Optional<String> getNickname(){
-            return Optional.ofNullable(this.nickname);
-        }
-
-
-        /**
-         * @param token chosen by the client controller (physical player)
-         */
-        public PlayerBuilder setTokenColor(TokenColor token){
-            this.token = token;
-            return this;
-        }
-
-        /**
-         * @return the player token color
-         */
-        public Optional<TokenColor> getTokenColor(){
-            return Optional.ofNullable(this.token);
-        }
-
-        /**
-         * @param cards list drawn from the GameBoard
-         */
-        public PlayerBuilder setHand(List<PlayableCard> cards){
-            this.cards = cards;
-            return this;
-        }
-
-        /**
-         * @param starterCard drawn from the GameBoard
-         * @throws StarterCardPlayedSideNotSetException if the played side of the starter card is not set before player construction.
-         */
-        public PlayerBuilder setStarterCard(PlayableCard starterCard) /*throws StarterCardPlayedSideNotSetException*/{
-            /*if(starterCard.getPlayedSide().isEmpty()){
-                throw new StarterCardPlayedSideNotSetException();
-            }*/
-            this.starterCard = starterCard;
-            return this;
-        }
-
-
-        /**
-         * @param side chosen by the client controller (physical player)
-         */
-        public void setStarterCardSide(CardSideType side){
-            this.starterCard.setPlayedSideType(side);
-        }
-
-        /**
-         * @param objectiveCard chosen by the client controller (physical player)
-         */
-        public PlayerBuilder setObjectiveCard(ObjectiveCard objectiveCard){
-            this.objectiveCard = objectiveCard;
-            return this;
-        }
-
-        /**
-         * @return a functioning player
-         */
-        public Player build(){
-                return new Player(this);
-        }
-
-        /**
-         * @return the player's starter card
-         */
-        public Optional<PlayableCard> getStarterCard() {
-            return Optional.ofNullable(starterCard);
-        }
+    /**
+     * @return the player nickname color
+     */
+    public Optional<String> getNickname() {
+      return Optional.ofNullable(this.nickname);
     }
 
 
     /**
-     * @return player's nickname
+     * @param token chosen by the client controller (physical player)
      */
-    public String getNickname(){
-        return this.nickname;
+    public PlayerBuilder setTokenColor(TokenColor token) {
+      this.token = token;
+      return this;
     }
 
     /**
-     * @return player's board
+     * @return the player token color
      */
-    public PlayerBoard getBoard(){
-        return this.board;
+    public Optional<TokenColor> getTokenColor() {
+      return Optional.ofNullable(this.token);
     }
 
     /**
-     * @return player's token
+     * @param cards list drawn from the GameBoard
      */
-    public TokenColor getToken(){
-        return this.token;
+    public PlayerBuilder setHand(List<PlayableCard> cards) {
+      this.cards = cards;
+      return this;
     }
 
     /**
-     * @return player's points
+     * @param starterCard The starter card drawn from the GameBoard
+     * @return the player starter card
      */
-    public int getPoints() {
-        return points;
+    public PlayerBuilder setStarterCard(PlayableCard starterCard) {
+      this.starterCard = starterCard;
+      return this;
     }
-
 
     /**
-     * @param card drawn from the GameBoard which is added to the players hand
+     * @param side chosen by the client controller (physical player)
      */
-    public void drawCard(PlayableCard card){
-        board.drawCard(card);
+    public void setStarterCardSide(CardSideType side) {
+      this.starterCard.setPlayedSideType(side);
     }
+
+    /**
+     * @param objectiveCard chosen by the client controller (physical player)
+     */
+    public PlayerBuilder setObjectiveCard(ObjectiveCard objectiveCard) {
+      this.objectiveCard = objectiveCard;
+      return this;
+    }
+
+    /**
+     * @return a functioning player
+     */
+    public Player build() {
+      return new Player(this);
+    }
+
+    /**
+     * @return the player's starter card
+     */
+    public PlayableCard getStarterCard() {
+      return starterCard;
+    }
+  }
+
+
+  /**
+   * @return player's nickname
+   */
+  public String getNickname() {
+    return this.nickname;
+  }
+
+  /**
+   * @return player's board
+   */
+  public PlayerBoard getBoard() {
+    return this.board;
+  }
+
+  /**
+   * @return player's token
+   */
+  public TokenColor getToken() {
+    return this.token;
+  }
+
+  /**
+   * @return player's points
+   */
+  public int getPoints() {
+    return points;
+  }
+
+
+  /**
+   * @param card drawn from the GameBoard which is added to the players hand
+   */
+  public void drawCard(PlayableCard card) {
+    board.drawCard(card);
+  }
 
     /**
      * Asks the PlayerBoard to position the card and then evaluates
@@ -174,7 +174,7 @@ public class Player {
     }
 
     /**
-     * Asks the PlayerBoard to evaluate the points of the objective card passed as argument
+     * Uses the PlayerBoard to evaluate the points of the objective card passed as argument
      * adds the point to the player score.
      * @param objectiveCard to be evaluated at the end of the game
      */
@@ -182,14 +182,15 @@ public class Player {
         this.points += objectiveCard.getEvaluator().apply(board);
     }
 
-    /**
-     * Evaluates the player secret objective, called by the Game class when Game overs
-     * */
-    public void evaluateSecretObjective(){
-        this.evaluate(
-            this.board.getObjectiveCard()
-        );
-    }
+  /**
+   * Evaluates the player secret objective, called by the Game class when
+   * Game overs
+   */
+  public void evaluateSecretObjective() {
+    this.evaluate(
+      this.board.getObjectiveCard()
+    );
+  }
 }
 
 

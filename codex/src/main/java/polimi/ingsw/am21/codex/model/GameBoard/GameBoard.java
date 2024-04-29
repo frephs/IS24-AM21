@@ -13,6 +13,7 @@ import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ public class GameBoard {
   private CardPair<ObjectiveCard> objectiveCards;
   final private Deck<PlayableCard> resourceDeck;
   private CardPair<PlayableCard> resourceCards;
+  private final List<Card> allCards;
 
   /**
    * @param index the index of the ge
@@ -45,6 +47,7 @@ public class GameBoard {
   /**
    * static method to create a GameBoard from a JSON array
    * Initializes the decks using a JSONArray
+   *
    * @param cards the full list
    */
   public static GameBoard fromJSON(JSONArray cards) {
@@ -52,6 +55,7 @@ public class GameBoard {
     List<PlayableCard> starterDeck = new ArrayList<>();
     List<ObjectiveCard> objectiveDeck = new ArrayList<>();
     List<PlayableCard> resourceDeck = new ArrayList<>();
+    List<Card> allCards = new ArrayList<>();
 
     for (int i = 0; i < cards.length(); i++) {
       JSONObject card = cards.getJSONObject(i);
@@ -187,17 +191,21 @@ public class GameBoard {
       }
 
       if (type == CardType.OBJECTIVE) {
-        objectiveDeck.add(builder.buildObjectiveCard());
+        ObjectiveCard objectiveCard = builder.buildObjectiveCard();
+        objectiveDeck.add(objectiveCard);
+        allCards.add(objectiveCard);
       } else {
         PlayableCard playableCard = builder.buildPlayableCard();
         if (type == CardType.GOLD) goldDeck.add(playableCard);
         else if (type == CardType.RESOURCE) resourceDeck.add(playableCard);
         else if (type == CardType.STARTER) starterDeck.add(playableCard);
+        allCards.add(playableCard);
       }
     }
 
 
-    return new GameBoard(goldDeck, resourceDeck, objectiveDeck, starterDeck);
+    return new GameBoard(allCards, goldDeck, resourceDeck, objectiveDeck,
+      starterDeck);
 
   }
 
@@ -211,7 +219,8 @@ public class GameBoard {
    * @param resourceCards  The pair of resource cards
    * @param objectiveCards The pair of common objective cards
    */
-  public GameBoard(Deck<PlayableCard> goldDeck,
+  public GameBoard(List<Card> allCards,
+                   Deck<PlayableCard> goldDeck,
                    Deck<PlayableCard> resourceDeck,
                    Deck<PlayableCard> starterDeck,
                    Deck<ObjectiveCard> objectiveDeck,
@@ -225,13 +234,15 @@ public class GameBoard {
     this.resourceCards = resourceCards;
     this.objectiveDeck = objectiveDeck;
     this.objectiveCards = objectiveCards;
+    this.allCards = allCards;
   }
 
   /**
    * Constructor
    * Initializes the decks and draws the first cards
    */
-  public GameBoard(List<PlayableCard> goldCardsList,
+  public GameBoard(List<Card> allCards,
+                   List<PlayableCard> goldCardsList,
                    List<PlayableCard> starterCardsList,
                    List<ObjectiveCard> objectiveCardsList,
                    List<PlayableCard> resourceCardsList) {
@@ -239,6 +250,7 @@ public class GameBoard {
     this.starterDeck = new Deck<>(starterCardsList);
     this.objectiveDeck = new Deck<>(objectiveCardsList);
     this.resourceDeck = new Deck<>(resourceCardsList);
+    this.allCards = allCards;
 
     // shuffle all the cards
     this.goldDeck.shuffle();
@@ -270,19 +282,39 @@ public class GameBoard {
   }
 
   /**
-   * Draws the first or the second gold card from the game board and replaces
-   * it with a new one from the deck
+   * Draws a card from a player's deck pair.
    *
-   * @param first if true, the first gold card is drawn, otherwise the second
-   * @return the gold card drawn
-   * @throws EmptyDeckException there are no gold cards left in the deck
+   * @param drawingSource Where we are drawing the card rom
+   * @param deckType      The type of deck to draw from.
+   * @return The drawn card.
+   * @throws EmptyDeckException If the deck being drawn from is empty.
    */
-  public PlayableCard drawGoldCardFromPair(Boolean first)
+  public PlayableCard drawCard(DrawingCardSource drawingSource,
+                               DrawingDeckType deckType)
   throws EmptyDeckException {
-    if (first) {
-      return this.goldCards.replaceFirst(this.drawGoldCardFromDeck());
+    if (drawingSource == DrawingCardSource.Deck) {
+      if (deckType == DrawingDeckType.GOLD) {
+        return this.goldDeck.draw();
+      } else {
+        return this.resourceDeck.draw();
+
+      }
+
     } else {
-      return this.goldCards.replaceSecond(this.drawGoldCardFromDeck());
+      CardPair<PlayableCard> drawingPair;
+      Deck<PlayableCard> drawingDeck;
+      if (deckType == DrawingDeckType.GOLD) {
+        drawingPair = this.goldCards;
+        drawingDeck = this.goldDeck;
+      } else {
+        drawingPair = this.resourceCards;
+        drawingDeck = this.resourceDeck;
+      }
+      if (drawingSource == DrawingCardSource.CardPairFirstCard) {
+        return drawingPair.replaceFirst(drawingDeck.draw());
+      } else {
+        return drawingPair.replaceSecond(drawingDeck.draw());
+      }
     }
   }
 
@@ -337,12 +369,21 @@ public class GameBoard {
   }
 
   /**
-   * Inserts a gold card in the bottom of the deck
+   * Inserts an objective card in the bottom of the deck
    *
    * @param card the card to insert
    */
   public void insertObjectiveCard(ObjectiveCard card) {
     this.objectiveDeck.insert(card);
+}
+
+  /**
+   * Inserts a starter card in the bottom of the deck
+   *
+   * @param card the card to insert
+   */
+  public void insertStarterCard(PlayableCard card) {
+    this.starterDeck.insert(card);
   }
 
   /**

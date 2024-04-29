@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:codex/src/main/java/polimi/ingsw/am21/codex/model/Lobby/NicknameAlreadyTakenException.java
 package polimi.ingsw.am21.codex.model.Lobby;
+========
+package polimi.ingsw.am21.codex.model.GameBoard.exceptions;
+>>>>>>>> ffbb53e (controller progress):codex/src/main/java/polimi/ingsw/am21/codex/model/GameBoard/exceptions/NicknameAlreadyTakenException.java
 
 public class NicknameAlreadyTakenException extends RuntimeException {
   String nickname;

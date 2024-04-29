@@ -1,7 +1,13 @@
+<<<<<<<< HEAD:codex/src/main/java/polimi/ingsw/am21/codex/model/Lobby/IncompletePlayerBuilderException.java
 package polimi.ingsw.am21.codex.model.Lobby;
 
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableSide;
 import polimi.ingsw.am21.codex.model.Player.Player;
+========
+package polimi.ingsw.am21.codex.model.GameBoard.exceptions;
+
+import polimi.ingsw.am21.codex.model.Player;
+>>>>>>>> ffbb53e (controller progress):codex/src/main/java/polimi/ingsw/am21/codex/model/GameBoard/exceptions/IncompletePlayerBuilderException.java
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +26,7 @@ public class IncompletePlayerBuilderException extends RuntimeException {
       missingParams.add("nickname");
     if (playerBuilder.getTokenColor().isEmpty())
       missingParams.add("tokenColor");
-    if (playerBuilder.getStarterCard().isEmpty())
-      missingParams.add("starterCard");
-    else if (playerBuilder.getStarterCard().get().getPlayedSideType().isEmpty())
+    else if (playerBuilder.getStarterCard().getPlayedSideType().isEmpty())
       missingParams.add("starterCardSide");
 
     if (!missingParams.isEmpty())

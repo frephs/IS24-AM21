@@ -2,6 +2,9 @@ package polimi.ingsw.am21.codex.model.Lobby;
 
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.*;
+import polimi.ingsw.am21.codex.model.Player;
+import polimi.ingsw.am21.codex.model.TokenColor;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
@@ -9,8 +12,6 @@ import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
-import polimi.ingsw.am21.codex.model.Player.Player;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 import java.util.*;
 
@@ -83,8 +84,7 @@ public class Lobby {
     if (remainingPlayerSlots <= 0) {
       throw new LobbyFullException();
     }
-    Player.PlayerBuilder playerBuilder = new Player.PlayerBuilder();
-    playerBuilder.setStarterCard(starterCard);
+    Player.PlayerBuilder playerBuilder = new Player.PlayerBuilder(starterCard);
     lobbyPlayers.put(socketId, playerBuilder);
     extractedCards.put(socketId, objectiveCards);
 
@@ -99,12 +99,12 @@ public class Lobby {
    * the player
    * @throws PlayerNotFoundException if the player is not found in the lobby
    */
-  public Pair<CardPair<ObjectiveCard>, Optional<PlayableCard>> removePlayer(UUID socketId)
+  public Pair<CardPair<ObjectiveCard>, PlayableCard> removePlayer(UUID socketId)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
     }
-    Optional<PlayableCard> starterCard = lobbyPlayers.get(socketId)
+    PlayableCard starterCard = lobbyPlayers.get(socketId)
       .getStarterCard();
     lobbyPlayers.remove(socketId);
     remainingPlayerSlots++;
@@ -270,7 +270,7 @@ public class Lobby {
    * @return the starter card of the player
    * @throws PlayerNotFoundException if the player is not found in the lobby
    */
-  public Optional<PlayableCard> getStarterCard(UUID socketId)
+  public PlayableCard getStarterCard(UUID socketId)
   throws PlayerNotFoundException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);

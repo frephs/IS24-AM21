@@ -102,6 +102,13 @@ public class PlayableCard extends Card {
     this.playedSideType = Optional.of(playedSideType);
   }
 
+  /**
+   * Removes the information of which side was played
+   */
+  public void clearPlayedSide() {
+    this.playedSideType = Optional.empty();
+  }
+
   public int getCoveredCorners() {
     return coveredCorners;
   }

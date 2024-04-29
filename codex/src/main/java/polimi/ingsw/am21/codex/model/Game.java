@@ -6,13 +6,19 @@ import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import org.json.JSONArray;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
+import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
-
 
 public class Game {
   static final int WINNING_POINTS = 20;
@@ -23,6 +29,24 @@ public class Game {
   private Integer remainingRounds = null;
   Integer currentPlayer;
 
+  public Game(int players) {
+    this.lobby = new Lobby();
+    this.state = GameState.GAME_INIT;
+    this.lobby = new Lobby(players);
+
+    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
+      "/cards.json";
+    File file = new File(jsonLocation);
+    JSONArray cards;
+    try {
+      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
+      cards = new JSONArray(content);
+      this.gameBoard = GameBoard.fromJSON(cards);
+      this.players = new ArrayList<>();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed loading cards json");
+    }
+  }
 
   public Game(int players, JSONArray cards) {
     this.lobby = new Lobby();
@@ -31,7 +55,6 @@ public class Game {
     this.gameBoard = GameBoard.fromJSON(cards);
     this.players = new ArrayList<>();
   }
-
 
   /**
    * Gets the lobby associated with the game.
@@ -116,6 +139,16 @@ public class Game {
     return this.players.get(currentPlayer);
   }
 
+  /**
+   * Gets the index of current player.
+   *
+   * @return The index of current player.
+   */
+
+  public Integer getCurrentPlayerIndex() {
+    return this.currentPlayer;
+  }
+
 
   /**
    * Adds a player to the game.
@@ -128,45 +161,8 @@ public class Game {
 
 
   /**
-   * Advances the game to the next turn.
-   *
-   * <p>This method increments the turn to the next player in the sequence.
-   * If the game is already over, it throws a {@link GameOverException}.
-   * After each turn, it checks if the game should end based on either
-   * reaching the maximum number of rounds or a player reaching the winning
-   * points threshold. If either condition is met, the game state is updated
-   * to {@link GameState#GAME_OVER} and a {@link GameOverException} is thrown.
-   *
-   * @throws GameOverException If the game is already over.
-   */
-  public void nextTurn() throws GameOverException {
-
-    if (this.state == GameState.GAME_OVER) throw new GameOverException();
-    currentPlayer = (currentPlayer + 1) % players.size();
-    if (this.currentPlayer == 0 && this.remainingRounds != null) {
-      this.remainingRounds--;
-      if (this.remainingRounds == 0) {
-        this.state = GameState.GAME_OVER;
-        for (Player player : players) {
-          player.evaluateSecretObjective();
-          CardPair<ObjectiveCard> objectiveCards =
-            gameBoard.getObjectiveCards();
-          player.evaluate(objectiveCards.getFirst());
-          player.evaluate(objectiveCards.getSecond());
-        }
-        throw new GameOverException();
-      }
-    }
-    if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
-      this.state = GameState.GAME_OVER;
-      throw new GameOverException();
-    }
-
-  }
-
-
-  /**
    * Checks if the game is over.
+   *
    * @return True if the game is over, otherwise false.
    */
   public Boolean isGameOver() {
@@ -182,6 +178,7 @@ public class Game {
 
   /**
    * Gets the remaining rounds in the game.
+   *
    * @return The remaining rounds in the game, if any.
    */
   public Optional<Integer> getRemainingRounds() {
@@ -191,6 +188,7 @@ public class Game {
 
   /**
    * Checks if the resource deck is empty.
+   *
    * @return True if the resource deck is empty, otherwise false.
    */
   public Boolean isResourceDeckEmpty() {
@@ -199,6 +197,7 @@ public class Game {
 
   /**
    * Checks if the gold deck is empty.
+   *
    * @return True if the gold deck is empty, otherwise false.
    */
   public Boolean isGoldDeckEmpty() {
@@ -206,72 +205,86 @@ public class Game {
   }
 
   /**
-   * Checks if both decks are empty.
-   * @return True if both decks are empty, otherwise false.
+   * Checks if one of the decks is empty
+   *
+   * @return True if one of the decks is empty
    */
   public Boolean areDecksEmpty() {
-    return this.isResourceDeckEmpty() && this.isGoldDeckEmpty();
-  }
-
-
-  /**
-   * Draws a card from the current player's deck.
-   * @param deckType The type of deck to draw from.
-   * @throws EmptyDeckException If the deck being drawn from is empty.
-   * @throws GameOverException If the game is over.
-   */
-  public void drawCurrentPlayerCardFromDeck(DrawingDeckType deckType)
-  throws EmptyDeckException, GameOverException {
-    if (this.state == GameState.GAME_OVER) throw new GameOverException();
-    try {
-      PlayableCard card;
-      if (deckType == DrawingDeckType.RESOURCE) {
-        card = this.gameBoard.drawResourceCardFromDeck();
-      } else {
-        card = this.gameBoard.drawGoldCardFromDeck();
-      }
-      this.players.get(this.currentPlayer).drawCard(card);
-    } catch (EmptyDeckException e) {
-      if (this.remainingRounds == null) {
-        this.remainingRounds = 2;
-
-      }
-      throw e;
-    }
+    return this.isResourceDeckEmpty() || this.isGoldDeckEmpty();
   }
 
   /**
-   * Draws a card from a player's deck pair.
-   * @param deckType The type of deck to draw from.
-   * @param first Whether to draw from the first or second card of the pair.
-   * @return The drawn card.
-   * @throws EmptyDeckException If the deck being drawn from is empty.
+   * Draws the player card and runs nextTurn();
+   *
+   * @param drawingSource Where we are drawing the card rom
+   * @param deckType      The type of deck to draw from.
    * @throws GameOverException If the game is over.
    */
-  public PlayableCard drawPlayerCardFromPair(DrawingDeckType deckType,
-                                             boolean first)
-  throws EmptyDeckException, GameOverException {
+  public void nextTurn(DrawingCardSource drawingSource,
+                       DrawingDeckType deckType)
+  throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
+    if (this.remainingRounds == null) {
+      throw new InvalidNextTurnCallException();
+    }
     try {
-      if (deckType == DrawingDeckType.RESOURCE) {
-        return this.gameBoard.drawResourceCardFromPair(first);
-      } else {
-        return this.gameBoard.drawGoldCardFromPair(first);
-      }
-
+      this.players.get(this.currentPlayer).drawCard(this.gameBoard.drawCard(
+        drawingSource,
+        deckType
+      ));
     } catch (EmptyDeckException e) {
-      if (this.remainingRounds == null) {
-        this.remainingRounds = 2;
-      }
+      this.remainingRounds = 2;
       throw e;
     }
+    this.nextTurn();
   }
 
 
   /**
+   * Advances the game to the next turn.
+   *
+   * <p>This method increments the turn to the next player in the sequence.
+   * If the game is already over, it throws a {@link GameOverException}.
+   * After each turn, it checks if the game should end based on either
+   * reaching the maximum number of rounds or a player reaching the winning
+   * points threshold. If either condition is met, the game state is updated
+   * to {@link GameState#GAME_OVER} and a {@link GameOverException} is thrown.
+   *
+   * @throws GameOverException            If the game is already over.
+   * @throws InvalidNextTurnCallException if nextTurn is called without the
+   *                                      drawing deck information, and it is
+   *                                      not the last round
+   */
+  public void nextTurn()
+  throws GameOverException, InvalidNextTurnCallException {
+    if (this.state == GameState.GAME_OVER) throw new GameOverException();
+    if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
+      this.state = GameState.GAME_OVER;
+      throw new GameOverException();
+    }
+    if (this.remainingRounds == null) throw new InvalidNextTurnCallException();
+    currentPlayer = (currentPlayer + 1) % players.size();
+    if (this.currentPlayer == 0) {
+      this.remainingRounds--;
+      if (this.remainingRounds == 0) {
+        this.state = GameState.GAME_OVER;
+        for (Player player : players) {
+          player.evaluateSecretObjective();
+          CardPair<ObjectiveCard> objectiveCards =
+            gameBoard.getObjectiveCards();
+          player.evaluate(objectiveCards.getFirst());
+          player.evaluate(objectiveCards.getSecond());
+        }
+        throw new GameOverException();
+      }
+    }
+  }
+
+  /**
    * Gets the order of players. (used for tests)
+   *
    * @return The order of players.
    */
   protected List<String> getPlayersOrder() {
@@ -280,6 +293,7 @@ public class Game {
 
   /**
    * Draws a starter card from the deck.
+   *
    * @return The starter card drawn from the deck.
    * @throws EmptyDeckException If the deck being drawn from is empty.
    */
@@ -288,4 +302,15 @@ public class Game {
     return this.gameBoard.drawStarterCardFromDeck();
   }
 
+  public void insertObjectiveCard(ObjectiveCard objectiveCard) {
+    this.gameBoard.insertObjectiveCard(objectiveCard);
+  }
+
+  public void insertStarterCard(PlayableCard starterCard) {
+    this.gameBoard.insertStarterCard(starterCard);
+  }
+
+  public Boolean isLastRound() {
+    return this.remainingRounds == 1;
+  }
 }
