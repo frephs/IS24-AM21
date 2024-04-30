@@ -2,7 +2,6 @@
 ## Table of Contents
 
 - [Message structure class diagram](#message-structure-class-diagram)
-  - [Class diagram](#class-diagram)
   - [Client requests](#client-requests)
   - [Server responses](#server-responses)
   - [Client actions](#client-actions)
