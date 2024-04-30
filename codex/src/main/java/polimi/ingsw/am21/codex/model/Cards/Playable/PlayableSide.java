@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
 import polimi.ingsw.am21.codex.model.Cards.Corner;
 import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
 import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
@@ -28,8 +27,10 @@ public abstract class PlayableSide {
     return corners;
   }
 
-  public void setCorner(CornerPosition position,
-                        Optional<CornerContentType> content) {
+  public void setCorner(
+    CornerPosition position,
+    Optional<CornerContentType> content
+  ) {
     if (content.isEmpty()) {
       corners.put(position, new Corner<>());
     } else {

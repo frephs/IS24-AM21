@@ -20,23 +20,19 @@ public enum ObjectType implements CornerContentType {
     return ObjectType.valueOf(str);
   }
 
-
   public static Boolean isObjectType(String value) {
     return Arrays.stream(Arrays.stream(ObjectType.values()).toArray())
       .map(Object::toString)
-      .anyMatch(
-        objectType -> objectType.equals(value)
-      );
+      .anyMatch(objectType -> objectType.equals(value));
   }
-    @Override
-    public void acceptVisitor(CornerContentVisitor visitor) {
-        CornerContentType.super.acceptVisitor(visitor);
-    }
 
-    @Override
-     public void acceptVisitor(CornerContentVisitor visitor, int arg) {
-        visitor.visit(this, arg);
-    }
+  @Override
+  public void acceptVisitor(CornerContentVisitor visitor) {
+    CornerContentType.super.acceptVisitor(visitor);
+  }
 
-
+  @Override
+  public void acceptVisitor(CornerContentVisitor visitor, int arg) {
+    visitor.visit(this, arg);
+  }
 }

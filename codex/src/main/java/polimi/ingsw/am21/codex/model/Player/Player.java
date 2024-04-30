@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 
 public class Player {
+
   private final String nickname;
   private final PlayerBoard board;
   private final TokenColor token;
@@ -26,6 +27,7 @@ public class Player {
   }
 
   public static class PlayerBuilder {
+
     private String nickname;
     private TokenColor token;
     private List<PlayableCard> cards;
@@ -50,7 +52,6 @@ public class Player {
     public Optional<String> getNickname() {
       return Optional.ofNullable(this.nickname);
     }
-
 
     /**
      * @param token chosen by the client controller (physical player)
@@ -122,7 +123,6 @@ public class Player {
     }
   }
 
-
   /**
    * @return player's nickname
    */
@@ -150,7 +150,6 @@ public class Player {
   public int getPoints() {
     return points;
   }
-
 
   /**
    * @param card drawn from the GameBoard which is added to the players hand
@@ -182,14 +181,14 @@ public class Player {
     this.points += card.getEvaluator().apply(board);
   }
 
-    /**
-     * Uses the PlayerBoard to evaluate the points of the objective card passed as argument
-     * adds the point to the player score.
-     * @param objectiveCard to be evaluated at the end of the game
-     */
-    public void evaluate(ObjectiveCard objectiveCard){
-        this.points += objectiveCard.getEvaluator().apply(board);
-    }
+  /**
+   * Uses the PlayerBoard to evaluate the points of the objective card passed as argument
+   * adds the point to the player score.
+   * @param objectiveCard to be evaluated at the end of the game
+   */
+  public void evaluate(ObjectiveCard objectiveCard) {
+    this.points += objectiveCard.getEvaluator().apply(board);
+  }
 
   /**
    * Evaluates the player secret objective, called by the Game class when Game overs

@@ -19,14 +19,14 @@ public class Position {
       // isometric grid
       case CornerPosition.TOP_LEFT -> new Position(x - 1, y); // was (-1, +1)
       case CornerPosition.TOP_RIGHT -> new Position(x, y + 1); // was (+1, +1 )
-      case CornerPosition.BOTTOM_LEFT -> new Position(x , y - 1); // was (-1, -1 )
+      case CornerPosition.BOTTOM_LEFT -> new Position(x, y - 1); // was (-1, -1 )
       case CornerPosition.BOTTOM_RIGHT -> new Position(x + 1, y); // was (+1. -1 )
-
       case EdgePosition.TOP -> new Position(x - 1, y + 1);
       case EdgePosition.CENTER -> new Position(x, y);
-      case EdgePosition.BOTTOM -> new Position(x + 1,y-1);
-      default ->
-        throw new IllegalStateException("Unexpected value: " + adjacentPosition);
+      case EdgePosition.BOTTOM -> new Position(x + 1, y - 1);
+      default -> throw new IllegalStateException(
+        "Unexpected value: " + adjacentPosition
+      );
     };
   }
 

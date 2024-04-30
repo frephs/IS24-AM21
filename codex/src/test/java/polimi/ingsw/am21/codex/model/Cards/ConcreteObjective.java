@@ -1,11 +1,11 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
+import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.Objective;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
-import java.util.function.BiFunction;
-
 public class ConcreteObjective extends Objective {
+
   public ConcreteObjective() {
     super();
   }

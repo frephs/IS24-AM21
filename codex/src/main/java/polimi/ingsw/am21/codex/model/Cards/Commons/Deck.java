@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Deck<T> {
+
   private List<T> cards;
 
   /**
@@ -40,8 +41,8 @@ public class Deck<T> {
    */
   public List<T> draw(int n) throws EmptyDeckException {
     if (this.cardsLeft() < n) throw new EmptyDeckException();
-    List<T> drawn = this.cards.subList(this.cards.size() - n,
-      this.cards.size());
+    List<T> drawn =
+      this.cards.subList(this.cards.size() - n, this.cards.size());
     this.cards = this.cards.subList(0, this.cards.size() - n);
     return drawn;
   }

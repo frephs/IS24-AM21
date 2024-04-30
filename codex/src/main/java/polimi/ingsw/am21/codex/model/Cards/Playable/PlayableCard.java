@@ -88,7 +88,7 @@ public class PlayableCard extends Card {
   /**
    * @return the card's backPermanentResources
    * */
-  public List<ResourceType> getBackPermanentResources(){
+  public List<ResourceType> getBackPermanentResources() {
     return backSide.getPermanentResources();
   }
 

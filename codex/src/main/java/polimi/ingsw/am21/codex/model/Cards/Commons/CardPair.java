@@ -3,38 +3,38 @@ package polimi.ingsw.am21.codex.model.Cards.Commons;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 
 public class CardPair<T extends Card> {
-    private T first;
-    private T second;
 
-    public CardPair(T firstCard, T secondCard){
-        this.first = firstCard;
-        this.second = secondCard;
-    }
+  private T first;
+  private T second;
 
-    public T getFirst(){
-        return this.first;
-    }
+  public CardPair(T firstCard, T secondCard) {
+    this.first = firstCard;
+    this.second = secondCard;
+  }
 
-    public T getSecond(){
-        return this.second;
-    }
+  public T getFirst() {
+    return this.first;
+  }
 
-    public T replaceFirst(T firstCard){
-        T toRet = this.first;
-        this.first = firstCard;
-        return toRet;
-    }
+  public T getSecond() {
+    return this.second;
+  }
 
-    public T replaceSecond(T secondCard){
-        T toRet = this.second;
-        this.second = secondCard;
-        return toRet;
-    }
+  public T replaceFirst(T firstCard) {
+    T toRet = this.first;
+    this.first = firstCard;
+    return toRet;
+  }
 
-    public void swap(){
-        T temp = this.first;
-        this.first = this.second;
-        this.second = temp;
-    }
+  public T replaceSecond(T secondCard) {
+    T toRet = this.second;
+    this.second = secondCard;
+    return toRet;
+  }
 
+  public void swap() {
+    T temp = this.first;
+    this.first = this.second;
+    this.second = temp;
+  }
 }

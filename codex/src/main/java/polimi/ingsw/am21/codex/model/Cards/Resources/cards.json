@@ -17,7 +17,8 @@
       }
     }
   },
-  {"id": 2,
+  {
+    "id": 2,
     "type": "RESOURCE",
     "backPermanentResources": ["FUNGI"],
     "corners": {
@@ -823,7 +824,7 @@
     "type": "GOLD",
     "backPermanentResources": ["FUNGI"],
     "points": 2,
-    "placementCondition": ["FUNGI", "FUNGI","FUNGI", "PLANT"],
+    "placementCondition": ["FUNGI", "FUNGI", "FUNGI", "PLANT"],
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
@@ -1028,7 +1029,7 @@
     "type": "GOLD",
     "backPermanentResources": ["PLANT"],
     "points": 2,
-    "placementCondition": ["PLANT", "PLANT", "PLANT","ANIMAL"],
+    "placementCondition": ["PLANT", "PLANT", "PLANT", "ANIMAL"],
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
@@ -1049,7 +1050,7 @@
     "type": "GOLD",
     "backPermanentResources": ["PLANT"],
     "points": 2,
-    "placementCondition": ["PLANT", "PLANT", "PLANT","FUNGI"],
+    "placementCondition": ["PLANT", "PLANT", "PLANT", "FUNGI"],
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
@@ -1212,7 +1213,7 @@
     "type": "GOLD",
     "backPermanentResources": ["ANIMAL"],
     "points": 2,
-    "placementCondition": ["ANIMAL", "ANIMAL", "INSECT","INSECT"],
+    "placementCondition": ["ANIMAL", "ANIMAL", "INSECT", "INSECT"],
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
@@ -1233,7 +1234,7 @@
     "type": "GOLD",
     "backPermanentResources": ["ANIMAL"],
     "points": 2,
-    "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL","FUNGI"],
+    "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL", "FUNGI"],
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
@@ -1254,7 +1255,7 @@
     "type": "GOLD",
     "backPermanentResources": ["ANIMAL"],
     "points": 2,
-    "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL","PLANT"],
+    "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL", "PLANT"],
     "pointCondition": "OBJECTS",
     "pointConditionObject": "INKWELL",
     "corners": {

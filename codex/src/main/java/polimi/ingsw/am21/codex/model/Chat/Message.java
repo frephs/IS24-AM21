@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.model.Chat;
 import java.util.Optional;
 
 public class Message {
+
   private final String sender;
   private String recipient;
   private final String content;
@@ -27,6 +28,7 @@ public class Message {
   public String getContent() {
     return content;
   }
+
   public String getSender() {
     return sender;
   }
