@@ -34,7 +34,7 @@ public final class CardsLoader {
   }
 
   /**
-   * @param index the index of the ge
+   * @param index the geometry card value (number between 0-6)
    * @return AdjacentPosition the parsed adjacent position
    */
   private static AdjacentPosition cardGeometryPositionFromJSONIndex(int index) {
