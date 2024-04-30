@@ -5,7 +5,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.model.PlayerBoardTest;
 
 class PlayableBackSideTest {
 
@@ -41,9 +45,12 @@ class PlayableBackSideTest {
     resources.add(ResourceType.PLANT);
     PlayableBackSide b = new PlayableBackSide(resources);
 
+    PlayerBoardTest pbt = new PlayerBoardTest();
+    pbt.externalSetup();
+
     PlayerBoard pb = new PlayerBoard(
-      new ArrayList<>(),
-      new PlayableCard(123, null, null),
+      List.of(pbt.resourceCard,pbt.resourceCard,pbt.resourceCard),
+      pbt.starterCard,
       new ObjectiveCard(123, 123, null)
     );
 

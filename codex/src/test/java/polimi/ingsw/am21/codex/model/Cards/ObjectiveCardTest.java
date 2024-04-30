@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.util.ArrayList;
 

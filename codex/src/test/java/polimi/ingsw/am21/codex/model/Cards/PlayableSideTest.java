@@ -8,6 +8,7 @@ class PlayableSideTest {
 
   @Test
   void getCorners() {
+    
   }
 
   @Test

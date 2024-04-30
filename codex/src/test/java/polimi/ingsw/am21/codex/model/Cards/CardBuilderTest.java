@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.Cards.Builder.*;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveType;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 
 class CardBuilderTest {
 

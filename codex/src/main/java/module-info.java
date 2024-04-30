@@ -4,7 +4,8 @@ module polimi.ingsw.am21.codex {
     requires org.json;
     requires org.controlsfx.controls;
     requires com.almasb.fxgl.all;
+  requires java.rmi;
 
-    opens polimi.ingsw.am21.codex to javafx.fxml;
+  opens polimi.ingsw.am21.codex to javafx.fxml;
     exports polimi.ingsw.am21.codex;
 }

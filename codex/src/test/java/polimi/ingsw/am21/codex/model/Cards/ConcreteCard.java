@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.model.PlayerBoard;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 /** This is a utility class that implements a bare-bone card: it's meant to exist for tests only. */
 class ConcreteCard extends Card {

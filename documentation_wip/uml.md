@@ -504,8 +504,8 @@ class Player {
     %% receive card and put it in the player's hand
     receiveDrawnCard(PlayableCard card) void
 
-    %% calls the player board placeCard method with the card as parameter and updates the player's points calling the getEvaluator method of the played card 
-    placeCard(PlayableCard card, CardSidesType side, Position position) void
+    %% calls the player board placeCard method with the cardIndex as parameter and updates the player's points calling the getEvaluator method of the played card 
+    placeCard(int cardIndex, CardSidesType side, Position position) void
 
     %% evaluate takes objective card (calls the getEvaluator method of the objective card) and increments the player points. called by Game.setGameOver() which will pass the player's secret objective and the game common objectives. 
     evaluate(ObjectiveCard objectiveCard) void
@@ -548,7 +548,7 @@ class PlayerBoard {
     %% constructor: initializes the player board with the player hand, the starter card in (0,0) and the objective card
 
     receiveDrawnCard(PlayableCard card) void
-    placeCard(PlayableCard card, cardSidesType side, Position position) void
+    placeCard(int playedCardIndex, cardSidesType side, Position position) void
     %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
 
     getPlayedCards() HashMap~Position, PlayableCard~
