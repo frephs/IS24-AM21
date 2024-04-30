@@ -52,8 +52,8 @@ sequenceDiagram
     
     # Get the available lobbies
     Note over Client,Server : Client is in the lobby view
-    Client ->> Server : GetAvailableLobbiesMessage
-    Server --) Client : AvailableLobbiesMessage
+    Client ->> Server : GetAvailableGameLobbiesMessage
+    Server --) Client : AvailableGameLobbiesMessage
     
     # Join the Game Lobby
     Note over Client,Server : Client selects a game lobby
