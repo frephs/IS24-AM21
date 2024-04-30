@@ -13,6 +13,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundExceptio
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
@@ -25,22 +26,23 @@ public class Game {
   private GameState state;
   private Integer remainingRounds = null;
   Integer currentPlayer;
+  private final Integer maxPlayers;
 
   public Game(int players) {
-    this.lobby = new Lobby();
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
 
     this.gameBoard = new GameBoard(new CardsLoader());
     this.players = new ArrayList<>();
+    this.maxPlayers = players;
   }
 
   public Game(int players, JSONArray cards) {
-    this.lobby = new Lobby();
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
     this.gameBoard = GameBoard.fromJSON(cards);
     this.players = new ArrayList<>();
+    this.maxPlayers = players;
   }
 
   /**
@@ -55,7 +57,8 @@ public class Game {
   /**
    * Starts the game.
    */
-  public void start() {
+  public void start() throws GameNotReadyException {
+    if (this.getPlayersSpotsLeft() != 0) throw new GameNotReadyException();
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
   }
@@ -301,5 +304,23 @@ public class Game {
     hand.add(this.gameBoard.drawResourceCardFromDeck());
     hand.add(this.gameBoard.drawResourceCardFromDeck());
     return hand;
+  }
+
+  /**
+   * @return the number of connected players
+   */
+  public Integer getPlayersCount() {
+    return this.players.size();
+  }
+
+  /**
+   * @return the number of maximum players
+   */
+  public Integer getMaxPlayers() {
+    return this.maxPlayers;
+  }
+
+  public Integer getPlayersSpotsLeft() {
+    return this.getMaxPlayers() - this.getPlayersCount();
   }
 }

@@ -19,6 +19,8 @@ import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
@@ -78,8 +80,59 @@ public class GameController {
     }
   }
 
+  private void lobbySetTokenColor(
+    String gameId,
+    UUID socketID,
+    TokenColor color
+  ) throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    Lobby lobby = game.getLobby();
+    lobby.setToken(socketID, color);
+    listeners.forEach(listener -> {
+      listener.playerSetToken(gameId, socketID, color);
+    });
+  }
+
+  private void lobbySetTokenColor(
+    String gameId,
+    UUID socketID,
+    String nickname
+  ) throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    Lobby lobby = game.getLobby();
+    lobby.setNickname(socketID, nickname);
+    listeners.forEach(listener -> {
+      listener.playerSetNickname(gameId, socketID, nickname);
+    });
+  }
+
+  private void lobbyChooseObjective(
+    String gameId,
+    UUID socketID,
+    Boolean first
+  ) throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    Lobby lobby = game.getLobby();
+    lobby.setObjectiveCard(socketID, first);
+    listeners.forEach(listener -> {
+      listener.playerChoseObjectiveCard(gameId, socketID, first);
+    });
+  }
+
+  private void startGame(String gameId, Game game)
+    throws GameNotReadyException {
+    game.start();
+    listeners.forEach(listener -> listener.gameStarted(gameId));
+  }
+
+  public void startGame(String gameId)
+    throws GameNotFoundException, GameNotReadyException {
+    Game game = getGame(gameId);
+    this.startGame(gameId, game);
+  }
+
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException {
+    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException {
     Game game = this.getGame(gameId);
     Player newPlayer = game
       .getLobby()
@@ -89,6 +142,9 @@ public class GameController {
       listener ->
         listener.playerJoinedGame(gameId, socketID, newPlayer.getNickname())
     );
+    if (game.getPlayersSpotsLeft() == 0) {
+      this.startGame(gameId, game);
+    }
   }
 
   public void createGame(String gameId, Integer players) {

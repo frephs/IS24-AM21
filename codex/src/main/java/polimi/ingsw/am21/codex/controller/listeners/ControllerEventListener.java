@@ -7,6 +7,7 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.Player;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface ControllerEventListener {
   void gameCreated(String gameId);
@@ -18,6 +19,12 @@ public interface ControllerEventListener {
   void playerJoinedLobby(String gameId, UUID socketID);
 
   void playerLeftLobby(String gameId, UUID socketID);
+
+  void playerSetToken(String gameId, UUID socketID, TokenColor token);
+
+  void playerSetNickname(String gameId, UUID socketID, String nickname);
+
+  void playerChoseObjectiveCard(String gameId, UUID socketID, Boolean isFirst);
 
   void playerJoinedGame(String gameId, UUID socketID, String nickname);
 
@@ -32,12 +39,4 @@ public interface ControllerEventListener {
     CardSideType side,
     Position position
   );
-
-  void nextTurn(
-    String gameId,
-    DrawingCardSource drawingCardSource,
-    DrawingDeckType drawingDeckType
-  );
-
-  void nextTurn();
 }

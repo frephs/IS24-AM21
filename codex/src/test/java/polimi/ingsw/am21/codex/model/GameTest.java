@@ -18,6 +18,7 @@ import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 
 class GameTest {
 
@@ -182,7 +183,16 @@ class GameTest {
     preparePlayers(this.game);
 
     assertEquals(GameState.GAME_INIT, this.game.getState());
-    game.start();
+    try {
+      game.start();
+    } catch (GameNotReadyException gnre) {
+      fail(
+        "Not enough players to start the game:\nneeded: " +
+        game.getMaxPlayers() +
+        "\nfound: " +
+        game.getPlayersCount()
+      );
+    }
 
     assertEquals(GameState.PLAYING, this.game.getState());
 
@@ -197,7 +207,16 @@ class GameTest {
     for (int i = 0; i < 10000 && !isDifferent; ++i) {
       this.game = new Game(4);
       preparePlayers(game);
-      game.start();
+      try {
+        game.start();
+      } catch (GameNotReadyException gnre) {
+        fail(
+          "Not enough players to start the game:\nneeded: " +
+          game.getMaxPlayers() +
+          "\nfound: " +
+          game.getPlayersCount()
+        );
+      }
       List<String> order = game.getPlayersOrder();
       if (
         order.get(0).compareTo("Player_0") != 0 ||
