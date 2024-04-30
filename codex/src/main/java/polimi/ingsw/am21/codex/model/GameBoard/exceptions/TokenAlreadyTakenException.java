@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.GameBoard;
+package polimi.ingsw.am21.codex.model.GameBoard.exceptions;
 
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 

@@ -1,16 +1,17 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
 import org.json.JSONArray;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
-import polimi.ingsw.am21.codex.model.Lobby.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 import java.io.File;
@@ -359,22 +360,15 @@ class LobbyTest {
 
   @Test
   void getStarterCard() {
-
     UUID firstPlayerID = UUID.randomUUID();
+    PlayableCard starterCard;
     try {
+      starterCard = mockGameboard.drawStarterCardFromDeck();
       lobby.addPlayer(firstPlayerID, mockGameboard.drawObjectiveCardPair(),
-        mockGameboard.drawStarterCardFromDeck());
+        starterCard);
+      assertEquals(starterCard, lobby.getStarterCard(firstPlayerID));
     } catch (Exception e) {
       fail("Failed to add player", e);
     }
-
-    Optional<PlayableCard> starterCard =
-      lobby.getStarterCard(firstPlayerID);
-
-    assertNotNull(starterCard);
-
-    assertNotEquals(Optional.empty(), starterCard);
-
-    starterCard.ifPresent(Assertions::assertNotNull);
   }
 }

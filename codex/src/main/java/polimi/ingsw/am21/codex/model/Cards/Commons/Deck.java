@@ -61,6 +61,6 @@ public class Deck<T> {
    * @param card the card to insert
    */
   public void insert(T card) {
-    this.cards.add(0, card);
+    this.cards.addFirst(card);
   }
 }

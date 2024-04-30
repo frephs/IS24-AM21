@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.model.GameBoard;
+package polimi.ingsw.am21.codex.model.GameBoard.exceptions;
 
 import java.util.UUID;
 

@@ -6,9 +6,9 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 
 public class Player {
-
   private final String nickname;
   private final PlayerBoard board;
   private final TokenColor token;
@@ -26,12 +26,15 @@ public class Player {
   }
 
   public static class PlayerBuilder {
-
     private String nickname;
     private TokenColor token;
     private List<PlayableCard> cards;
     private PlayableCard starterCard;
     private ObjectiveCard objectiveCard;
+
+    public PlayerBuilder(PlayableCard card) {
+      this.starterCard = card;
+    }
 
     /**
      * @param nickname the player's chose nickname, its uni
@@ -47,6 +50,7 @@ public class Player {
     public Optional<String> getNickname() {
       return Optional.ofNullable(this.nickname);
     }
+
 
     /**
      * @param token chosen by the client controller (physical player)
@@ -64,6 +68,13 @@ public class Player {
     }
 
     /**
+     * @return the player token color
+     */
+    public Optional<List<PlayableCard>> getHand() {
+      return Optional.ofNullable(this.cards);
+    }
+
+    /**
      * @param cards list drawn from the GameBoard
      */
     public PlayerBuilder setHand(List<PlayableCard> cards) {
@@ -72,11 +83,10 @@ public class Player {
     }
 
     /**
-     * @param starterCard drawn from the GameBoard
+     * @param starterCard The starter card drawn from the GameBoard
+     * @return the player starter card
      */
-    public PlayerBuilder setStarterCard(
-      PlayableCard starterCard
-    ) {
+    public PlayerBuilder setStarterCard(PlayableCard starterCard) {
       this.starterCard = starterCard;
       return this;
     }
@@ -99,17 +109,19 @@ public class Player {
     /**
      * @return a functioning player
      */
-    public Player build() {
+    public Player build() throws IncompletePlayerBuilderException {
+      IncompletePlayerBuilderException.checkPlayerBuilder(this);
       return new Player(this);
     }
 
     /**
      * @return the player's starter card
      */
-    public Optional<PlayableCard> getStarterCard() {
-      return Optional.ofNullable(starterCard);
+    public PlayableCard getStarterCard() {
+      return starterCard;
     }
   }
+
 
   /**
    * @return player's nickname
@@ -138,6 +150,7 @@ public class Player {
   public int getPoints() {
     return points;
   }
+
 
   /**
    * @param card drawn from the GameBoard which is added to the players hand
@@ -169,14 +182,14 @@ public class Player {
     this.points += card.getEvaluator().apply(board);
   }
 
-  /**
-   * Asks the PlayerBoard to evaluate the points of the objective card passed as argument
-   * adds the point to the player score.
-   * @param objectiveCard to be evaluated at the end of the game
-   */
-  public void evaluate(ObjectiveCard objectiveCard) {
-    this.points += objectiveCard.getEvaluator().apply(board);
-  }
+    /**
+     * Uses the PlayerBoard to evaluate the points of the objective card passed as argument
+     * adds the point to the player score.
+     * @param objectiveCard to be evaluated at the end of the game
+     */
+    public void evaluate(ObjectiveCard objectiveCard){
+        this.points += objectiveCard.getEvaluator().apply(board);
+    }
 
   /**
    * Evaluates the player secret objective, called by the Game class when Game overs

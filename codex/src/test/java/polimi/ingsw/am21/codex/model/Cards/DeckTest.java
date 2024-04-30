@@ -19,9 +19,7 @@ class DeckTest {
         List<Integer> numbers = new ArrayList<>();
         for (int i = 0; i < initialSize; ++i) numbers.add(i);
         this.deck = new Deck<>(numbers);
-        this.shuffle();
-        assertEquals(initialSize, this.deck.cardsLeft());
-        for (int i = 0; i < initialSize; ++i) this.deck.insert(initialSize);
+        this.deck.shuffle();
     }
 
     @Test
