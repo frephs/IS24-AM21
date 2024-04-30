@@ -80,38 +80,38 @@ classDiagram
     }
 
     namespace Game{
-        class getGameStatusMessage{
+        class GetGameStatusMessage{
 
         }
     }
     
     namespace Lobby {
 
-        class getAvailableGameLobbiesMessage {
+        class GetAvailableGameLobbiesMessage {
             
         }
-        class getAvailableTokenColorsMessage {
+        class GetAvailableTokenColorsMessage {
         
         }
 
-        class getObjectiveCardsMessage {
+        class GetObjectiveCardsMessage {
 
         }
 
-        class getStarterCardSidesMessage{
+        class GetStarterCardSidesMessage{
 
         }
 
     } 
 
-    RequestMessage <|-- getAvailableGameLobbiesMessage : realization
-        RequestMessage <|-- getAvailableTokenColorsMessage : realization
-        RequestMessage <|-- getObjectiveCardsMessage : realization
-        RequestMessage <|-- getStarterCardSidesMessage : realization
+    RequestMessage <|-- GetAvailableGameLobbiesMessage : realization
+        RequestMessage <|-- GetAvailableTokenColorsMessage : realization
+        RequestMessage <|-- GetObjectiveCardsMessage : realization
+        RequestMessage <|-- GetStarterCardSidesMessage : realization
 
     
     %% game
-    RequestMessage <|-- getGameStatusMessage : realization
+    RequestMessage <|-- GetGameStatusMessage : realization
 
 
 
@@ -171,29 +171,29 @@ classDiagram
         + lobbyId: int
         }
 
-        class setNicknameMessage{
+        class SetNicknameMessage{
             nickname: String
         }
 
-        class setTokenColorMessage {
+        class SetTokenColorMessage {
             color: TokenColor
         }
 
         
-        class selectFromPairMessage {
+        class SelectFromPairMessage {
             first: Boolean
         }
     
     }
 
     ActionMessage <|-- JoinLobbyMessage : inheritance
-    ActionMessage <|-- setNicknameMessage : inheritance
-    ActionMessage <|-- setTokenColorMessage : inheritance
-    ActionMessage <|-- selectFromPairMessage: inheritance
+    ActionMessage <|-- SetNicknameMessage : inheritance
+    ActionMessage <|-- SetTokenColorMessage : inheritance
+    ActionMessage <|-- SelectFromPairMessage: inheritance
 
     namespace Game{
     
-    class placeCardMessage{
+    class PlaceCardMessage{
         +x: int
         +y: int
         +handIndex: int 
@@ -210,7 +210,7 @@ classDiagram
     }
     }
     
-    ActionMessage <|-- placeCardMessage: inheritance
+    ActionMessage <|-- PlaceCardMessage: inheritance
     ActionMessage <|-- DeckDrawCardMessage: inheritance
 
     DeckDrawCardMessage <|-- CardPairDrawMessage  : inheritance
