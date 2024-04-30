@@ -37,15 +37,15 @@ class CountingObjectiveTest {
       new ObjectiveCard(123, 2, countingObjective)
     );
 
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(-1,1));
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(1,-1));
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(2,-2));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(-1,0));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(1,0));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(2,0));
 
     pb.getHand().add(pbt.resourceCard);
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(3,-3));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(3,0));
 
     pb.getHand().add(pbt.starterCard);
-    pb.placeCard(pbt.starterCard,CardSideType.BACK, new Position(4,-4));
+    pb.placeCard(pbt.starterCard,CardSideType.BACK, new Position(4,0));
 
 
     //evaluator should return 0

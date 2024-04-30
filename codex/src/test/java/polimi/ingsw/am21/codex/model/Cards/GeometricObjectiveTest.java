@@ -42,16 +42,16 @@ class GeometricObjectiveTest {
 
     assertEquals(pbt.resourceCard.getKingdom().orElseThrow(), ResourceType.PLANT);
 
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(-1,1));
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(1,-1));
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(2,-2));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(-1,0));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(1,0));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(2,0));
 
     // introducing an element of disturb
     pb.getHand().add(pbt.resourceCard);
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(3,-1));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(2,1));
 
     pb.getHand().add(pbt.resourceCard);
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(3,-3));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(3,0));
 
     assertEquals(9, pb.getObjectiveCard().getEvaluator().apply(pb));
 
@@ -69,9 +69,9 @@ class GeometricObjectiveTest {
       new ObjectiveCard(123, 2, new GeometricObjective(geometry))
     );
 
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(-1,1));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(-1,0));
+    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(1,0));
     pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(1,-1));
-    pb.placeCard(pbt.resourceCard,CardSideType.BACK, new Position(0,-2));
 
     assertEquals(2, pb.getObjectiveCard().getEvaluator().apply(pb));
 
