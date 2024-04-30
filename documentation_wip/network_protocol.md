@@ -175,7 +175,7 @@ sequenceDiagram
         Playing client ->> Server : DeckDrawMessage OR CardPairDrawMessage
         Server --) Playing client : ConfirmMessage
         loop for each client
-            Server -) Client : DeckCardDrawMessage OR CardPairDrawMessage
+            Server -) Client : DeckCardDrawnMessage OR CardPairDrawnMessage
         end 
     end
 
