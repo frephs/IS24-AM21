@@ -1,6 +1,14 @@
 {
   "dependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "prettier-plugin-java": "^2.6.0"
+  },
+  "scripts": {
+    "prepare": "cd .. && husky codex/.husky"
+  },
+  "lint-staged": {
+    "src/**/*": "prettier --write"
   }
 }
