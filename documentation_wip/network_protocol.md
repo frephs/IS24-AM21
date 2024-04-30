@@ -65,10 +65,10 @@ sequenceDiagram
     Server ->> Controller : Controller.getAvailableGameLobbies()
     alt there are no games available
         Server ->> Controller: Controller.createGame()
-        Controller --) Server : Returns List<GameLobbies>
+        Controller --) Server : Returns gameIds: List<int>
     else there are games available 
         Server ->> Controller : Controller.listGames()
-        Controller --) Server : Returns List<Games>
+        Controller --) Server : Returns gameIds: List<int>
 
     end 
     Server --) Client : AvailableGameLobbiesMessage
