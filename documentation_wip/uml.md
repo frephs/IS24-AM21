@@ -45,8 +45,11 @@ class ResourceType {
     FUNGI_KINGDOM
     INSECT_KINGDOM
 
-    +toString() String
+    +fromString(String resourceTypeStr) String
     +has(Object value) boolean
+    +isResourceType(String value) boolean
+    +acceptVisitor(COrnerCOntentVisitor visitor) void
+    +acceptVisitor(CornerContentVisitor visitor, int arg) void
 }
 
 class ObjectType {
@@ -55,8 +58,11 @@ class ObjectType {
     INKWELL
     MANUSCRIPT
 
-    +toString() String
+    +fromString(String str) String
     +has(Object value) boolean
+    +isObjectType(String value) boolean
+    +acceptVisitor(CornerContentVisitor visitor) void
+    +aceeptVisitor(CornerContentVisitor visitor, int arg) void
 }
 
 class CardSideType {
@@ -72,6 +78,24 @@ class AdjacentPosition {
 AdjacentPosition <|.. CornerPosition : Realization
 AdjacentPosition <|.. EdgePosition : Realization
 
+class CornerContentType {
+    <<Interface>>
+    acceptVisitor(CornerContentVisitor visitor) void
+    acceptVisitor(CornerContentVisitor visitor, int arg) void
+}
+CornerContentType <|.. ObjectType : Realization
+CornerContentType <|.. ResourceType : Realization
+
+class CornerContentVisitor {
+    <<Interface>>
+    visit(ObjectType object, int diff) void
+    visit(ResourceType resource, int diff) void
+}
+
+CornerContentVisitor <|.. MapUpdater: Realization
+
+
+
 
 class CornerPosition {
     <<Enumeration>>
@@ -79,6 +103,10 @@ class CornerPosition {
     BOTTOM_LEFT
     TOP_RIGHT
     BOTTOM_RIGHT
+
+    -index: int
+    CornerPosition(int index)
+    getOppositeCornerPosition() CornerPosition
 }
 
 class EdgePosition{
@@ -108,6 +136,7 @@ class Corner~T~ {
     isEmpty() bool
     getContent() Optional~T~
     cover() void
+    isCovered() bool
 }
 PlayableSide "1" *-- "1..4" Corner: composition
 
@@ -115,6 +144,8 @@ class PointConditionType {
     <<Enumeration>>
     OBJECTS
     CORNERS
+
+    fromString(String str) PointConditionType
 }
 
 class ObjectiveCard {
@@ -138,21 +169,21 @@ Card <|.. ObjectiveCard: realization
 class GeometricObjective {
     -geometry: HashMap~AdjacentPosition, ResourceType~
 
-    GeometricObjective(ResourceType[3][3] geometry)
+    GeometricObjective(HashMap ~AdjacentPostion, ResourceType~ geometry)
 
-    getEvaluator() Function~PlayerBoard pb; Integer points~
+    getEvaluator() BiFunction~PlayerBoard pb; Integer points; Integer~
 }
 Objective <|.. GeometricObjective : realization
 %% ResourceType "3..n" <-- "n" GeometricObjective: dependency
 
 
 class CountingObjective {
-    -resources: HashMap~ResourceType; int~
-    -objects: HashMap~ObjectType; int~
+    -resources: HashMap~ResourceType; Integer~
+    -objects: HashMap~ObjectType; Integer~
 
     CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
    
-    getEvaluator() Function~PlayerBoard pb; Integer points~
+    getEvaluator() BiFunction~PlayerBoard pb; Integer points, Integer~
 
 }
 Objective <|.. CountingObjective : realization
@@ -162,18 +193,23 @@ Objective <|.. CountingObjective : realization
 class PlayableCard {
     -frontSide: PlayableFrontSide
     -backSide: PlayableBackSide
-    -playedSide: CardSideType[0..1]
+    -playableSideType: Optional~CardSideType~
     -coveredCorners: int
-    -kingdom: ResourceType[0..1]
+    -kingdom: Optional~ResourceType~
 
     PlayableCard(int id, PlayableSide front, PlayableSide back)
     PlayableCard(int id, PlayableSide front, PlayableSide back, ResourceType kingdom)
 
-    getKingdom() ResourceType[0..1]
-    getPlayedSide() PlayableSide
-    setPlayedSide(CardSideType sideType) void
+    getKingdom() Optional~ResourceType~
+    getPlayedSideType() Optional~CardSideType~
+    getSides() List~PlayableSide~
+    getPlayedSide() Optional~PlayableSide~
+    getPermanentResources() List~ResourceType~
+    setPlayedSideType(CardSideType playedSideType) void
+    clearPlayedSide() void
     getCoveredCorners() int
-    setCoveredCorners(int n) void
+    SetCoveredCorners(int coveredCorners) void
+    
     getEvaluator() Function~PlayerBoard pb; Integer points~
 }
 Card <|.. PlayableCard: realization
@@ -194,12 +230,12 @@ class PlayableSide {
 %% ObjectType "0..4" <-- "n" PlayableSide: dependency
 
 class PlayableBackSide {
-    -permanentResources: ResourceType[1..3]
+    -permanentResources: List~ResourceType~
 
-    PlayableBackSide(ResourceType[1..3] permanentResources)
+    PlayableBackSide(List~ResourceType~ permanentResources)
 
-    getResources() ResourceType[1..3]
-    getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
+    getPermanentResources() List~ResourceType~
+    getEvaluator() BiFunction~PlayerBoard pb, Integer, Integer~
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
@@ -231,11 +267,11 @@ class ResourceCardFrontSide {
 PlayableFrontSide <|.. ResourceCardFrontSide: realization
 
 class GoldCardFrontSide {
-    -placementCondition: ResourceType[1..5]
-    -pointCondition: PointConditionType[0..1]
-    -pointConditionObject: ObjectType[0..1]
+    -placementCondition: List~ResourceType~
+    -pointCondition: Optional~PointConditionType
+    -pointCOnditionObject: Optional~ObjectType~
 
-    GoldCardFrontSide(int points, ResourceType[1..5] placementCondition, PointConditionType[0..1] pointCondition, ObjectType[0..1] pointConditionObject)
+    GoldCardFrontSide(int points, List~ResourceType~ placementCondition, PointConditionType pointCondition, ObjectType pointConditionObject)
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
     %%implements the abstract method in PlayableSide
@@ -248,44 +284,67 @@ ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% PointConditionType "0..1" <-- "n" GoldCardFrontSide: dependency
 %% ObjectType "0..1" <-- "n" GoldCardFrontSide: dependency
 
+class CardPair {
+    -first: T
+    -second: T
+
+    CardPair(T firstCard, T secondCard) 
+
+    getFirst() T
+    getSecond() T
+
+    replaceFirst(T firstCard) T
+    replaceSecond(T secondCard) T
+
+    swap() void
+}
+CardPair <|.. Card: realization
+
 class CardBuilder {
     -id: int
     %% Resource | Starter | Gold | Objective
     -type: CardType 
+    -points: Optional~Integer~
+    -objectiveType: Optional~TùObjectiveType~
+    -objectiveGeometry: Optional~Map<AdjacentPostion, ResourceType>~
+    -objectiveResources: Optional~Map<ResourceType, Integer>~
+    -objectiveObjects: Optional~Map<ObjectiveType, Integer>~
+    %%Resource | STarter | Gold
+    -backPermanentResources: Optional~List~ResourceType~~
+    -frontCorner: Optional~Map~CornerPosition, Optional~CornerContentType~~~
+    -backCorner: Optional~Map~COrnerPostion, Optional~CornerCOntentType~~~
 
-    %% Objective | Resource | Gold
-    -points: int[0..1]
-
-    %% Objective
-    -objectiveType: ObjectiveType[0..1]
-    -objectiveGeometry: ResourceType[3][3][0..1]
-    -objectiveResources: HashMap~ResourceType, int~[0..1]
-    -objectiveObjects: HashMap~ObjectType, int~[0..1]
-
-    %% Resource | Starter | Gold
-    -backPermanentResources: ResourceType[1..3][0..1]
-
-    %% Gold
-    -placementCondition: ResourceType[1..5][0..1]
-    -pointCondition: PointConditionType[0..1]
-    -pointConditionObject: ObjectType[0..1]
+    %%Gold
+    -placementCondition: Optional~List~ResourceType~~
+    -pointCOndition: Optional~PointConditionType~
+    -pointCOnditionObject: Optional~ObjectType~
 
     CardBuilder(int id, CardType type)
 
-    setPoints(int points) CardBuilder ~~throws~~ WrongCardTypeException
+    +checkType(CardType... expected) ~~throws~~ WrongCardTypeExcpetion
 
-    setObjectiveType(ObjectiveType objectiveType) CardBuilder ~~throws~~ WrongCardTypeException
-    setObjectiveGeometry(ResourceType[3][3] objectiveGeometry) CardBuilder ~~throws~~ WrongCardTypeException, MissingParametersException
-    setObjectiveResources(HashMap~ResourceType, int~ objectiveResources) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
-    setObjectiveObjects(HashMap~ObjectType, int~ objectiveObjects) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
+    +setPoints(int points) CardBuilder ~~throws~~ WrongCardTypeException
 
-    setBackPermanentResources(ResourceType[1..3] backPermanentResources) CardBuilder ~~throws~~ WrongCardTypeException
+    +setObjectiveType(ObjectiveType objectiveType) CardBuilder ~~throws~~ WrongCardTypeException
+    +setObjectiveGeometry(Map~AdjacentPostion, ResourceType~ objectiveGeometry) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
+    +setObjectiveResources(Map~ResourceType, Integer~ objectiveResources) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
+    +setObjectiveObjects(Map~ObjectType, Integer~ objectiveObjects) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingParameterException
 
-    setPlacementCondition(ResourceType[1..5] placementCondition) CardBuilder ~~throws~~ WrongCardTypeException
-    setPointCondition(PointConditionType pointCondition) CardBuilder ~~throws~~ WrongCardTypeException
-    setPointConditionObject(ObjectType pointConditionObject) CardBuilder ~~throws~~ WrongCardTypeException
+    +setBackPermanentResources(List~ResourceType~ backPermanentResources) CardBuilder ~~throws~~ WrongCardTypeException
+
+    +setPlacementCondition(List~ResourceType~ placementCondition) CardBuilder ~~throws~~ WrongCardTypeException
+    +setPointCondition(PointConditionType pointCondition) CardBuilder ~~throws~~ WrongCardTypeException
+    +setPointConditionObject(ObjectType pointConditionObject) CardBuilder ~~throws~~ WrongCardTypeException, ConflictingPrameterException
+
+    +setCorners(CardSideType side, Map~CornerPostion, Optional~CornerContentType~ cornerMap~) CardBuilder ~~throws~~ WrongCardTypeException
+
+    +buildObjectiveCard() ObjectiveCard ~~throws~~ MissingParameterExcpetion 
+
+    +buildPlayableCard() PlayableCard ~~throws~~ MissingParameterExcpetion
 
     build() Card ~~throws~~ MissingParametersException
+
+    getPlayableCard(List~ResourceType~ permanentResources, PlayableFrontSide frontSide, CardType cardType) PlayableCard
 }
 Card "1" *-- "1" CardBuilder: composition
 ObjectiveCard "0..1" <-- "1" CardBuilder: dependency
@@ -312,12 +371,16 @@ class CardType {
     STARTER
     GOLD
     OBJECTIVE
+
+    fromString(String str) CardType
 }
 
 class ObjectiveType {
     <<Enumeration>>
     GEOMETRIC
     COUNTING
+
+    fromString(String key) ObjectiveType
 }
 
 class WrongCardTypeException {
@@ -441,10 +504,10 @@ class Game {
     areDecksEmpty() boolean
 
     %% draw a card from the respective deck and adds it to the player's hand
-    drawCurrentPlayerCardFromDeck(DrawingDeckType deckType) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
+    drawCurrentPlayerCardFromDeck(DeckType deckType) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
 
     %% draw a card from the common board and adds it to the player hands, if the first is true the first card in the pair is drawn, otherwise the second
-    drawCurrentPlayerCardFromPair(DrawingDeckType deckType, boolean first) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
+    drawCurrentPlayerCardFromPair(DeckType deckType, boolean first) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
 }
 
 
@@ -570,17 +633,23 @@ class PlayerBoard {
 %%    chooseObjectiveCard(int choice) ObjectiveCard
 %%
 %%    chooseDrawingSource(int choice) DrawingSourceType
-%%    chooseDrawingDeck(int choice) DrawingDeckType
+%%    chooseDrawingDeck(int choice) DeckType
 %%
 %%    choosePlayingCard(int choice) PlayableCard
 %%    choosePlayingCardSide(int choice) CardSidesType
 %%    choosePlayingCardPosition(int choice) Position
 %%}
 
-class DrawingDeckType {
+class DeckType {
     <<Enumeration>>
     GOLD_DECK
     RESOURCE_DECK
+}
+
+class DrawingDeckType {
+    <<Enumeration>>
+    RESOURCE
+    GOLD
 }
 
 class DrawingSourceType {
@@ -594,10 +663,11 @@ class Position{
     -y: int
 
     Position(int x, int y)
+    Position()
 
     %% Overriding default hashmap key methods
-    equals(Position position) boolean
-    computeLinkingPosition(CornerEnum linkedCorner) Position
+    equals(Object o) boolean
+    computeAdjacentPosition(AdjacentPosition adjacentPosition) Position
     hashCode() int
 }
 
@@ -609,6 +679,7 @@ class GameBoard {
     -resourceDeck: Deck~PlayableCard~
     -resourceCards: CardPair~PlayableCard~
     -objectiveCards: CardPair~ObjectiveCard~
+    -allCards: List~Card~
 
     %% the game board has two constructors, one with parameters and one without
     %% the constructor with parameters is used to restore a game from a save file
@@ -648,7 +719,7 @@ PlayerBoard <-- Position : uses
 Player --* PlayerBoard: composition
 
 Player <-- DrawingSourceType : uses
-Player <-- DrawingDeckType : uses
+Player <-- DeckType : uses
 %% Player --> PlayerActions : offers
 
 GameBoard --|> EmptyDeckException : composition
