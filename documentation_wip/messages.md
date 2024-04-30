@@ -19,7 +19,7 @@ classDiagram
 
     class Message {
         <<Abstract>>
-        message: String    
+        + message: String    
         + String toString()*
     }
 
