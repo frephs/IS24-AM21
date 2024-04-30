@@ -165,9 +165,9 @@ public class PlayerBoardTest {
 
 
     // testing a card is correctly added to the playedCards set
-    pb.placeCard(card, CardSideType.BACK, new Position(-1,1));
+    pb.placeCard(card, CardSideType.BACK, new Position(-1,0));
     assertEquals(
-      pb.getPlayedCards().get(new Position(-1,1)).getPlayedSide(), card.getPlayedSide()
+      pb.getPlayedCards().get(new Position(-1,0)).getPlayedSide(), card.getPlayedSide()
     );
 
     // testing resources have been correctly updated
@@ -182,7 +182,7 @@ public class PlayerBoardTest {
     );
 
 
-    pb.placeCard(card, CardSideType.BACK, new Position(0,2));
+    pb.placeCard(card, CardSideType.BACK, new Position(-1,1));
 
     assertEquals(
       2,
@@ -204,15 +204,15 @@ public class PlayerBoardTest {
     //testing if an exception is thrown when you try placing a card in positions which have one disabled angle but one available
     assertThrows(
       IllegalPlacingPositionException.class,
-      () -> pb.placeCard(card, CardSideType.BACK, new Position (1,1))
+      () -> pb.placeCard(card, CardSideType.BACK, new Position (0,1))
     );
 
     //testing ig the playerboard removes all the resources a card covers.
-    pb.placeCard(card, CardSideType.BACK, new Position(1,-1));
+    pb.placeCard(card, CardSideType.BACK, new Position(1,-0));
 
     // you must have a card in your hand to place it's side
     pb.getHand().add(starterCard);
-    pb.placeCard(starterCard, CardSideType.BACK, new Position(2,0));
+    pb.placeCard(starterCard, CardSideType.BACK, new Position(1,1));
 
     assertEquals(
       4,
@@ -227,12 +227,12 @@ public class PlayerBoardTest {
 
     // remember not to try to place the same card with a different side it fucks up everything
     pb.getHand().add(goldCard);
-    pb.placeCard(goldCard, CardSideType.FRONT, new Position(3,-1));
+    pb.placeCard(goldCard, CardSideType.FRONT, new Position(2,1));
 
     // testing if a card with a pointCondition corretly sets it's covered corners
     assertEquals(
       1,
-      pb.getPlayedCards().get(new Position(3,-1)).getCoveredCorners()
+      pb.getPlayedCards().get(new Position(2,1)).getCoveredCorners()
     );
 
 
