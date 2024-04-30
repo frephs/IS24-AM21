@@ -32,7 +32,16 @@ sequenceDiagram
 
     Note over Client,Server: Client sends a type of message <br> that is not expected 
     Client ->> Server: <Unexpected message>
+    alt client is the lobby view
+    Server ->> Controller : Controller.checkIfCurrentPlayer(game, nickname)
+    Controller --) Server : PlayerNotActive
+
+    else client is the game view 
+    Server ->> Controller : Controller.joinGame(socketId,game)
+    Controller --) Server : IncompletePlayerBuilderException
+    end
     Server --) Client: ActionNotAllowedMessage 
+
 
     Note over Client,Server: Client sends a message which <br>is not recognized by the server
     Client ->> Server: <Unknown-type message>
