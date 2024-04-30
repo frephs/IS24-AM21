@@ -1,13 +1,12 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
+import java.util.List;
+import java.util.UUID;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.Player;
-
-import java.util.List;
-import java.util.UUID;
 
 public interface ControllerEventListener {
   void gameCreated(String gameId);
@@ -27,13 +26,18 @@ public interface ControllerEventListener {
   void changeTurn(String gameId, Integer nextPlayer, Boolean isLastRound);
 
   /* current player placed a card */
-  void cardPlaced(String gameId, Integer playerHandCardNumber,
-                  CardSideType side,
-                  Position position);
+  void cardPlaced(
+    String gameId,
+    Integer playerHandCardNumber,
+    CardSideType side,
+    Position position
+  );
 
-  void nextTurn(String gameId, DrawingCardSource drawingCardSource,
-                DrawingDeckType drawingDeckType);
+  void nextTurn(
+    String gameId,
+    DrawingCardSource drawingCardSource,
+    DrawingDeckType drawingDeckType
+  );
 
   void nextTurn();
-
 }

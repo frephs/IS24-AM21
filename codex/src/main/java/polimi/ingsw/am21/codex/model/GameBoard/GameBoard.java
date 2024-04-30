@@ -1,5 +1,7 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
+import java.util.*;
+import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -15,17 +17,14 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-
 public class GameBoard {
-  final private Deck<PlayableCard> goldDeck;
+
+  private final Deck<PlayableCard> goldDeck;
   private CardPair<PlayableCard> goldCards;
-  final private Deck<PlayableCard> starterDeck;
-  final private Deck<ObjectiveCard> objectiveDeck;
+  private final Deck<PlayableCard> starterDeck;
+  private final Deck<ObjectiveCard> objectiveDeck;
   private CardPair<ObjectiveCard> objectiveCards;
-  final private Deck<PlayableCard> resourceDeck;
+  private final Deck<PlayableCard> resourceDeck;
   private CardPair<PlayableCard> resourceCards;
   private final List<Card> allCards;
 
@@ -65,26 +64,27 @@ public class GameBoard {
       CardType type = CardType.fromString(typeStr);
       CardBuilder builder = new CardBuilder(id, type);
 
-
-      if (card.has("points"))
-        builder.setPoints(card.getInt("points"));
-      if (card.has("objectiveType"))
-        builder.setObjectiveType(ObjectiveType.fromString(card.getString(
-          "objectiveType")));
-
+      if (card.has("points")) builder.setPoints(card.getInt("points"));
+      if (card.has("objectiveType")) builder.setObjectiveType(
+        ObjectiveType.fromString(card.getString("objectiveType"))
+      );
 
       if (card.has("objectiveGeometry")) {
         JSONArray geometryObjectivesArray = card.getJSONArray(
-          "objectiveGeometry");
-        Map<AdjacentPosition, ResourceType> objectiveGeometry =
-          new HashMap<AdjacentPosition, ResourceType>();
+          "objectiveGeometry"
+        );
+        Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<
+          AdjacentPosition,
+          ResourceType
+        >();
 
         for (int j = 0; j < geometryObjectivesArray.length(); j++) {
           if (!geometryObjectivesArray.isNull(i)) {
             AdjacentPosition position =
               GameBoard.cardGeometryPositionFromJSONIndex(j);
-            ResourceType resource =
-              ResourceType.fromString(geometryObjectivesArray.getString(j));
+            ResourceType resource = ResourceType.fromString(
+              geometryObjectivesArray.getString(j)
+            );
             objectiveGeometry.put(position, resource);
           }
         }
@@ -92,30 +92,32 @@ public class GameBoard {
         builder.setObjectiveGeometry(objectiveGeometry);
       }
 
-
       if (card.has("objectiveResources")) {
-        Set<String> objectiveResourcesSet = card.getJSONObject(
-            "objectiveResources")
+        Set<String> objectiveResourcesSet = card
+          .getJSONObject("objectiveResources")
           .keySet();
         Map<ResourceType, Integer> objectiveResources = new HashMap<>();
         for (String resourceTypeStr : objectiveResourcesSet) {
           ResourceType resourceType = ResourceType.fromString(resourceTypeStr);
-          objectiveResources.put(resourceType, card.getJSONObject(
-              "objectiveResources")
-            .getInt(resourceTypeStr));
+          objectiveResources.put(
+            resourceType,
+            card.getJSONObject("objectiveResources").getInt(resourceTypeStr)
+          );
         }
         builder.setObjectiveResources(objectiveResources);
       }
 
       if (card.has("objectiveObjects")) {
         Map<ObjectType, Integer> objectiveObjects = new HashMap<>();
-        Set<String> objectiveObjectsSet = card.getJSONObject("objectiveObjects")
+        Set<String> objectiveObjectsSet = card
+          .getJSONObject("objectiveObjects")
           .keySet();
         for (String objectiveTypeStr : objectiveObjectsSet) {
           ObjectType objectiveType = ObjectType.fromString(objectiveTypeStr);
-          objectiveObjects.put(objectiveType, card.getJSONObject(
-              "objectiveObjects")
-            .getInt(objectiveTypeStr));
+          objectiveObjects.put(
+            objectiveType,
+            card.getJSONObject("objectiveObjects").getInt(objectiveTypeStr)
+          );
         }
         builder.setObjectiveObjects(objectiveObjects);
       }
@@ -123,37 +125,47 @@ public class GameBoard {
       if (card.has("backPermanentResources")) {
         List<String> backPermanentResources = new ArrayList<>();
         JSONArray backPermanentResourcesStr = card.getJSONArray(
-          "backPermanentResources");
+          "backPermanentResources"
+        );
         for (int r = 0; r < backPermanentResourcesStr.length(); r++) {
           backPermanentResources.add(backPermanentResourcesStr.getString(r));
         }
-        builder.setBackPermanentResources(backPermanentResources.stream()
-          .map(ResourceType::fromString)
-          .collect(Collectors.toList()));
+        builder.setBackPermanentResources(
+          backPermanentResources
+            .stream()
+            .map(ResourceType::fromString)
+            .collect(Collectors.toList())
+        );
       }
-
 
       if (card.has("placementCondition")) {
         List<String> placementCondition = new ArrayList<>();
         JSONArray placementConditionStr = card.getJSONArray(
-          "placementCondition");
+          "placementCondition"
+        );
         for (int p = 0; p < placementConditionStr.length(); p++) {
           placementCondition.add(placementConditionStr.getString(p));
         }
-        builder.setPlacementCondition(placementCondition.stream()
-          .map(ResourceType::fromString)
-          .collect(Collectors.toList()));
+        builder.setPlacementCondition(
+          placementCondition
+            .stream()
+            .map(ResourceType::fromString)
+            .collect(Collectors.toList())
+        );
       }
 
       if (card.has("pointCondition")) {
         String pointConditionStr = card.getString("pointCondition");
-        builder.setPointCondition(PointConditionType.fromString(pointConditionStr));
+        builder.setPointCondition(
+          PointConditionType.fromString(pointConditionStr)
+        );
       }
 
       if (card.has("pointConditionObject")) {
         ObjectType.fromString(card.getString("pointConditionObject"));
-        builder.setPointConditionObject(ObjectType.fromString(card.getString(
-          "pointConditionObject")));
+        builder.setPointConditionObject(
+          ObjectType.fromString(card.getString("pointConditionObject"))
+        );
       }
 
       if (card.has("corners")) {
@@ -169,22 +181,26 @@ public class GameBoard {
             for (CornerPosition cornerPosition : cornerPositions) {
               String cornerPositionStr = cornerPosition.toString();
               if (jsonCorners.has(cornerPositionStr)) {
-                String cornerInfo =
-                  jsonCorners.getString(cornerPositionStr);
+                String cornerInfo = jsonCorners.getString(cornerPositionStr);
                 if (ResourceType.isResourceType(cornerInfo)) {
-                  corners.put(cornerPosition,
-                    Optional.of(ResourceType.fromString((cornerInfo))));
+                  corners.put(
+                    cornerPosition,
+                    Optional.of(ResourceType.fromString((cornerInfo)))
+                  );
                 } else if (ObjectType.isObjectType(cornerInfo)) {
-                  corners.put(cornerPosition,
-                    Optional.of(ObjectType.fromString(cornerInfo)));
+                  corners.put(
+                    cornerPosition,
+                    Optional.of(ObjectType.fromString(cornerInfo))
+                  );
                 } else if (cornerInfo.equals("EMPTY")) {
                   corners.put(cornerPosition, Optional.empty());
                 } else {
-                  throw new RuntimeException("Invalid corner content type: " + cornerInfo);
+                  throw new RuntimeException(
+                    "Invalid corner content type: " + cornerInfo
+                  );
                 }
               }
             }
-
           }
           builder.setCorners(side, corners);
         }
@@ -203,9 +219,13 @@ public class GameBoard {
       }
     }
 
-    return new GameBoard(allCards, goldCardsList, starterCardsList,
-      objectiveCardsList, resourceCardsList);
-
+    return new GameBoard(
+      allCards,
+      goldCardsList,
+      starterCardsList,
+      objectiveCardsList,
+      resourceCardsList
+    );
   }
 
   /**
@@ -218,14 +238,16 @@ public class GameBoard {
    * @param resourceCards  The pair of resource cards
    * @param objectiveCards The pair of common objective cards
    */
-  public GameBoard(List<Card> allCards,
-                   Deck<PlayableCard> goldDeck,
-                   Deck<PlayableCard> resourceDeck,
-                   Deck<PlayableCard> starterDeck,
-                   Deck<ObjectiveCard> objectiveDeck,
-                   CardPair<PlayableCard> resourceCards,
-                   CardPair<ObjectiveCard> objectiveCards,
-                   CardPair<PlayableCard> goldCards) {
+  public GameBoard(
+    List<Card> allCards,
+    Deck<PlayableCard> goldDeck,
+    Deck<PlayableCard> resourceDeck,
+    Deck<PlayableCard> starterDeck,
+    Deck<ObjectiveCard> objectiveDeck,
+    CardPair<PlayableCard> resourceCards,
+    CardPair<ObjectiveCard> objectiveCards,
+    CardPair<PlayableCard> goldCards
+  ) {
     this.goldDeck = goldDeck;
     this.goldCards = goldCards;
     this.starterDeck = starterDeck;
@@ -240,11 +262,13 @@ public class GameBoard {
    * Constructor
    * Initializes the decks and draws the first cards
    */
-  public GameBoard(List<Card> allCards,
-                   List<PlayableCard> goldCardsList,
-                   List<PlayableCard> starterCardsList,
-                   List<ObjectiveCard> objectiveCardsList,
-                   List<PlayableCard> resourceCardsList) {
+  public GameBoard(
+    List<Card> allCards,
+    List<PlayableCard> goldCardsList,
+    List<PlayableCard> starterCardsList,
+    List<ObjectiveCard> objectiveCardsList,
+    List<PlayableCard> resourceCardsList
+  ) {
     this.goldDeck = new Deck<>(goldCardsList);
     this.starterDeck = new Deck<>(starterCardsList);
     this.objectiveDeck = new Deck<>(objectiveCardsList);
@@ -258,17 +282,22 @@ public class GameBoard {
     this.objectiveDeck.shuffle();
 
     try {
-      this.goldCards = new CardPair<>(this.drawGoldCardFromDeck(),
-        this.drawGoldCardFromDeck());
-      this.objectiveCards = new CardPair<>(this.drawObjectiveCardFromDeck(),
-        this.drawObjectiveCardFromDeck());
-      this.resourceCards = new CardPair<>(this.drawResourceCardFromDeck(),
-        this.drawResourceCardFromDeck());
+      this.goldCards = new CardPair<>(
+        this.drawGoldCardFromDeck(),
+        this.drawGoldCardFromDeck()
+      );
+      this.objectiveCards = new CardPair<>(
+        this.drawObjectiveCardFromDeck(),
+        this.drawObjectiveCardFromDeck()
+      );
+      this.resourceCards = new CardPair<>(
+        this.drawResourceCardFromDeck(),
+        this.drawResourceCardFromDeck()
+      );
     } catch (EmptyDeckException ignored) {
       // This will never happen as we just seeded the decks
     }
   }
-
 
   /**
    * Draws a gold card from the deck
@@ -288,17 +317,16 @@ public class GameBoard {
    * @return The drawn card.
    * @throws EmptyDeckException If the deck being drawn from is empty.
    */
-  public PlayableCard drawCard(DrawingCardSource drawingSource,
-                               DrawingDeckType deckType)
-  throws EmptyDeckException {
+  public PlayableCard drawCard(
+    DrawingCardSource drawingSource,
+    DrawingDeckType deckType
+  ) throws EmptyDeckException {
     if (drawingSource == DrawingCardSource.Deck) {
       if (deckType == DrawingDeckType.GOLD) {
         return this.goldDeck.draw();
       } else {
         return this.resourceDeck.draw();
-
       }
-
     } else {
       CardPair<PlayableCard> drawingPair;
       Deck<PlayableCard> drawingDeck;
@@ -341,14 +369,12 @@ public class GameBoard {
     return this.starterDeck.draw();
   }
 
-
   /**
    * @return the number of starter cards left in the deck
    */
   public int starterCardsLeft() {
     return this.starterDeck.cardsLeft();
   }
-
 
   /**
    * Draws an objective card from the deck
@@ -392,7 +418,6 @@ public class GameBoard {
     return this.objectiveDeck.cardsLeft();
   }
 
-
   /**
    * Draws a resource card from the deck
    *
@@ -411,7 +436,7 @@ public class GameBoard {
    * @throws EmptyDeckException there are no resource cards left in the deck
    */
   public List<PlayableCard> drawResourceCardFromDeck(int n)
-  throws EmptyDeckException {
+    throws EmptyDeckException {
     return this.resourceDeck.draw(n);
   }
 
@@ -423,7 +448,7 @@ public class GameBoard {
    * @return the resource card drawn
    */
   public PlayableCard drawResourceCardFromPair(Boolean first)
-  throws EmptyDeckException {
+    throws EmptyDeckException {
     if (first) {
       return this.resourceCards.replaceFirst(this.drawResourceCardFromDeck());
     } else {
@@ -438,14 +463,15 @@ public class GameBoard {
     return this.resourceDeck.cardsLeft();
   }
 
-
   /**
    * @return a card pair with objective cards from the deck
    * @throws EmptyDeckException if the objective cards deck is empty
    */
   public CardPair<ObjectiveCard> drawObjectiveCardPair()
-  throws EmptyDeckException {
-    return new CardPair<>(this.drawObjectiveCardFromDeck(),
-      this.drawObjectiveCardFromDeck());
+    throws EmptyDeckException {
+    return new CardPair<>(
+      this.drawObjectiveCardFromDeck(),
+      this.drawObjectiveCardFromDeck()
+    );
   }
 }

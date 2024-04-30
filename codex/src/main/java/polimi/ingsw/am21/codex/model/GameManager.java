@@ -1,11 +1,10 @@
 package polimi.ingsw.am21.codex.model;
 
-
+import java.util.*;
 import polimi.ingsw.am21.codex.model.Game;
 
-import java.util.*;
-
 public class GameManager {
+
   private final Map<String, Game> games;
 
   public GameManager() {

@@ -1,10 +1,9 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class CornerTest {
 

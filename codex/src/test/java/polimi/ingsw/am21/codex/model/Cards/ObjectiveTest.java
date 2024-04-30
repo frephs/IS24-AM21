@@ -1,12 +1,11 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 class ObjectiveTest {
 
   @Test
-  void getEvaluator() {
-  }
+  void getEvaluator() {}
 }

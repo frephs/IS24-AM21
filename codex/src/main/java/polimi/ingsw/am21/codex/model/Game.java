@@ -1,27 +1,26 @@
 package polimi.ingsw.am21.codex.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import org.json.JSONArray;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-
-import org.json.JSONArray;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
+import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 public class Game {
+
   static final int WINNING_POINTS = 20;
   private final List<Player> players;
   private final GameBoard gameBoard;
@@ -35,7 +34,8 @@ public class Game {
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
 
-    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
+    String jsonLocation =
+      "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
       "/Resources/cards.json";
     File file = new File(jsonLocation);
     JSONArray cards;
@@ -66,14 +66,12 @@ public class Game {
     return this.lobby;
   }
 
-
   /**
    * Starts the game.
    */
   public void start() {
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
-
   }
 
   /**
@@ -83,7 +81,7 @@ public class Game {
    * @throws EmptyDeckException When the deck being drawn from is empty.
    */
   public CardPair<ObjectiveCard> drawObjectiveCardPair()
-  throws EmptyDeckException {
+    throws EmptyDeckException {
     return this.gameBoard.drawObjectiveCardPair();
   }
 
@@ -105,9 +103,9 @@ public class Game {
    */
   public PlayerState getPlayerState(String nickname) {
     int i = 0;
-    while (i < players.size() && !players.get(i)
-      .getNickname()
-      .equals(nickname)) {
+    while (
+      i < players.size() && !players.get(i).getNickname().equals(nickname)
+    ) {
       i++;
     }
 
@@ -150,7 +148,6 @@ public class Game {
     return this.currentPlayer;
   }
 
-
   /**
    * Adds a player to the game.
    *
@@ -159,7 +156,6 @@ public class Game {
   public void addPlayer(Player player) {
     this.players.add(player);
   }
-
 
   /**
    * Checks if the game is over.
@@ -221,9 +217,10 @@ public class Game {
    * @param deckType      The type of deck to draw from.
    * @throws GameOverException If the game is over.
    */
-  public void nextTurn(DrawingCardSource drawingSource,
-                       DrawingDeckType deckType)
-  throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
+  public void nextTurn(
+    DrawingCardSource drawingSource,
+    DrawingDeckType deckType
+  ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
@@ -231,17 +228,15 @@ public class Game {
       throw new InvalidNextTurnCallException();
     }
     try {
-      this.players.get(this.currentPlayer).drawCard(this.gameBoard.drawCard(
-        drawingSource,
-        deckType
-      ));
+      this.players.get(this.currentPlayer).drawCard(
+          this.gameBoard.drawCard(drawingSource, deckType)
+        );
     } catch (EmptyDeckException e) {
       this.remainingRounds = 2;
       throw e;
     }
     this.nextTurn();
   }
-
 
   /**
    * Advances the game to the next turn.
@@ -259,7 +254,7 @@ public class Game {
    *                                      not the last round
    */
   public void nextTurn()
-  throws GameOverException, InvalidNextTurnCallException {
+    throws GameOverException, InvalidNextTurnCallException {
     if (this.state == GameState.GAME_OVER) throw new GameOverException();
     if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
       this.state = GameState.GAME_OVER;
@@ -298,8 +293,7 @@ public class Game {
    * @return The starter card drawn from the deck.
    * @throws EmptyDeckException If the deck being drawn from is empty.
    */
-  public PlayableCard drawStarterCard()
-  throws EmptyDeckException {
+  public PlayableCard drawStarterCard() throws EmptyDeckException {
     return this.gameBoard.drawStarterCardFromDeck();
   }
 

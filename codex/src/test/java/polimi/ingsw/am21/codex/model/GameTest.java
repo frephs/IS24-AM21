@@ -1,19 +1,6 @@
 package polimi.ingsw.am21.codex.model;
 
-import org.json.JSONArray;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.Lobby.Lobby;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Player.Player;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,17 +10,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.json.JSONArray;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Lobby.Lobby;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Player.Player;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 class GameTest {
+
   Game game;
   JSONArray cardsJSON;
 
   GameTest() {
-
-
-    String jsonLocation = "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
+    String jsonLocation =
+      "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
       "/Resources/cards.json";
     File file = new File(jsonLocation);
     try {
@@ -50,7 +49,6 @@ class GameTest {
     this.game = new Game(2, this.cardsJSON);
   }
 
-
   @Test
   void testLobby() {
     // the lobby should be created inside the Game constructor
@@ -60,8 +58,11 @@ class GameTest {
     assertEquals(0, lobby.getPlayersCount());
     UUID firstPlayer = UUID.randomUUID();
     try {
-      lobby.addPlayer(firstPlayer, this.game.drawObjectiveCardPair(),
-        this.game.drawStarterCard());
+      lobby.addPlayer(
+        firstPlayer,
+        this.game.drawObjectiveCardPair(),
+        this.game.drawStarterCard()
+      );
     } catch (Exception e) {
       e.printStackTrace();
       fail("Exception thrown while adding first player");
@@ -76,8 +77,11 @@ class GameTest {
 
     UUID secondPlayer = UUID.randomUUID();
     try {
-      lobby.addPlayer(secondPlayer, this.game.drawObjectiveCardPair(),
-        this.game.drawStarterCard());
+      lobby.addPlayer(
+        secondPlayer,
+        this.game.drawObjectiveCardPair(),
+        this.game.drawStarterCard()
+      );
     } catch (Exception e) {
       // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions
       // )
@@ -94,34 +98,56 @@ class GameTest {
     UUID randomId = UUID.randomUUID();
     // the blue token was already taken by firstPlayer and therefore cannot
     // be selected by SecondPlayer
-    assertThrows(TokenAlreadyTakenException.class,
-      () -> lobby.setToken(secondPlayer, TokenColor.BLUE));
+    assertThrows(
+      TokenAlreadyTakenException.class,
+      () -> lobby.setToken(secondPlayer, TokenColor.BLUE)
+    );
     // the socked ID does not exist cannot set token color
-    assertThrows(PlayerNotFoundException.class, () -> lobby.setToken(randomId
-      , TokenColor.RED));
+    assertThrows(
+      PlayerNotFoundException.class,
+      () -> lobby.setToken(randomId, TokenColor.RED)
+    );
     // the socket ID does not exist cannot set nickname
-    assertThrows(PlayerNotFoundException.class,
-      () -> lobby.setNickname(randomId, "test"));
+    assertThrows(
+      PlayerNotFoundException.class,
+      () -> lobby.setNickname(randomId, "test")
+    );
     // the lobby is already full cannot add another player
-    assertThrows(LobbyFullException.class, () -> lobby.addPlayer(randomId,
-      this.game.drawObjectiveCardPair(), this.game.drawStarterCard()));
+    assertThrows(
+      LobbyFullException.class,
+      () ->
+        lobby.addPlayer(
+          randomId,
+          this.game.drawObjectiveCardPair(),
+          this.game.drawStarterCard()
+        )
+    );
 
-
-    assertThrows(PlayerNotFoundException.class,
-      () -> lobby.setNickname(randomId, "test"));
-
+    assertThrows(
+      PlayerNotFoundException.class,
+      () -> lobby.setNickname(randomId, "test")
+    );
 
     lobby.setObjectiveCard(firstPlayer, true);
     try {
-      lobby.finalizePlayer(firstPlayer, CardSideType.BACK,
-        this.game.drawHand());
+      lobby.finalizePlayer(
+        firstPlayer,
+        CardSideType.BACK,
+        this.game.drawHand()
+      );
     } catch (EmptyDeckException e) {
       fail("Empty deck exception");
     }
     // player was already finalized cannot finalize twice
-    assertThrows(PlayerNotFoundException.class,
-      () -> lobby.finalizePlayer(firstPlayer, CardSideType.FRONT,
-        this.game.drawHand()));
+    assertThrows(
+      PlayerNotFoundException.class,
+      () ->
+        lobby.finalizePlayer(
+          firstPlayer,
+          CardSideType.FRONT,
+          this.game.drawHand()
+        )
+    );
   }
 
   void preparePlayers(Game game) {
@@ -135,40 +161,42 @@ class GameTest {
       UUID playerSocketID = UUID.randomUUID();
 
       try {
-        game.getLobby()
-          .addPlayer(playerSocketID, game.drawObjectiveCardPair(),
-            game.drawStarterCard());
+        game
+          .getLobby()
+          .addPlayer(
+            playerSocketID,
+            game.drawObjectiveCardPair(),
+            game.drawStarterCard()
+          );
       } catch (Exception e) {
         fail("Failed creating player in lobby");
       }
-
 
       game.getLobby().setNickname(playerSocketID, "Player_" + i++);
 
       game.getLobby().setToken(playerSocketID, TokenColor.GREEN);
       game.getLobby().setToken(playerSocketID, TokenColor.RED);
 
-      Optional<CardPair<ObjectiveCard>> firstPlayerObjectiveCards =
-        game.getLobby()
-          .getPlayerObjectiveCards(playerSocketID);
-      if (firstPlayerObjectiveCards.isEmpty())
-        fail("The first player objective cards are null, this should never " +
-          "happened 💀");
+      Optional<CardPair<ObjectiveCard>> firstPlayerObjectiveCards = game
+        .getLobby()
+        .getPlayerObjectiveCards(playerSocketID);
+      if (firstPlayerObjectiveCards.isEmpty()) fail(
+        "The first player objective cards are null, this should never " +
+        "happened 💀"
+      );
 
       game.getLobby().setObjectiveCard(playerSocketID, true);
       try {
-        Player player = game.getLobby()
-          .finalizePlayer(playerSocketID, CardSideType.FRONT,
-            game.drawHand());
+        Player player = game
+          .getLobby()
+          .finalizePlayer(playerSocketID, CardSideType.FRONT, game.drawHand());
 
         game.addPlayer(player);
       } catch (EmptyDeckException e) {
         fail("Empty deck exception");
       }
     }
-
   }
-
 
   @Test
   void testGame() {
@@ -182,8 +210,6 @@ class GameTest {
     // at the game start we shouldn't have remainingRounds as it signals that
     // the game is about to end in next round
     assertEquals(Optional.empty(), this.game.getRemainingRounds());
-
-
   }
 
   @Test
@@ -194,9 +220,11 @@ class GameTest {
       preparePlayers(game);
       game.start();
       List<String> order = game.getPlayersOrder();
-      if (order.get(0).compareTo("Player_0") != 0
-        || order.get(1).compareTo("Player_1") != 0
-        || order.get(2).compareTo("Player_2") != 0) {
+      if (
+        order.get(0).compareTo("Player_0") != 0 ||
+        order.get(1).compareTo("Player_1") != 0 ||
+        order.get(2).compareTo("Player_2") != 0
+      ) {
         isDifferent = true;
       }
 
@@ -208,7 +236,8 @@ class GameTest {
         fail("The shuffled players contain duplicate nicknames");
       }
     }
-    if (!isDifferent)
-      fail("After 10k tests the player order was never shuffled");
+    if (!isDifferent) fail(
+      "After 10k tests the player order was never shuffled"
+    );
   }
 }

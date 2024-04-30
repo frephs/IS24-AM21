@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.Lobby.exceptions;
 
 public class NicknameAlreadyTakenException extends RuntimeException {
+
   String nickname;
 
   public NicknameAlreadyTakenException(String nickname) {

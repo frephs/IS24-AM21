@@ -1,10 +1,9 @@
 package polimi.ingsw.am21.codex.model.Cards.Builder;
 
+import java.util.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.*;
 import polimi.ingsw.am21.codex.model.Cards.Playable.*;
-
-import java.util.*;
 
 public class CardBuilder {
 

@@ -3,7 +3,6 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 

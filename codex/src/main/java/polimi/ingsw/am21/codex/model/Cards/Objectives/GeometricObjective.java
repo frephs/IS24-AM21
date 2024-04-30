@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
 import java.util.Map;
 import java.util.function.BiFunction;
-
 import polimi.ingsw.am21.codex.model.Cards.AdjacentPosition;
 import polimi.ingsw.am21.codex.model.Cards.EdgePosition;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -66,6 +65,7 @@ public class GeometricObjective extends Objective {
         .map(e -> e.orElse(false))
         .filter(Boolean::booleanValue)
         .mapToInt(element -> 1)
-        .sum() * points;
+        .sum() *
+      points;
   }
 }

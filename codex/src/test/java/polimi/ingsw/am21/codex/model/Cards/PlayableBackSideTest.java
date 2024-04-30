@@ -49,7 +49,7 @@ class PlayableBackSideTest {
     pbt.externalSetup();
 
     PlayerBoard pb = new PlayerBoard(
-      List.of(pbt.resourceCard,pbt.resourceCard,pbt.resourceCard),
+      List.of(pbt.resourceCard, pbt.resourceCard, pbt.resourceCard),
       pbt.starterCard,
       new ObjectiveCard(123, 123, null)
     );
