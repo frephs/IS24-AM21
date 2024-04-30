@@ -246,7 +246,7 @@ public class Game {
   /**
    * Advances the game to the next turn.
    *
-   * <p>This method increments the turn to the next player in the sequence.
+   * This method increments the turn to the next player in the sequence.
    * If the game is already over, it throws a {@link GameOverException}.
    * After each turn, it checks if the game should end based on either
    * reaching the maximum number of rounds or a player reaching the winning
