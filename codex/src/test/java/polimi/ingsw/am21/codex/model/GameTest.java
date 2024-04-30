@@ -2,22 +2,16 @@ package polimi.ingsw.am21.codex.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
@@ -28,25 +22,10 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 class GameTest {
 
   Game game;
-  JSONArray cardsJSON;
-
-  GameTest() {
-    String jsonLocation =
-      "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/Resources/cards.json";
-    File file = new File(jsonLocation);
-    try {
-      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
-      this.cardsJSON = new JSONArray(content);
-    } catch (IOException e) {
-      e.printStackTrace();
-      fail("could not read cards file");
-    }
-  }
 
   @BeforeEach
   void initTest() {
-    this.game = new Game(2, this.cardsJSON);
+    this.game = new Game(2);
   }
 
   @Test

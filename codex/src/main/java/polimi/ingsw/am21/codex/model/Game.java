@@ -1,12 +1,9 @@
 package polimi.ingsw.am21.codex.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import org.json.JSONArray;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -34,19 +31,8 @@ public class Game {
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
 
-    String jsonLocation =
-      "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/Resources/cards.json";
-    File file = new File(jsonLocation);
-    JSONArray cards;
-    try {
-      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
-      cards = new JSONArray(content);
-      this.gameBoard = GameBoard.fromJSON(cards);
-      this.players = new ArrayList<>();
-    } catch (IOException e) {
-      throw new RuntimeException("Failed loading cards json");
-    }
+    this.gameBoard = new GameBoard(new CardsLoader());
+    this.players = new ArrayList<>();
   }
 
   public Game(int players, JSONArray cards) {
@@ -240,7 +226,7 @@ public class Game {
 
   /**
    * Advances the game to the next turn.
-   *
+   * <p>
    * This method increments the turn to the next player in the sequence.
    * If the game is already over, it throws a {@link GameOverException}.
    * After each turn, it checks if the game should end based on either
