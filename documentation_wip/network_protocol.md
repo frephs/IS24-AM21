@@ -219,7 +219,7 @@ sequenceDiagram
                 Controller --) Server: InvalidCardPlacementMessage
                 Server --) Playing client : InvalidCardPlacementMessage
             else card placement is valid
-                Controller --) Server: SUCCESS
+                Controller --> Server: Returns
                 Server --) Playing client : ConfirmMessage
             end
         end
