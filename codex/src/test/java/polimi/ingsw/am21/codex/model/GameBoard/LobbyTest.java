@@ -269,11 +269,6 @@ class LobbyTest {
     }
   }
 
-  //@Test
-  //void setExtractedCard() {
-  //TODO
-  // }
-
   @Test
   void finalizePlayer() {
     UUID socketID = generateNewSocketID();

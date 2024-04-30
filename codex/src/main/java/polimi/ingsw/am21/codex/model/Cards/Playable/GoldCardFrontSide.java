@@ -65,7 +65,7 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
       return (
         (playerBoard, coveredCorners) ->
           pointConditionObject
-            .map(obj -> playerBoard.getObjects().get(obj))
+            .map(obj -> playerBoard.getObjects().get(obj) * points)
             .orElse(0)
       );
     };
