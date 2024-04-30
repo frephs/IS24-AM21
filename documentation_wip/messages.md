@@ -125,20 +125,20 @@ classDiagram
     }
     namespace Lobby {
         class AvailableGameLobbiesMessage{
-            list: list~GameID~
+            +list: list~GameID~
         }
 
         class AvailableTokenColorsMessage{
-            tokenColors: List~TokenColor~
+            +tokenColors: List~TokenColor~
         }
 
         class ObjectiveCardsMessage{
-            first_id: int
-            second_id: int
+            +first_id: int
+            +second_id: int
         }
 
         class StarterCardSidesMessage{
-            card_id: int
+            +card_id: int
         }
         
     
@@ -146,7 +146,7 @@ classDiagram
 
     namespace Game{
         class GameStatusMessage{
-            Gamestate
+            +gameState: Gamestate
         }
     }
 
@@ -168,20 +168,20 @@ classDiagram
 
     namespace Lobby{
         class JoinLobbyMessage {
-        + lobbyId: int
+            + lobbyId: int
         }
 
         class SetNicknameMessage{
-            nickname: String
+            + nickname: String
         }
 
         class SetTokenColorMessage {
-            color: TokenColor
+            + color: TokenColor
         }
 
         
         class SelectFromPairMessage {
-            first: Boolean
+            + first: Boolean
         }
     
     }
@@ -222,7 +222,7 @@ classDiagram
 classDiagram
     class ViewUpdatingMessage{
         <<Abstract>>
-        +playerId: int
+        + playerId: int
     }
 
      namespace Lobby {
@@ -337,7 +337,7 @@ classDiagram
 
     namespace Game {
         class InvalidCardPlacementMessage {
-            cardId: int
+            + cardId: int
         }
     }
 
