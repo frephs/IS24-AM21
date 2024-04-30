@@ -1,0 +1,43 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+
+
+\title{Presentation document of UML diagram\\Peer review}
+\author{Berardinelli, Genovese, Grandi, Haddou\\Gruppo AM21}
+\date{March 26, 2024}
+
+\begin{document}
+
+\maketitle
+\section{Model}
+\subsection{Defining the model and the controller's roles}
+As a team, we made the choice to implement part of the game logic in our model because we wanted the controller layer in the server to be as light as possible. This way the role of the controller layer is to parse the inputs coming from the client, call the model methods to update the game, players, gameboard and playerboards statuses with the parsed data and finally to signal the views to update. 
+
+\subsection{Notes on the UML diagram of the model}
+For development and accessibility purposes we split the model class diagram in two parts: 
+\begin{enumerate}
+\item Card hierarchy 
+\item Rest of the model 
+\end{enumerate}
+
+\paragraph{}
+We deliberately omitted some of the links between some classes (notably enums), so that the most meaningful connections would be easily visible.
+\paragraph{}
+
+
+\newpage
+
+\subsection{Documenting design choices•}
+Some design choices we took that we think are worth documenting a little bit in detail are:
+\begin{enumerate}
+\item The hybrid approach to evaluating objectives and card placement points\vspace{0.1cm}\\  To reflect actual game dynamics we decided to make the cards return a Function which will be called with the \texttt{PlayerBoard} parameters in the \texttt{PlayerBoard} context. This way we avoid sending around the \texttt{PlayerBoard} instances, which we considered a bad practice, and avoid duplicating it just to have the cards evaluate the points with their specificity, which we obtain nonetheless with this approach.      
+
+\item The use of the builder pattern for the \texttt{Player} class\vspace{0.10cm}\\  Since the player attributes are all final once chosen by the client, we decided to store \texttt{PlayerBuilder} instances in a \texttt{HashMap} in the \texttt{Lobby} class, as the controller layer handles the parsing of the client inputs. This way a player is added to the Game's Player list only when finalized (once they have chosen their Secret Objective).
+
+\item Some classes can be considered redundant as they could be easily implemented as part of the class they are a composition to. We decided to keep them separate to keep the code more readable and to make the implementation of the \texttt{GUI} easier as these entities are effectively functional on their own and can be considered "Drawable". 
+\end{enumerate}
+
+
+\end{document}
