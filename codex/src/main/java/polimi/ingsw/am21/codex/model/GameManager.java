@@ -17,9 +17,7 @@ public class GameManager {
   }
 
   public Optional<Game> getGame(String gameName) {
-    if (games.containsKey(gameName))
-      return Optional.of(games.get(gameName));
-    return Optional.empty();
+    return Optional.ofNullable(games.get(gameName));
   }
 
   public Game createGame(String gameName, Integer players) {

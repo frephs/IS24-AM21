@@ -37,11 +37,7 @@ public class GameController {
   }
 
   public Game getGame(String gameId) throws GameNotFoundException {
-    Optional<Game> oGame = manager.getGame(gameId);
-    if (oGame.isEmpty()) {
-      throw new GameNotFoundException();
-    }
-    return oGame.get();
+    return manager.getGame(gameId).orElseThrow(GameNotFoundException::new);
   }
 
 
@@ -65,13 +61,7 @@ public class GameController {
 
   public void joinLobby(String gameId, UUID socketID)
   throws GameNotFoundException, LobbyFullException {
-    Optional<Game> oGame = manager.getGame(gameId);
-
-    if (oGame.isEmpty()) {
-      throw new GameNotFoundException();
-    }
-
-    Game game = oGame.get();
+    Game game = this.getGame(gameId);
 
     Lobby lobby = game.getLobby();
     try {
