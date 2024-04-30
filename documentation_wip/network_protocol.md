@@ -203,27 +203,28 @@ As before, other than the `ConfirmMessage`, we have a series of messages whose r
 ```mermaid
 sequenceDiagram
     actor Playing client
+    Server -) Controller: Controller.startGame()
+    Server -) Client : GameStatusMessage (GAME_START) 
 
     loop until the game is over
         # New turn 
         Note over Server,Client: Current Player Changes
-        loop for each client
-            autonumber
-            Server -) Client : PlayerStateUpdateMessage 
-        end
         
         # Place card  
         Note over Playing client,Server: The playing client can place a card  
         loop until the card placement is valid
             Playing client ->> Server : PlaceCardMessage
+            Server --) Controller: Controller.placeCard(handIndex, side, position)
             alt card placement is not valid
+                Controller --) Server: InvalidCardPlacementMessage
                 Server --) Playing client : InvalidCardPlacementMessage
             else card placement is valid
+                Controller --) Server: SUCCESS
                 Server --) Playing client : ConfirmMessage
             end
         end
         loop for each client
-            Server -) Client : CardPlacedMessage 
+            Server -) Client : CardPlacedMessage
             opt only if the player's score is updated
                 Server -) Client : PlayerScoreUpdateMessage
             end
@@ -234,14 +235,21 @@ sequenceDiagram
         # Draw card 
         Note over Playing client,Server: The playing client can draw a card
         Playing client ->> Server : DeckDrawMessage OR CardPairDrawMessage
-        Server --) Playing client : ConfirmMessage
-        loop for each client
-            Server -) Client : DeckCardDrawnMessage OR CardPairDrawnMessage
-        end 
+        Server --) Controller: Controller.drawCard()
+        alt deck is empty
+            Controller --) Server: EmptyDeckException
+            loop for each client
+                Server --) Playing client : LastRoundMessage
+            end
+        else deck is not empty
+            Note over Playing client,Server: This notfication serves also to notify the
+            Server --) Playing client : ConfirmMessage
+            loop for each client
+                Server -) Client : DeckCardDrawnMessage OR CardPairDrawnMessage
+            end
+        end
+        Server -) Client : NotifyNextPlayerMessage
     end
-
-
-
 ```
 ### Game over flow
 When `Game.nextTurn()` detects that a player has a winning score or an `EmptyDeckException` is caught by the controller, a message is sent to all the clients to notify them of the number of remaining rounds.
