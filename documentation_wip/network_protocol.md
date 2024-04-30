@@ -198,7 +198,7 @@ sequenceDiagram
 
     Note over Server: Last round interactions
     Controller --> Controller: Last round reached
-    Controller ->> Server: changeTurn (lastRound)
+    Controller ->> Server: nextTurn() (lastRound)
 
     Server -) Client : RemainingTurnsMessage 
     loop for each client 
