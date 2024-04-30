@@ -221,6 +221,8 @@ public class PlayerBoard {
   /**
    * Helper method called by PlayerBoard.updateResourcesAndObjects() to
    * update the stored data structures of player's resources and objects
+   * @param corner the corner whose content will be added to the playerBoard resources or objects
+   * @param delta the count difference that will be applied to the resource or object map (usually either 1 or -1)
    */
   private <T extends CornerContentType> void updateResourcesAndObjectsMaps(
     Corner<T> corner,

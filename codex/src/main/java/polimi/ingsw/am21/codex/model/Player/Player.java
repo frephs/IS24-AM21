@@ -73,14 +73,10 @@ public class Player {
 
     /**
      * @param starterCard drawn from the GameBoard
-     * @throws StarterCardPlayedSideNotSetException if the played side of the starter card is not set before player construction.
      */
     public PlayerBuilder setStarterCard(
       PlayableCard starterCard
-    ) /*throws StarterCardPlayedSideNotSetException*/{
-      /*if(starterCard.getPlayedSide().isEmpty()){
-                throw new StarterCardPlayedSideNotSetException();
-            }*/
+    ) {
       this.starterCard = starterCard;
       return this;
     }
@@ -163,7 +159,7 @@ public class Player {
       playedCard = board.getHand().get(cardIndex);
     } catch (IndexOutOfBoundsException e) {
       throw new IndexOutOfBoundsException(
-        "You tried to place a played card which either doesn't exist or is not in your hand"
+        "You tried to place a card which either doesn't exist or is not in your hand"
       );
     }
 
