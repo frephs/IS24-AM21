@@ -2,22 +2,17 @@ package polimi.ingsw.am21.codex.model.GameBoard;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
-import org.json.JSONArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -33,19 +28,7 @@ class LobbyTest {
   @BeforeEach
   void prepareLobbyTest() {
     this.lobby = new Lobby(MAX_PLAYERS);
-
-    String jsonLocation =
-      "src/main/java/polimi/ingsw/am21/codex/model/Cards" +
-      "/Resources/cards.json";
-    File file = new File(jsonLocation);
-    try {
-      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
-      JSONArray cards = new JSONArray(content);
-      this.mockGameboard = GameBoard.fromJSON(cards);
-    } catch (IOException e) {
-      e.printStackTrace();
-      fail("could not read cards file");
-    }
+    this.mockGameboard = new GameBoard(new CardsLoader());
   }
 
   UUID generateNewSocketID() {
