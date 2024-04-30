@@ -66,6 +66,6 @@ public class GeometricObjective extends Objective {
         .map(e -> e.orElse(false))
         .filter(Boolean::booleanValue)
         .mapToInt(element -> 1)
-        .sum();
+        .sum() * points;
   }
 }

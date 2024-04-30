@@ -13,30 +13,36 @@ import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PlayerBoardTest {
+public class PlayerBoardTest {
   GameBoard gameBoard;
-  PlayerBoard pb;
+  public PlayerBoard pb;
   Method updateMap_1;
   Method updateMap_2;
   Method updateResourcesAndObjectsMaps;
 
-  PlayableCard card;
-  PlayableCard starterCard;
-  PlayableCard goldCard;
+  public PlayableCard card;
+  public PlayableCard starterCard;
+  public PlayableCard goldCard;
+  public PlayableCard resourceCard;
 
-  PlayableBackSide cb;
-  PlayableFrontSide cf;
-  ObjectiveCard objectiveCard;
+  public PlayableBackSide cb;
+  public PlayableFrontSide cf;
+  public ObjectiveCard objectiveCard;
 
+  public void externalSetup(){
+    try{
+      initTest();
+    }catch (NoSuchMethodException ignored){}
+  }
 
   @BeforeEach
   void initTest() throws NoSuchMethodException {
+    // dummy card front side
     PlayableFrontSide cf =  new GoldCardFrontSide(12,
       List.of(
         ResourceType.FUNGI, ResourceType.FUNGI
@@ -45,31 +51,46 @@ class PlayerBoardTest {
       ObjectType.QUILL
     );
 
+    cf.setCorner(CornerPosition.BOTTOM_LEFT, Optional.of(ResourceType.ANIMAL));
+
+
+    // dummy cards back sides
     PlayableBackSide cb =  new PlayableBackSide(List.of());
-    PlayableBackSide cb_2 =  new PlayableBackSide(List.of());
+    PlayableBackSide cb_2 =  new PlayableBackSide(List.of(ResourceType.INSECT));
+    PlayableBackSide cb_3 =  new PlayableBackSide(List.of(ResourceType.PLANT));
+
+    cb.setCorner(CornerPosition.BOTTOM_LEFT, Optional.of(ResourceType.ANIMAL));
+    cb.setCorner(CornerPosition.TOP_RIGHT, Optional.of(ResourceType.FUNGI));
 
     cb_2.setCorner(CornerPosition.BOTTOM_RIGHT, Optional.of(ResourceType.ANIMAL));
     cb_2.setCorner(CornerPosition.TOP_RIGHT, Optional.of(ResourceType.FUNGI));
     cb_2.setCorner(CornerPosition.TOP_LEFT, Optional.empty());
 
-    cf.setCorner(CornerPosition.BOTTOM_LEFT, Optional.of(ResourceType.ANIMAL));
+    cb_3.setCorner(CornerPosition.BOTTOM_LEFT, Optional.empty());
+    cb_3.setCorner(CornerPosition.TOP_LEFT, Optional.empty());
+    cb_3.setCorner(CornerPosition.TOP_RIGHT, Optional.empty());
+    cb_3.setCorner(CornerPosition.BOTTOM_RIGHT, Optional.empty());
 
-    cb.setCorner(CornerPosition.BOTTOM_LEFT, Optional.of(ResourceType.ANIMAL));
-    cb.setCorner(CornerPosition.TOP_RIGHT, Optional.of(ResourceType.FUNGI));
+    //dummy cards
+    card = new PlayableCard(1, cf,cb);
 
-    card = new PlayableCard(12, cf,cb);
-    starterCard = new PlayableCard(12, cf,cb_2);
+    starterCard = new PlayableCard(2, cf,cb_2);
     starterCard.setPlayedSideType(CardSideType.BACK);
-    goldCard = new PlayableCard(22,cf,cb);
-    ObjectiveCard objectiveCard = new ObjectiveCard(12,12, new ConcreteObjective());
+    resourceCard = new PlayableCard(4, cf, cb_3, ResourceType.PLANT);
+    resourceCard.setPlayedSideType(CardSideType.BACK);
 
+    goldCard = new PlayableCard(3,cf,cb);
+    objectiveCard = new ObjectiveCard(4,12, new ConcreteObjective());
+
+
+    // dummy playerBoard
     pb = new PlayerBoard(
       List.of(card,card,card),
       starterCard,
       objectiveCard
     );
 
-    // let's make private methods public
+    // let's make private methods public to test them
 
     updateMap_1 = pb.getClass().getDeclaredMethod(
       "updateMap", ResourceType.class, int.class
@@ -111,18 +132,18 @@ class PlayerBoardTest {
     assertEquals(d,1);
   }
 
-
   @Test
   void testEquals(){
     Object o = (Object) ResourceType.ANIMAL;
     Optional<Object> oo =  Optional.of(o);
     ResourceType r = ResourceType.ANIMAL;
-    assert(r.equals(oo.get()));
+    assertEquals(r, oo.get());
   }
 
   @Test
   void getPlaceableCardSides() {
-    assertEquals(pb.getPlaceableCardSides().size(), 3);
+    assertEquals(3, pb.getPlaceableCardSides().size()
+    );
   }
 
   @Test
@@ -144,29 +165,33 @@ class PlayerBoardTest {
 
 
     // testing a card is correctly added to the playedCards set
-    pb.placeCard(card, CardSideType.BACK, new Position(-1,1));
+    pb.placeCard(card, CardSideType.BACK, new Position(-1,0));
     assertEquals(
-      pb.getPlayedCards().get(new Position(-1,1)).getPlayedSide(), card.getPlayedSide()
+      pb.getPlayedCards().get(new Position(-1,0)).getPlayedSide(), card.getPlayedSide()
     );
 
     // testing resources have been correctly updated
     assertEquals(
-      pb.getResources().get(ResourceType.FUNGI), 2
+      2,
+      pb.getResources().get(ResourceType.FUNGI)
     );
 
     assertEquals(
-      pb.getResources().get(ResourceType.ANIMAL), 2
+      2,
+      pb.getResources().get(ResourceType.ANIMAL)
     );
 
 
-    pb.placeCard(card, CardSideType.BACK, new Position(0,2));
+    pb.placeCard(card, CardSideType.BACK, new Position(-1,1));
 
     assertEquals(
-      pb.getResources().get(ResourceType.FUNGI), 2
+      2,
+      pb.getResources().get(ResourceType.FUNGI)
     );
 
     assertEquals(
-      pb.getResources().get(ResourceType.ANIMAL), 3
+      3,
+      pb.getResources().get(ResourceType.ANIMAL)
     );
 
 
@@ -179,32 +204,43 @@ class PlayerBoardTest {
     //testing if an exception is thrown when you try placing a card in positions which have one disabled angle but one available
     assertThrows(
       IllegalPlacingPositionException.class,
-      () -> pb.placeCard(card, CardSideType.BACK, new Position (1,1))
+      () -> pb.placeCard(card, CardSideType.BACK, new Position (0,1))
     );
 
     //testing ig the playerboard removes all the resources a card covers.
-    pb.placeCard(card, CardSideType.BACK, new Position(1,-1));
+    pb.placeCard(card, CardSideType.BACK, new Position(1,-0));
 
     // you must have a card in your hand to place it's side
     pb.getHand().add(starterCard);
-    pb.placeCard(starterCard, CardSideType.BACK, new Position(2,0));
+    pb.placeCard(starterCard, CardSideType.BACK, new Position(1,1));
 
     assertEquals(
-      pb.getResources().get(ResourceType.ANIMAL), 4
+      4,
+      pb.getResources().get(ResourceType.ANIMAL)
     );
     assertEquals(
-      pb.getResources().get(ResourceType.FUNGI), 3
+      3,
+      pb.getResources().get(ResourceType.FUNGI)
     );
 
     // testing if a card with a placing condition can be placed after the condition is met
 
     // remember not to try to place the same card with a different side it fucks up everything
     pb.getHand().add(goldCard);
-    pb.placeCard(goldCard, CardSideType.FRONT, new Position(3,-1));
+    pb.placeCard(goldCard, CardSideType.FRONT, new Position(2,1));
 
     // testing if a card with a pointCondition corretly sets it's covered corners
     assertEquals(
-      pb.getPlayedCards().get(new Position(3,-1)).getCoveredCorners(),1
+      1,
+      pb.getPlayedCards().get(new Position(2,1)).getCoveredCorners()
+    );
+
+
+    // testing if the backPermanentResources are correctly added to the resources
+    // (starterCard is added 2 times: on PlayerBoard initialization and later in testing)
+    assertEquals(
+      2,
+      pb.getResources().get(ResourceType.INSECT)
     );
 
 

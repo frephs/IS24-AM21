@@ -1,13 +1,12 @@
 package polimi.ingsw.am21.codex.model.Player;
 
+import java.util.List;
+import java.util.Optional;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
-
-import java.util.List;
-import java.util.Optional;
 
 public class Player {
   private final String nickname;
@@ -160,27 +159,28 @@ public class Player {
     board.drawCard(card);
   }
 
-    /**
-     * Asks the PlayerBoard to position the card and then evaluates
-     * @param cardIndex of the card chosen from the player's hand,
-     * @param side of the card chosen to be placed on the PlayerBoard
-     * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
-     */
-    public void placeCard(int cardIndex, CardSideType side, Position position) throws
-      IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException
-      {
-          PlayableCard playedCard;
-          try{
-              playedCard= board.getHand().get(cardIndex);
-          }catch (IndexOutOfBoundsException e){
-              throw new IndexOutOfBoundsException("You tried to place a played card which either doesn't exist or is not in your hand");
-          }
-
-        board.placeCard(playedCard, side, position);
-
-        PlayableCard card = board.getHand().get(cardIndex);
-        this.points += card.getEvaluator().apply(board);
+  /**
+   * Asks the PlayerBoard to position the card and then evaluates it
+   * @param cardIndex of the card chosen from the player's hand,
+   * @param side of the card chosen to be placed on the PlayerBoard
+   * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
+   */
+  public void placeCard(int cardIndex, CardSideType side, Position position)
+    throws IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+    PlayableCard playedCard;
+    try {
+      playedCard = board.getHand().get(cardIndex);
+    } catch (IndexOutOfBoundsException e) {
+      throw new IndexOutOfBoundsException(
+        "You tried to place a card which either doesn't exist or is not in your hand"
+      );
     }
+
+    board.placeCard(playedCard, side, position);
+
+    PlayableCard card = board.getHand().get(cardIndex);
+    this.points += card.getEvaluator().apply(board);
+  }
 
     /**
      * Uses the PlayerBoard to evaluate the points of the objective card passed as argument
@@ -192,15 +192,9 @@ public class Player {
     }
 
   /**
-   * Evaluates the player secret objective, called by the Game class when
-   * Game overs
-   */
+   * Evaluates the player secret objective, called by the Game class when Game overs
+   * */
   public void evaluateSecretObjective() {
-    this.evaluate(
-      this.board.getObjectiveCard()
-    );
+    this.evaluate(this.board.getObjectiveCard());
   }
 }
-
-
-

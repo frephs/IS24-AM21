@@ -3,7 +3,6 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
@@ -62,7 +61,6 @@ public class PlayableCard extends Card {
     PlayableBackSide backSide
   ) {
     this(id, frontSide, backSide, null);
-    this.playedSideType = Optional.empty();
   }
 
   public Optional<ResourceType> getKingdom() {
@@ -77,13 +75,6 @@ public class PlayableCard extends Card {
     return List.of(frontSide, backSide);
   }
 
-  public PlayableSide getSide(CardSideType side){
-    return switch (side) {
-      case FRONT -> frontSide;
-      case BACK -> backSide;
-    };
-  }
-
   /**
    * Gets the currently played side, if any
    */
@@ -92,6 +83,13 @@ public class PlayableCard extends Card {
       if (type == CardSideType.FRONT) return frontSide;
       return backSide;
     });
+  }
+
+  /**
+   * @return the card's backPermanentResources
+   * */
+  public List<ResourceType> getBackPermanentResources(){
+    return backSide.getPermanentResources();
   }
 
   /**
