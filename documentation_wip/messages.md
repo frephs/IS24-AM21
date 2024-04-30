@@ -8,6 +8,7 @@
   - [View updates](#view-updates)
   - [Server errors](#server-errors)
 
+## Class diagram
 
 ```mermaid
 classDiagram
