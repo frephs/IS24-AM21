@@ -187,18 +187,27 @@ After the final rounds are played, the server will send a series of messages to 
 
 ```mermaid
 sequenceDiagram
-    Note over Server,Client: Normal Turn flow interactions
+    participant Controller
+    participant Server
+    actor Client
+
+    Note over Server: Normal Turn flow interactions
     loop until game.remainingTurns is set
-        Server --> Client : turn flow messages 
+        Controller --> Client : turn flow messages 
     end 
 
-    Note over Server,Client: Last turn interactions
+    Note over Server: Last round interactions
+    Controller --> Controller: Last round reached
+    Controller ->> Server: changeTurn (lastRound)
+
     Server -) Client : RemainingTurnsMessage 
     loop for each client 
-        Server -> Client : normal turn interactions 
+        Controller -> Client : normal turn interactions 
     end 
     
-    Note over Server,Client: Game overs
+    Note over Server: Game overs
+    Controller --> Controller: Game over
+    Controller ->> Server: setGameOver
     loop for each client 
         Server -) Client : GameOverMessage
         loop for each player
