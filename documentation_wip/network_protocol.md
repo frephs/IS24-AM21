@@ -62,18 +62,45 @@ sequenceDiagram
     # Get the available lobbies
     Note over Client,Server : Client is in the lobby view
     Client ->> Server : GetAvailableGameLobbiesMessage
+    Server ->> Controller : Controller.getAvailableGameLobbies()
+    alt there are no games available
+        Server ->> Controller: Controller.createGame()
+        Controller --) Server : Returns List<GameLobbies>
+    else there are games available 
+        Server ->> Controller : Controller.listGames()
+        Controller --) Server : Returns List<Games>
+
+    end 
     Server --) Client : AvailableGameLobbiesMessage
     
     # Join the Game Lobby
-    Note over Client,Server : Client selects a game lobby
+    Note over Client,Server : Client selects a game lobby or creates a new one
+    alt Client selects a game lobby
+
     loop until the selected lobby is not full
         Client -) Server : JoinLobbyMessage
         alt Lobby is full
+            Server ->> Controller : Controller.lobbyJoin(socketId, lobbyId)
+            Controller --) Server : LobbyFullException
             Server --) Client : LobbyFullMessage
         else Lobby is not full
+            Controller ->> Server : Controller.lobbyJoin(socketId, gameId)
+            Controller -->Server: Returns
             Server --) Client : ConfirmMessage
         end
     end
+
+    else Client creates a new game lobby
+        Client ->> Server : CreateGameLobbyMessage
+        Server ->> Controller : Controller.createGame()
+        Controller --> Server : Returns 
+
+        Server ->> Controller : Controller.lobbyJoin(socketId, gameId)
+
+        Controller --) Server : Returns 
+        Server --) Client : ConfirmMessage
+    end
+
 
     # Player Nickname
     Note over Client,Server : Client selects a nickname
@@ -99,7 +126,7 @@ sequenceDiagram
         loop until the player has not selected a token color
             Client ->> Server : GetAvailableTokenColorsMessage
             Server ->> Controller: Controller.lobbyGetAvailableTokenColors() 
-            Controller --> Server : Returns
+            Controller --) Server : Returns tokens: List<TokenColor> 
             Server --) Client : AvailableTokenColorsMessage
         end
 
@@ -124,7 +151,7 @@ sequenceDiagram
     Note over Client,Server: Client selects a secret objective
     Client ->> Server : GetObjectiveCardsMessage
     Server ->> Controller : Controller.lobbyGetObjectiveCards()
-    Controller --> Server : Returns
+    Controller --> Server : Returns cardIds: Pair<int> 
     Server -->> Client : ObjectiveCardsMessage 
     
     Client -) Server : SelectFromPairMessage 
@@ -138,7 +165,7 @@ sequenceDiagram
 
     Client ->> Server : GetStarterCardSidesMessage
     Server ->> Controller : Controller.lobbyGetStarterCardSides()
-    Controller --> Server : Returns
+    Controller --> Server : Returns cardId: int
     Server --) Client : StarterCardSidesMessage
 
     Client ->> Server : SelectFromPairMessage
@@ -158,6 +185,7 @@ sequenceDiagram
 
         Note left of Server: No response
     else All players are in the game
+        Server ->> Controller: Controller.gameStart(gameId)
         Controller --) Server: Returns true
         Server --) Client: GameStatusMessage (GAME_START)
         loop: for each client in the game view
