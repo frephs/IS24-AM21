@@ -305,10 +305,6 @@ class CardBuilderTest {
     // missing backPermanentResources
     assertThrows(MissingParametersException.class, builder::build);
 
-    builder = builder.setBackPermanentResources(
-      List.of(ResourceType.FUNGI, ResourceType.INSECT)
-    );
-
     assertDoesNotThrow(() -> {
       new CardBuilder(123, CardType.RESOURCE)
         .setBackPermanentResources(List.of(ResourceType.PLANT))

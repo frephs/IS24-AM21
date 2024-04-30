@@ -291,8 +291,6 @@ class LobbyTest {
       "could not find player with socket id" + socketID
     );
     assertEquals(playerNickname.get(), "test");
-
-    UUID socketID2 = generateNewSocketID();
   }
 
   @Test
