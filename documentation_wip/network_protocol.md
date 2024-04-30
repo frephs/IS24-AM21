@@ -215,7 +215,7 @@ sequenceDiagram
 
 ## Advanced Features
 ### Chat
-This comunication happens when a player (`Client`) wants to write a message in the chat. They send a `PostMessage` to the server, that will reply that the message has been received and posted. Later, the server will send a notification to all the other players (`Recipient`), informing them that there is a new message in the chat.
+This comunication happens when a player (`Client`) wants to write a message in the chat. When a `PostMessage` is sent, the server replies that the message has been received and posted. After that, the server sends a notification to all the recipients of the message informing them that there is a new message in the chat.
 
 ```mermaid
 sequenceDiagram
