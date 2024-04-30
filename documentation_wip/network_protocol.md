@@ -79,9 +79,12 @@ sequenceDiagram
     Note over Client,Server : Client selects a nickname
     loop until the selected nickname is not taken
         Client ->> Server : SetNicknameMessage
+        Server ->> Controller: Controller.lobbySetNickname(socketId, nickname)
         alt Nickname is already taken   
+            Controller --) Server: NicknameAlreadyTakenException
             Server --) Client : NicknameAlreadyTakenMessage
         else Nickname is accepted
+            Controller --> Server : Returns 
             Server --) Client : ConfirmMessage
         end    
     end
@@ -95,13 +98,18 @@ sequenceDiagram
     loop until the selected token color is not taken
         loop until the player has not selected a token color
             Client ->> Server : GetAvailableTokenColorsMessage
+            Server ->> Controller: Controller.lobbyGetAvailableTokenColors() 
+            Controller --> Server : Returns
             Server --) Client : AvailableTokenColorsMessage
         end
 
         Client ->> Server : SetTokenColorMessage 
+        Server ->> Controller: Controller.lobbySetTokenColor(nickname, tokenColor)
         alt Token color is already taken
+            Controller --) Server : NoSuchElementException
             Server --) Client : TokenColorAlreadyTakenMessage 
         else Token color is accepted
+            Controller --> Server : Returns
             Server --) Client : ConfirmMessage
         end
     end   
@@ -115,8 +123,13 @@ sequenceDiagram
     # Player Secret Objective 
     Note over Client,Server: Client selects a secret objective
     Client ->> Server : GetObjectiveCardsMessage
+    Server ->> Controller : Controller.lobbyGetObjectiveCards()
+    Controller --> Server : Returns
     Server -->> Client : ObjectiveCardsMessage 
+    
     Client -) Server : SelectFromPairMessage 
+    Server ->> Controller : Controller.lobbyChooseObjectiveCard(first)
+    Controller --> Server : Returns
     Server ->> Client : ConfirmMessage
     
 
@@ -124,8 +137,13 @@ sequenceDiagram
     Note over Client,Server: Client selects a starter card side to play
 
     Client ->> Server : GetStarterCardSidesMessage
+    Server ->> Controller : Controller.lobbyGetStarterCardSides()
+    Controller --> Server : Returns
     Server --) Client : StarterCardSidesMessage
+
     Client ->> Server : SelectFromPairMessage
+    Server ->> Controller : Controller.lobbyChooseStarterCardSide(first)
+    Controller --> Server : Returns
     Server --) Client : ConfirmMessage
 
     loop for each client in the game
@@ -133,10 +151,18 @@ sequenceDiagram
     end
     Note over Client,Server: The player in now in the game view
     Client ->> Server : GetGameStatusMessage
+    
+    Server ->> Controller: Controller.checkIfGameStarted()
     alt Not all players are in the game
+        Controller --) Server: Returns false
+
         Note left of Server: No response
     else All players are in the game
-        Server -) Client: GameStatusMessage (GAME_START)
+        Controller --) Server: Returns true
+        Server --) Client: GameStatusMessage (GAME_START)
+        loop: for each client in the game view
+            Server -) Client in the game view: GameStatusMessage (GAME_START)
+        end
     end
 
 ```
