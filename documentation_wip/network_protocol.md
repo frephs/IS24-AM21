@@ -32,7 +32,16 @@ sequenceDiagram
 
     Note over Client,Server: Client sends a type of message <br> that is not expected 
     Client ->> Server: <Unexpected message>
+    alt client is the lobby view
+    Server ->> Controller : Controller.checkIfCurrentPlayer(game, nickname)
+    Controller --) Server : PlayerNotActive
+
+    else client is the game view 
+    Server ->> Controller : Controller.joinGame(socketId,game)
+    Controller --) Server : IncompletePlayerBuilderException
+    end
     Server --) Client: ActionNotAllowedMessage 
+
 
     Note over Client,Server: Client sends a message which <br>is not recognized by the server
     Client ->> Server: <Unknown-type message>
@@ -53,26 +62,56 @@ sequenceDiagram
     # Get the available lobbies
     Note over Client,Server : Client is in the lobby view
     Client ->> Server : GetAvailableGameLobbiesMessage
+    Server ->> Controller : Controller.getAvailableGameLobbies()
+    alt there are no games available
+        Server ->> Controller: Controller.createGame()
+        Controller --) Server : Returns gameIds: List<int>
+    else there are games available 
+        Server ->> Controller : Controller.listGames()
+        Controller --) Server : Returns gameIds: List<int>
+
+    end 
     Server --) Client : AvailableGameLobbiesMessage
     
     # Join the Game Lobby
-    Note over Client,Server : Client selects a game lobby
+    Note over Client,Server : Client selects a game lobby or creates a new one
+    alt Client selects a game lobby
+
     loop until the selected lobby is not full
         Client -) Server : JoinLobbyMessage
         alt Lobby is full
+            Server ->> Controller : Controller.lobbyJoin(socketId, lobbyId)
+            Controller --) Server : LobbyFullException
             Server --) Client : LobbyFullMessage
         else Lobby is not full
+            Controller ->> Server : Controller.lobbyJoin(socketId, gameId)
+            Controller -->Server: Returns
             Server --) Client : ConfirmMessage
         end
     end
+
+    else Client creates a new game lobby
+        Client ->> Server : CreateGameLobbyMessage
+        Server ->> Controller : Controller.createGame()
+        Controller --> Server : Returns 
+
+        Server ->> Controller : Controller.lobbyJoin(socketId, gameId)
+
+        Controller --) Server : Returns 
+        Server --) Client : ConfirmMessage
+    end
+
 
     # Player Nickname
     Note over Client,Server : Client selects a nickname
     loop until the selected nickname is not taken
         Client ->> Server : SetNicknameMessage
+        Server ->> Controller: Controller.lobbySetNickname(socketId, nickname)
         alt Nickname is already taken   
+            Controller --) Server: NicknameAlreadyTakenException
             Server --) Client : NicknameAlreadyTakenMessage
         else Nickname is accepted
+            Controller --> Server : Returns 
             Server --) Client : ConfirmMessage
         end    
     end
@@ -86,13 +125,18 @@ sequenceDiagram
     loop until the selected token color is not taken
         loop until the player has not selected a token color
             Client ->> Server : GetAvailableTokenColorsMessage
+            Server ->> Controller: Controller.lobbyGetAvailableTokenColors() 
+            Controller --) Server : Returns tokens: List<TokenColor> 
             Server --) Client : AvailableTokenColorsMessage
         end
 
         Client ->> Server : SetTokenColorMessage 
+        Server ->> Controller: Controller.lobbySetTokenColor(nickname, tokenColor)
         alt Token color is already taken
+            Controller --) Server : NoSuchElementException
             Server --) Client : TokenColorAlreadyTakenMessage 
         else Token color is accepted
+            Controller --> Server : Returns
             Server --) Client : ConfirmMessage
         end
     end   
@@ -106,8 +150,13 @@ sequenceDiagram
     # Player Secret Objective 
     Note over Client,Server: Client selects a secret objective
     Client ->> Server : GetObjectiveCardsMessage
+    Server ->> Controller : Controller.lobbyGetObjectiveCards()
+    Controller --> Server : Returns cardIds: Pair<int> 
     Server -->> Client : ObjectiveCardsMessage 
+    
     Client -) Server : SelectFromPairMessage 
+    Server ->> Controller : Controller.lobbyChooseObjectiveCard(first)
+    Controller --> Server : Returns
     Server ->> Client : ConfirmMessage
     
 
@@ -115,8 +164,13 @@ sequenceDiagram
     Note over Client,Server: Client selects a starter card side to play
 
     Client ->> Server : GetStarterCardSidesMessage
+    Server ->> Controller : Controller.lobbyGetStarterCardSides()
+    Controller --> Server : Returns cardId: int
     Server --) Client : StarterCardSidesMessage
+
     Client ->> Server : SelectFromPairMessage
+    Server ->> Controller : Controller.lobbyChooseStarterCardSide(first)
+    Controller --> Server : Returns
     Server --) Client : ConfirmMessage
 
     loop for each client in the game
@@ -124,10 +178,19 @@ sequenceDiagram
     end
     Note over Client,Server: The player in now in the game view
     Client ->> Server : GetGameStatusMessage
+    
+    Server ->> Controller: Controller.checkIfGameStarted()
     alt Not all players are in the game
+        Controller --) Server: Returns false
+
         Note left of Server: No response
     else All players are in the game
-        Server -) Client: GameStatusMessage (GAME_START)
+        Server ->> Controller: Controller.gameStart(gameId)
+        Controller --) Server: Returns true
+        Server --) Client: GameStatusMessage (GAME_START)
+        loop: for each client in the game view
+            Server -) Client in the game view: GameStatusMessage (GAME_START)
+        end
     end
 
 ```
@@ -140,27 +203,28 @@ As before, other than the `ConfirmMessage`, we have a series of messages whose r
 ```mermaid
 sequenceDiagram
     actor Playing client
+    Server -) Controller: Controller.startGame()
+    Server -) Client : GameStatusMessage (GAME_START) 
 
     loop until the game is over
         # New turn 
         Note over Server,Client: Current Player Changes
-        loop for each client
-            autonumber
-            Server -) Client : PlayerStateUpdateMessage 
-        end
         
         # Place card  
         Note over Playing client,Server: The playing client can place a card  
         loop until the card placement is valid
             Playing client ->> Server : PlaceCardMessage
+            Server --) Controller: Controller.placeCard(handIndex, side, position)
             alt card placement is not valid
+                Controller --) Server: InvalidCardPlacementMessage
                 Server --) Playing client : InvalidCardPlacementMessage
             else card placement is valid
+                Controller --> Server: Returns
                 Server --) Playing client : ConfirmMessage
             end
         end
         loop for each client
-            Server -) Client : CardPlacedMessage 
+            Server -) Client : CardPlacedMessage
             opt only if the player's score is updated
                 Server -) Client : PlayerScoreUpdateMessage
             end
@@ -171,14 +235,21 @@ sequenceDiagram
         # Draw card 
         Note over Playing client,Server: The playing client can draw a card
         Playing client ->> Server : DeckDrawMessage OR CardPairDrawMessage
-        Server --) Playing client : ConfirmMessage
-        loop for each client
-            Server -) Client : DeckCardDrawnMessage OR CardPairDrawnMessage
-        end 
+        Server --) Controller: Controller.drawCard()
+        alt deck is empty
+            Controller --) Server: EmptyDeckException
+            loop for each client
+                Server --) Playing client : LastRoundMessage
+            end
+        else deck is not empty
+            Note over Playing client,Server: This notfication serves also to notify the
+            Server --) Playing client : ConfirmMessage
+            loop for each client
+                Server -) Client : DeckCardDrawnMessage OR CardPairDrawnMessage
+            end
+        end
+        Server -) Client : NotifyNextPlayerMessage
     end
-
-
-
 ```
 ### Game over flow
 When `Game.nextTurn()` detects that a player has a winning score or an `EmptyDeckException` is caught by the controller, a message is sent to all the clients to notify them of the number of remaining rounds.
