@@ -1,3 +1,15 @@
+# Message structure class diagram
+## Table of Contents
+
+- [Message structure class diagram](#message-structure-class-diagram)
+  - [Class diagram](#class-diagram)
+  - [Client requests](#client-requests)
+  - [Server responses](#server-responses)
+  - [Client actions](#client-actions)
+  - [View updates](#view-updates)
+  - [Server errors](#server-errors)
+
+
 ```mermaid
 classDiagram
  Serializable <|-- Message : implementation
@@ -6,7 +18,8 @@ classDiagram
 
 
     class Message {
-        <<Abstract>>    
+        <<Abstract>>
+        message: String    
         + String toString()*
     }
 
@@ -57,97 +70,96 @@ classDiagram
 
 ```
 
-## Error messages
+
+
+## Client requests 
 ```mermaid
 classDiagram
-
-    class ErrorMessage {
-        <<Abstract>>    
+    class RequestMessage {
+        <<Abstract>> 
     }
-
-    ErrorMessage <|-- ActionNotAllowedMessage : realization
-    ErrorMessage <|-- UnknownMessageTypeMessage : realization
-
-    class ActionNotAllowedMessage {
-
-    }
-    namespace Lobby {
-        class gameFullMessage {
-
-        }
-
-        class NicknameAlreadyTakenMessage {
-            
-        }
-
-        class TokenColorAlreadyTakenMessage {
-            
-        }
-    }
-
-    ErrorMessage <|-- gameFullMessage : realization
-    ErrorMessage <|-- NicknameAlreadyTakenMessage : realization
-    ErrorMessage <|-- TokenColorAlreadyTakenMessage : realization
-
-    class UnknownMessageTypeMessage {
-        
-    }
-
-
-
-
-```
-## View updating messages
-```mermaid
-classDiagram
-    class ViewUpdatingMessage{
-        <<Abstract>>
-        +playerId: int
-    }
-
-     namespace Lobby {
-        class PlayerNicknameSetMessage {
-            + nickname: String
-        }
-
-        class TokenColorSetMessage {
-            + color: TokenColorType
-        }
-
-        class PlayerGameJoinMessage{
-            + lobbyId: int
-        }
-    }
-    ViewUpdatingMessage <|-- PlayerNicknameSetMessage  : realization
-    ViewUpdatingMessage <|-- TokenColorSetMessage  : realization
-    ViewUpdatingMessage <|-- PlayerGameJoinMessage  : realization
-
 
     namespace Game{
-        class CardPlacedMessage{
-            + x: int
-            + y: int
-            + side: cardSideType
-            + cardId: int
-        }
+        class getGameStatusMessage{
 
-        class DeckCardDrawnMessage{
-            + deck: DrawingDeckType
-        }
-
-        class CardPairDrawnMessage{
-            + first: Boolean
-            + deck: DrawingDeckType
-            + newCardId: int
         }
     }
     
-    ViewUpdatingMessage <|-- CardPlacedMessage  : realization
-    ViewUpdatingMessage <|-- DeckCardDrawnMessage  : realization
-    ViewUpdatingMessage <|-- CardPairDrawnMessage  : realization
+    namespace Lobby {
+
+        class getAvailableGameLobbiesMessage {
+            
+        }
+        class getAvailableTokenColorsMessage {
+        
+        }
+
+        class getObjectiveCardsMessage {
+
+        }
+
+        class getStarterCardSidesMessage{
+
+        }
+
+    } 
+
+    RequestMessage <|-- getAvailableLobbiesMessage : realization
+        RequestMessage <|-- getAvailableTokenColorsMessage : realization
+        RequestMessage <|-- getObjectiveCardsMessage : realization
+        RequestMessage <|-- getStarterCardSidesMessage : realization
+
+    
+    %% game
+    RequestMessage <|-- getGameStatusMessage : realization
+
+
+
 ```
 
-## Client action messages
+## Server responses 
+```mermaid
+classDiagram 
+    class ResponseMessage {
+        <<Abstract>> 
+    }
+    namespace Lobby {
+        class AvailableGameLobbiesMessage{
+            list: list~GameID~
+        }
+
+        class AvailableTokenColorsMessage{
+            tokenColors: List~TokenColor~
+        }
+
+        class ObjectiveCardsMessage{
+            first_id: int
+            second_id: int
+        }
+
+        class StarterCardSidesMessage{
+            card_id: int
+        }
+        
+    
+    }
+
+    namespace Game{
+        class GameStatusMessage{
+            Gamestate
+        }
+    }
+
+    ResponseMessage <|-- AvailableGameLobbiesMessage : realization
+    ResponseMessage <|-- AvailableTokenColorsMessage : realization
+    ResponseMessage <|-- ObjectiveCardsMessage : realization
+    ResponseMessage <|-- StarterCardSidesMessage : realization
+    ResponseMessage <|-- GameStatusMessage : realization
+    
+```
+
+
+## Client actions 
 ```mermaid
 classDiagram
     class ActionMessage {
@@ -205,88 +217,133 @@ classDiagram
 
 ```
 
-## Request messages
+## View updates 
 ```mermaid
 classDiagram
-    class RequestMessage {
-        <<Abstract>> 
+    class ViewUpdatingMessage{
+        <<Abstract>>
+        +playerId: int
     }
+
+     namespace Lobby {
+        class PlayerNicknameSetMessage {
+            + nickname: String
+        }
+
+        class TokenColorSetMessage {
+            + color: TokenColorType
+        }
+
+        class PlayerGameJoinMessage{
+            + lobbyId: int
+        }
+    }
+    ViewUpdatingMessage <|-- PlayerNicknameSetMessage  : realization
+    ViewUpdatingMessage <|-- TokenColorSetMessage  : realization
+    ViewUpdatingMessage <|-- PlayerGameJoinMessage  : realization
+
 
     namespace Game{
-        class getGameStatusMessage{
-
+        class CardPlacedMessage{
+            + x: int
+            + y: int
+            + side: cardSideType
+            + cardId: int
         }
-    }
-    
-    namespace Lobby {
 
-        class getAvailableGameLobbiesMessage {
-            
+        class DeckCardDrawnMessage{
+            + deck: DrawingDeckType
         }
-        class getAvailableTokenColorsMessage {
+
+        class CardPairDrawnMessage{
+            + first: Boolean
+            + deck: DrawingDeckType
+            + newCardId: int
+        }
+
+        class RemainingTurnsMessage {
+            + turns: int
+        }
+
+        class GameOverMessage {
         
         }
 
-        class getObjectiveCardsMessage {
-
+        class PlayerScoreUpdateMessage {
+            + delta: int
         }
 
-        class getStarterCardSidesMessage{
-
+        class WinningPlayerMessage {
+            winnerNickname: String
         }
 
-    } 
+        class DeckCardDrawnMessage{
+            + cardId: int
+        }
+        class CardPairDrawnMessage{
+            + cardId: int
+        }
 
-    RequestMessage <|-- getAvailableLobbiesMessage : realization
-        RequestMessage <|-- getAvailableTokenColorsMessage : realization
-        RequestMessage <|-- getObjectiveCardsMessage : realization
-        RequestMessage <|-- getStarterCardSidesMessage : realization
-
+    }
     
-    %% game
-    RequestMessage <|-- getGameStatusMessage : realization
-
-
-
+    ViewUpdatingMessage <|-- CardPlacedMessage  : realization
+    ViewUpdatingMessage <|-- DeckCardDrawnMessage  : realization
+    ViewUpdatingMessage <|-- CardPairDrawnMessage  : realization
+    ViewUpdatingMessage <|-- RemainingTurnsMessage  : realization
+    ViewUpdatingMessage <|-- GameOverMessage  : realization
+    ViewUpdatingMessage <|-- PlayerScoreUpdateMessage  : realization
+    ViewUpdatingMessage <|-- WinningPlayerMessage  : realization
+    ViewUpdatingMessage <|-- DeckCardDrawnMessage  : realization
+    ViewUpdatingMessage <|-- CardPairDrawnMessage  : realization
+    
 ```
 
-## Response messages
+## Server errors
 ```mermaid
-classDiagram 
-    class ResponseMessage {
-        <<Abstract>> 
+classDiagram
+
+    class ErrorMessage {
+        <<Abstract>>    
     }
-    namespace Lobby {
-        class AvailableGameLobbiesMessage{
-            list: list~GameID~
-        }
+    
+    class ActionNotAllowedMessage {
 
-        class AvailableTokenColorsMessage{
-            tokenColors: List~TokenColor~
-        }
+    }
 
-        class ObjectiveCardsMessage{
-            first_id: int
-            second_id: int
-        }
-
-        class StarterCardSidesMessage{
-            card_id: int
-        }
+    class UnknownMessageTypeMessage {
         
-    
     }
 
-    namespace Game{
-        class GameStatusMessage{
-            Gamestate
+    ErrorMessage <|-- ActionNotAllowedMessage : realization
+    ErrorMessage <|-- UnknownMessageTypeMessage : realization
+
+    namespace Lobby {
+        class GameFullMessages {
+
+        }
+
+        class NicknameAlreadyTakenMessage {
+            
+        }
+
+        class TokenColorAlreadyTakenMessage {
+            
         }
     }
 
-    ResponseMessage <|-- AvailableGameLobbiesMessage : realization
-    ResponseMessage <|-- AvailableTokenColorsMessage : realization
-    ResponseMessage <|-- ObjectiveCardsMessage : realization
-    ResponseMessage <|-- StarterCardSidesMessage : realization
-    ResponseMessage <|-- GameStatusMessage : realization
-    
+    ErrorMessage <|-- GameFullMessages : realization
+    ErrorMessage <|-- NicknameAlreadyTakenMessage : realization
+    ErrorMessage <|-- TokenColorAlreadyTakenMessage : realization
+
+
+    namespace Game {
+        class InvalidCardPlacementMessage {
+            cardId: int
+        }
+    }
+
+    ErrorMessage <|-- InvalidCardPlacementMessage : realization
+
+
+
 ```
