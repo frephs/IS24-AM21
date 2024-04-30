@@ -293,8 +293,7 @@ classDiagram
     ViewUpdatingMessage <|-- GameOverMessage  : realization
     ViewUpdatingMessage <|-- PlayerScoreUpdateMessage  : realization
     ViewUpdatingMessage <|-- WinningPlayerMessage  : realization
-    ViewUpdatingMessage <|-- DeckCardDrawnMessage  : realization
-    ViewUpdatingMessage <|-- CardPairDrawnMessage  : realization
+
     
 ```
 
