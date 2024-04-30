@@ -39,7 +39,7 @@ classDiagram
 
     class ViewUpdatingMessage{
         <<Abstract>>
-        +playerId: int
+        + playerId: int
     }
 
     Message <|-- ViewUpdatingMessage : inheritance
@@ -125,20 +125,20 @@ classDiagram
     }
     namespace Lobby {
         class AvailableGameLobbiesMessage{
-            +list: list~GameID~
+            + list: list~GameID~
         }
 
         class AvailableTokenColorsMessage{
-            +tokenColors: List~TokenColor~
+            + tokenColors: List~TokenColor~
         }
 
         class ObjectiveCardsMessage{
-            +first_id: int
-            +second_id: int
+            + first_id: int
+            + second_id: int
         }
 
         class StarterCardSidesMessage{
-            +card_id: int
+            + card_id: int
         }
         
     
@@ -194,14 +194,14 @@ classDiagram
     namespace Game{
     
     class PlaceCardMessage{
-        +x: int
-        +y: int
-        +handIndex: int 
-        +side: cardSideType 
+        + x: int
+        + y: int
+        + handIndex: int 
+        + side: cardSideType 
     }
 
     class DeckDrawCardMessage{
-        +deck: DrawingDeckType
+        + deck: DrawingDeckType
     }
 
     class CardPairDrawMessage {
@@ -274,7 +274,7 @@ classDiagram
         }
 
         class WinningPlayerMessage {
-            winnerNickname: String
+            + winnerNickname: String
         }
 
         class DeckCardDrawnMessage{
