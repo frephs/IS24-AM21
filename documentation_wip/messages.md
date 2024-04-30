@@ -104,7 +104,7 @@ classDiagram
 
     } 
 
-    RequestMessage <|-- getAvailableLobbiesMessage : realization
+    RequestMessage <|-- getAvailableGameLobbiesMessage : realization
         RequestMessage <|-- getAvailableTokenColorsMessage : realization
         RequestMessage <|-- getObjectiveCardsMessage : realization
         RequestMessage <|-- getStarterCardSidesMessage : realization
