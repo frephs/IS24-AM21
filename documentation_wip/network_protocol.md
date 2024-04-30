@@ -123,13 +123,11 @@ sequenceDiagram
     Server -) Client in the game view: PlayerGameJoinMessage
     end
     Note over Client,Server: The player in now in the game view
-    loop every 2 seconds until all players are in the game
-        Client ->> Server : GetGameStatusMessage
-        alt Not all players are in the game
-            Server --) Client: GameStatusMessage (GAME_INIT)
-        else All players are in the game
-            Server -) Client: GameStatusMessage (GAME_START)
-        end
+    Client ->> Server : GetGameStatusMessage
+    alt Not all players are in the game
+        Note left of Server: No response
+    else All players are in the game
+        Server -) Client: GameStatusMessage (GAME_START)
     end
 
 ```
