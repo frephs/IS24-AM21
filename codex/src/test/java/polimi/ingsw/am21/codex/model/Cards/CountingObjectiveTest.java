@@ -11,13 +11,16 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.ResourceCardFrontSide;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.PlayerBoardTest;
 
 class CountingObjectiveTest {
 
   @Test
-  void getEvaluator() {
+  void getEvaluator()
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     PlayerBoardTest pbt = new PlayerBoardTest();
     pbt.externalSetup();
 

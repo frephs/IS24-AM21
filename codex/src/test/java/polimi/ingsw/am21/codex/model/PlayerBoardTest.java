@@ -37,11 +37,16 @@ public class PlayerBoardTest {
   public void externalSetup() {
     try {
       initTest();
-    } catch (NoSuchMethodException ignored) {}
+    } catch (NoSuchMethodException ignored) {} catch (
+      IllegalCardSideChoiceException | IllegalPlacingPositionException e
+    ) {
+      throw new RuntimeException(e);
+    }
   }
 
   @BeforeEach
-  void initTest() throws NoSuchMethodException {
+  void initTest()
+    throws NoSuchMethodException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
     // dummy card front side
     PlayableFrontSide cf = new GoldCardFrontSide(
       12,
@@ -154,7 +159,8 @@ public class PlayerBoardTest {
   void drawCard() {}
 
   @Test
-  void placeCard() {
+  void placeCard()
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     // testing if exception is thrown if not enough resources are on the playerboard
     assertThrows(
       IllegalCardSideChoiceException.class,

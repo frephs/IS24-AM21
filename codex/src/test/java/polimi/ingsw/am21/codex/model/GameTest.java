@@ -16,6 +16,8 @@ import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundExceptio
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -116,6 +118,10 @@ class GameTest {
       );
     } catch (EmptyDeckException e) {
       fail("Empty deck exception");
+    } catch (
+      IllegalCardSideChoiceException | IllegalPlacingPositionException e
+    ) {
+      throw new RuntimeException(e);
     }
     // player was already finalized cannot finalize twice
     assertThrows(
@@ -173,6 +179,10 @@ class GameTest {
         game.addPlayer(player);
       } catch (EmptyDeckException e) {
         fail("Empty deck exception");
+      } catch (
+        IllegalCardSideChoiceException | IllegalPlacingPositionException e
+      ) {
+        throw new RuntimeException(e);
       }
     }
   }
