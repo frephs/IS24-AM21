@@ -221,13 +221,16 @@ class CardBuilderTest {
       () -> new CardBuilder(123, CardType.OBJECTIVE).setCorners(null, null)
     );
 
-    // TODO: FIX
-    //List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
-    //  type ->
-    //    assertDoesNotThrow(
-    //      () -> new CardBuilder(123, type).setCorners(null, null)
-    //    )
-    //);
+    List.of(CardType.GOLD, CardType.RESOURCE, CardType.STARTER).forEach(
+      type ->
+        assertDoesNotThrow(
+          () ->
+            new CardBuilder(123, type).setCorners(
+              CardSideType.FRONT,
+              new HashMap<>()
+            )
+        )
+    );
 
     assertInstanceOf(
       CardBuilder.class,
@@ -301,10 +304,6 @@ class CardBuilderTest {
     builder = new CardBuilder(123, CardType.RESOURCE);
     // missing backPermanentResources
     assertThrows(MissingParametersException.class, builder::build);
-
-    builder = builder.setBackPermanentResources(
-      List.of(ResourceType.FUNGI, ResourceType.INSECT)
-    );
 
     assertDoesNotThrow(() -> {
       new CardBuilder(123, CardType.RESOURCE)

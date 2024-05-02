@@ -37,7 +37,7 @@ public class Deck<T> {
    * Draws a card from the deck
    *
    * @param n number of cards to draw
-   * @return the card drawn
+   * @return the list of drawn cards
    */
   public List<T> draw(int n) throws EmptyDeckException {
     if (this.cardsLeft() < n) throw new EmptyDeckException();
