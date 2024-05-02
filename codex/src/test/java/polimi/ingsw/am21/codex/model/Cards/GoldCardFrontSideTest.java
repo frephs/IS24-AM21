@@ -7,13 +7,16 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.*;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.PlayerBoardTest;
 
 class GoldCardFrontSideTest {
 
   @Test
-  void getEvaluator() {
+  void getEvaluator()
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     PlayerBoardTest pbt = new PlayerBoardTest();
     pbt.externalSetup();
     PlayerBoard pb = pbt.pb;
