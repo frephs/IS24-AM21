@@ -38,7 +38,7 @@ public class PlayerBoard {
     List<PlayableCard> hand,
     PlayableCard starterCard,
     ObjectiveCard objectiveCard
-  ) {
+  ) throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     this.hand = new LinkedList<>(hand);
     this.objectiveCard = objectiveCard;
 
@@ -97,16 +97,14 @@ public class PlayerBoard {
    * @param playedCard chosen from the player's hand, the card will be evaluated after placement
    * @param playedSideType of the card chosen to be placed on the PlayerBoard
    * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
-   * @throws IllegalPlacingPositionException if the position is either not reachable or forbidden
-   * @throws IndexOutOfBoundsException if the card index exceeds the hand size
+   * @throws IllegalPlacingPositionException if the provided position is either not reachable, forbidden or occupied
    * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of card placing conditions.
    */
   public void placeCard(
     PlayableCard playedCard,
     CardSideType playedSideType,
     Position position
-  )
-    throws IllegalPlacingPositionException, IndexOutOfBoundsException, IllegalCardSideChoiceException {
+  ) throws IllegalPlacingPositionException, IllegalCardSideChoiceException {
     playedCard.setPlayedSideType(playedSideType);
     if (playedCards.containsKey(position)) {
       throw new IllegalPlacingPositionException(

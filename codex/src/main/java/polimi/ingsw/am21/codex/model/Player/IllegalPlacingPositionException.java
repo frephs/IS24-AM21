@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.model.Player;
 
-public class IllegalPlacingPositionException extends IllegalArgumentException {
+public class IllegalPlacingPositionException extends Exception {
 
   public IllegalPlacingPositionException() {
     super(

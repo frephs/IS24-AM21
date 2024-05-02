@@ -15,7 +15,8 @@ public class Player {
   private final TokenColor token;
   private int points;
 
-  Player(PlayerBuilder builder) {
+  Player(PlayerBuilder builder)
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     this.nickname = builder.nickname;
     this.token = builder.token;
     this.points = 0;
@@ -110,7 +111,8 @@ public class Player {
     /**
      * @return a functioning player
      */
-    public Player build() throws IncompletePlayerBuilderException {
+    public Player build()
+      throws IncompletePlayerBuilderException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
       IncompletePlayerBuilderException.checkPlayerBuilder(this);
       return new Player(this);
     }
@@ -163,6 +165,9 @@ public class Player {
    * @param cardIndex of the card chosen from the player's hand,
    * @param side of the card chosen to be placed on the PlayerBoard
    * @param position of the PlayerBoard in which the card will be placed by the PlayerBoard
+   * @throws IndexOutOfBoundsException if the index provided exceeds the player
+   * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of the side placing condition
+   * @throws IllegalPlacingPositionException if the position provided is either unreachable, occupied or forbidden
    */
   public void placeCard(int cardIndex, CardSideType side, Position position)
     throws IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
