@@ -7,6 +7,6 @@ public class CardPairDrawMessage extends DeckDrawCardMessage {
   public boolean first;
 
   public CardPairDrawMessage() {
-    super(MessageType.CARDPAIR_DRAW);
+    super(MessageType.CARD_PAIR_DRAW);
   }
 }

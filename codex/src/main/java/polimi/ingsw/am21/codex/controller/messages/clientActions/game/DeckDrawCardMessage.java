@@ -9,7 +9,7 @@ public class DeckDrawCardMessage extends ActionMessage {
   public DrawingDeckType deck;
 
   public DeckDrawCardMessage() {
-    super(MessageType.DECK_DRAW);
+    super(MessageType.DECK_DRAW_CARD);
   }
 
   public DeckDrawCardMessage(MessageType type) {

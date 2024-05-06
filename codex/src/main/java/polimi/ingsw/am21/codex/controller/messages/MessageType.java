@@ -1,9 +1,9 @@
 package polimi.ingsw.am21.codex.controller.messages;
 
 public enum MessageType {
-  DECK_DRAW,
+  DECK_DRAW_CARD,
   PLACE_CARD,
-  CARDPAIR_DRAW,
+  CARD_PAIR_DRAW,
 
   JOIN_LOBBY,
   SELECT_FROM_PAIR,

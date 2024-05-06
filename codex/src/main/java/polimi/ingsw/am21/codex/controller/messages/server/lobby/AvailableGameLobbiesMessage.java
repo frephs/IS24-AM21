@@ -3,9 +3,9 @@ package polimi.ingsw.am21.codex.controller.messages.server.lobby;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ResponseMessage;
 
-public class AvilableTokenColorsMessage extends ResponseMessage {
+public class AvailableGameLobbiesMessage extends ResponseMessage {
 
-  public AvilableTokenColorsMessage() {
-    super(MessageType.AVAILABLE_TOKEN_COLORS);
+  public AvailableGameLobbiesMessage() {
+    super(MessageType.AVAILABLE_GAME_LOBBIES);
   }
 }
