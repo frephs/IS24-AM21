@@ -3,9 +3,9 @@ package polimi.ingsw.am21.codex.controller.messages.server.lobby;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ResponseMessage;
 
-public class ObjectiveCardsMessage extends ResponseMessage {
+public class AvilableTokenColorsMessage extends ResponseMessage {
 
-  public ObjectiveCardsMessage() {
-    super(MessageType.OBJECTIVE_CARDS);
+  public AvilableTokenColorsMessage() {
+    super(MessageType.AVAILABLE_TOKEN_COLORS);
   }
 }
