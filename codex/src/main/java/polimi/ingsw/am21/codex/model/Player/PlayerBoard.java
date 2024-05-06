@@ -159,7 +159,8 @@ public class PlayerBoard {
     PlayableSide playedSide = playedCard
       .getPlayedSide()
       .orElseThrow(() -> new NoSuchElementException("Side not present"));
-    Map<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
+    Map<CornerPosition, Corner<CornerContentType>> enabledCorners =
+      playedSide.getCorners();
 
     // add the resources of the card just placed
     enabledCorners.forEach(
@@ -191,9 +192,9 @@ public class PlayerBoard {
           .get(adjacentCardPosition)
           .getPlayedSide()
           .orElseThrow(() -> new NoSuchElementException("Side not present"));
-        Map<CornerPosition, Corner> enabledOppositeCorners =
+        Map<CornerPosition, Corner<CornerContentType>> enabledOppositeCorners =
           oppositeCard.getCorners();
-        Corner oppositeCorner = enabledOppositeCorners.get(
+        Corner<CornerContentType> oppositeCorner = enabledOppositeCorners.get(
           oppositeCornerPosition
         );
         oppositeCorner.cover();
@@ -259,7 +260,8 @@ public class PlayerBoard {
     Position position
   ) {
     this.availableSpots.remove(position);
-    Map<CornerPosition, Corner> enabledCorners = playedSide.getCorners();
+    Map<CornerPosition, Corner<CornerContentType>> enabledCorners =
+      playedSide.getCorners();
 
     for (CornerPosition cornerPosition : CornerPosition.values()) {
       Position adjacentCardPosition = position.computeAdjacentPosition(

@@ -17,13 +17,13 @@ public abstract class PlayableSide {
   /**
    * The Map of the CornerPosition and the corner on the side of the card
    */
-  private final Map<CornerPosition, Corner> corners;
+  private final Map<CornerPosition, Corner<CornerContentType>> corners;
 
   public PlayableSide() {
     this.corners = new HashMap<>();
   }
 
-  public Map<CornerPosition, Corner> getCorners() {
+  public Map<CornerPosition, Corner<CornerContentType>> getCorners() {
     return corners;
   }
 
