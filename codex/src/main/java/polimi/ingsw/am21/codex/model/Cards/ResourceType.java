@@ -1,8 +1,11 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
+import polimi.ingsw.am21.codex.cli.CliUtils;
+import polimi.ingsw.am21.codex.cli.Color;
+import polimi.ingsw.am21.codex.cli.Colorable;
 
-public enum ResourceType implements CornerContentType {
+public enum ResourceType implements CornerContentType, Colorable {
   PLANT,
   ANIMAL,
   FUNGI,
@@ -32,5 +35,20 @@ public enum ResourceType implements CornerContentType {
   @Override
   public void acceptVisitor(CornerContentVisitor visitor, int arg) {
     visitor.visit(this, arg);
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  public Color getColor() {
+    return switch (this) {
+      case PLANT -> Color.GREEN_BOLD;
+      case ANIMAL -> Color.CYAN_BOLD;
+      case FUNGI -> Color.RED_BOLD;
+      case INSECT -> Color.PURPLE_BOLD;
+    };
   }
 }
