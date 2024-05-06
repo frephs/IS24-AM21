@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
+import java.util.HashMap;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
@@ -13,5 +14,14 @@ class ConcreteCard extends Card {
   @Override
   public Function<PlayerBoard, Integer> getEvaluator() {
     return pb -> 123;
+  }
+
+  @Override
+  public String cardToString() {
+    return "";
+  }
+
+  public String cardToAscii() {
+    return "";
   }
 }

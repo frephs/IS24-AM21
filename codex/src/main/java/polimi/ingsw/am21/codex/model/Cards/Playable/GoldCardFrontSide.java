@@ -7,6 +7,9 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import polimi.ingsw.am21.codex.cli.CliUtils;
+import polimi.ingsw.am21.codex.cli.Color;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
@@ -99,5 +102,47 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
         )
         .reduce(true, (a, b) -> a && b);
     };
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  @Override
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    pointCondition.ifPresent(pointConditionType -> {
+      if (pointConditionType == PointConditionType.OBJECTS) {
+        pointConditionObject.ifPresent(
+          pointConditionObject ->
+            cardStringMap.put(
+              5,
+              StringUtils.center(
+                CliUtils.colorizeString(pointConditionObject, 1) + "|" + points,
+                6 + CliUtils.getColorableLength(pointConditionObject, 1),
+                ' '
+              )
+            )
+        );
+      } else if (pointConditionType == PointConditionType.CORNERS) {
+        cardStringMap.put(5, StringUtils.center("╔" + "|" + points, 7, ' '));
+      }
+    });
+
+    StringBuilder sb = new StringBuilder();
+    placementCondition.forEach(
+      resource -> sb.append(CliUtils.colorizeString(resource, 1))
+    );
+    cardStringMap.put(
+      6,
+      "|" + CliUtils.colorizeAndCenter(placementCondition, 5, ' ') + "|"
+    );
+    return super.cardToAscii(cardStringMap);
+  }
+
+  @Override
+  public String cardToString() {
+    return "";
   }
 }

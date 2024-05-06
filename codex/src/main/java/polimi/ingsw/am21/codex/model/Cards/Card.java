@@ -1,9 +1,10 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.function.Function;
+import polimi.ingsw.am21.codex.cli.PrintableCard;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
-public abstract class Card {
+public abstract class Card implements PrintableCard {
 
   /**
    * A unique identifier for the card

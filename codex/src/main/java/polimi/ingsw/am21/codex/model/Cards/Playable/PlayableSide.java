@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.model.Cards.Corner;
-import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
-import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
+import polimi.ingsw.am21.codex.cli.CliUtils;
+import polimi.ingsw.am21.codex.cli.PrintableCard;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 // TODO investigate "Raw use of parameterized class 'Corner'" warning
 
-public abstract class PlayableSide {
+public abstract class PlayableSide implements PrintableCard {
 
   /**
    * The Map of the CornerPosition and the corner on the side of the card
@@ -54,5 +54,27 @@ public abstract class PlayableSide {
    */
   public Function<PlayerBoard, Boolean> getPlaceabilityChecker() {
     return playerBoard -> true;
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    // corners
+    corners.forEach((cornerPosition, corner) -> {
+      corner
+        .getContent()
+        .ifPresent(
+          content ->
+            cardStringMap.put(
+              cornerPosition.index,
+              CliUtils.colorizeString(content, 1)
+            )
+        );
+    });
+    return PrintableCard.cardToAscii(cardStringMap);
   }
 }
