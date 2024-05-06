@@ -14,13 +14,16 @@ import polimi.ingsw.am21.codex.model.Cards.Objectives.Objective;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.PlayerBoardTest;
 
 class GeometricObjectiveTest {
 
   @Test
-  void getEvaluator() {
+  void getEvaluator()
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     Map<AdjacentPosition, ResourceType> geometry = new HashMap<>();
 
     // test diagonal geometry

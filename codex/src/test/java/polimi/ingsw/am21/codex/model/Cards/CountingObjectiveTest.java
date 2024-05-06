@@ -2,23 +2,25 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.CountingObjective;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.GeometricObjective;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.ResourceCardFrontSide;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.PlayerBoardTest;
 
 class CountingObjectiveTest {
 
   @Test
-  void getEvaluator() {
+  void getEvaluator()
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     PlayerBoardTest pbt = new PlayerBoardTest();
     pbt.externalSetup();
 
@@ -27,6 +29,7 @@ class CountingObjectiveTest {
 
     resources.put(ResourceType.PLANT, 1);
     resources.put(ResourceType.INSECT, 1);
+    objects.put(ObjectType.QUILL, 1);
 
     CountingObjective countingObjective = new CountingObjective(
       resources,
@@ -49,7 +52,22 @@ class CountingObjectiveTest {
     pb.getHand().add(pbt.starterCard);
     pb.placeCard(pbt.starterCard, CardSideType.BACK, new Position(4, 0));
 
-    //evaluator should return 0
-    assertEquals(4, pb.getObjectiveCard().getEvaluator().apply(pb));
+    assertEquals(2 * 2, pb.getObjectiveCard().getEvaluator().apply(pb));
+
+    ResourceCardFrontSide quillSide = new ResourceCardFrontSide(1);
+    quillSide.setCorner(
+      CornerPosition.BOTTOM_LEFT,
+      Optional.of(ObjectType.QUILL)
+    );
+    PlayableCard quillCard = new PlayableCard(
+      123,
+      quillSide,
+      new PlayableBackSide(List.of())
+    );
+
+    pb.getHand().add(quillCard);
+    pb.placeCard(quillCard, CardSideType.FRONT, new Position(5, 0));
+
+    assertEquals(2 * 3, pb.getObjectiveCard().getEvaluator().apply(pb));
   }
 }

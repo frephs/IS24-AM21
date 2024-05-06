@@ -10,6 +10,8 @@ import polimi.ingsw.am21.codex.model.GameBoard.exceptions.*;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -217,7 +219,8 @@ public class Lobby {
     UUID socketId,
     CardSideType cardSide,
     List<PlayableCard> hand
-  ) throws PlayerNotFoundException, IncompletePlayerBuilderException {
+  )
+    throws PlayerNotFoundException, IncompletePlayerBuilderException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
     }

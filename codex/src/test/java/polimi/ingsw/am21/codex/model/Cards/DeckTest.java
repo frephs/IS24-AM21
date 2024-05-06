@@ -57,6 +57,26 @@ class DeckTest {
   }
 
   @Test
+  void drawN() {
+    assertEquals(initialSize, this.deck.cardsLeft());
+
+    try {
+      List<Integer> result = this.deck.draw(5);
+      assertEquals(5, result.size());
+    } catch (EmptyDeckException e) {
+      fail(
+        "Deck was empty after " +
+        (5) +
+        " draws when the deck should contain " +
+        initialSize +
+        " cards"
+      );
+    }
+    assertDoesNotThrow(() -> this.deck.draw(45));
+    assertThrows(EmptyDeckException.class, () -> this.deck.draw());
+  }
+
+  @Test
   void cardsLeft() {
     assertEquals(initialSize, this.deck.cardsLeft());
   }
@@ -67,4 +87,7 @@ class DeckTest {
     this.deck.insert(initialSize);
     assertEquals(initialCardsLeft + 1, this.deck.cardsLeft());
   }
+
+  @Test
+  void testDraw() {}
 }

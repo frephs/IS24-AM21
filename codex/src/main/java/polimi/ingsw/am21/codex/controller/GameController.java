@@ -18,6 +18,8 @@ import polimi.ingsw.am21.codex.model.GameManager;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
@@ -132,7 +134,7 @@ public class GameController {
   }
 
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException {
+    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotReadyException {
     Game game = this.getGame(gameId);
     Player newPlayer = game
       .getLobby()
@@ -217,7 +219,8 @@ public class GameController {
     Integer playerHandCardNumber,
     CardSideType side,
     Position position
-  ) throws GameNotFoundException, PlayerNotActive {
+  )
+    throws GameNotFoundException, PlayerNotActive, IllegalPlacingPositionException, IllegalCardSideChoiceException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     Player currentPlayer = game.getCurrentPlayer();
