@@ -5,14 +5,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import polimi.ingsw.am21.codex.cli.CliPrintable;
 import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.PrintableCard;
+import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 // TODO investigate "Raw use of parameterized class 'Corner'" warning
 
-public abstract class PlayableSide implements PrintableCard {
+public abstract class PlayableSide implements CliPrintable {
 
   /**
    * The Map of the CornerPosition and the corner on the side of the card
@@ -67,14 +68,28 @@ public abstract class PlayableSide implements PrintableCard {
     corners.forEach((cornerPosition, corner) -> {
       corner
         .getContent()
-        .ifPresent(
+        .ifPresentOrElse(
           content ->
             cardStringMap.put(
               cornerPosition.index,
-              CliUtils.colorizeString(content, 1)
-            )
+              CliUtils.colorize(content, ColorStyle.BOLD, 1)
+            ),
+          () -> cardStringMap.put(cornerPosition.index, " ")
         );
     });
-    return PrintableCard.cardToAscii(cardStringMap);
+    //    for (CornerPosition cornerPosition : CornerPosition.values()) {
+    //      if (!corners.containsKey(cornerPosition)) {
+    //        cardStringMap.put(
+    //          cornerPosition.index,
+    //          CliUtils.colorize("X", Color.RED_BACKGROUND)
+    //        );
+    //      }
+    //    }
+
+    return CliPrintable.playableCardToAscii(cardStringMap);
   }
+  //  @Override
+  //  public String cardToString() {
+  //
+  //  }
 }

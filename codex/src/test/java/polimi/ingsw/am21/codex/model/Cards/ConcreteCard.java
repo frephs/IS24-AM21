@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
@@ -21,7 +22,7 @@ class ConcreteCard extends Card {
     return "";
   }
 
-  public String cardToAscii() {
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
     return "";
   }
 }

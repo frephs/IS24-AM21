@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.Map;
 import java.util.function.BiFunction;
-import polimi.ingsw.am21.codex.cli.PrintableCard;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 public class StarterCardFrontSide extends PlayableFrontSide {

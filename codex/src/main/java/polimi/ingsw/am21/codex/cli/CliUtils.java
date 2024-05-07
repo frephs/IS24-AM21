@@ -31,48 +31,65 @@ public class CliUtils {
     return sb.toString();
   }
 
-  public static <T extends Colorable> String colorizeString(
+  public static <T extends Colorable> String colorize(
     T colorable,
+    ColorStyle style,
     int length
   ) {
     if (Cli.getInstance().isColored()) {
       return (
-        colorable.getColor().code +
+        colorable.getColor().getCode(style) +
         colorable.toString().substring(0, length) +
-        Color.RESET.code
+        Color.RESET.normal
       );
     } else {
       return colorable.toString();
     }
   }
 
-  public static <T extends Colorable> String colorizeString(T colorable) {
-    return colorizeString(colorable, colorable.toString().length());
+  public static <T extends Colorable> String colorize(
+    T colorable,
+    ColorStyle style
+  ) {
+    return colorize(colorable, style, colorable.toString().length());
+  }
+
+  public static String colorize(String string, Color color, ColorStyle style) {
+    if (Cli.getInstance().isColored()) {
+      return Color.colorize(string, color, style);
+    }
+    return string;
   }
 
   public static <T extends Colorable> String colorizeAndCenter(
     List<T> colorables,
     int length,
-    char padChar
+    char padChar,
+    ColorStyle style
   ) {
     StringBuilder sb = new StringBuilder();
     if (Cli.getInstance().isColored()) {
       AtomicInteger ansiSize = new AtomicInteger();
       colorables.forEach(colorable -> {
         ansiSize.addAndGet(
-          colorable.getColor().code.length() + Color.RESET.code.length()
+          colorable.getColor().getCode(style).length() +
+          Color.RESET.normal.length()
         );
-        sb.append(colorizeString(colorable, 1));
+        sb.append(colorize(colorable, style, 1));
       });
       return StringUtils.center(sb.toString(), length + ansiSize.get(), ' ');
     }
-    colorables.forEach(colorable -> sb.append(colorizeString(colorable, 1)));
+    colorables.forEach(colorable -> sb.append(colorize(colorable, style, 1)));
     return StringUtils.center(colorables.toString(), length, padChar);
   }
 
-  public static int getColorableLength(Colorable colorable, int colorableSize) {
+  public static int getColorableLength(
+    Colorable colorable,
+    int colorableSize,
+    ColorStyle style
+  ) {
     if (Cli.getInstance().isColored()) {
-      return colorizeString(colorable, colorableSize).length();
+      return colorize(colorable, style, colorableSize).length();
     }
     return colorable.toString().length();
   }

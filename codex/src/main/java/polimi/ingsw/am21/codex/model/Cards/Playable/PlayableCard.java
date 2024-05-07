@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.cli.CliUtils;
@@ -131,7 +132,7 @@ public class PlayableCard extends Card {
    * -----------------
    * */
 
-  public String cardToAscii() {
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
     String frontSideString = frontSide.cardToAscii(new HashMap<>());
     String backSideString = backSide.cardToAscii(new HashMap<>());
     return CliUtils.joinMinLines(frontSideString, backSideString);

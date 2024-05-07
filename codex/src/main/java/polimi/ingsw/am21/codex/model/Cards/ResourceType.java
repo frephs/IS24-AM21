@@ -45,10 +45,10 @@ public enum ResourceType implements CornerContentType, Colorable {
 
   public Color getColor() {
     return switch (this) {
-      case PLANT -> Color.GREEN_BOLD;
-      case ANIMAL -> Color.CYAN_BOLD;
-      case FUNGI -> Color.RED_BOLD;
-      case INSECT -> Color.PURPLE_BOLD;
+      case PLANT -> Color.GREEN;
+      case ANIMAL -> Color.CYAN;
+      case FUNGI -> Color.RED;
+      case INSECT -> Color.PURPLE;
     };
   }
 }

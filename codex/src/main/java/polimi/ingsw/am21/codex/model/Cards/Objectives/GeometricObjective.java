@@ -2,13 +2,14 @@ package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
 import java.util.Map;
 import java.util.function.BiFunction;
+import polimi.ingsw.am21.codex.cli.CliPrintable;
 import polimi.ingsw.am21.codex.model.Cards.AdjacentPosition;
 import polimi.ingsw.am21.codex.model.Cards.EdgePosition;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
-public class GeometricObjective extends Objective {
+public class GeometricObjective extends Objective implements CliPrintable {
 
   /**
    * The map of the adjacent card you need to reach the objective
@@ -67,5 +68,15 @@ public class GeometricObjective extends Objective {
         .mapToInt(element -> 1)
         .sum() *
       points;
+  }
+
+  @Override
+  public String cardToString() {
+    return "";
+  }
+
+  @Override
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    return "";
   }
 }

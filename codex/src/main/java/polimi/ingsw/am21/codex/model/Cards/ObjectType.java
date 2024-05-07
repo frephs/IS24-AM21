@@ -46,6 +46,6 @@ public enum ObjectType implements CornerContentType, Colorable {
 
   @Override
   public Color getColor() {
-    return Color.YELLOW_BOLD;
+    return Color.YELLOW;
   }
 }

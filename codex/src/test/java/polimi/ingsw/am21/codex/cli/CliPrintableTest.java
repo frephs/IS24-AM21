@@ -9,7 +9,7 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.GameBoard;
 
-class PrintableCardTest {
+class CliPrintableTest {
 
   @Test
   void printCards() {
@@ -17,7 +17,14 @@ class PrintableCardTest {
 
     try {
       System.out.println(
-        gb.drawCard(DrawingCardSource.Deck, DrawingDeckType.GOLD).cardToAscii()
+        gb
+          .drawCard(DrawingCardSource.Deck, DrawingDeckType.RESOURCE)
+          .cardToAscii(null)
+      );
+      System.out.println(
+        gb
+          .drawCard(DrawingCardSource.Deck, DrawingDeckType.GOLD)
+          .cardToAscii(null)
       );
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);

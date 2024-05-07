@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+import polimi.ingsw.am21.codex.cli.CliPrintable;
 import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.PrintableCard;
+import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
-public class PlayableBackSide extends PlayableSide implements PrintableCard {
+public class PlayableBackSide extends PlayableSide implements CliPrintable {
 
   /**
    * The list of permanent resources on the side
@@ -45,7 +46,10 @@ public class PlayableBackSide extends PlayableSide implements PrintableCard {
     final int BEGIN = 4;
     for (int i = 0; i < permanentResources.size(); i++) {
       ResourceType resource = permanentResources.get(i);
-      cardStringMap.put(BEGIN + i, CliUtils.colorizeString(resource, 1));
+      cardStringMap.put(
+        BEGIN + i,
+        CliUtils.colorize(resource, ColorStyle.BOLD, 1)
+      );
     }
     return super.cardToAscii(cardStringMap);
   }

@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.Color;
+import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
@@ -119,24 +119,37 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
             cardStringMap.put(
               5,
               StringUtils.center(
-                CliUtils.colorizeString(pointConditionObject, 1) + "|" + points,
-                6 + CliUtils.getColorableLength(pointConditionObject, 1),
+                CliUtils.colorize(pointConditionObject, ColorStyle.BOLD, 1) +
+                "|" +
+                points,
+                4 +
+                CliUtils.getColorableLength(
+                  pointConditionObject,
+                  1,
+                  ColorStyle.BOLD
+                ),
                 ' '
               )
             )
         );
       } else if (pointConditionType == PointConditionType.CORNERS) {
-        cardStringMap.put(5, StringUtils.center("╔" + "|" + points, 7, ' '));
+        cardStringMap.put(5, StringUtils.center("╔" + "|" + points, 5, ' '));
       }
     });
 
     StringBuilder sb = new StringBuilder();
     placementCondition.forEach(
-      resource -> sb.append(CliUtils.colorizeString(resource, 1))
+      resource ->
+        sb.append(CliUtils.colorize(resource, ColorStyle.UNDERLINED, 1))
     );
     cardStringMap.put(
       6,
-      "|" + CliUtils.colorizeAndCenter(placementCondition, 5, ' ') + "|"
+      CliUtils.colorizeAndCenter(
+        placementCondition,
+        5,
+        ' ',
+        ColorStyle.UNDERLINED
+      )
     );
     return super.cardToAscii(cardStringMap);
   }
