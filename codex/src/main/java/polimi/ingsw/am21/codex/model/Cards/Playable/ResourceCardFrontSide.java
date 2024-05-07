@@ -3,12 +3,12 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 import java.util.Map;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
-import polimi.ingsw.am21.codex.cli.CliPrintable;
+import polimi.ingsw.am21.codex.cli.CliCard;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 public class ResourceCardFrontSide
   extends PlayableFrontSide
-  implements CliPrintable {
+  implements CliCard {
 
   /**
    * The points the card should attribute to the player

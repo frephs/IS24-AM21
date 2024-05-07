@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.cli;
 
 import java.util.Map;
 
-public interface CliPrintable {
+public interface CliCard {
   String cardToString();
   String cardToAscii(Map<Integer, String> cardStringMap);
 
@@ -34,9 +34,7 @@ public interface CliPrintable {
             : !cardStringMap.containsKey(0) && cardStringMap.containsKey(3)
               ? "┐"
               : " ") +
-      "  " +
-      cardStringMap.getOrDefault(4, " ") +
-      "  " +
+      cardStringMap.getOrDefault(4, "     ") +
       (cardStringMap.containsKey(1) && cardStringMap.containsKey(2)
           ? "├"
           : cardStringMap.containsKey(1) && !cardStringMap.containsKey(2)

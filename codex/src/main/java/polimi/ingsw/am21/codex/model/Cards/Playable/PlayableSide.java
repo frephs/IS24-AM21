@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.cli.CliPrintable;
+import polimi.ingsw.am21.codex.cli.CliCard;
 import polimi.ingsw.am21.codex.cli.CliUtils;
 import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -13,7 +13,7 @@ import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
 // TODO investigate "Raw use of parameterized class 'Corner'" warning
 
-public abstract class PlayableSide implements CliPrintable {
+public abstract class PlayableSide implements CliCard {
 
   /**
    * The Map of the CornerPosition and the corner on the side of the card
@@ -86,7 +86,7 @@ public abstract class PlayableSide implements CliPrintable {
     //      }
     //    }
 
-    return CliPrintable.playableCardToAscii(cardStringMap);
+    return CliCard.playableCardToAscii(cardStringMap);
   }
   //  @Override
   //  public String cardToString() {

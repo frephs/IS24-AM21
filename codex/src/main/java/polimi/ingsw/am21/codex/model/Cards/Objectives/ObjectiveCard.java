@@ -2,11 +2,11 @@ package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
 import java.util.Map;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.cli.CliPrintable;
+import polimi.ingsw.am21.codex.cli.CliCard;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 
-public class ObjectiveCard extends Card implements CliPrintable {
+public class ObjectiveCard extends Card implements CliCard {
 
   /**
    * The points that the objective can give
