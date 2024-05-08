@@ -253,11 +253,6 @@ class LobbyTest {
     }
   }
 
-  //@Test
-  //void setExtractedCard() {
-  //TODO
-  // }
-
   @Test
   void finalizePlayer() {
     UUID socketID = generateNewSocketID();
@@ -280,8 +275,6 @@ class LobbyTest {
       "could not find player with socket id" + socketID
     );
     assertEquals(playerNickname.get(), "test");
-
-    UUID socketID2 = generateNewSocketID();
   }
 
   @Test

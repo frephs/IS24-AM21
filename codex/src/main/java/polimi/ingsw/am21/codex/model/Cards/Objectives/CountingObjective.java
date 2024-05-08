@@ -32,33 +32,28 @@ public class CountingObjective extends Objective {
    */
   @Override
   public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
-    return (playerBoard, points) -> {
-      return (
-        resources
+    return (playerBoard, points) ->
+      (resources
             .entrySet()
             .stream()
-            .map(resource -> {
-              return (
-                playerBoard.getResources().get(resource.getKey()) /
-                resource.getValue()
-              );
-            })
+            .map(
+              resource ->
+                (playerBoard.getResources().get(resource.getKey()) /
+                  resource.getValue())
+            )
             .reduce(Integer::min)
             .orElse(0) *
           points +
         (objects
             .entrySet()
             .stream()
-            .map(object -> {
-              return (
-                playerBoard.getObjects().get(object.getKey()) /
-                object.getValue()
-              );
-            })
+            .map(
+              object ->
+                (playerBoard.getObjects().get(object.getKey()) /
+                  object.getValue())
+            )
             .reduce(Integer::min)
             .orElse(0) *
-          points)
-      );
-    };
+          points));
   }
 }

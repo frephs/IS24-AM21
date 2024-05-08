@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.PlayerBoardTest;
 
@@ -37,7 +39,8 @@ class PlayableBackSideTest {
   }
 
   @Test
-  void getEvaluator() {
+  void getEvaluator()
+    throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     List<ResourceType> resources = new ArrayList<>();
     resources.add(ResourceType.ANIMAL);
     PlayableBackSide a = new PlayableBackSide(resources);
