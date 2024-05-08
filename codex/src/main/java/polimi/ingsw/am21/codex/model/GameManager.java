@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Game;
 
 public class GameManager {
@@ -12,7 +13,14 @@ public class GameManager {
   }
 
   public Set<String> getGames() {
-    return games.keySet();
+    return games
+      .keySet()
+      .stream()
+      .filter(
+        gameName ->
+          games.get(gameName).getLobby().getRemainingPlayerSlots() != 0
+      )
+      .collect(Collectors.toSet());
   }
 
   public Optional<Game> getGame(String gameName) {
