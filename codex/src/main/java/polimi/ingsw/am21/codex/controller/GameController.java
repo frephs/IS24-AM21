@@ -106,11 +106,8 @@ public class GameController {
     });
   }
 
-  private void lobbyChooseObjective(
-    String gameId,
-    UUID socketID,
-    Boolean first
-  ) throws GameNotFoundException {
+  public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
+    throws GameNotFoundException {
     Game game = this.getGame(gameId);
     Lobby lobby = game.getLobby();
     lobby.setObjectiveCard(socketID, first);
