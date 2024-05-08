@@ -83,8 +83,11 @@ public class GameController {
     }
   }
 
-  void lobbySetTokenColor(String gameId, UUID socketID, TokenColor color)
-    throws GameNotFoundException {
+  public void lobbySetTokenColor(
+    String gameId,
+    UUID socketID,
+    TokenColor color
+  ) throws GameNotFoundException {
     Game game = this.getGame(gameId);
     Lobby lobby = game.getLobby();
     lobby.setToken(socketID, color);
@@ -93,7 +96,7 @@ public class GameController {
     });
   }
 
-  void lobbySetNickname(String gameId, UUID socketID, String nickname)
+  public void lobbySetNickname(String gameId, UUID socketID, String nickname)
     throws GameNotFoundException, NicknameAlreadyTakenException {
     Game game = this.getGame(gameId);
     Lobby lobby = game.getLobby();
