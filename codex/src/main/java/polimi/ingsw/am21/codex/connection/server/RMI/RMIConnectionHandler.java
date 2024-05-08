@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.connection.server;
+package polimi.ingsw.am21.codex.connection.server.RMI;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;

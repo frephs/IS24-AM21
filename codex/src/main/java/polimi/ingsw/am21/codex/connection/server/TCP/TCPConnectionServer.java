@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.connection.server;
+package polimi.ingsw.am21.codex.connection.server.TCP;
 
 import java.io.IOException;
 import java.net.PortUnreachableException;

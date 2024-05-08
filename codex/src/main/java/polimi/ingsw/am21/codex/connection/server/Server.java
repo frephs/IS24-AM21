@@ -3,6 +3,8 @@ package polimi.ingsw.am21.codex.connection.server;
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
 import java.rmi.RemoteException;
+import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionServer;
+import polimi.ingsw.am21.codex.connection.server.TCP.TCPConnectionServer;
 import polimi.ingsw.am21.codex.controller.GameController;
 
 public class Server {
