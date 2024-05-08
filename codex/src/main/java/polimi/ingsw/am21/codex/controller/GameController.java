@@ -144,8 +144,19 @@ public class GameController {
     }
   }
 
-  public void createGame(String gameId, Integer players) {
-    manager.createGame(gameId, players);
+  public void createGame(String gameId, UUID socketID, Integer players)
+    throws EmptyDeckException {
+    try {
+      Game newGame = manager.createGame(gameId, players);
+      newGame
+        .getLobby()
+        .addPlayer(
+          socketID,
+          newGame.drawObjectiveCardPair(),
+          newGame.drawStarterCard()
+        );
+    } catch (LobbyFullException ignored) {}
+
     listeners.forEach(listener -> {
       listener.gameCreated(gameId);
     });
