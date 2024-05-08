@@ -18,6 +18,7 @@ import polimi.ingsw.am21.codex.model.GameManager;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
@@ -99,7 +100,7 @@ public class GameController {
     String gameId,
     UUID socketID,
     String nickname
-  ) throws GameNotFoundException {
+  ) throws GameNotFoundException, NicknameAlreadyTakenException {
     Game game = this.getGame(gameId);
     Lobby lobby = game.getLobby();
     lobby.setNickname(socketID, nickname);
@@ -134,7 +135,7 @@ public class GameController {
   }
 
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotReadyException {
+    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
     Game game = this.getGame(gameId);
     Player newPlayer = game
       .getLobby()
@@ -220,7 +221,7 @@ public class GameController {
     CardSideType side,
     Position position
   )
-    throws GameNotFoundException, PlayerNotActive, IllegalPlacingPositionException, IllegalCardSideChoiceException {
+    throws GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     Player currentPlayer = game.getCurrentPlayer();
