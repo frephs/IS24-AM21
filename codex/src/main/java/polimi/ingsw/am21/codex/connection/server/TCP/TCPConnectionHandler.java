@@ -255,7 +255,7 @@ public class TCPConnectionHandler implements Runnable {
 
   private void handleMessage(NextTurnMessage message) {
     // TODO how can we draw a card from a deck? ( look at the bottom )
-    // I put  isLastRound also in the message we could either used the that or the newly added controller.isLastRound
+    // isLastRound() is present both in the message and the controller, we can use either
     try {
       if (controller.isLastRound(message.getGameId())) {
         controller.nextTurn(message.getGameId(), message.getPlayerNickname());
