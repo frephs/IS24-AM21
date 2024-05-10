@@ -1,14 +1,11 @@
 package polimi.ingsw.am21.codex.controller.messages.clientActions.game;
 
-import polimi.ingsw.am21.codex.controller.messages.ActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 
-public class PlaceCardMessage extends ActionMessage {
+public class PlaceCardMessage extends GameActionMessage {
 
-  private final String gameId;
-  private final String playerNickname;
   private final int playerHandCardNumber;
   private final CardSideType side;
   private final Position position;
@@ -20,20 +17,10 @@ public class PlaceCardMessage extends ActionMessage {
     CardSideType side,
     Position position
   ) {
-    super(MessageType.PLACE_CARD);
-    this.gameId = gameId;
-    this.playerNickname = playerNickname;
+    super(MessageType.PLACE_CARD, gameId, playerNickname);
     this.playerHandCardNumber = playerHandCardNumber;
     this.side = side;
     this.position = position;
-  }
-
-  public String getGameId() {
-    return gameId;
-  }
-
-  public String getPlayerNickname() {
-    return playerNickname;
   }
 
   public int getPlayerHandCardNumber() {

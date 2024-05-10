@@ -40,6 +40,8 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
+import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 /** Runnable that handles a TCP connection */
 public class TCPConnectionHandler implements Runnable {
@@ -204,9 +206,8 @@ public class TCPConnectionHandler implements Runnable {
   private void handleMessage(Message message)
     throws NotAClientMessageException {
     switch (message.getType()) {
-      case DECK_DRAW_CARD -> handleMessage((DeckDrawCardMessage) message);
+      case NEXT_TURN -> handleMessage((NextTurnMessage) message);
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
-      case CARD_PAIR_DRAW -> handleMessage((CardPairDrawMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
       case JOIN_LOBBY -> handleMessage((JoinLobbyMessage) message);
       case SELECT_FROM_PAIR -> handleMessage((SelectFromPairMessage) message);
@@ -252,13 +253,31 @@ public class TCPConnectionHandler implements Runnable {
     System.out.println(message);
   }
 
-  private void handleMessage(DeckDrawCardMessage message) {
-    // TODO how can we draw a card from a deck?
-
-    //    try{
-    //    Game game = controller.getGame(message.getGameId());
-    //    game.getCurrentPlayer().drawCard();
-    //    }
+  private void handleMessage(NextTurnMessage message) {
+    // TODO how can we draw a card from a deck? ( look at the bottom )
+    // I put  isLastRound also in the message we could either used the that or the newly added controller.isLastRound
+    try {
+      if (controller.isLastRound(message.getGameId())) {
+        controller.nextTurn(message.getGameId(), message.getPlayerNickname());
+      } else {
+        controller.nextTurn(
+          message.getGameId(),
+          message.getPlayerNickname(),
+          message.getCardSource(),
+          message.getDeck()
+        );
+      }
+    } catch (GameNotFoundException gameNotFound) {
+      // TODO: handle game not found
+    } catch (InvalidNextTurnCallException invalidTurnCall) {
+      // TODO: handle invalid turn call
+    } catch (PlayerNotActive playerNotActive) {
+      // TODO: handle player not active
+    } catch (GameOverException gameOver) {
+      // TODO: handle game over
+    } catch (EmptyDeckException emptyDeck) {
+      // TODO: handle empty deck
+    }
   }
 
   private void handleMessage(PlaceCardMessage message) {
@@ -281,10 +300,6 @@ public class TCPConnectionHandler implements Runnable {
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     }
-  }
-
-  private void handleMessage(CardPairDrawMessage message) {
-    // TODO same as DeckCardDraw
   }
 
   private void handleMessage(CreateGameMessage message) {

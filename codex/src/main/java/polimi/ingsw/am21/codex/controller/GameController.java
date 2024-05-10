@@ -163,6 +163,10 @@ public class GameController {
     });
   }
 
+  public Boolean isLastRound(String gameId) throws GameNotFoundException {
+    return this.getGame(gameId).isLastRound();
+  }
+
   public void deleteGame(String gameId) {
     manager.deleteGame(gameId);
     listeners.forEach(listener -> {

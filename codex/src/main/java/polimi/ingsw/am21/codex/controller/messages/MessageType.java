@@ -2,9 +2,9 @@ package polimi.ingsw.am21.codex.controller.messages;
 
 public enum MessageType {
   CONFIRM,
-  DECK_DRAW_CARD,
+  NEXT_TURN,
+  NEXT_TURN_LAST_ROUNDS,
   PLACE_CARD,
-  CARD_PAIR_DRAW,
   CREATE_GAME,
 
   JOIN_LOBBY,
