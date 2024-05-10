@@ -5,7 +5,14 @@ import polimi.ingsw.am21.codex.controller.messages.RequestMessage;
 
 public class GetGameStatusMessage extends RequestMessage {
 
-  public GetGameStatusMessage() {
+  private final String gameId;
+
+  public GetGameStatusMessage(String gameId) {
     super(MessageType.GET_GAME_STATUS);
+    this.gameId = gameId;
+  }
+
+  public String getGameId() {
+    return gameId;
   }
 }

@@ -5,7 +5,14 @@ import polimi.ingsw.am21.codex.controller.messages.RequestMessage;
 
 public class GetAvailableTokenColorsMessage extends RequestMessage {
 
-  public GetAvailableTokenColorsMessage() {
+  private final String gameId;
+
+  public GetAvailableTokenColorsMessage(String gameId) {
     super(MessageType.GET_AVAILABLE_TOKEN_COLORS);
+    this.gameId = gameId;
+  }
+
+  public String getGameId() {
+    return gameId;
   }
 }

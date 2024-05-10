@@ -6,13 +6,28 @@ import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 
 public class DeckDrawCardMessage extends ActionMessage {
 
-  public DrawingDeckType deck;
+  private final String gameId;
+  private final DrawingDeckType deck;
 
-  public DeckDrawCardMessage() {
-    super(MessageType.DECK_DRAW_CARD);
+  public DeckDrawCardMessage(String gameId, DrawingDeckType deck) {
+    this(MessageType.DECK_DRAW_CARD, gameId, deck);
   }
 
-  public DeckDrawCardMessage(MessageType type) {
+  protected DeckDrawCardMessage(
+    MessageType type,
+    String gameId,
+    DrawingDeckType deck
+  ) {
     super(type);
+    this.gameId = gameId;
+    this.deck = deck;
+  }
+
+  public String getGameId() {
+    return gameId;
+  }
+
+  public DrawingDeckType getDeck() {
+    return deck;
   }
 }

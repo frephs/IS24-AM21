@@ -39,7 +39,7 @@ public class TCPConnectionServer {
               "Client connected from " + connectionSocket.getInetAddress()
             );
             executor.execute(
-              new TCPConnectionHandler(connectionSocket, controller)
+              new TCPConnectionHandler(connectionSocket, controller, executor)
             );
           } catch (IOException error) {
             // Socket has been closed

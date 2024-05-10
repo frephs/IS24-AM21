@@ -5,9 +5,14 @@ import polimi.ingsw.am21.codex.controller.messages.MessageType;
 
 public class JoinLobbyMessage extends ActionMessage {
 
-  private int lobbyId;
+  private final String lobbyId;
 
-  public JoinLobbyMessage() {
+  public JoinLobbyMessage(String lobbyId) {
     super(MessageType.JOIN_LOBBY);
+    this.lobbyId = lobbyId;
+  }
+
+  public String getLobbyId() {
+    return lobbyId;
   }
 }

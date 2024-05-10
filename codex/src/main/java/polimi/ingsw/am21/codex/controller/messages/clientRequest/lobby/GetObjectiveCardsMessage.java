@@ -5,7 +5,14 @@ import polimi.ingsw.am21.codex.controller.messages.RequestMessage;
 
 public class GetObjectiveCardsMessage extends RequestMessage {
 
-  public GetObjectiveCardsMessage() {
+  private final String gameId;
+
+  public GetObjectiveCardsMessage(String gameId) {
     super(MessageType.GET_OBJECTIVE_CARDS);
+    this.gameId = gameId;
+  }
+
+  public String getGameId() {
+    return gameId;
   }
 }

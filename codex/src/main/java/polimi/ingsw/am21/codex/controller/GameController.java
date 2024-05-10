@@ -14,6 +14,7 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameManager;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
@@ -87,7 +88,7 @@ public class GameController {
     String gameId,
     UUID socketID,
     TokenColor color
-  ) throws GameNotFoundException {
+  ) throws GameNotFoundException, TokenAlreadyTakenException {
     Game game = this.getGame(gameId);
     Lobby lobby = game.getLobby();
     lobby.setToken(socketID, color);

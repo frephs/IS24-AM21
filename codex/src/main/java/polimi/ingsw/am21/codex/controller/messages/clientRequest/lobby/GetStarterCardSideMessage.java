@@ -5,7 +5,14 @@ import polimi.ingsw.am21.codex.controller.messages.RequestMessage;
 
 public class GetStarterCardSideMessage extends RequestMessage {
 
-  public GetStarterCardSideMessage() {
+  private final String gameId;
+
+  public GetStarterCardSideMessage(String gameId) {
     super(MessageType.GET_STARTER_CARD_SIDE);
+    this.gameId = gameId;
+  }
+
+  public String getGameId() {
+    return gameId;
   }
 }

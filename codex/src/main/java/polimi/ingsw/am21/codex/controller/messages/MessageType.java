@@ -1,9 +1,11 @@
 package polimi.ingsw.am21.codex.controller.messages;
 
 public enum MessageType {
+  CONFIRM,
   DECK_DRAW_CARD,
   PLACE_CARD,
   CARD_PAIR_DRAW,
+  CREATE_GAME,
 
   JOIN_LOBBY,
   SELECT_FROM_PAIR,
@@ -24,9 +26,11 @@ public enum MessageType {
 
   INVALID_CARD_PLACEMENT,
   GAME_FULL,
+  GAME_NOT_FOUND,
   NICKNAME_ALREADY_TAKEN,
   TOKEN_COLOR_ALREADY_TAKEN,
   ACTION_NOT_ALLOWED,
+  NOT_A_CLIENT_MESSAGE,
   UNKNOWN_MESSAGE_TYPE,
 
   CARD_PLACED,
