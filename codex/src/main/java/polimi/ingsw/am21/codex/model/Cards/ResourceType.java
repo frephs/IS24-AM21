@@ -1,9 +1,8 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
-import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.Color;
-import polimi.ingsw.am21.codex.cli.Colorable;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
 public enum ResourceType implements CornerContentType, Colorable {
   PLANT,

@@ -1,8 +1,11 @@
-package polimi.ingsw.am21.codex.cli;
+package polimi.ingsw.am21.codex.view.TUI.utils;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.StringUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
 public class CliUtils {
 

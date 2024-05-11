@@ -3,8 +3,8 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 import java.util.Map;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
-import polimi.ingsw.am21.codex.cli.CliCard;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
 public class ResourceCardFrontSide
   extends PlayableFrontSide

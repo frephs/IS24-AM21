@@ -1,7 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-import polimi.ingsw.am21.codex.cli.Color;
-import polimi.ingsw.am21.codex.cli.Colorable;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
 public interface CornerContentType extends Colorable {
   // visitor pattern

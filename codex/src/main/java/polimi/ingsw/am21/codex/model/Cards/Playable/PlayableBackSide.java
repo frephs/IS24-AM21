@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import polimi.ingsw.am21.codex.cli.CliCard;
-import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class PlayableBackSide extends PlayableSide implements CliCard {
 

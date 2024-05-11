@@ -2,9 +2,9 @@ package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
 import java.util.Map;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.cli.CliCard;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
 public class ObjectiveCard extends Card implements CliCard {
 

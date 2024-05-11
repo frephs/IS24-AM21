@@ -8,12 +8,12 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class GoldCardFrontSide extends ResourceCardFrontSide {
 

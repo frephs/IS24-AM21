@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.cli;
+package polimi.ingsw.am21.codex.view.TUI.utils;
 
 public class Cli {
 

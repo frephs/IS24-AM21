@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex.cli;
+package polimi.ingsw.am21.codex.view.TUI.utils.commons;
 
 public enum Color {
   RESET("\u001B[0m", null, null, null, null),
@@ -37,11 +37,11 @@ public enum Color {
     this.bright = bright;
   }
 
-  static String colorize(String string, Color color, ColorStyle style) {
+  public static String colorize(String string, Color color, ColorStyle style) {
     return (color.getCode(style) + string + Color.RESET.normal);
   }
 
-  String getCode(ColorStyle style) {
+  public String getCode(ColorStyle style) {
     return switch (style) {
       case NORMAL -> this.normal;
       case BOLD -> this.bold;

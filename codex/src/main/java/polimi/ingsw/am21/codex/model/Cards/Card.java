@@ -1,8 +1,8 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.cli.CliCard;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
 public abstract class Card implements CliCard {
 

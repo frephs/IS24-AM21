@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.cli.CliCard;
-import polimi.ingsw.am21.codex.cli.CliUtils;
-import polimi.ingsw.am21.codex.cli.ColorStyle;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 // TODO investigate "Raw use of parameterized class 'Corner'" warning
 
