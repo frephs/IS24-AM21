@@ -11,29 +11,24 @@ public interface ClientConnectionHandler {
   void connect();
 
   /**
-   * returns the list of available games
-   *
-   * @return the list of games
+   * retrieves the list of available games
    */
-  List<String> listGames();
+  void listGames();
 
   /**
    * @param gameId the id of the game to connect to
-   * @return true if the connection was successful
    */
-  boolean connectToGame(String gameId);
+  void connectToGame(String gameId);
 
   /**
    * @param gameId the id of the game create and connect to
-   * @return true if the connection was successful
    */
-  boolean createAndConnectToGame(String gameId);
+  void createAndConnectToGame(String gameId);
 
   /**
-   * @return true if the game you are connected to has started ( false if it
-   * is still in the lobby )
+   * checks if the game you are connected to has started
    */
-  boolean checkIfGameStarted();
+  void checkIfGameStarted();
 
   /**
    * @param color the color of the chosen token color
