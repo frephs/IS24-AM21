@@ -128,6 +128,17 @@ public class Game {
   }
 
   /**
+   * Gets a player from the nickname
+   * @param nickname The nickname of the player you're looking for
+   */
+  public Player getPlayer(String nickname) throws PlayerNotFoundException {
+    return this.players.stream()
+      .filter(player -> Objects.equals(player.getNickname(), nickname))
+      .findFirst()
+      .orElseThrow(() -> new PlayerNotFoundException(nickname));
+  }
+
+  /**
    * Gets the index of current player.
    *
    * @return The index of current player.

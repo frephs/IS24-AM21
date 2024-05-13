@@ -10,6 +10,8 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javafx.util.Pair;
+import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -35,6 +37,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
@@ -227,6 +230,7 @@ public class TCPConnectionHandler implements Runnable {
         (GetStarterCardSideMessage) message
       );
       case CONFIRM,
+        CARD_DRAWN,
         GAME_STATUS,
         TOKEN_COLOR_SET,
         PLAYER_NICKNAME_SET,
@@ -242,7 +246,6 @@ public class TCPConnectionHandler implements Runnable {
         NOT_A_CLIENT_MESSAGE,
         UNKNOWN_MESSAGE_TYPE,
         CARD_PLACED,
-        DECK_CARD_DRAWN,
         GAME_OVER,
         PLAYER_SCORE_UPDATE,
         REMAINING_TURNS,
@@ -254,9 +257,8 @@ public class TCPConnectionHandler implements Runnable {
   }
 
   private void handleMessage(NextTurnMessage message) {
-    // TODO how can we draw a card from a deck? ( look at the bottom )
-    // isLastRound() is present both in the message and the controller, we can use either
     try {
+      // isLastRound() is present both in the message and the controller, we can use either
       if (controller.isLastRound(message.getGameId())) {
         controller.nextTurn(message.getGameId(), message.getPlayerNickname());
       } else {
@@ -267,16 +269,33 @@ public class TCPConnectionHandler implements Runnable {
           message.getDeck()
         );
       }
-    } catch (GameNotFoundException gameNotFound) {
-      // TODO: handle game not found
-    } catch (InvalidNextTurnCallException invalidTurnCall) {
-      // TODO: handle invalid turn call
-    } catch (PlayerNotActive playerNotActive) {
-      // TODO: handle player not active
-    } catch (GameOverException gameOver) {
-      // TODO: handle game over
-    } catch (EmptyDeckException emptyDeck) {
-      // TODO: handle empty deck
+
+      PlayableCard drawnCard = controller
+        .getGame(message.getGameId())
+        .getPlayer(message.getPlayerNickname())
+        .getBoard()
+        .getHand()
+        .getLast();
+
+      broadcast(
+        new NextTurnMessage(
+          message.getGameId(),
+          message.getPlayerNickname(),
+          message.getCardSource(),
+          message.getDeck(),
+          drawnCard.getId()
+        )
+      );
+    } catch (GameNotFoundException e) {
+      send(new GameNotFoundMessage());
+    } catch (
+      PlayerNotActive
+      | GameOverException
+      | EmptyDeckException
+      | InvalidNextTurnCallException
+      | PlayerNotFoundException e
+    ) {
+      send(new ActionNotAllowedMessage());
     }
   }
 
@@ -339,6 +358,7 @@ public class TCPConnectionHandler implements Runnable {
     try {
       // TODO this will need to handle the starter card as well?
       //  or is it better to handle this in placeCard?
+
       controller.lobbyChooseObjective(
         message.getLobbyId(),
         socketId,
@@ -384,8 +404,7 @@ public class TCPConnectionHandler implements Runnable {
     try {
       Game game = controller.getGame(message.getGameId());
 
-      // TODO what do I pass in this message? Let who is making the client decide
-      send(new GameStatusMessage());
+      send(new GameStatusMessage(game.getState()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     }
@@ -412,11 +431,15 @@ public class TCPConnectionHandler implements Runnable {
         .getLobby()
         .getPlayerObjectiveCards(socketId);
 
-      // TODO are card ids enough? or is it better to pass a Card object directly?
-      //  Either way, complete message constructor
-      // use pair.orElseThrow(...), probably a runtime exception would be ok so t
-      // hat it gets caught by the parent call and we terminate the connection
-      send(new ObjectiveCardsMessage());
+      send(
+        new ObjectiveCardsMessage(
+          pair
+            .map(p -> new Pair<>(p.getFirst().getId(), p.getSecond().getId()))
+            .orElseThrow(
+              () -> new RuntimeException("No player objective cards found.")
+            )
+        )
+      );
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     }
@@ -427,9 +450,7 @@ public class TCPConnectionHandler implements Runnable {
       Game game = controller.getGame(message.getGameId());
       PlayableCard starterCard = game.getLobby().getStarterCard(socketId);
 
-      // TODO are card ids enough? or is it better to pass a Card object directly?
-      //  Either way, complete message constructor
-      send(new StarterCardSidesMessage());
+      send(new StarterCardSidesMessage(starterCard.getId()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     }
