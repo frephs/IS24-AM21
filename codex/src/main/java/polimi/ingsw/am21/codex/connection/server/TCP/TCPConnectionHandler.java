@@ -32,6 +32,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -209,7 +210,7 @@ public class TCPConnectionHandler implements Runnable {
   private void handleMessage(Message message)
     throws NotAClientMessageException {
     switch (message.getType()) {
-      case NEXT_TURN -> handleMessage((NextTurnMessage) message);
+      case NEXT_TURN_ACTION -> handleMessage((NextTurnActionMessage) message);
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
       case JOIN_LOBBY -> handleMessage((JoinLobbyMessage) message);
@@ -247,6 +248,7 @@ public class TCPConnectionHandler implements Runnable {
         UNKNOWN_MESSAGE_TYPE,
         CARD_PLACED,
         GAME_OVER,
+        NEXT_TURN_UPDATE,
         PLAYER_SCORE_UPDATE,
         REMAINING_TURNS,
         WINNING_PLAYER,
@@ -256,7 +258,7 @@ public class TCPConnectionHandler implements Runnable {
     System.out.println(message);
   }
 
-  private void handleMessage(NextTurnMessage message) {
+  private void handleMessage(NextTurnActionMessage message) {
     try {
       // isLastRound() is present both in the message and the controller, we can use either
       if (controller.isLastRound(message.getGameId())) {
@@ -278,7 +280,7 @@ public class TCPConnectionHandler implements Runnable {
         .getLast();
 
       broadcast(
-        new NextTurnMessage(
+        new NextTurnUpdateMessage(
           message.getGameId(),
           message.getPlayerNickname(),
           message.getCardSource(),

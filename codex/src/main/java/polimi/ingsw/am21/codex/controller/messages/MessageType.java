@@ -2,8 +2,7 @@ package polimi.ingsw.am21.codex.controller.messages;
 
 public enum MessageType {
   CONFIRM,
-  NEXT_TURN,
-  NEXT_TURN_LAST_ROUNDS,
+  NEXT_TURN_ACTION,
   PLACE_CARD,
   CREATE_GAME,
 
@@ -36,6 +35,7 @@ public enum MessageType {
 
   CARD_PLACED,
   GAME_OVER,
+  NEXT_TURN_UPDATE,
   PLAYER_SCORE_UPDATE,
   REMAINING_TURNS,
   WINNING_PLAYER,
