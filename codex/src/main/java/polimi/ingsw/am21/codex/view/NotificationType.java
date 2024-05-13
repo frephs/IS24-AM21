@@ -7,6 +7,7 @@ public enum NotificationType implements Colorable {
   WARNING,
   ERROR,
   RESPONSE,
+  UPDATE,
   CONFIRM;
 
   @Override
