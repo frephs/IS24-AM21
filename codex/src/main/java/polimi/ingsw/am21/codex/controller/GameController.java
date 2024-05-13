@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.controller;
 import java.net.Socket;
 import java.util.*;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.listeners.ControllerEventListener;
@@ -16,6 +17,7 @@ import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameManager;
+import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
@@ -63,8 +65,12 @@ public class GameController {
   }
 
   public void joinLobby(String gameId, UUID socketID)
-    throws GameNotFoundException, LobbyFullException {
+    throws GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
     Game game = this.getGame(gameId);
+
+    if (
+      game.getState() != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
 
     Lobby lobby = game.getLobby();
     try {
@@ -88,8 +94,14 @@ public class GameController {
     String gameId,
     UUID socketID,
     TokenColor color
-  ) throws GameNotFoundException, TokenAlreadyTakenException {
+  )
+    throws GameNotFoundException, TokenAlreadyTakenException, GameAlreadyStartedException {
     Game game = this.getGame(gameId);
+
+    if (
+      game.getState() != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
     Lobby lobby = game.getLobby();
     lobby.setToken(socketID, color);
     listeners.forEach(listener -> {
@@ -98,8 +110,13 @@ public class GameController {
   }
 
   public void lobbySetNickname(String gameId, UUID socketID, String nickname)
-    throws GameNotFoundException, NicknameAlreadyTakenException {
+    throws GameNotFoundException, NicknameAlreadyTakenException, GameAlreadyStartedException {
     Game game = this.getGame(gameId);
+
+    if (
+      game.getState() != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
     Lobby lobby = game.getLobby();
     lobby.setNickname(socketID, nickname);
     listeners.forEach(listener -> {
@@ -108,8 +125,13 @@ public class GameController {
   }
 
   public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
-    throws GameNotFoundException {
+    throws GameNotFoundException, GameAlreadyStartedException {
     Game game = this.getGame(gameId);
+
+    if (
+      game.getState() != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
     Lobby lobby = game.getLobby();
     lobby.setObjectiveCard(socketID, first);
     listeners.forEach(listener -> {
@@ -118,19 +140,19 @@ public class GameController {
   }
 
   private void startGame(String gameId, Game game)
-    throws GameNotReadyException {
+    throws GameNotReadyException, GameAlreadyStartedException {
     game.start();
     listeners.forEach(listener -> listener.gameStarted(gameId));
   }
 
   public void startGame(String gameId)
-    throws GameNotFoundException, GameNotReadyException {
+    throws GameNotFoundException, GameNotReadyException, GameAlreadyStartedException {
     Game game = getGame(gameId);
     this.startGame(gameId, game);
   }
 
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameAlreadyStartedException {
     Game game = this.getGame(gameId);
     Player newPlayer = game
       .getLobby()

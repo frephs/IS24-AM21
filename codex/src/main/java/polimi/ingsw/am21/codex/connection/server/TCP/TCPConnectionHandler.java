@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.messages.ConfirmMessage;
@@ -336,11 +337,6 @@ public class TCPConnectionHandler implements Runnable {
   }
 
   /*
-   * TODO handle all lobby messages when the game is not in the lobby state anymore.
-   *  This means that GameNotFound will not be thrown, but we need to add an exception
-   *  so that here we can then respond with an ActionNotAllowedMessage
-   */
-  /*
    * TODO also, in other messages, make sure that we are not in the lobby state;
    *  otherwise, use ActionNotAllowedMessage
    */
@@ -353,6 +349,8 @@ public class TCPConnectionHandler implements Runnable {
       send(new GameNotFoundMessage());
     } catch (LobbyFullException e) {
       send(new GameFullMessage());
+    } catch (GameAlreadyStartedException e) {
+      send(new ActionNotAllowedMessage());
     }
   }
 
@@ -369,6 +367,8 @@ public class TCPConnectionHandler implements Runnable {
       send(new ConfirmMessage());
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
+    } catch (GameAlreadyStartedException e) {
+      send(new ActionNotAllowedMessage());
     }
   }
 
@@ -384,6 +384,8 @@ public class TCPConnectionHandler implements Runnable {
       send(new NicknameAlreadyTakenMessage());
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
+    } catch (GameAlreadyStartedException e) {
+      send(new ActionNotAllowedMessage());
     }
   }
 
@@ -399,6 +401,8 @@ public class TCPConnectionHandler implements Runnable {
       send(new GameNotFoundMessage());
     } catch (TokenAlreadyTakenException e) {
       send(new TokenColorAlreadyTakenMessage());
+    } catch (GameAlreadyStartedException e) {
+      send(new ActionNotAllowedMessage());
     }
   }
 

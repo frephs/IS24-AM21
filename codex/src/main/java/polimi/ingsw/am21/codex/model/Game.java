@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model;
 
 import java.util.*;
 import org.json.JSONArray;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -57,8 +58,13 @@ public class Game {
   /**
    * Starts the game.
    */
-  public void start() throws GameNotReadyException {
+  public void start()
+    throws GameNotReadyException, GameAlreadyStartedException {
     if (this.getPlayersSpotsLeft() != 0) throw new GameNotReadyException();
+    if (
+      this.state != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
   }
