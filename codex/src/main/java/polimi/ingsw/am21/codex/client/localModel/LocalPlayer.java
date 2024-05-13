@@ -8,7 +8,7 @@ import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public class Player {
+public class LocalPlayer {
 
   public String nickname;
   public int points;
