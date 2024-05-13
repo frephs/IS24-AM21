@@ -215,7 +215,7 @@ public class TCPConnectionHandler implements Runnable {
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
       case JOIN_LOBBY -> handleMessage((JoinLobbyMessage) message);
-      case SELECT_FROM_PAIR -> handleMessage((SelectFromPairMessage) message);
+      case SELECT_OBJECTIVE -> handleMessage((SelectObjectiveMessage) message);
       case SET_NICKNAME -> handleMessage((SetNicknameMessage) message);
       case SET_TOKEN_COLOR -> handleMessage((SetTokenColorMessage) message);
       case GET_GAME_STATUS -> handleMessage((GetGameStatusMessage) message);
@@ -354,11 +354,8 @@ public class TCPConnectionHandler implements Runnable {
     }
   }
 
-  private void handleMessage(SelectFromPairMessage message) {
+  private void handleMessage(SelectObjectiveMessage message) {
     try {
-      // TODO this will need to handle the starter card as well?
-      //  or is it better to handle this in placeCard?
-
       controller.lobbyChooseObjective(
         message.getLobbyId(),
         socketId,
