@@ -4,13 +4,13 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.ClientContext;
-import polimi.ingsw.am21.codex.client.localModel.GameBoard;
+import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.ConnectionType;
 
 public class Client {
 
-  private GameBoard game;
+  private LocalGameBoard game;
   private ClientContext context = ClientContext.LOBBY;
 
   Scanner scanner = new Scanner(System.in);
