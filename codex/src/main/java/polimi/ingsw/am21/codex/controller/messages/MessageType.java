@@ -8,6 +8,7 @@ public enum MessageType {
 
   JOIN_LOBBY,
   SELECT_FROM_PAIR,
+  SELECT_CARD_SIDE,
   SET_NICKNAME,
   SET_TOKEN_COLOR,
 
