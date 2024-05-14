@@ -147,7 +147,6 @@ public class TCPConnectionHandler implements Runnable {
           incomingMessages.wait();
         } catch (ClassNotFoundException e) {
           send(new UnknownMessageTypeMessage());
-          // TODO break?
         } catch (IOException e) {
           System.err.println(
             "IOException caught when parsing message from " +
@@ -317,10 +316,9 @@ public class TCPConnectionHandler implements Runnable {
       send(new ConfirmMessage());
     } catch (PlayerNotActive e) {
       send(new ActionNotAllowedMessage());
-    } catch (IllegalCardSideChoiceException e) {
-      // TODO differentiate for illegal side choice?
-      send(new InvalidCardPlacementMessage());
-    } catch (IllegalPlacingPositionException e) {
+    } catch (
+      IllegalPlacingPositionException | IllegalCardSideChoiceException e
+    ) {
       send(new InvalidCardPlacementMessage());
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
