@@ -122,13 +122,13 @@ class LobbyTest {
 
     try {
       this.lobby.setNickname(firstAdded, "test1");
-    } catch (PlayerNotFoundException e) {
-      fail("First player is not in the lobby");
+    } catch (PlayerNotFoundException | NicknameAlreadyTakenException e) {
+      fail(e);
     }
     try {
       this.lobby.setNickname(lastAdded, "test2");
-    } catch (PlayerNotFoundException e) {
-      fail("Last player is not in the lobby");
+    } catch (PlayerNotFoundException | NicknameAlreadyTakenException e) {
+      fail(e);
     }
   }
 
@@ -174,7 +174,11 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    this.lobby.setNickname(socketID, "test");
+    try {
+      this.lobby.setNickname(socketID, "test");
+    } catch (NicknameAlreadyTakenException e) {
+      fail(e);
+    }
     Optional<String> playerNickname = this.lobby.getPlayerNickname(socketID);
     if (playerNickname.isEmpty()) fail(
       "could not find player with socket id" + socketID
@@ -268,7 +272,11 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    this.lobby.setNickname(socketID, "test");
+    try {
+      this.lobby.setNickname(socketID, "test");
+    } catch (NicknameAlreadyTakenException e) {
+      fail(e);
+    }
 
     Optional<String> playerNickname = this.lobby.getPlayerNickname(socketID);
     if (playerNickname.isEmpty()) fail(
@@ -341,7 +349,11 @@ class LobbyTest {
     Optional<String> playerNickname = lobby.getPlayerNickname(firstPlayerID);
     assertEquals(Optional.empty(), playerNickname);
 
-    lobby.setNickname(firstPlayerID, "firstPlayer");
+    try {
+      lobby.setNickname(firstPlayerID, "firstPlayer");
+    } catch (NicknameAlreadyTakenException e) {
+      fail(e);
+    }
     playerNickname = lobby.getPlayerNickname(firstPlayerID);
     if (playerNickname.isEmpty()) {
       fail("Empty player nickname");
