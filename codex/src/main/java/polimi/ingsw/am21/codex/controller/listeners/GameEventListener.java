@@ -2,14 +2,12 @@ package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.util.List;
 import java.util.UUID;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public interface ControllerEventListener {
+public interface GameEventListener {
   void gameCreated(String gameId);
 
   void gameDeleted(String gameId);
@@ -36,6 +34,7 @@ public interface ControllerEventListener {
   void cardPlaced(
     String gameId,
     Integer playerHandCardNumber,
+    Integer cardId,
     CardSideType side,
     Position position
   );
