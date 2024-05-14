@@ -1,38 +1,10 @@
 package polimi.ingsw.am21.codex.client;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public enum ClientContext {
-  LOBBY(
-    new HashMap<String, String>(
-      Map.of(
-        "get-lobbies",
-        "Get the available game lobbies",
-        "join-game-lobby <lobbyId>",
-        "Join the specified lobby",
-        "create-game ",
-        "Create a new came lobby ",
-        "set-nickname <nickname>",
-        "Choose your player nickname",
-        "get-token-colors",
-        "Get the available token colors",
-        "set-token-color <color>",
-        "Choose your player token color",
-        "get-objective-cards",
-        "Get the available secret objective card's id",
-        "set-objective-card <first>",
-        "Choose your secret objective card",
-        "get-starter-card-sides",
-        "Get the id of the startCard to show its' sides",
-        "set-starter-card-sides <first>",
-        "Choose the starter card to place on your playerboard ",
-        "get-game-status",
-        "Get the current game status"
-      )
-    )
-  ),
+  LOBBY(generateLobbyCommands()),
   GAME(
     new HashMap<String, String>(
       Map.of(
@@ -50,5 +22,30 @@ public enum ClientContext {
 
   ClientContext(Map<String, String> availableCommands) {
     this.availableCommands = availableCommands;
+  }
+
+  private static Map<String, String> generateLobbyCommands() {
+    Map<String, String> res = new HashMap<>();
+    res.put("get-lobbies", "Get the available game lobbies");
+    res.put("join-game-lobby <lobbyId>", "Join the specified lobby");
+    res.put("create-game", "Create a new game lobby");
+    res.put("set-nickname <nickname>", "Choose your player nickname");
+    res.put("get-token-colors", "Get the available token colors");
+    res.put("set-token-color <color>", "Choose your player token color");
+    res.put(
+      "get-objective-cards",
+      "Get the available secret objective card's id"
+    );
+    res.put("set-objective-card <first>", "Choose your secret objective card");
+    res.put(
+      "get-starter-card-sides",
+      "Get the id of the startCard to show its' sides"
+    );
+    res.put(
+      "set-starter-card-sides <first>",
+      "Choose the starter card to place on your playerboard"
+    );
+    res.put("get-game-status", "Get the current game status");
+    return res;
   }
 }

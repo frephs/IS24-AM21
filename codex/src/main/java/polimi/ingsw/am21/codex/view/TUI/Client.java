@@ -16,24 +16,24 @@ public class Client {
   Scanner scanner = new Scanner(System.in);
 
   void start(ConnectionType connectionType, String address, int port) {
-    String line;
-    String[] command;
-    ClientConnectionHandler client;
-
-    if (connectionType == ConnectionType.TCP) {
-      client = new SocketClient(address, port);
-    } else {
-      client = new RmiClient(address, port);
-    }
-
-    ExecutorService executorService = Executors.newCachedThreadPool();
-
-    while (true) {
-      line = scanner.nextLine().trim();
-      command = line.split(" ");
-
-      switch (command[0]) {}
-    }
+    //    String line;
+    //    String[] command;
+    //    ClientConnectionHandler client;
+    //
+    //    if (connectionType == ConnectionType.TCP) {
+    //      client = new SocketClient(address, port);
+    //    } else {
+    //      client = new RmiClient(address, port);
+    //    }
+    //
+    //    ExecutorService executorService = Executors.newCachedThreadPool();
+    //
+    //    while (true) {
+    //      line = scanner.nextLine().trim();
+    //      command = line.split(" ");
+    //
+    //      switch (command[0]) {}
+    //    }
   }
 
   public static void main(String[] args) {}
