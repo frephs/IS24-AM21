@@ -64,11 +64,4 @@ public interface CliCard {
 
     return cardString;
   }
-  //  public static void main(String[] args) {
-  //    HashMap<Integer, String> cardStringMap = new HashMap<Integer, String>();
-  //    for (int i = 0; i < 6; i++) {
-  //      cardStringMap.put(i, String.valueOf(i));
-  //    }
-  //    cardToAscii(cardStringMap);
-  //  }
 }

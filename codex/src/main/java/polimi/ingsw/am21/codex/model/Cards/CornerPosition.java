@@ -6,10 +6,14 @@ public enum CornerPosition implements AdjacentPosition {
   BOTTOM_RIGHT(2),
   BOTTOM_LEFT(3);
 
-  public final int index;
+  private final int index;
 
   CornerPosition(int index) {
     this.index = index;
+  }
+
+  public int getIndex() {
+    return this.index;
   }
 
   public CornerPosition getOppositeCornerPosition() {

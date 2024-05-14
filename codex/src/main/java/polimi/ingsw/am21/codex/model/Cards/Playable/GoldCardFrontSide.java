@@ -137,11 +137,6 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
       }
     });
 
-    StringBuilder sb = new StringBuilder();
-    placementCondition.forEach(
-      resource ->
-        sb.append(CliUtils.colorize(resource, ColorStyle.UNDERLINED, 1))
-    );
     cardStringMap.put(
       6,
       CliUtils.colorizeAndCenter(

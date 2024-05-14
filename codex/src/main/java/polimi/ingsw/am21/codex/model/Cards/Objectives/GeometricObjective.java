@@ -72,11 +72,13 @@ public class GeometricObjective extends Objective implements CliCard {
 
   @Override
   public String cardToString() {
+    //TODO add cardToString implementation
     return "";
   }
 
   @Override
   public String cardToAscii(Map<Integer, String> cardStringMap) {
+    //TODO add cardToAscii implementation
     return "";
   }
 }

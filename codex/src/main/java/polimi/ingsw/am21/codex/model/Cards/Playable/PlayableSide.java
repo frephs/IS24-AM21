@@ -71,25 +71,20 @@ public abstract class PlayableSide implements CliCard {
         .ifPresentOrElse(
           content ->
             cardStringMap.put(
-              cornerPosition.index,
+              cornerPosition.getIndex(),
               CliUtils.colorize(content, ColorStyle.BOLD, 1)
             ),
-          () -> cardStringMap.put(cornerPosition.index, " ")
+          () -> cardStringMap.put(cornerPosition.getIndex(), " ")
         );
     });
-    //    for (CornerPosition cornerPosition : CornerPosition.values()) {
-    //      if (!corners.containsKey(cornerPosition)) {
-    //        cardStringMap.put(
-    //          cornerPosition.index,
-    //          CliUtils.colorize("X", Color.RED_BACKGROUND)
-    //        );
-    //      }
-    //    }
+
 
     return CliCard.playableCardToAscii(cardStringMap);
   }
-  //  @Override
-  //  public String cardToString() {
-  //
-  //  }
+
+  @Override
+  public String cardToString() {
+    //TODO add cardToString implementation
+    return "";
+  }
 }
