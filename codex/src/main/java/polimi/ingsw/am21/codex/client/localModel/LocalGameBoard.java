@@ -22,7 +22,7 @@ public class LocalGameBoard {
 
   private final Map<String, LocalPlayer> players = new HashMap<>();
 
-  LocalGameBoard(String gameId) {
+  public LocalGameBoard(String gameId) {
     this.gameId = gameId;
   }
 
