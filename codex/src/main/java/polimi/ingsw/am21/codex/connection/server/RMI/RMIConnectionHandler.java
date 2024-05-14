@@ -8,6 +8,7 @@ import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
+import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -31,7 +32,7 @@ public class RMIConnectionHandler implements Remote {
     this.controller = controller;
   }
 
-  public void setClient(GameEventListener eventLister) {
+  public void setClient(GameEventListener eventListener) {
     this.controller.addListener(eventListener);
   }
 
