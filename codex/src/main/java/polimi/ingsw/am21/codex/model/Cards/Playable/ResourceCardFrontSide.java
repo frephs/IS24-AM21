@@ -45,6 +45,7 @@ public class ResourceCardFrontSide
 
   @Override
   public String cardToString() {
+    // TODO: Implement TUI method
     return "";
   }
 }

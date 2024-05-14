@@ -42,10 +42,12 @@ public class ObjectiveCard extends Card implements CliCard {
 
   @Override
   public String cardToString() {
+    // TODO: Implement TUI method
     return "";
   }
 
   public String cardToAscii(Map<Integer, String> cardStringMap) {
+    // TODO: Implement TUI method
     return "";
   }
 }
