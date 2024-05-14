@@ -6,10 +6,20 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 
 public class SelectCardSideMessage extends ActionMessage {
 
-  CardSideType cardSideType;
+  private final String lobbyId;
+  private final CardSideType cardSideType;
 
   public SelectCardSideMessage(CardSideType cardSideType, String lobbyId) {
     super(MessageType.SELECT_CARD_SIDE);
     this.cardSideType = cardSideType;
+    this.lobbyId = lobbyId;
+  }
+
+  public String getLobbyId() {
+    return lobbyId;
+  }
+
+  public CardSideType getCardSideType() {
+    return cardSideType;
   }
 }

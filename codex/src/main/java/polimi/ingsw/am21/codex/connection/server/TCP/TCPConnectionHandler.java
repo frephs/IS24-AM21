@@ -45,6 +45,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
@@ -215,6 +216,7 @@ public class TCPConnectionHandler implements Runnable {
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
       case JOIN_LOBBY -> handleMessage((JoinLobbyMessage) message);
+      case SELECT_CARD_SIDE -> handleMessage((SelectCardSideMessage) message);
       case SELECT_OBJECTIVE -> handleMessage((SelectObjectiveMessage) message);
       case SET_NICKNAME -> handleMessage((SetNicknameMessage) message);
       case SET_TOKEN_COLOR -> handleMessage((SetTokenColorMessage) message);
@@ -232,7 +234,6 @@ public class TCPConnectionHandler implements Runnable {
         (GetStarterCardSideMessage) message
       );
       case CONFIRM,
-        CARD_DRAWN,
         GAME_STATUS,
         TOKEN_COLOR_SET,
         PLAYER_NICKNAME_SET,
@@ -242,6 +243,7 @@ public class TCPConnectionHandler implements Runnable {
         STARTER_CARD_SIDES,
         INVALID_CARD_PLACEMENT,
         GAME_FULL,
+        GAME_NOT_FOUND,
         NICKNAME_ALREADY_TAKEN,
         TOKEN_COLOR_ALREADY_TAKEN,
         ACTION_NOT_ALLOWED,
@@ -351,6 +353,27 @@ public class TCPConnectionHandler implements Runnable {
       send(new GameFullMessage());
     } catch (GameAlreadyStartedException e) {
       send(new ActionNotAllowedMessage());
+    }
+  }
+
+  private void handleMessage(SelectCardSideMessage message) {
+    try {
+      controller.joinGame(
+        message.getLobbyId(),
+        socketId,
+        message.getCardSideType()
+      );
+      send(new ConfirmMessage());
+    } catch (
+      GameNotReadyException | GameAlreadyStartedException | EmptyDeckException e
+    ) {
+      send(new ActionNotAllowedMessage());
+    } catch (
+      IllegalCardSideChoiceException | IllegalPlacingPositionException e
+    ) {
+      send(new InvalidCardPlacementMessage());
+    } catch (GameNotFoundException e) {
+      send(new GameNotFoundMessage());
     }
   }
 
