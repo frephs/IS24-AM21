@@ -82,22 +82,22 @@ public class TCPConnectionHandler implements Runnable {
   private final ExecutorService localExecutor;
 
   /**
-   * The executor associated to the connections thread pool, that can be used to
-   * broadcast messages to all clients
+   * The map of active connection handlers, used to handle message broadcasting
    */
-  private final ExecutorService serverExecutor;
+  private final Map<UUID, TCPConnectionHandler> activeHandlers;
 
   public TCPConnectionHandler(
     Socket socket,
     GameController controller,
-    ExecutorService serverExecutor
+    UUID socketId,
+    Map<UUID, TCPConnectionHandler> activeHandlers
   ) {
     this.socket = socket;
     this.controller = controller;
     this.incomingMessages = new ArrayDeque<>();
     this.localExecutor = Executors.newCachedThreadPool();
-    this.serverExecutor = serverExecutor;
-    this.socketId = UUID.randomUUID();
+    this.socketId = socketId;
+    this.activeHandlers = activeHandlers;
 
     try {
       this.inputStream = new ObjectInputStream(socket.getInputStream());
@@ -114,6 +114,16 @@ public class TCPConnectionHandler implements Runnable {
   public void run() {
     startMessageParser();
     startMessageHandler();
+  }
+
+  /**
+   * Closes the connection socket and removes the handler from the active map
+   */
+  private void closeConnection() {
+    try {
+      socket.close();
+    } catch (IOException ignored) {}
+    activeHandlers.remove(socketId);
   }
 
   /**
@@ -185,9 +195,7 @@ public class TCPConnectionHandler implements Runnable {
 
           send(new NotAClientMessageMessage());
 
-          try {
-            socket.close();
-          } catch (IOException ignored) {}
+          closeConnection();
           break;
         } catch (Exception e) {
           System.err.println(
@@ -197,9 +205,7 @@ public class TCPConnectionHandler implements Runnable {
           );
           System.err.println(e.getMessage());
 
-          try {
-            socket.close();
-          } catch (IOException ignored) {}
+          closeConnection();
           break;
         }
       }
@@ -493,9 +499,8 @@ public class TCPConnectionHandler implements Runnable {
         socket.getInetAddress() +
         ", closing socket."
       );
-      try {
-        socket.close();
-      } catch (IOException ignore) {}
+
+      closeConnection();
     }
   }
 
@@ -506,7 +511,11 @@ public class TCPConnectionHandler implements Runnable {
    *                       defaults to false
    */
   public void broadcast(Message message, boolean excludeCurrent) {
-    // TODO wait until the client "server" part is implemented
+    activeHandlers.forEach((socketId, handler) -> {
+      if (socketId != this.socketId || !excludeCurrent) {
+        handler.send(message);
+      }
+    });
   }
 
   public void broadcast(Message message) {

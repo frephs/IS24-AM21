@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.PortUnreachableException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -18,10 +21,15 @@ public class TCPConnectionServer {
    * The Game controller to use
    */
   private final GameController controller;
+  /**
+   * A map with the socket ids as keys and the corresponding connection handlers as values
+   */
+  private final Map<UUID, TCPConnectionHandler> activeHandlers;
 
   public TCPConnectionServer(Integer port, GameController controller) {
     this.port = port;
     this.controller = controller;
+    this.activeHandlers = new HashMap<>();
   }
 
   public void start() throws PortUnreachableException {
@@ -33,14 +41,22 @@ public class TCPConnectionServer {
       try (ServerSocket serverSocket = new ServerSocket(port)) {
         System.out.println("TCP server ready on port " + port);
         while (true) {
+          UUID socketId = UUID.randomUUID();
           try {
             Socket connectionSocket = serverSocket.accept();
             System.out.println(
               "Client connected from " + connectionSocket.getInetAddress()
             );
-            executor.execute(
-              new TCPConnectionHandler(connectionSocket, controller, executor)
+
+            TCPConnectionHandler handler = new TCPConnectionHandler(
+              connectionSocket,
+              controller,
+              socketId,
+              activeHandlers
             );
+            activeHandlers.put(socketId, handler);
+
+            executor.execute(handler);
           } catch (IOException error) {
             // Socket has been closed
             break;
