@@ -1,12 +1,11 @@
 package polimi.ingsw.am21.codex.controller;
 
-import java.net.Socket;
 import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
-import polimi.ingsw.am21.codex.controller.listeners.ControllerEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -33,7 +32,7 @@ import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 public class GameController {
 
   GameManager manager;
-  List<ControllerEventListener> listeners;
+  List<GameEventListener> listeners;
 
   public GameController() {
     manager = new GameManager();
@@ -238,11 +237,11 @@ public class GameController {
     this.sendNextTurnEvents(gameId, game);
   }
 
-  public void addListener(ControllerEventListener listener) {
+  public void addListener(GameEventListener listener) {
     listeners.add(listener);
   }
 
-  public void removeListener(ControllerEventListener listener) {
+  public void removeListener(GameEventListener listener) {
     listeners.remove(listener);
   }
 
@@ -257,10 +256,20 @@ public class GameController {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     Player currentPlayer = game.getCurrentPlayer();
-    currentPlayer.placeCard(playerHandCardNumber, side, position);
+    PlayableCard playedCard = currentPlayer.placeCard(
+      playerHandCardNumber,
+      side,
+      position
+    );
     listeners.forEach(
       listener ->
-        listener.cardPlaced(gameId, playerHandCardNumber, side, position)
+        listener.cardPlaced(
+          gameId,
+          playerHandCardNumber,
+          playedCard.getId(),
+          side,
+          position
+        )
     );
   }
 }

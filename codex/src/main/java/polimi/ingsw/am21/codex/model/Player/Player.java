@@ -169,7 +169,11 @@ public class Player {
    * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of the side placing condition
    * @throws IllegalPlacingPositionException if the position provided is either unreachable, occupied or forbidden
    */
-  public void placeCard(int cardIndex, CardSideType side, Position position)
+  public PlayableCard placeCard(
+    int cardIndex,
+    CardSideType side,
+    Position position
+  )
     throws IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
     PlayableCard playedCard;
     try {
@@ -181,9 +185,9 @@ public class Player {
     }
 
     board.placeCard(playedCard, side, position);
-
-    PlayableCard card = board.getHand().get(cardIndex);
-    this.points += card.getEvaluator().apply(board);
+    board.getHand().remove(cardIndex);
+    this.points += playedCard.getEvaluator().apply(board);
+    return playedCard;
   }
 
   /**
