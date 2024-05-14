@@ -286,6 +286,27 @@ public class Lobby {
   }
 
   /**
+   * Gets a list of all the available token colors in the lobby
+   */
+  public List<TokenColor> getAvailableColors() {
+    return Arrays.stream(TokenColor.values())
+      .filter(
+        color ->
+          lobbyPlayers
+            .values()
+            .stream()
+            .noneMatch(
+              player ->
+                player
+                  .getTokenColor()
+                  .map(playerColor -> playerColor == color)
+                  .orElse(false)
+            )
+      )
+      .toList();
+  }
+
+  /**
    * @param socketId the socked ID of the player
    * @return the starter card of the player
    * @throws PlayerNotFoundException if the player is not found in the lobby

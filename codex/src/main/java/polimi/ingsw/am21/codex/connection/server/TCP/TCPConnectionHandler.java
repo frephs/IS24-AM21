@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayDeque;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.util.Pair;
@@ -24,7 +21,6 @@ import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableTokenColorsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
@@ -34,6 +30,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFou
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.AvailableTokenColorsMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -45,6 +42,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -223,9 +221,6 @@ public class TCPConnectionHandler implements Runnable {
       case GET_GAME_STATUS -> handleMessage((GetGameStatusMessage) message);
       case GET_AVAILABLE_GAME_LOBBIES -> handleMessage(
         (GetAvailableGameLobbiesMessage) message
-      );
-      case GET_AVAILABLE_TOKEN_COLORS -> handleMessage(
-        (GetAvailableTokenColorsMessage) message
       );
       case GET_OBJECTIVE_CARDS -> handleMessage(
         (GetObjectiveCardsMessage) message
@@ -416,7 +411,14 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getColor()
       );
+
+      List<TokenColor> availableColors = controller
+        .getGame(message.getLobbyId())
+        .getLobby()
+        .getAvailableColors();
+
       send(new ConfirmMessage());
+      broadcast(new AvailableTokenColorsMessage(availableColors), true);
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (TokenAlreadyTakenException e) {
@@ -438,16 +440,6 @@ public class TCPConnectionHandler implements Runnable {
 
   private void handleMessage(GetAvailableGameLobbiesMessage message) {
     send(new AvailableGameLobbiesMessage(controller.getGames()));
-  }
-
-  private void handleMessage(GetAvailableTokenColorsMessage message) {
-    try {
-      // TODO how do I get the available token colors?
-      // TODO also, do we need to remove this based on the peer review?
-      send(new AvailableTokenColorsMessage());
-    } catch (Exception e) {
-      // TODO handle exceptions based on controller call
-    }
   }
 
   private void handleMessage(GetObjectiveCardsMessage message) {
