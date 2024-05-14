@@ -7,10 +7,13 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class GoldCardFrontSide extends ResourceCardFrontSide {
 
@@ -99,5 +102,56 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
         )
         .reduce(true, (a, b) -> a && b);
     };
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  @Override
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    pointCondition.ifPresent(pointConditionType -> {
+      if (pointConditionType == PointConditionType.OBJECTS) {
+        pointConditionObject.ifPresent(
+          pointConditionObject ->
+            cardStringMap.put(
+              5,
+              StringUtils.center(
+                CliUtils.colorize(pointConditionObject, ColorStyle.BOLD, 1) +
+                "|" +
+                points,
+                4 +
+                CliUtils.getColorableLength(
+                  pointConditionObject,
+                  1,
+                  ColorStyle.BOLD
+                ),
+                ' '
+              )
+            )
+        );
+      } else if (pointConditionType == PointConditionType.CORNERS) {
+        cardStringMap.put(5, StringUtils.center("╔" + "|" + points, 5, ' '));
+      }
+    });
+
+    cardStringMap.put(
+      6,
+      CliUtils.colorizeAndCenter(
+        placementCondition,
+        5,
+        ' ',
+        ColorStyle.UNDERLINED
+      )
+    );
+    return super.cardToAscii(cardStringMap);
+  }
+
+  @Override
+  public String cardToString() {
+    // TODO: Implement TUI method
+    return "";
   }
 }

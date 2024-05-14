@@ -7,8 +7,9 @@ import polimi.ingsw.am21.codex.model.Cards.EdgePosition;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
-public class GeometricObjective extends Objective {
+public class GeometricObjective extends Objective implements CliCard {
 
   /**
    * The map of the adjacent card you need to reach the objective
@@ -67,5 +68,17 @@ public class GeometricObjective extends Objective {
         .mapToInt(element -> 1)
         .sum() *
       points;
+  }
+
+  @Override
+  public String cardToString() {
+    //TODO add cardToString implementation
+    return "";
+  }
+
+  @Override
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    //TODO add cardToAscii implementation
+    return "";
   }
 }
