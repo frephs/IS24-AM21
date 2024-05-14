@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -43,7 +44,7 @@ public class RMIConnectionHandler implements Remote {
   }
 
   public void joinLobby(String gameId, UUID connectionID)
-    throws RemoteException, GameNotFoundException, LobbyFullException {
+    throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
     this.controller.joinLobby(gameId, connectionID);
   }
 
@@ -51,7 +52,8 @@ public class RMIConnectionHandler implements Remote {
     String gameId,
     UUID connectionID,
     String username
-  ) throws NicknameAlreadyTakenException, GameNotFoundException {
+  )
+    throws NicknameAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException {
     this.controller.lobbySetNickname(gameId, connectionID, username);
   }
 
@@ -59,7 +61,7 @@ public class RMIConnectionHandler implements Remote {
     String gameId,
     UUID connectionID,
     TokenColor tokenColor
-  ) throws GameNotFoundException {
+  ) throws GameNotFoundException, GameAlreadyStartedException {
     this.controller.lobbySetTokenColor(gameId, connectionID, tokenColor);
   }
 
@@ -67,7 +69,7 @@ public class RMIConnectionHandler implements Remote {
     String gameId,
     UUID connectionID,
     Boolean isFirst
-  ) throws GameNotFoundException {
+  ) throws GameNotFoundException, GameAlreadyStartedException {
     this.controller.lobbyChooseObjective(gameId, connectionID, isFirst);
   }
 
@@ -76,7 +78,7 @@ public class RMIConnectionHandler implements Remote {
     UUID connectionID,
     CardSideType starterCardSize
   )
-    throws GameNotReadyException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException {
+    throws GameNotReadyException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException, GameAlreadyStartedException {
     this.controller.joinGame(gameId, connectionID, starterCardSize);
   }
 
