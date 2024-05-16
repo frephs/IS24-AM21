@@ -8,4 +8,9 @@ public class GameFullMessage extends ErrorMessage {
   public GameFullMessage() {
     super(MessageType.GAME_FULL);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

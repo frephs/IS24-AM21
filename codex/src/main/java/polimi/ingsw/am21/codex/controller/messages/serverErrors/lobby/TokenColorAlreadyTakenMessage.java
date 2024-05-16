@@ -8,4 +8,9 @@ public class TokenColorAlreadyTakenMessage extends ErrorMessage {
   public TokenColorAlreadyTakenMessage() {
     super(MessageType.TOKEN_COLOR_ALREADY_TAKEN);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

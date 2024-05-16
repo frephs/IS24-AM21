@@ -15,4 +15,9 @@ public class GetObjectiveCardsMessage extends RequestMessage {
   public String getGameId() {
     return gameId;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "gameId='" + gameId + '\'' + '}';
+  }
 }

@@ -17,4 +17,9 @@ public class AvailableTokenColorsMessage extends ViewUpdatingMessage {
   public List<TokenColor> getColors() {
     return colors;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "colors=" + colors + '}';
+  }
 }

@@ -16,4 +16,9 @@ public class ObjectiveCardsMessage extends ResponseMessage {
   public Pair<Integer, Integer> getIdPair() {
     return idPair;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "idPair=" + idPair + '}';
+  }
 }

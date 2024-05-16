@@ -21,4 +21,11 @@ public class SelectObjectiveMessage extends ActionMessage {
   public String getLobbyId() {
     return lobbyId;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() + "{" + "first=" + first + ", lobbyId='" + lobbyId + '\'' + '}'
+    );
+  }
 }

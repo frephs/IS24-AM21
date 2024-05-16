@@ -8,4 +8,9 @@ public class UnknownMessageTypeMessage extends ErrorMessage {
   public UnknownMessageTypeMessage() {
     super(MessageType.UNKNOWN_MESSAGE_TYPE);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

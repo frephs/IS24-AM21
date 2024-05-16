@@ -8,4 +8,9 @@ public class GetAvailableGameLobbiesMessage extends RequestMessage {
   public GetAvailableGameLobbiesMessage() {
     super(MessageType.GET_AVAILABLE_GAME_LOBBIES);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

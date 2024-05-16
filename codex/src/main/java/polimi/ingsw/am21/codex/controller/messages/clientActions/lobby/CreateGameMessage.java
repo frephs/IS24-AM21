@@ -21,4 +21,18 @@ public class CreateGameMessage extends ActionMessage {
   public int getPlayers() {
     return players;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "gameId='" +
+      gameId +
+      '\'' +
+      ", players=" +
+      players +
+      '}'
+    );
+  }
 }

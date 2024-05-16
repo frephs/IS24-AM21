@@ -34,4 +34,23 @@ public class PlaceCardMessage extends GameActionMessage {
   public Position getPosition() {
     return position;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "playerHandCardNumber=" +
+      playerHandCardNumber +
+      ", side=" +
+      side +
+      ", position=" +
+      position +
+      ", gameId='" +
+      getGameId() +
+      ", nickname='" +
+      getPlayerNickname() +
+      '}'
+    );
+  }
 }

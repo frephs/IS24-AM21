@@ -22,4 +22,11 @@ public class SetTokenColorMessage extends ActionMessage {
   public String getLobbyId() {
     return lobbyId;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() + "{" + "color=" + color + ", lobbyId='" + lobbyId + '\'' + '}'
+    );
+  }
 }

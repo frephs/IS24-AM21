@@ -17,4 +17,9 @@ public class AvailableGameLobbiesMessage extends ResponseMessage {
   public Set<String> getLobbyIds() {
     return lobbyIds;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "lobbyIds=" + lobbyIds + '}';
+  }
 }

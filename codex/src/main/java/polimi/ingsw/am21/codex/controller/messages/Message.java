@@ -11,6 +11,8 @@ public abstract class Message implements Serializable {
     this.type = type;
   }
 
+  public abstract String toString();
+
   public MessageType getType() {
     return this.type;
   }

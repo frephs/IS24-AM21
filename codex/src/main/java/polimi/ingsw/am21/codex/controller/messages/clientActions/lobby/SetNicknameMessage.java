@@ -21,4 +21,19 @@ public class SetNicknameMessage extends ActionMessage {
   public String getLobbyId() {
     return lobbyId;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "nickname='" +
+      nickname +
+      '\'' +
+      ", lobbyId='" +
+      lobbyId +
+      '\'' +
+      '}'
+    );
+  }
 }

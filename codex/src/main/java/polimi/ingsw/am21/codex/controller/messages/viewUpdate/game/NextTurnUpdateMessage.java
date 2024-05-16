@@ -1,11 +1,14 @@
 package polimi.ingsw.am21.codex.controller.messages.viewUpdate.game;
 
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
-import polimi.ingsw.am21.codex.controller.messages.clientActions.game.GameActionMessage;
+import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 
-public class NextTurnUpdateMessage extends GameActionMessage {
+public class NextTurnUpdateMessage extends ViewUpdatingMessage {
+
+  private final String gameId;
+  private final String nickname;
 
   private final DrawingCardSource cardSource;
   private final DrawingDeckType deck;
@@ -55,11 +58,21 @@ public class NextTurnUpdateMessage extends GameActionMessage {
     // TODO remove this and put it in its own message, so that it's not shared with every client
     Integer drawnCardId
   ) {
-    super(type, gameId, nickname);
+    super(type);
+    this.gameId = gameId;
+    this.nickname = nickname;
     this.cardSource = cardSource;
     this.deck = deck;
     this.isLastRound = isLastRound;
     this.drawnCardId = drawnCardId;
+  }
+
+  public String getGameId() {
+    return gameId;
+  }
+
+  public String getNickname() {
+    return nickname;
   }
 
   public DrawingCardSource getCardSource() {
@@ -76,5 +89,26 @@ public class NextTurnUpdateMessage extends GameActionMessage {
 
   public Integer getDrawnCardId() {
     return drawnCardId;
+  }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "gameId=" +
+      gameId +
+      ", nickname=" +
+      nickname +
+      "cardSource=" +
+      cardSource +
+      ", deck=" +
+      deck +
+      ", isLastRound=" +
+      isLastRound +
+      ", drawnCardId=" +
+      drawnCardId +
+      '}'
+    );
   }
 }

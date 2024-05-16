@@ -8,4 +8,9 @@ public class ActionNotAllowedMessage extends ErrorMessage {
   public ActionNotAllowedMessage() {
     super(MessageType.ACTION_NOT_ALLOWED);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

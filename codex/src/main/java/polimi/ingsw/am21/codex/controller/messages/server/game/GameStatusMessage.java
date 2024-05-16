@@ -16,4 +16,9 @@ public class GameStatusMessage extends ResponseMessage {
   public GameState getState() {
     return state;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "state=" + state + '}';
+  }
 }
