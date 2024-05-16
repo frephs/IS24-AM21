@@ -1,8 +1,7 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
@@ -18,12 +17,13 @@ public class LocalGameBoard {
   private Card secretObjective;
   private List<Card> hand;
 
-  private String playerNickname;
+  private int playerIndex;
 
-  private final Map<String, LocalPlayer> players = new HashMap<>();
+  private final List<LocalPlayer> players;
 
-  public LocalGameBoard(String gameId) {
+  public LocalGameBoard(String gameId, int players) {
     this.gameId = gameId;
+    this.players = new ArrayList<>(players);
   }
 
   public String getGameId() {
@@ -31,11 +31,11 @@ public class LocalGameBoard {
   }
 
   public String getPlayerNickname() {
-    return playerNickname;
+    return players.get(playerIndex).getNickname();
   }
 
-  public void setPlayerIndex(String playerNickname) {
-    this.playerNickname = playerNickname;
+  public void setPlayerIndex(int playerIndex) {
+    this.playerIndex = playerIndex;
   }
 
   public List<Card> getHand() {
@@ -70,7 +70,7 @@ public class LocalGameBoard {
     this.goldCards = goldCards;
   }
 
-  public Map<String, LocalPlayer> getPlayers() {
+  public List<LocalPlayer> getPlayers() {
     return players;
   }
 }

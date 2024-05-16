@@ -3,7 +3,6 @@ package polimi.ingsw.am21.codex.client.localModel;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
-
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -27,8 +26,16 @@ public class LocalPlayer {
     this.token = token;
   }
 
-  public void setPoints(int points) {
-    this.points = this.points+points;
+  public String getNickname() {
+    return nickname;
+  }
+
+  public TokenColor getToken() {
+    return token;
+  }
+
+  public void addPoints(int points) {
+    this.points = this.points + points;
   }
 
   public int getPoints() {
@@ -58,5 +65,4 @@ public class LocalPlayer {
   public EnumMap<ObjectType, Integer> getObjects() {
     return this.objects;
   }
-
 }
