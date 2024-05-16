@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.controller;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -160,7 +161,18 @@ public class GameController {
     game.addPlayer(newPlayer);
     listeners.forEach(
       listener ->
-        listener.playerJoinedGame(gameId, socketID, newPlayer.getNickname())
+        listener.playerJoinedGame(
+          gameId,
+          socketID,
+          newPlayer.getNickname(),
+          newPlayer.getToken(),
+          newPlayer
+            .getBoard()
+            .getHand()
+            .stream()
+            .map(PlayableCard::getId)
+            .collect(Collectors.toSet())
+        )
     );
     if (game.getPlayersSpotsLeft() == 0) {
       this.startGame(gameId, game);
@@ -269,7 +281,10 @@ public class GameController {
           playerHandCardNumber,
           playedCard.getId(),
           side,
-          position
+          position,
+          currentPlayer.getPoints(),
+          currentPlayer.getBoard().getResources(),
+          currentPlayer.getBoard().getObjects()
         )
     );
   }
