@@ -36,6 +36,7 @@ public class GameController {
 
   public GameController() {
     manager = new GameManager();
+    listeners = new ArrayList<>();
   }
 
   public Set<String> getGames() {

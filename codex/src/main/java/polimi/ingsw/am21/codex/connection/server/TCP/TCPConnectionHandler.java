@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -93,6 +94,11 @@ public class TCPConnectionHandler implements Runnable {
     Map<UUID, TCPConnectionHandler> activeHandlers
   ) {
     this.socket = socket;
+    try {
+      this.socket.setKeepAlive(true);
+    } catch (SocketException e) {
+      throw new RuntimeException("Failed to enable TCP/IP Keep-Alive", e);
+    }
     this.controller = controller;
     this.incomingMessages = new ArrayDeque<>();
     this.localExecutor = Executors.newCachedThreadPool();
@@ -100,8 +106,8 @@ public class TCPConnectionHandler implements Runnable {
     this.activeHandlers = activeHandlers;
 
     try {
-      this.inputStream = new ObjectInputStream(socket.getInputStream());
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+      this.inputStream = new ObjectInputStream(socket.getInputStream());
     } catch (IOException e) {
       throw new RuntimeException(
         "TCP connection handler initialization failed: can't get IO streams " +
@@ -112,6 +118,14 @@ public class TCPConnectionHandler implements Runnable {
 
   /** Runs the parser and handler threads */
   public void run() {
+    localExecutor.execute(() -> {
+      while (true) {
+        if (!socket.isConnected()) {
+          System.out.println("Connection closed. server");
+          break;
+        }
+      }
+    });
     startMessageParser();
     startMessageHandler();
   }
@@ -144,7 +158,7 @@ public class TCPConnectionHandler implements Runnable {
           incomingMessages.add((Message) receviedObject);
 
           incomingMessages.notifyAll();
-          incomingMessages.wait();
+          incomingMessages.wait(1);
         } catch (ClassNotFoundException e) {
           send(new UnknownMessageTypeMessage());
         } catch (IOException e) {
@@ -202,7 +216,7 @@ public class TCPConnectionHandler implements Runnable {
             socket.getInetAddress() +
             ". Closing connection."
           );
-          System.err.println(e.getMessage());
+          e.printStackTrace();
 
           closeConnection();
           break;
@@ -257,8 +271,6 @@ public class TCPConnectionHandler implements Runnable {
         WINNING_PLAYER,
         PLAYER_GAME_JOIN -> throw new NotAClientMessageException();
     }
-
-    System.out.println(message);
   }
 
   private void handleMessage(NextTurnActionMessage message) {
@@ -332,6 +344,7 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getPlayers()
       );
+      send(new ConfirmMessage());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }
@@ -481,13 +494,15 @@ public class TCPConnectionHandler implements Runnable {
   /** Sends a message synchronously to the client socket */
   public void send(Message message) {
     try {
-      // This thread lock is needed because the send method could be called
-      // by both the message handler thread and the controller (in case of a
-      // server push)
-      synchronized (outputStream) {
-        outputStream.writeObject(message);
-        outputStream.flush();
-        outputStream.reset();
+      if (socket.isConnected() && !socket.isClosed()) {
+        System.out.println("Sending " + message.getType() + " to " + socketId);
+        synchronized (outputStream) {
+          outputStream.writeObject(message);
+          outputStream.flush();
+          outputStream.reset();
+        }
+      } else {
+        System.err.println("Socket is not connected, cannot send message.");
       }
     } catch (IOException e) {
       System.err.println(
@@ -495,9 +510,9 @@ public class TCPConnectionHandler implements Runnable {
         message.getType() +
         " to " +
         socket.getInetAddress() +
-        ", closing socket."
+        ", closing socket. " +
+        e
       );
-
       closeConnection();
     }
   }

@@ -38,37 +38,36 @@ public class TCPConnectionServer {
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
       System.out.println("Starting TCP server on port " + port);
 
-      try (ServerSocket serverSocket = new ServerSocket(port)) {
-        System.out.println("TCP server ready on port " + port);
-        while (true) {
-          UUID socketId = UUID.randomUUID();
-          try {
-            Socket connectionSocket = serverSocket.accept();
-            System.out.println(
-              "Client connected from " + connectionSocket.getInetAddress()
-            );
+      ServerSocket serverSocket = new ServerSocket(port);
+      System.out.println("TCP server ready on port " + port);
+      while (true) {
+        UUID socketId = UUID.randomUUID();
+        try {
+          Socket connectionSocket = serverSocket.accept();
+          System.out.println(
+            "Client connected from " + connectionSocket.getInetAddress()
+          );
 
-            TCPConnectionHandler handler = new TCPConnectionHandler(
-              connectionSocket,
-              controller,
-              socketId,
-              activeHandlers
-            );
-            activeHandlers.put(socketId, handler);
+          TCPConnectionHandler handler = new TCPConnectionHandler(
+            connectionSocket,
+            controller,
+            socketId,
+            activeHandlers
+          );
+          activeHandlers.put(socketId, handler);
 
-            executor.execute(handler);
-          } catch (IOException error) {
-            // Socket has been closed
-            break;
-          }
+          executor.execute(handler);
+        } catch (IOException error) {
+          // Socket has been closed
+          break;
         }
-      } catch (IOException error) {
-        System.err.println("Can't start server on port " + port);
-        System.err.println(error.getMessage());
-
-        // Propagate the error so that the RMI client can be closed as well
-        throw new PortUnreachableException();
       }
-    } // No need to catch errors here
+    } catch (IOException error) {
+      System.err.println("Can't start server on port " + port);
+      System.err.println(error.getMessage());
+
+      // Propagate the error so that the RMI client can be closed as well
+      throw new PortUnreachableException();
+    }
   }
 }
