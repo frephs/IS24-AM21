@@ -32,6 +32,7 @@ public class RMIConnectionHandler implements Remote {
     this.controller = controller;
   }
 
+  //TODO add method check if game started
   public void setClient(GameEventListener eventListener) {
     this.controller.addListener(eventListener);
   }
