@@ -6,8 +6,9 @@ import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
-public class CountingObjective extends Objective {
+public class CountingObjective extends Objective implements CliCard {
 
   /**
    * The map of which resources and how many to complete the objective
@@ -55,5 +56,17 @@ public class CountingObjective extends Objective {
             .reduce(Integer::min)
             .orElse(0) *
           points));
+  }
+
+  @Override
+  public String cardToString() {
+    //TODO add cardToString implementation
+    return "";
+  }
+
+  @Override
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    //TODO add cardToString implementation
+    return "";
   }
 }

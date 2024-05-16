@@ -1,8 +1,10 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
-public enum ObjectType implements CornerContentType {
+public enum ObjectType implements CornerContentType, Colorable {
   QUILL,
   INKWELL,
   MANUSCRIPT;
@@ -34,5 +36,16 @@ public enum ObjectType implements CornerContentType {
   @Override
   public void acceptVisitor(CornerContentVisitor visitor, int arg) {
     visitor.visit(this, arg);
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  @Override
+  public Color getColor() {
+    return Color.YELLOW;
   }
 }
