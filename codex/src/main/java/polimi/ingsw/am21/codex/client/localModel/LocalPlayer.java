@@ -1,29 +1,48 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class LocalPlayer {
 
-  private String nickname;
+  private final String nickname;
+  private final TokenColor token;
   private int points;
+  private List<Card> hand;
 
-  private TokenColor token;
+  private final Map<ResourceType, Integer> resources = new EnumMap<>(
+    ResourceType.class
+  );
+  private final Map<ObjectType, Integer> objects = new EnumMap<>(
+    ObjectType.class
+  );
 
-  private EnumMap<ResourceType, Integer> resources;
-  private EnumMap<ObjectType, Integer> objects;
-  private Map<Position, Card> playedCards;
+  private Map<Position, Pair<Card, CardSideType>> playedCards;
 
-  public LocalPlayer(String nickname, TokenColor token) {
+  public LocalPlayer(String nickname, TokenColor token, List<Card> hand) {
     this.nickname = nickname;
     points = 0;
     this.token = token;
+    this.hand = hand;
+
+    Arrays.stream(ResourceType.values()).forEach(
+      resourceType -> resources.put(resourceType, 0)
+    );
+
+    Arrays.stream(ObjectType.values()).forEach(
+      objectType -> objects.put(objectType, 0)
+    );
+  }
+
+  public List<Card> getHand() {
+    return hand;
   }
 
   public String getNickname() {
@@ -34,19 +53,19 @@ public class LocalPlayer {
     return token;
   }
 
-  public void addPoints(int points) {
-    this.points = this.points + points;
+  public void setPoints(int points) {
+    this.points = points;
   }
 
   public int getPoints() {
     return points;
   }
 
-  public void addPlayedCards(Card card, Position position) {
-    this.playedCards.put(position, card);
+  public void addPlayedCards(Card card, CardSideType side, Position position) {
+    this.playedCards.put(position, new Pair<>(card, side));
   }
 
-  public Map<Position, Card> getPlayedCards() {
+  public Map<Position, Pair<Card, CardSideType>> getPlayedCards() {
     return this.playedCards;
   }
 
@@ -54,7 +73,7 @@ public class LocalPlayer {
     this.resources.put(resourceType, amount);
   }
 
-  public EnumMap<ResourceType, Integer> getResources() {
+  public Map<ResourceType, Integer> getResources() {
     return this.resources;
   }
 
@@ -62,7 +81,7 @@ public class LocalPlayer {
     this.objects.put(objectType, amount);
   }
 
-  public EnumMap<ObjectType, Integer> getObjects() {
+  public Map<ObjectType, Integer> getObjects() {
     return this.objects;
   }
 }
