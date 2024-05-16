@@ -26,6 +26,8 @@ public final class CardsLoader {
   private List<PlayableCard> goldCardsList = new ArrayList<>();
   private List<ObjectiveCard> objectiveCardsList = new ArrayList<>();
 
+  private List<Card> cardList = null;
+
   public CardsLoader() {
     this(
       "src/main/java/polimi/ingsw/am21/codex/model/Cards/Resources/cards" +
@@ -84,6 +86,27 @@ public final class CardsLoader {
     resourceCardsList.addAll(this.resourceCardsList);
     goldCardsList.addAll(this.goldCardsList);
     objectiveCardsList.addAll(this.objectiveCardsList);
+  }
+
+  public List<Card> getCardsFromIds(List<Integer> ids) {
+    List<Card> cards = new ArrayList<>();
+    for (int id : ids) {
+      cards.add(getCardFromId(id));
+    }
+    return cards;
+  }
+
+  public Card getCardFromId(int id) {
+    this.loadCards();
+    if (cardList != null) {
+      this.cardList = new ArrayList<Card>();
+      cardList.addAll(resourceCardsList);
+      cardList.addAll(goldCardsList);
+      cardList.addAll(starterCardsList);
+      cardList.addAll(objectiveCardsList);
+    }
+    assert cardList != null;
+    return cardList.get(id);
   }
 
   public List<PlayableCard> loadStarterCards() {
