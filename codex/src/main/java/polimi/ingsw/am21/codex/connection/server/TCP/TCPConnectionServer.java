@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -31,6 +32,9 @@ public class TCPConnectionServer {
    */
   private final TCPControllerListener controllerListener;
 
+  private ServerSocket serverSocket;
+  private final CountDownLatch serverReadyLatch;
+
   public TCPConnectionServer(Integer port, GameController controller) {
     this.port = port;
     this.controller = controller;
@@ -41,6 +45,7 @@ public class TCPConnectionServer {
         handler.send(message);
       }
     });
+    this.serverReadyLatch = new CountDownLatch(1);
   }
 
   public void start() throws PortUnreachableException {
@@ -51,7 +56,8 @@ public class TCPConnectionServer {
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
       System.out.println("Starting TCP server on port " + port);
 
-      ServerSocket serverSocket = new ServerSocket(port);
+      serverSocket = new ServerSocket(port);
+      serverReadyLatch.countDown();
       System.out.println("TCP server ready on port " + port);
       while (true) {
         UUID socketId = UUID.randomUUID();
@@ -84,5 +90,16 @@ public class TCPConnectionServer {
     } finally {
       controller.removeListener(controllerListener);
     }
+  }
+
+  public void stop() {
+    try {
+      serverSocket.close();
+    } catch (IOException ignored) {}
+    controller.removeListener(controllerListener);
+  }
+
+  public CountDownLatch getServerReadyLatch() {
+    return serverReadyLatch;
   }
 }
