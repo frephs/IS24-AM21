@@ -269,7 +269,7 @@ public class TCPConnectionHandler implements Runnable {
         PLAYER_SCORE_UPDATE,
         REMAINING_TURNS,
         WINNING_PLAYER,
-        PLAYER_GAME_JOIN -> throw new NotAClientMessageException();
+        PLAYER_JOINED_LOBBY -> throw new NotAClientMessageException();
     }
   }
 

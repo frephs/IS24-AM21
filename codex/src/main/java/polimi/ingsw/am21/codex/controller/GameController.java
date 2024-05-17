@@ -143,7 +143,9 @@ public class GameController {
   private void startGame(String gameId, Game game)
     throws GameNotReadyException, GameAlreadyStartedException {
     game.start();
-    listeners.forEach(listener -> listener.gameStarted(gameId));
+    listeners.forEach(
+      listener -> listener.gameStarted(gameId, game.getPlayerIds())
+    );
   }
 
   public void startGame(String gameId)
@@ -171,7 +173,7 @@ public class GameController {
             .getHand()
             .stream()
             .map(PlayableCard::getId)
-            .collect(Collectors.toSet())
+            .collect(Collectors.toList())
         )
     );
     if (game.getPlayersSpotsLeft() == 0) {
@@ -193,7 +195,7 @@ public class GameController {
     } catch (LobbyFullException ignored) {}
 
     listeners.forEach(listener -> {
-      listener.gameCreated(gameId);
+      listener.gameCreated(gameId, players);
     });
   }
 
@@ -278,6 +280,7 @@ public class GameController {
       listener ->
         listener.cardPlaced(
           gameId,
+          playerNickname,
           playerHandCardNumber,
           playedCard.getId(),
           side,

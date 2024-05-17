@@ -3,12 +3,12 @@ package polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 
-public class PlayerGameJoinMessage extends ViewUpdatingMessage {
+public class PlayerJoinedLobbyMessage extends ViewUpdatingMessage {
 
   private final int lobbyId;
 
-  public PlayerGameJoinMessage(int lobbyId) {
-    super(MessageType.PLAYER_GAME_JOIN);
+  public PlayerJoinedLobbyMessage(int lobbyId) {
+    super(MessageType.PLAYER_JOINED_LOBBY);
     this.lobbyId = lobbyId;
   }
 

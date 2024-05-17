@@ -211,6 +211,7 @@ public class LocalModelContainer implements GameEventListener {
   @Override
   public void cardPlaced(
     String gameId,
+    String playerId,
     Integer playerHandCardNumber,
     Integer cardId,
     CardSideType side,

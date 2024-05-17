@@ -145,6 +145,13 @@ public class Game {
   }
 
   /**
+   * Gets the nicknames of the players in the game.
+   */
+  public List<String> getPlayerIds() {
+    return this.players.stream().map(Player::getNickname).toList();
+  }
+
+  /**
    * Gets the index of current player.
    *
    * @return The index of current player.

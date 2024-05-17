@@ -49,6 +49,7 @@ public interface GameEventListener {
   /* current player placed a card */
   void cardPlaced(
     String gameId,
+    String playerId,
     Integer playerHandCardNumber,
     Integer cardId,
     CardSideType side,
