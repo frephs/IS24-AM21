@@ -83,9 +83,9 @@ public class GameController {
         game.drawObjectiveCardPair(),
         game.drawStarterCard()
       );
-      listeners.forEach(listener -> {
-        listener.playerJoinedLobby(gameId, socketID);
-      });
+      listeners.forEach(
+        listener -> listener.playerJoinedLobby(gameId, socketID)
+      );
     } catch (EmptyDeckException e) {
       throw new RuntimeException("EmptyDeckException");
     }
@@ -105,9 +105,9 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setToken(socketID, color);
-    listeners.forEach(listener -> {
-      listener.playerSetToken(gameId, socketID, color);
-    });
+    listeners.forEach(
+      listener -> listener.playerSetToken(gameId, socketID, color)
+    );
   }
 
   public void lobbySetNickname(String gameId, UUID socketID, String nickname)
@@ -120,9 +120,9 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setNickname(socketID, nickname);
-    listeners.forEach(listener -> {
-      listener.playerSetNickname(gameId, socketID, nickname);
-    });
+    listeners.forEach(
+      listener -> listener.playerSetNickname(gameId, socketID, nickname)
+    );
   }
 
   public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
@@ -135,9 +135,9 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setObjectiveCard(socketID, first);
-    listeners.forEach(listener -> {
-      listener.playerChoseObjectiveCard(gameId, socketID, first);
-    });
+    listeners.forEach(
+      listener -> listener.playerChoseObjectiveCard(gameId, socketID, first)
+    );
   }
 
   private void startGame(String gameId, Game game)
@@ -194,9 +194,7 @@ public class GameController {
         );
     } catch (LobbyFullException ignored) {}
 
-    listeners.forEach(listener -> {
-      listener.gameCreated(gameId, players);
-    });
+    listeners.forEach(listener -> listener.gameCreated(gameId, players));
   }
 
   public Boolean isLastRound(String gameId) throws GameNotFoundException {
@@ -205,9 +203,7 @@ public class GameController {
 
   public void deleteGame(String gameId) {
     manager.deleteGame(gameId);
-    listeners.forEach(listener -> {
-      listener.gameDeleted(gameId);
-    });
+    listeners.forEach(listener -> listener.gameDeleted(gameId));
   }
 
   private void checkIfCurrentPlayer(Game game, String playerNickname)
@@ -218,25 +214,15 @@ public class GameController {
     ) throw new PlayerNotActive();
   }
 
-  private void sendNextTurnEvents(String gameId, Game game) {
-    if (game.isLastRound()) {
-      listeners.forEach(
-        listener ->
-          listener.changeTurn(
-            gameId,
-            game.getCurrentPlayerIndex(),
-            game.isLastRound()
-          )
-      );
-    }
-  }
-
   public void nextTurn(String gameId, String playerNickname)
     throws GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     game.nextTurn();
-    this.sendNextTurnEvents(gameId, game);
+    listeners.forEach(
+      listener ->
+        listener.changeTurn(gameId, playerNickname, game.isLastRound())
+    );
   }
 
   public void nextTurn(
@@ -248,8 +234,23 @@ public class GameController {
     throws GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
-    game.nextTurn(drawingSource, deckType);
-    this.sendNextTurnEvents(gameId, game);
+    game.nextTurn(
+      drawingSource,
+      deckType,
+      (playerCardId, pairCardId) ->
+        listeners.forEach(
+          listener ->
+            listener.changeTurn(
+              gameId,
+              playerNickname,
+              game.isLastRound(),
+              drawingSource,
+              deckType,
+              playerCardId,
+              pairCardId
+            )
+        )
+    );
   }
 
   public void addListener(GameEventListener listener) {

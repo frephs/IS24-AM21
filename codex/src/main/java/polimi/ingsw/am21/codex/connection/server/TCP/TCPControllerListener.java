@@ -7,9 +7,9 @@ import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.GameCreatedMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.GameDeletedMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.GameStartedMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.PlayerJoinedGameMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -56,22 +56,28 @@ public class TCPControllerListener implements GameEventListener {
   @Override
   public void changeTurn(
     String gameId,
-    Integer nextPlayer,
+    String playerId,
+    Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Boolean isLastRound
+    Integer newPairCardId
   ) {
-    // TODO
+    broadcast.accept(
+      new NextTurnUpdateMessage(
+        gameId,
+        playerId,
+        source,
+        deck,
+        cardId,
+        newPairCardId
+      )
+    );
   }
 
   @Override
-  public void changeTurn(
-    String gameId,
-    Integer nextPlayer,
-    Boolean isLastRound
-  ) {
-    // TODO
+  public void changeTurn(String gameId, String playerId, Boolean isLastRound) {
+    broadcast.accept(new NextTurnUpdateMessage(gameId, playerId));
   }
 
   @Override
@@ -91,22 +97,22 @@ public class TCPControllerListener implements GameEventListener {
 
   @Override
   public void playerJoinedLobby(String gameId, UUID socketID) {
-    // TODO
+    broadcast.accept(new PlayerJoinedLobbyMessage(gameId, socketID));
   }
 
   @Override
   public void playerLeftLobby(String gameId, UUID socketID) {
-    // TODO
+    broadcast.accept(new PlayerLeftLobbyMessage(gameId, socketID));
   }
 
   @Override
   public void playerSetToken(String gameId, UUID socketID, TokenColor token) {
-    // TODO
+    broadcast.accept(new PlayerSetTokenColorMessage(gameId, socketID, token));
   }
 
   @Override
   public void playerSetNickname(String gameId, UUID socketID, String nickname) {
-    // TODO
+    broadcast.accept(new PlayerSetNicknameMessage(gameId, socketID, nickname));
   }
 
   @Override
@@ -115,7 +121,7 @@ public class TCPControllerListener implements GameEventListener {
     UUID socketID,
     Boolean isFirst
   ) {
-    // TODO
+    // TODO Do we need to add a broadcast message for this? Do other clients care?
   }
 
   @Override
@@ -126,6 +132,8 @@ public class TCPControllerListener implements GameEventListener {
     TokenColor color,
     List<Integer> handIDs
   ) {
-    // TODO
+    broadcast.accept(
+      new PlayerJoinedGameMessage(gameId, socketID, nickname, color, handIDs)
+    );
   }
 }

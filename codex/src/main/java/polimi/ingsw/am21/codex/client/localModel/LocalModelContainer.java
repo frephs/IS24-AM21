@@ -286,7 +286,7 @@ public class LocalModelContainer implements GameEventListener {
   @Override
   public void changeTurn(
     String gameId,
-    Integer nextPlayer,
+    String playerId,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
@@ -328,15 +328,12 @@ public class LocalModelContainer implements GameEventListener {
       deck.toString().toLowerCase() +
       ". "
     );
-    changeTurn(gameId, nextPlayer, isLastRound);
+
+    changeTurn(gameId, playerId, isLastRound);
   }
 
   @Override
-  public void changeTurn(
-    String gameId,
-    Integer nextPlayer,
-    Boolean isLastRound
-  ) {
+  public void changeTurn(String gameId, String playerId, Boolean isLastRound) {
     if (isLastRound) {
       view.postNotification(NotificationType.WARNING, "Last round of the game");
     }
@@ -345,6 +342,24 @@ public class LocalModelContainer implements GameEventListener {
       NotificationType.UPDATE,
       "It's" + localGameBoard.getCurrentPlayer().getNickname() + "'s turn. "
     );
-    localGameBoard.setCurrentPlayer(nextPlayer);
+
+    int nextPlayerIndex =
+      ((localGameBoard
+            .getPlayers()
+            .indexOf(
+              localGameBoard
+                .getPlayers()
+                .stream()
+                .filter(player -> player.getNickname().equals(playerId))
+                .findFirst()
+                .orElseThrow(() -> {
+                  // TODO replace with a better error?
+                  return new RuntimeException("No player found");
+                })
+            )) +
+        1) %
+      localGameBoard.getPlayers().size();
+
+    localGameBoard.setCurrentPlayer(nextPlayerIndex);
   }
 }

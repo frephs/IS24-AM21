@@ -14,13 +14,15 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
   private final DrawingDeckType deck;
   private final Boolean isLastRound;
   private final Integer drawnCardId;
+  private final Integer newPairCardId;
 
   public NextTurnUpdateMessage(
     String gameId,
     String nickname,
     DrawingCardSource cardSource,
     DrawingDeckType deck,
-    Integer cardId
+    Integer cardId,
+    Integer newPairCardId
   ) {
     this(
       MessageType.NEXT_TURN_UPDATE,
@@ -29,7 +31,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
       false,
       cardSource,
       deck,
-      cardId
+      cardId,
+      newPairCardId
     );
   }
 
@@ -39,6 +42,7 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
       gameId,
       nickname,
       true,
+      null,
       null,
       null,
       null
@@ -55,8 +59,9 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     Boolean isLastRound,
     DrawingCardSource cardSource,
     DrawingDeckType deck,
-    // TODO remove this and put it in its own message, so that it's not shared with every client
-    Integer drawnCardId
+    // TODO remove this and put it in its own message, so that it's not shared with every client?
+    Integer drawnCardId,
+    Integer newPairCardId
   ) {
     super(type);
     this.gameId = gameId;
@@ -65,6 +70,7 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     this.deck = deck;
     this.isLastRound = isLastRound;
     this.drawnCardId = drawnCardId;
+    this.newPairCardId = newPairCardId;
   }
 
   public String getGameId() {
@@ -89,6 +95,10 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
 
   public Integer getDrawnCardId() {
     return drawnCardId;
+  }
+
+  public Integer getNewPairCardId() {
+    return newPairCardId;
   }
 
   @Override

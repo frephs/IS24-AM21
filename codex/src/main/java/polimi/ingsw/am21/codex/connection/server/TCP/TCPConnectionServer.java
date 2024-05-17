@@ -26,13 +26,26 @@ public class TCPConnectionServer {
    */
   private final Map<UUID, TCPConnectionHandler> activeHandlers;
 
+  /**
+   * The listener for the controller associated to this server
+   */
+  private final TCPControllerListener controllerListener;
+
   public TCPConnectionServer(Integer port, GameController controller) {
     this.port = port;
     this.controller = controller;
     this.activeHandlers = new HashMap<>();
+
+    this.controllerListener = new TCPControllerListener(message -> {
+      for (TCPConnectionHandler handler : activeHandlers.values()) {
+        handler.send(message);
+      }
+    });
   }
 
   public void start() throws PortUnreachableException {
+    controller.addListener(controllerListener);
+
     // Using try-with-resources here will automatically shut down the executor if
     // no longer needed, as it implements the AutoCloseable interface.
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
@@ -68,6 +81,8 @@ public class TCPConnectionServer {
 
       // Propagate the error so that the RMI client can be closed as well
       throw new PortUnreachableException();
+    } finally {
+      controller.removeListener(controllerListener);
     }
   }
 }

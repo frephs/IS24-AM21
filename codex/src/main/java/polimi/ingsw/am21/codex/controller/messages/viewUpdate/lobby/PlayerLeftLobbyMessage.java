@@ -4,13 +4,13 @@ import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 
-public class PlayerJoinedLobbyMessage extends ViewUpdatingMessage {
+public class PlayerLeftLobbyMessage extends ViewUpdatingMessage {
 
   private final String lobbyId;
   private final UUID socketId;
 
-  public PlayerJoinedLobbyMessage(String lobbyId, UUID socketId) {
-    super(MessageType.PLAYER_JOINED_LOBBY);
+  public PlayerLeftLobbyMessage(String lobbyId, UUID socketId) {
+    super(MessageType.PLAYER_LEFT_LOBBY);
     this.lobbyId = lobbyId;
     this.socketId = socketId;
   }

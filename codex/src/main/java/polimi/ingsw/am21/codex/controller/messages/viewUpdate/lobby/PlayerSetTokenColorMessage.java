@@ -1,36 +1,37 @@
-package polimi.ingsw.am21.codex.controller.messages.viewUpdate.game;
+package polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby;
 
-import java.util.List;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
+public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
 
   private final String gameId;
   private final UUID socketId;
-  private final String nickname;
   private final TokenColor color;
-  private final List<Integer> handIDs;
 
-  public PlayerJoinedGameMessage(
-    String gameId,
+  public PlayerSetTokenColorMessage(
+    String gamedId,
     UUID socketId,
-    String nickname,
-    TokenColor color,
-    List<Integer> handIDs
+    TokenColor color
   ) {
-    super(MessageType.PLAYER_JOINED_GAME);
-    this.gameId = gameId;
+    super(MessageType.PLAYER_SET_TOKEN_COLOR);
+    this.gameId = gamedId;
     this.socketId = socketId;
-    this.nickname = nickname;
     this.color = color;
-    this.handIDs = handIDs;
   }
 
   public String getGameId() {
     return gameId;
+  }
+
+  public UUID getSocketId() {
+    return socketId;
+  }
+
+  public TokenColor getColor() {
+    return color;
   }
 
   @Override
@@ -38,17 +39,12 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
     return (
       getType() +
       "{" +
-      "gameId=" +
+      "gameId='" +
       gameId +
-      ", socketId=" +
+      "', socketId=" +
       socketId +
-      ", nickname='" +
-      nickname +
-      '\'' +
       ", color=" +
       color +
-      ", handIDs=" +
-      handIDs +
       '}'
     );
   }

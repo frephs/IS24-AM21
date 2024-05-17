@@ -31,7 +31,6 @@ public enum MessageType {
   NOT_A_CLIENT_MESSAGE,
   UNKNOWN_MESSAGE_TYPE,
 
-  // TODO update server handler for viewupdatingmessage
   CARD_PLACED,
   GAME_OVER,
   NEXT_TURN_UPDATE,
@@ -44,6 +43,7 @@ public enum MessageType {
   GAME_DELETED,
   GAME_STARTED,
   PLAYER_JOINED_LOBBY,
-  PLAYER_NICKNAME_SET,
-  TOKEN_COLOR_SET,
+  PLAYER_LEFT_LOBBY,
+  PLAYER_SET_NICKNAME,
+  PLAYER_SET_TOKEN_COLOR,
 }

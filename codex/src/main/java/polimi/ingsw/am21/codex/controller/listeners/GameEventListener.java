@@ -35,9 +35,12 @@ public interface GameEventListener {
 
   void gameStarted(String gameId, List<String> players);
 
+  /**
+   * @param playerId The player that has just finished their turn
+   */
   void changeTurn(
     String gameId,
-    Integer nextPlayer,
+    String playerId,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
@@ -45,7 +48,10 @@ public interface GameEventListener {
     Integer newPairCardId
   );
 
-  void changeTurn(String gameId, Integer nextPlayer, Boolean isLastRound);
+  /**
+   * @param playerId The player that has just finished their turn
+   */
+  void changeTurn(String gameId, String playerId, Boolean isLastRound);
 
   /* current player placed a card */
   void cardPlaced(

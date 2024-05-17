@@ -30,8 +30,6 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.AvailableTokenColorsMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -43,7 +41,6 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -247,29 +244,7 @@ public class TCPConnectionHandler implements Runnable {
       case GET_STARTER_CARD_SIDE -> handleMessage(
         (GetStarterCardSideMessage) message
       );
-      case CONFIRM,
-        GAME_STATUS,
-        TOKEN_COLOR_SET,
-        PLAYER_NICKNAME_SET,
-        AVAILABLE_GAME_LOBBIES,
-        AVAILABLE_TOKEN_COLORS,
-        OBJECTIVE_CARDS,
-        STARTER_CARD_SIDES,
-        INVALID_CARD_PLACEMENT,
-        GAME_FULL,
-        GAME_NOT_FOUND,
-        NICKNAME_ALREADY_TAKEN,
-        TOKEN_COLOR_ALREADY_TAKEN,
-        ACTION_NOT_ALLOWED,
-        NOT_A_CLIENT_MESSAGE,
-        UNKNOWN_MESSAGE_TYPE,
-        CARD_PLACED,
-        GAME_OVER,
-        NEXT_TURN_UPDATE,
-        PLAYER_SCORE_UPDATE,
-        REMAINING_TURNS,
-        WINNING_PLAYER,
-        PLAYER_JOINED_LOBBY -> throw new NotAClientMessageException();
+      default -> throw new NotAClientMessageException();
     }
   }
 
@@ -286,23 +261,6 @@ public class TCPConnectionHandler implements Runnable {
           message.getDeck()
         );
       }
-
-      PlayableCard drawnCard = controller
-        .getGame(message.getGameId())
-        .getPlayer(message.getPlayerNickname())
-        .getBoard()
-        .getHand()
-        .getLast();
-
-      broadcast(
-        new NextTurnUpdateMessage(
-          message.getGameId(),
-          message.getPlayerNickname(),
-          message.getCardSource(),
-          message.getDeck(),
-          drawnCard.getId()
-        )
-      );
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (
@@ -429,13 +387,8 @@ public class TCPConnectionHandler implements Runnable {
         message.getColor()
       );
 
-      List<TokenColor> availableColors = controller
-        .getGame(message.getLobbyId())
-        .getLobby()
-        .getAvailableColors();
-
       send(new ConfirmMessage());
-      broadcast(new AvailableTokenColorsMessage(availableColors), true);
+      // Broadcast of available colors triggered by controller emitter
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (TokenAlreadyTakenException e) {
