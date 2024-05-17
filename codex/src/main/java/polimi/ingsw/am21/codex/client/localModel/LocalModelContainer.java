@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.client.localModel;
 import java.util.*;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
@@ -286,31 +287,45 @@ public class LocalModelContainer implements GameEventListener {
   public void changeTurn(
     String gameId,
     Integer nextPlayer,
+    Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
-    Integer cardId,
-    Boolean isLastRound
+    Integer drawnCardId,
+    Integer newPairCardId
   ) {
-    Card newCard = cardsLoader.getCardFromId(cardId);
+    Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
 
-    localGameBoard.getCurrentPlayer().getHand().add(newCard);
-
+    localGameBoard.getCurrentPlayer().getHand().add(drawnCard);
     view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
-    if (
-      source == DrawingCardSource.CardPairFirstCard ||
-      source == DrawingCardSource.CardPairSecondCard
-    ) {
-      view.drawCardDraw(deck, newCard);
-    } else if (source == DrawingCardSource.Deck) {
-      view.drawCardDraw(deck);
+
+    switch (source) {
+      case CardPairFirstCard, CardPairSecondCard -> {
+        Card newPairCard = cardsLoader.getCardFromId(newPairCardId);
+        CardPair<Card> cardPairToUpdate =
+          switch (deck) {
+            case GOLD -> localGameBoard.getGoldCards();
+            case RESOURCE -> localGameBoard.getResourceCards();
+          };
+
+        switch (source) {
+          case CardPairFirstCard -> cardPairToUpdate.replaceFirst(newPairCard);
+          case CardPairSecondCard -> cardPairToUpdate.replaceSecond(
+            newPairCard
+          );
+        }
+
+        view.drawCardDraw(deck, newPairCard);
+      }
+      case Deck -> view.drawCardDraw(deck);
     }
 
     view.postNotification(
       NotificationType.UPDATE,
       localGameBoard.getCurrentPlayer().getNickname() +
       "has drawn a card from the " +
-      deck.toString().toLowerCase() +
       source.toString().toLowerCase() +
+      " " +
+      deck.toString().toLowerCase() +
       ". "
     );
     changeTurn(gameId, nextPlayer, isLastRound);

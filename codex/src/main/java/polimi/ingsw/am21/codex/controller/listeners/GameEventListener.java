@@ -38,10 +38,11 @@ public interface GameEventListener {
   void changeTurn(
     String gameId,
     Integer nextPlayer,
+    Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Boolean isLastRound
+    Integer newPairCardId
   );
 
   void changeTurn(String gameId, Integer nextPlayer, Boolean isLastRound);
