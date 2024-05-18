@@ -25,6 +25,7 @@ import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Set;
 import java.util.UUID;
 
 public class RMIClientConnectionHandler implements ClientConnectionHandler, Remote {
@@ -44,16 +45,25 @@ public class RMIClientConnectionHandler implements ClientConnectionHandler, Remo
   }
 
   @Override
-  public void listGames() throws RemoteException {
-    rmiConnectionHandler.getGames();
+  public void listGames() {
+    try{
+      rmiConnectionHandler.getGames();
+    } catch (RemoteException e) {
+
+    }
   }
 
   @Override
-  public void connectToGame(String gameId)
-  throws LobbyFullException, RemoteException, GameNotFoundException {
+  public void connectToGame(String gameId) {
     try{
       rmiConnectionHandler.joinLobby(gameId, this.index);
     } catch (GameAlreadyStartedException e) {
+
+    } catch (LobbyFullException e) {
+
+    } catch (RemoteException e) {
+
+    } catch (GameNotFoundException e) {
 
     }
   }
@@ -74,6 +84,11 @@ public class RMIClientConnectionHandler implements ClientConnectionHandler, Remo
   public void lobbySetToken(TokenColor color)
   throws GameAlreadyStartedException, GameNotFoundException {
     rmiConnectionHandler.lobbySetTokenColor(this.localGameBoard.getGameId(), this.index, color);
+  }
+
+  @Override
+  public Set<TokenColor> getTokens() {
+    return null;
   }
 
   @Override
@@ -113,6 +128,11 @@ public class RMIClientConnectionHandler implements ClientConnectionHandler, Remo
   public void nextTurn()
   throws PlayerNotActive, GameOverException, InvalidNextTurnCallException, RemoteException, GameNotFoundException {
     rmiConnectionHandler.nextTurn(localGameBoard.getGameId(), localPlayer.getNickname());
+  }
+
+  @Override
+  public GameState getGameState() {
+    return null;
   }
 
 }
