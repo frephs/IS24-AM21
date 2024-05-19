@@ -8,4 +8,9 @@ public class NicknameAlreadyTakenMessage extends ErrorMessage {
   public NicknameAlreadyTakenMessage() {
     super(MessageType.NICKNAME_ALREADY_TAKEN);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,8 +30,6 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.AvailableTokenColorsMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -42,7 +41,6 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -93,6 +91,11 @@ public class TCPConnectionHandler implements Runnable {
     Map<UUID, TCPConnectionHandler> activeHandlers
   ) {
     this.socket = socket;
+    try {
+      this.socket.setKeepAlive(true);
+    } catch (SocketException e) {
+      throw new RuntimeException("Failed to enable TCP/IP Keep-Alive", e);
+    }
     this.controller = controller;
     this.incomingMessages = new ArrayDeque<>();
     this.localExecutor = Executors.newCachedThreadPool();
@@ -100,8 +103,8 @@ public class TCPConnectionHandler implements Runnable {
     this.activeHandlers = activeHandlers;
 
     try {
-      this.inputStream = new ObjectInputStream(socket.getInputStream());
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+      this.inputStream = new ObjectInputStream(socket.getInputStream());
     } catch (IOException e) {
       throw new RuntimeException(
         "TCP connection handler initialization failed: can't get IO streams " +
@@ -112,6 +115,14 @@ public class TCPConnectionHandler implements Runnable {
 
   /** Runs the parser and handler threads */
   public void run() {
+    localExecutor.execute(() -> {
+      while (true) {
+        if (!socket.isConnected()) {
+          System.out.println("Connection closed. server");
+          break;
+        }
+      }
+    });
     startMessageParser();
     startMessageHandler();
   }
@@ -144,7 +155,7 @@ public class TCPConnectionHandler implements Runnable {
           incomingMessages.add((Message) receviedObject);
 
           incomingMessages.notifyAll();
-          incomingMessages.wait();
+          incomingMessages.wait(1);
         } catch (ClassNotFoundException e) {
           send(new UnknownMessageTypeMessage());
         } catch (IOException e) {
@@ -202,7 +213,7 @@ public class TCPConnectionHandler implements Runnable {
             socket.getInetAddress() +
             ". Closing connection."
           );
-          System.err.println(e.getMessage());
+          e.printStackTrace();
 
           closeConnection();
           break;
@@ -233,32 +244,8 @@ public class TCPConnectionHandler implements Runnable {
       case GET_STARTER_CARD_SIDE -> handleMessage(
         (GetStarterCardSideMessage) message
       );
-      case CONFIRM,
-        GAME_STATUS,
-        TOKEN_COLOR_SET,
-        PLAYER_NICKNAME_SET,
-        AVAILABLE_GAME_LOBBIES,
-        AVAILABLE_TOKEN_COLORS,
-        OBJECTIVE_CARDS,
-        STARTER_CARD_SIDES,
-        INVALID_CARD_PLACEMENT,
-        GAME_FULL,
-        GAME_NOT_FOUND,
-        NICKNAME_ALREADY_TAKEN,
-        TOKEN_COLOR_ALREADY_TAKEN,
-        ACTION_NOT_ALLOWED,
-        NOT_A_CLIENT_MESSAGE,
-        UNKNOWN_MESSAGE_TYPE,
-        CARD_PLACED,
-        GAME_OVER,
-        NEXT_TURN_UPDATE,
-        PLAYER_SCORE_UPDATE,
-        REMAINING_TURNS,
-        WINNING_PLAYER,
-        PLAYER_GAME_JOIN -> throw new NotAClientMessageException();
+      default -> throw new NotAClientMessageException();
     }
-
-    System.out.println(message);
   }
 
   private void handleMessage(NextTurnActionMessage message) {
@@ -274,23 +261,6 @@ public class TCPConnectionHandler implements Runnable {
           message.getDeck()
         );
       }
-
-      PlayableCard drawnCard = controller
-        .getGame(message.getGameId())
-        .getPlayer(message.getPlayerNickname())
-        .getBoard()
-        .getHand()
-        .getLast();
-
-      broadcast(
-        new NextTurnUpdateMessage(
-          message.getGameId(),
-          message.getPlayerNickname(),
-          message.getCardSource(),
-          message.getDeck(),
-          drawnCard.getId()
-        )
-      );
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (
@@ -332,6 +302,7 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getPlayers()
       );
+      send(new ConfirmMessage());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }
@@ -416,13 +387,8 @@ public class TCPConnectionHandler implements Runnable {
         message.getColor()
       );
 
-      List<TokenColor> availableColors = controller
-        .getGame(message.getLobbyId())
-        .getLobby()
-        .getAvailableColors();
-
       send(new ConfirmMessage());
-      broadcast(new AvailableTokenColorsMessage(availableColors), true);
+      // Broadcast of available colors triggered by controller emitter
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (TokenAlreadyTakenException e) {
@@ -481,13 +447,15 @@ public class TCPConnectionHandler implements Runnable {
   /** Sends a message synchronously to the client socket */
   public void send(Message message) {
     try {
-      // This thread lock is needed because the send method could be called
-      // by both the message handler thread and the controller (in case of a
-      // server push)
-      synchronized (outputStream) {
-        outputStream.writeObject(message);
-        outputStream.flush();
-        outputStream.reset();
+      if (socket.isConnected() && !socket.isClosed()) {
+        System.out.println("Sending " + message.getType() + " to " + socketId);
+        synchronized (outputStream) {
+          outputStream.writeObject(message);
+          outputStream.flush();
+          outputStream.reset();
+        }
+      } else {
+        System.err.println("Socket is not connected, cannot send message.");
       }
     } catch (IOException e) {
       System.err.println(
@@ -495,9 +463,9 @@ public class TCPConnectionHandler implements Runnable {
         message.getType() +
         " to " +
         socket.getInetAddress() +
-        ", closing socket."
+        ", closing socket. " +
+        e
       );
-
       closeConnection();
     }
   }

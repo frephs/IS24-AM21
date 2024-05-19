@@ -21,4 +21,19 @@ public class GameActionMessage extends ActionMessage {
   public String getPlayerNickname() {
     return nickname;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "gameId='" +
+      gameId +
+      '\'' +
+      ", nickname='" +
+      nickname +
+      '\'' +
+      '}'
+    );
+  }
 }

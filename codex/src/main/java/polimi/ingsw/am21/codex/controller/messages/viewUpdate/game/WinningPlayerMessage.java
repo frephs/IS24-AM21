@@ -5,9 +5,19 @@ import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 
 public class WinningPlayerMessage extends ViewUpdatingMessage {
 
-  public String winnerNickname;
+  private final String winnerNickname;
 
-  public WinningPlayerMessage() {
+  public WinningPlayerMessage(String winnerNickname) {
     super(MessageType.WINNING_PLAYER);
+    this.winnerNickname = winnerNickname;
+  }
+
+  public String getWinnerNickname() {
+    return winnerNickname;
+  }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "winnerNickname='" + winnerNickname + '\'' + '}';
   }
 }

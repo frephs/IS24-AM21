@@ -10,4 +10,9 @@ public class InvalidCardPlacementMessage extends ErrorMessage {
   public InvalidCardPlacementMessage() {
     super(MessageType.INVALID_CARD_PLACEMENT);
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "cardId=" + cardId + '}';
+  }
 }

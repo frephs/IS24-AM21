@@ -55,4 +55,23 @@ public class NextTurnActionMessage extends GameActionMessage {
   public Boolean isLastRound() {
     return isLastRound;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "cardSource=" +
+      cardSource +
+      ", deck=" +
+      deck +
+      ", isLastRound=" +
+      isLastRound +
+      ", gameId='" +
+      getGameId() +
+      ", nickname='" +
+      getPlayerNickname() +
+      '}'
+    );
+  }
 }

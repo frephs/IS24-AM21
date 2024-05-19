@@ -15,4 +15,9 @@ public class StarterCardSidesMessage extends ResponseMessage {
   public int getCardId() {
     return cardId;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "cardId=" + cardId + '}';
+  }
 }

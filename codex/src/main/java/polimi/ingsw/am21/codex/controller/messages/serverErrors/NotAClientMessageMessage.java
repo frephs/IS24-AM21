@@ -8,4 +8,9 @@ public class NotAClientMessageMessage extends ErrorMessage {
   public NotAClientMessageMessage() {
     super(MessageType.NOT_A_CLIENT_MESSAGE);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

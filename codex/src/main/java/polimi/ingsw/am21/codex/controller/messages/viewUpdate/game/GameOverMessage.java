@@ -8,4 +8,9 @@ public class GameOverMessage extends ViewUpdatingMessage {
   public GameOverMessage() {
     super(MessageType.GAME_OVER);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

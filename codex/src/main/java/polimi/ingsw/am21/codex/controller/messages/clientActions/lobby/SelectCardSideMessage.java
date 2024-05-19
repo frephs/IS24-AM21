@@ -22,4 +22,18 @@ public class SelectCardSideMessage extends ActionMessage {
   public CardSideType getCardSideType() {
     return cardSideType;
   }
+
+  @Override
+  public String toString() {
+    return (
+      getType() +
+      "{" +
+      "lobbyId='" +
+      lobbyId +
+      '\'' +
+      ", cardSideType=" +
+      cardSideType +
+      '}'
+    );
+  }
 }

@@ -8,4 +8,9 @@ public class GameNotFoundMessage extends ErrorMessage {
   public GameNotFoundMessage() {
     super(MessageType.GAME_NOT_FOUND);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

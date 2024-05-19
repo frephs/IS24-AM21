@@ -9,4 +9,9 @@ public class ConfirmMessage extends Message {
   public ConfirmMessage() {
     this(MessageType.CONFIRM);
   }
+
+  @Override
+  public String toString() {
+    return getType().toString();
+  }
 }

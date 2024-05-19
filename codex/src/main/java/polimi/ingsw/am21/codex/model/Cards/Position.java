@@ -42,4 +42,9 @@ public class Position {
   public int hashCode() {
     return 0; // TODO actually return something
   }
+
+  @Override
+  public String toString() {
+    return "Position{" + "x=" + x + ", y=" + y + '}';
+  }
 }

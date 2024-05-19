@@ -15,4 +15,9 @@ public class JoinLobbyMessage extends ActionMessage {
   public String getLobbyId() {
     return lobbyId;
   }
+
+  @Override
+  public String toString() {
+    return getType() + "{" + "lobbyId='" + lobbyId + '\'' + '}';
+  }
 }

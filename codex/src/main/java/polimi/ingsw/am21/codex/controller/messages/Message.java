@@ -4,11 +4,6 @@ import java.io.Serializable;
 
 public abstract class Message implements Serializable {
 
-  /**
-   * Describe the message to the client
-   */
-  private String message;
-
   private final MessageType type;
 
   public Message(MessageType type) {
@@ -16,10 +11,7 @@ public abstract class Message implements Serializable {
     this.type = type;
   }
 
-  @Override
-  public String toString() {
-    return "Message{" + "message='" + message + '\'' + '}';
-  }
+  public abstract String toString();
 
   public MessageType getType() {
     return this.type;

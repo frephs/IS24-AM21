@@ -15,14 +15,30 @@ public class LocalGameBoard {
   private CardPair<Card> resourceCards;
 
   private Card secretObjective;
-  private List<Card> hand;
+
+  private int playerNumber;
 
   private int playerIndex;
+
+  public LocalPlayer getCurrentPlayer() {
+    return players.get(currentPlayer);
+  }
+
+  public int getCurrentPlayerIndex() {
+    return currentPlayer;
+  }
+
+  public void setCurrentPlayer(int currentPlayer) {
+    this.currentPlayer = currentPlayer;
+  }
+
+  private int currentPlayer;
 
   private final List<LocalPlayer> players;
 
   public LocalGameBoard(String gameId, int players) {
     this.gameId = gameId;
+    this.playerNumber = players;
     this.players = new ArrayList<>(players);
   }
 
@@ -36,14 +52,6 @@ public class LocalGameBoard {
 
   public void setPlayerIndex(int playerIndex) {
     this.playerIndex = playerIndex;
-  }
-
-  public List<Card> getHand() {
-    return hand;
-  }
-
-  public void setHand(List<Card> hand) {
-    this.hand = hand;
   }
 
   public Card getSecretObjective() {

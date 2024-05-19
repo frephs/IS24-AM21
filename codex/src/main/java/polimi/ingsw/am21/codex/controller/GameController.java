@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.controller;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -36,6 +37,7 @@ public class GameController {
 
   public GameController() {
     manager = new GameManager();
+    listeners = new ArrayList<>();
   }
 
   public Set<String> getGames() {
@@ -81,9 +83,9 @@ public class GameController {
         game.drawObjectiveCardPair(),
         game.drawStarterCard()
       );
-      listeners.forEach(listener -> {
-        listener.playerJoinedLobby(gameId, socketID);
-      });
+      listeners.forEach(
+        listener -> listener.playerJoinedLobby(gameId, socketID)
+      );
     } catch (EmptyDeckException e) {
       throw new RuntimeException("EmptyDeckException");
     }
@@ -103,9 +105,9 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setToken(socketID, color);
-    listeners.forEach(listener -> {
-      listener.playerSetToken(gameId, socketID, color);
-    });
+    listeners.forEach(
+      listener -> listener.playerSetToken(gameId, socketID, color)
+    );
   }
 
   public void lobbySetNickname(String gameId, UUID socketID, String nickname)
@@ -118,9 +120,9 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setNickname(socketID, nickname);
-    listeners.forEach(listener -> {
-      listener.playerSetNickname(gameId, socketID, nickname);
-    });
+    listeners.forEach(
+      listener -> listener.playerSetNickname(gameId, socketID, nickname)
+    );
   }
 
   public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
@@ -133,15 +135,17 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setObjectiveCard(socketID, first);
-    listeners.forEach(listener -> {
-      listener.playerChoseObjectiveCard(gameId, socketID, first);
-    });
+    listeners.forEach(
+      listener -> listener.playerChoseObjectiveCard(gameId, socketID, first)
+    );
   }
 
   private void startGame(String gameId, Game game)
     throws GameNotReadyException, GameAlreadyStartedException {
     game.start();
-    listeners.forEach(listener -> listener.gameStarted(gameId));
+    listeners.forEach(
+      listener -> listener.gameStarted(gameId, game.getPlayerIds())
+    );
   }
 
   public void startGame(String gameId)
@@ -159,7 +163,18 @@ public class GameController {
     game.addPlayer(newPlayer);
     listeners.forEach(
       listener ->
-        listener.playerJoinedGame(gameId, socketID, newPlayer.getNickname())
+        listener.playerJoinedGame(
+          gameId,
+          socketID,
+          newPlayer.getNickname(),
+          newPlayer.getToken(),
+          newPlayer
+            .getBoard()
+            .getHand()
+            .stream()
+            .map(PlayableCard::getId)
+            .collect(Collectors.toList())
+        )
     );
     if (game.getPlayersSpotsLeft() == 0) {
       this.startGame(gameId, game);
@@ -179,9 +194,7 @@ public class GameController {
         );
     } catch (LobbyFullException ignored) {}
 
-    listeners.forEach(listener -> {
-      listener.gameCreated(gameId);
-    });
+    listeners.forEach(listener -> listener.gameCreated(gameId, players));
   }
 
   public Boolean isLastRound(String gameId) throws GameNotFoundException {
@@ -190,9 +203,7 @@ public class GameController {
 
   public void deleteGame(String gameId) {
     manager.deleteGame(gameId);
-    listeners.forEach(listener -> {
-      listener.gameDeleted(gameId);
-    });
+    listeners.forEach(listener -> listener.gameDeleted(gameId));
   }
 
   private void checkIfCurrentPlayer(Game game, String playerNickname)
@@ -203,25 +214,15 @@ public class GameController {
     ) throw new PlayerNotActive();
   }
 
-  private void sendNextTurnEvents(String gameId, Game game) {
-    if (game.isLastRound()) {
-      listeners.forEach(
-        listener ->
-          listener.changeTurn(
-            gameId,
-            game.getCurrentPlayerIndex(),
-            game.isLastRound()
-          )
-      );
-    }
-  }
-
   public void nextTurn(String gameId, String playerNickname)
     throws GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     game.nextTurn();
-    this.sendNextTurnEvents(gameId, game);
+    listeners.forEach(
+      listener ->
+        listener.changeTurn(gameId, playerNickname, game.isLastRound())
+    );
   }
 
   public void nextTurn(
@@ -233,8 +234,23 @@ public class GameController {
     throws GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
-    game.nextTurn(drawingSource, deckType);
-    this.sendNextTurnEvents(gameId, game);
+    game.nextTurn(
+      drawingSource,
+      deckType,
+      (playerCardId, pairCardId) ->
+        listeners.forEach(
+          listener ->
+            listener.changeTurn(
+              gameId,
+              playerNickname,
+              game.isLastRound(),
+              drawingSource,
+              deckType,
+              playerCardId,
+              pairCardId
+            )
+        )
+    );
   }
 
   public void addListener(GameEventListener listener) {
@@ -265,10 +281,14 @@ public class GameController {
       listener ->
         listener.cardPlaced(
           gameId,
+          playerNickname,
           playerHandCardNumber,
           playedCard.getId(),
           side,
-          position
+          position,
+          currentPlayer.getPoints(),
+          currentPlayer.getBoard().getResources(),
+          currentPlayer.getBoard().getObjects()
         )
     );
   }
