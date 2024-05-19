@@ -13,28 +13,26 @@ public class Server {
   RMIConnectionServer rmiServer;
   TCPConnectionServer tcpServer;
 
-  public Server(
-    String rmiHost,
-    Integer rmiPort,
-    Integer tcpPort,
-    GameController controller
-  ) {
+  Integer rmiPort;
+  Integer tcpPort;
+
+  public Server(Integer tcpPort, Integer rmiPort, GameController controller) {
+    this.tcpPort = tcpPort;
+    this.rmiPort = rmiPort;
     this.controller = controller;
-    //    this.rmiServer = new RMIConnectionServer(rmiHost, rmiPort, controller);
     this.tcpServer = new TCPConnectionServer(tcpPort, controller);
+    this.rmiServer = new RMIConnectionServer(rmiPort, controller);
   }
 
-  public Server(String rmiHost, Integer rmiPort, Integer tcpPort) {
-    this(rmiHost, rmiPort, tcpPort, new GameController());
-  }
-
-  public Server(Integer rmiPort, Integer tcpPort) {
-    this("//localhost/CodexServer", rmiPort, tcpPort);
+  public Server(Integer tcpPort, Integer rmiPort) {
+    this(tcpPort, rmiPort, new GameController());
   }
 
   public void start()
     throws MalformedURLException, RemoteException, PortUnreachableException {
-    //    this.rmiServer.start();
-    this.tcpServer.start();
+    //    System.out.println("Starting TCP server on port " + this.tcpPort);
+    //    this.tcpServer.start();
+    System.out.println("Starting RMI server on port " + this.rmiPort);
+    this.rmiServer.start();
   }
 }

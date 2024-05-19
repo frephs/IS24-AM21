@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.connection.server.RMI;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
@@ -25,43 +24,71 @@ import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
-public interface RMIConnectionHandler extends Remote {
-  public void setClient(GameEventListener eventListener) throws RemoteException;
+public class RMIConnectionHandlerImpl
+  extends UnicastRemoteObject
+  implements RMIConnectionHandler {
 
-  public Set<String> getGames() throws RemoteException;
+  GameController controller;
+
+  public RMIConnectionHandlerImpl(GameController controller)
+    throws RemoteException {
+    super();
+    this.controller = controller;
+  }
+
+  public void setClient(GameEventListener eventListener)
+    throws RemoteException {
+    this.controller.addListener(eventListener);
+  }
+
+  public Set<String> getGames() throws RemoteException {
+    return this.controller.getGames();
+  }
 
   public void joinLobby(String gameId, UUID connectionID)
-    throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException;
+    throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
+    this.controller.joinLobby(gameId, connectionID);
+  }
 
   public void lobbySetNickname(
     String gameId,
     UUID connectionID,
     String username
   )
-    throws RemoteException, NicknameAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException;
+    throws RemoteException, NicknameAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException {
+    this.controller.lobbySetNickname(gameId, connectionID, username);
+  }
 
   public void lobbySetTokenColor(
     String gameId,
     UUID connectionID,
     TokenColor tokenColor
   )
-    throws RemoteException, TokenAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException;
+    throws RemoteException, TokenAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException {
+    this.controller.lobbySetTokenColor(gameId, connectionID, tokenColor);
+  }
 
   public void lobbySetObjectiveCard(
     String gameId,
     UUID connectionID,
     Boolean isFirst
-  ) throws RemoteException, GameNotFoundException, GameAlreadyStartedException;
+  ) throws RemoteException, GameNotFoundException, GameAlreadyStartedException {
+    this.controller.lobbyChooseObjective(gameId, connectionID, isFirst);
+  }
 
   public void lobbyJoinGame(
     String gameId,
     UUID connectionID,
     CardSideType starterCardSize
   )
-    throws RemoteException, GameNotReadyException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException, GameAlreadyStartedException;
+    throws RemoteException, GameNotReadyException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException, GameAlreadyStartedException {
+    this.controller.joinGame(gameId, connectionID, starterCardSize);
+  }
 
   public void createGame(String gameId, UUID socketID, Integer players)
-    throws RemoteException, EmptyDeckException;
+    throws RemoteException, EmptyDeckException {
+    this.controller.createGame(gameId, socketID, players);
+  }
 
   public void placeCard(
     String gameId,
@@ -70,10 +97,20 @@ public interface RMIConnectionHandler extends Remote {
     CardSideType side,
     Position position
   )
-    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException;
+    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+    this.controller.placeCard(
+        gameId,
+        playerNickname,
+        playerHandCardNumber,
+        side,
+        position
+      );
+  }
 
   public void nextTurn(String gameId, String playerNickname)
-    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException;
+    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException {
+    this.controller.nextTurn(gameId, playerNickname);
+  }
 
   public void nextTurn(
     String gameId,
@@ -81,5 +118,7 @@ public interface RMIConnectionHandler extends Remote {
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
   )
-    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException;
+    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException {
+    this.controller.nextTurn(gameId, playerNickname, drawingSource, deckType);
+  }
 }
