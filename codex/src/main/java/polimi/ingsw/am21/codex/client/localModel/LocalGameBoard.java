@@ -8,7 +8,6 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 
 public class LocalGameBoard {
 
-  CardsLoader cardsLoader = new CardsLoader();
   private final String gameId;
 
   private CardPair<Card> goldCards;
@@ -18,6 +17,7 @@ public class LocalGameBoard {
 
   private int playerNumber;
 
+  private int currentPlayer;
   private int playerIndex;
 
   public LocalPlayer getCurrentPlayer() {
@@ -31,8 +31,6 @@ public class LocalGameBoard {
   public void setCurrentPlayer(int currentPlayer) {
     this.currentPlayer = currentPlayer;
   }
-
-  private int currentPlayer;
 
   private final List<LocalPlayer> players;
 
