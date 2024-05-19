@@ -7,6 +7,7 @@ public enum MessageType {
   CREATE_GAME,
 
   JOIN_LOBBY,
+  LEAVE_LOBBY,
   SELECT_OBJECTIVE,
   SELECT_CARD_SIDE,
   SET_NICKNAME,
