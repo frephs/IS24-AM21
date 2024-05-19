@@ -53,9 +53,10 @@ public interface ClientConnectionHandler {
     throws GameAlreadyStartedException, GameNotFoundException;
 
   /**
-   * @return the set of the token that are already taken
+   * @return the set of the token that are available
    */
-  Set<TokenColor> getTokens();
+
+  Set<TokenColor> getAvailableTokens();
 
   /**
    * @param nickname the nickname of the lobby player

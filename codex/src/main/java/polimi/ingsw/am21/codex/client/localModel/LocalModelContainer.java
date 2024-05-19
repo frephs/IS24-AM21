@@ -66,6 +66,14 @@ public class LocalModelContainer implements GameEventListener {
     view.drawAvailableGames(availableGames, localLobby.getPlayersPerGame());
   }
 
+  public String getGameId() {
+    return localGameBoard.getGameId();
+  }
+
+  public Set<TokenColor> getTokenColor() {
+    return localLobby.getAvailableTokens();
+  }
+
   @Override
   public void playerJoinedLobby(String gameId, UUID socketId) {
     if (socketId == this.socketId) {

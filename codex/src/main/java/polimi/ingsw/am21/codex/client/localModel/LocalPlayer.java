@@ -12,7 +12,7 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class LocalPlayer {
 
-  private final String nickname;
+  private String nickname;
   private final TokenColor token;
   private int points;
   private List<Card> hand;
@@ -26,11 +26,9 @@ public class LocalPlayer {
 
   private Map<Position, Pair<Card, CardSideType>> playedCards;
 
-  public LocalPlayer(String nickname, TokenColor token, List<Card> hand) {
-    this.nickname = nickname;
+  public LocalPlayer(TokenColor token) {
     points = 0;
     this.token = token;
-    this.hand = hand;
 
     Arrays.stream(ResourceType.values()).forEach(
       resourceType -> resources.put(resourceType, 0)
@@ -39,6 +37,13 @@ public class LocalPlayer {
     Arrays.stream(ObjectType.values()).forEach(
       objectType -> objects.put(objectType, 0)
     );
+  }
+
+  public void setNickname(String nickname) {
+    this.nickname = nickname;
+  }
+  public void setHand(List<Card> hand) {
+    this.hand = hand;
   }
 
   public List<Card> getHand() {

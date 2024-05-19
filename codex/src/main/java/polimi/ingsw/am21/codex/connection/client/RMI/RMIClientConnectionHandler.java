@@ -4,8 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Set;
 import java.util.UUID;
-import javafx.geometry.Pos;
-import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
+
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
@@ -27,13 +27,9 @@ import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.Set;
-import java.util.UUID;
-
-  private LocalGameBoard localGameBoard;
+public class RMIClientConnectionHandler implements Remote, ClientConnectionHandler{
   private LocalPlayer localPlayer;
+  private final LocalModelContainer localModelContainer;
   private final RMIConnectionHandler rmiConnectionHandler;
   private final UUID index;
 
@@ -43,14 +39,18 @@ import java.util.UUID;
   }
 
   @Override
-  public void connect() {}
+  public void connect() {
+    localModelContainer = new LocalModelContainer(this.index, new );
+  }
 
   @Override
   public void listGames() {
     try{
       rmiConnectionHandler.getGames();
+      //TODO add method to modify the local model
     } catch (RemoteException e) {
-
+      System.err.println("A remote exception occurred" + e.getMessage());
+      e.printStackTrace();
     }
   }
 
@@ -58,22 +58,42 @@ import java.util.UUID;
   public void connectToGame(String gameId) {
     try{
       rmiConnectionHandler.joinLobby(gameId, this.index);
+      localModelContainer.playerJoinedLobby(gameId, this.index);
     } catch (GameAlreadyStartedException e) {
-
+        System.err.println("The game already started" + e.getMessage());
+        localModelContainer.playerLeftLobby(gameId, this.index);
+        e.printStackTrace();
     } catch (LobbyFullException e) {
+        System.err.println("The lobby is full" + e.getMessage());
+        localModelContainer.playerLeftLobby(gameId, this.index);
+        e.printStackTrace();
+    } catch (GameNotFoundException e) {
+        System.err.println("The game was not found" + e.getMessage());
 
     } catch (RemoteException e) {
-
-    } catch (GameNotFoundException e) {
-
+        System.err.println("A remote exception occurred" + e.getMessage());
     }
   }
 
   @Override
   public void createAndConnectToGame(String gameId, int numberPlayers)
-    throws EmptyDeckException, RemoteException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException {
-    rmiConnectionHandler.createGame(gameId, this.index, numberPlayers);
-    rmiConnectionHandler.joinLobby(gameId, this.index);
+    throws EmptyDeckException, RemoteException, LobbyFullException, GameNotFoundException {
+    try {
+      rmiConnectionHandler.createGame(gameId, this.index, numberPlayers);
+      rmiConnectionHandler.joinLobby(gameId, this.index);
+      localModelContainer.gameCreated(gameId, numberPlayers);
+      localModelContainer.playerJoinedLobby(gameId, this.index);
+
+    } catch (GameAlreadyStartedException e) {
+      System.err.println("The game already started" + e.getMessage());
+    } catch (LobbyFullException e) {
+      System.err.println("The lobby is full" + e.getMessage());
+    } catch (GameNotFoundException e) {
+      System.err.println("The game was not found" + e.getMessage());
+    } catch (EmptyDeckException e) {
+      System.err.println("A remote exception occurred" + e.getMessage());
+    }
+
   }
 
   //TODO how can i know which game started and which no?
@@ -81,49 +101,66 @@ import java.util.UUID;
   public void checkIfGameStarted() throws RemoteException {}
 
   @Override
-  public void lobbySetToken(TokenColor color)
-    throws GameAlreadyStartedException, GameNotFoundException {
-    rmiConnectionHandler.lobbySetTokenColor(
-      this.localGameBoard.getGameId(),
-      this.index,
-      color
-    );
+  public void lobbySetToken(TokenColor color) {
+    try{
+      rmiConnectionHandler.lobbySetTokenColor(localModelContainer.getGameId(), this.index, color);
+      localModelContainer.playerSetToken(localModelContainer.getGameId(), this.index, color);
+      localPlayer = new LocalPlayer(color);
+    } catch (GameAlreadyStartedException e) {
+      System.err.println("The game already started" + e.getMessage());
+    } catch (GameNotFoundException e) {
+      System.err.println("The game was not found" + e.getMessage());
+    }
   }
 
   @Override
-  public Set<TokenColor> getTokens() {
-    return null;
+  public Set<TokenColor> getAvailableTokens() {
+    return localModelContainer.getTokenColor();
   }
 
   @Override
-  public void lobbySetNickname(String nickname)
-    throws GameAlreadyStartedException, NicknameAlreadyTakenException, GameNotFoundException {
-    rmiConnectionHandler.lobbySetNickname(
-      localGameBoard.getGameId(),
-      this.index,
-      nickname
-    );
+  public void lobbySetNickname(String nickname) {
+    try {
+      rmiConnectionHandler.lobbySetNickname(localModelContainer.getGameId(), this.index, nickname);
+      this.localPlayer.setNickname(nickname);
+    } catch (NicknameAlreadyTakenException e) {
+      System.err.println("Nickname already taken" + e.getNickname());
+    } catch (GameAlreadyStartedException e) {
+      System.err.println("The game already started" + e.getMessage());
+    } catch (GameNotFoundException e) {
+      System.err.println("The game was not found" + e.getMessage());
+    }
+  }
+  @Override
+  public void lobbyChooseObjectiveCard(Boolean first) {
+    try{
+      rmiConnectionHandler.lobbySetObjectiveCard(localModelContainer.getGameId(), this.index, first);
+      localModelContainer.playerChoseObjectiveCard(localModelContainer.getGameId(), , this.index, first);
+    } catch (GameAlreadyStartedException e) {
+      localModelContainer.playerLeftLobby(localModelContainer.getGameId(), this.index);
+    } catch (GameNotFoundException e) {
+      System.err.println("The game was not found");
+    }
   }
 
-  //TODO capire cosa cambia nell localGameBoard
   @Override
-  public void lobbyChooseObjectiveCard(Boolean first)
-    throws GameAlreadyStartedException, GameNotFoundException {
-    rmiConnectionHandler.lobbySetObjectiveCard(
-      localGameBoard.getGameId(),
-      this.index,
-      first
-    );
-  }
+  public void lobbyJoinGame(CardSideType cardSide) {
+    try {
+      rmiConnectionHandler.lobbyJoinGame(localModelContainer.getGameId(), this.index, cardSide);
+      localModelContainer.playerJoinedGame(localModelContainer.getGameId(), this.index, localPlayer.getNickname(), localPlayer.getToken(), );
+    } catch (GameNotReadyException e) {
 
-  @Override
-  public void lobbyJoinGame(CardSideType cardSide)
-    throws GameNotReadyException, GameAlreadyStartedException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException {
-    rmiConnectionHandler.lobbyJoinGame(
-      localGameBoard.getGameId(),
-      this.index,
-      cardSide
-    );
+    } catch (GameAlreadyStartedException e) {
+      localModelContainer.playerLeftLobby(localModelContainer.getGameId(), this.index);
+    } catch (EmptyDeckException e) {
+
+    } catch (IllegalCardSideChoiceException e) {
+
+    } catch (IllegalPlacingPositionException e) {
+
+    } catch (GameNotFoundException e) {
+
+    }
   }
 
   @Override
@@ -177,3 +214,4 @@ import java.util.UUID;
     return null;
   }
 }
+
