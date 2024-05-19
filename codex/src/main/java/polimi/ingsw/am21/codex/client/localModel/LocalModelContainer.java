@@ -46,27 +46,53 @@ public class LocalModelContainer
     view.postNotification(Notification.UNKNOWN_RESPONSE);
   }
 
-  @Override
-  public void gameCreated(String gameId, int players) {
-    //TODO add createGameMessage
+  public void listGames(
+    Set<String> gameIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
     Set<String> availableGames = localLobby.getAvailableGames();
+    Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
+    Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
+
+    if (gameIds.isEmpty()) {
+      view.postNotification(NotificationType.WARNING, "No games available");
+    } else {
+      availableGames.addAll(gameIds);
+      playerSlots.putAll(currentPlayers);
+      maxPlayerSlots.putAll(maxPlayers);
+    }
+    view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
+  }
+
+  @Override
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    Set<String> availableGames = localLobby.getAvailableGames();
+    Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
+    Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
+
     availableGames.add(gameId);
-    Map<String, Integer> playersPerGame = localLobby.getPlayersPerGame();
-    playersPerGame.put(gameId, players);
-    view.drawAvailableGames(availableGames, playersPerGame);
+    playerSlots.put(gameId, currentPlayers);
+    maxPlayerSlots.put(gameId, maxPlayers);
+
+    view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
   @Override
   public void gameDeleted(String gameId) {
-    // TODO add gameDeletedMessage
     Set<String> availableGames = localLobby.getAvailableGames();
+    Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
+    Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
+
     availableGames.remove(gameId);
-    Map<String, Integer> playersPerGame = localLobby.getPlayersPerGame();
-    playersPerGame.remove(gameId);
+    playerSlots.remove(gameId);
+    maxPlayerSlots.remove(gameId);
+
     view.postNotification(
       NotificationType.ERROR,
       "Game " + gameId + " not found. "
     );
+    view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
   @Override

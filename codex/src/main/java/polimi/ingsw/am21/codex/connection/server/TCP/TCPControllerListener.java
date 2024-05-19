@@ -91,8 +91,10 @@ public class TCPControllerListener implements GameEventListener {
   }
 
   @Override
-  public void gameCreated(String gameId, int players) {
-    broadcast.accept(new GameCreatedMessage(gameId, players));
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    broadcast.accept(
+      new GameCreatedMessage(gameId, currentPlayers, maxPlayers)
+    );
   }
 
   @Override

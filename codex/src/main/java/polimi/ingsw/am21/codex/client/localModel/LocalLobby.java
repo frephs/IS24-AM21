@@ -11,21 +11,27 @@ public class LocalLobby {
   private final Set<TokenColor> availableTokens = new HashSet<>(4);
   private final Set<String> availableGames = new HashSet<>();
 
-  private final Map<String, Integer> playersPerGame = new HashMap();
+  private Map<String, Integer> playerSlots = new HashMap();
+  private Map<String, Integer> maxPlayerSlots = new HashMap();
 
   private CardPair<Card> availableObjectives;
 
   private final List<UUID> players = new LinkedList<>();
   private final Map<UUID, String> nicknames = new HashMap<>();
   private final Map<UUID, TokenColor> tokens = new HashMap<>();
+
   private String gameId;
 
   LocalLobby(String gameId) {
     this.gameId = gameId;
   }
 
-  public Map<String, Integer> getPlayersPerGame() {
-    return playersPerGame;
+  public Map<String, Integer> getMaxPlayerSlots() {
+    return maxPlayerSlots;
+  }
+
+  public Map<String, Integer> getPlayerSlots() {
+    return playerSlots;
   }
 
   public Map<UUID, TokenColor> getTokens() {

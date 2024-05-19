@@ -11,7 +11,7 @@ import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface GameEventListener {
-  void gameCreated(String gameId, int players);
+  void gameCreated(String gameId, int currentPlayers, int maxPlayers);
 
   void gameDeleted(String gameId);
 

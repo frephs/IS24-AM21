@@ -202,7 +202,7 @@ public class GameController {
         );
     } catch (LobbyFullException ignored) {}
 
-    listeners.forEach(listener -> listener.gameCreated(gameId, players));
+    listeners.forEach(listener -> listener.gameCreated(gameId, 1, players));
   }
 
   public Boolean isLastRound(String gameId) throws GameNotFoundException {
