@@ -115,7 +115,7 @@ public class LocalModelContainer
       localLobby.getPlayers().remove(socketID);
       view.postNotification(
         NotificationType.UPDATE,
-        "Player" + socketID + " joined game " + gameId + ". "
+        "Player" + socketID + " left the game lobby " + gameId + ". "
       );
       Map<UUID, String> nicknames = localLobby.getNicknames();
       nicknames.remove(socketID);
