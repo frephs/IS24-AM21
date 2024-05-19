@@ -14,7 +14,8 @@ import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
-public class LocalModelContainer implements GameEventListener {
+public class LocalModelContainer
+  implements GameEventListener, GameErrorListener {
 
   private LocalGameBoard localGameBoard;
   private LocalLobby localLobby;
@@ -40,7 +41,10 @@ public class LocalModelContainer implements GameEventListener {
     this.socketId = socketId;
   }
 
-  // TODO add methods for getters (listers)
+  @Override
+  public void unknownResponse() {
+    view.postNotification(Notification.UNKNOWN_RESPONSE);
+  }
 
   @Override
   public void gameCreated(String gameId, int players) {
@@ -63,7 +67,14 @@ public class LocalModelContainer implements GameEventListener {
       NotificationType.ERROR,
       "Game " + gameId + " not found. "
     );
-    view.drawAvailableGames(availableGames, localLobby.getPlayersPerGame());
+  }
+
+  @Override
+  public void gameFull(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + gameId + " is full. "
+    );
   }
 
   @Override
@@ -137,6 +148,14 @@ public class LocalModelContainer implements GameEventListener {
       "Player " + socketID + " chose the nickname" + nickname + ". "
     );
     view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+  }
+
+  @Override
+  public void nicknameTaken(String nickname) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "The nickname " + nickname + " is already taken. "
+    );
   }
 
   @Override
