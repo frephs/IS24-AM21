@@ -307,6 +307,26 @@ public class Lobby {
   }
 
   /**
+   * Gets the information of all the players in the lobby.
+   *
+   * @return a map of the players' socket ID to their nickname and token color
+   */
+  public Map<UUID, Pair<String, TokenColor>> getPlayersInfo() {
+    Map<UUID, Pair<String, TokenColor>> playersInfo = new HashMap<>();
+    lobbyPlayers.forEach(
+      (socketId, playerBuilder) ->
+        playersInfo.put(
+          socketId,
+          new Pair<>(
+            playerBuilder.getNickname().orElse(null),
+            playerBuilder.getTokenColor().orElse(null)
+          )
+        )
+    );
+    return playersInfo;
+  }
+
+  /**
    * @param socketId the socked ID of the player
    * @return the starter card of the player
    * @throws PlayerNotFoundException if the player is not found in the lobby

@@ -22,6 +22,7 @@ import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
@@ -317,7 +318,11 @@ public class TCPConnectionHandler implements Runnable {
   private void handleMessage(JoinLobbyMessage message) {
     try {
       controller.joinLobby(message.getLobbyId(), socketId);
-      send(new ConfirmMessage());
+      send(
+        new LobbyStatusMessage(
+          controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
+        )
+      );
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (LobbyFullException e) {
