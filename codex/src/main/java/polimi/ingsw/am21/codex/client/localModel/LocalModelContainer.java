@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
+import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -14,7 +15,8 @@ import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
-public class LocalModelContainer implements GameEventListener {
+public class LocalModelContainer
+  implements GameEventListener, GameErrorListener {
 
   private LocalGameBoard localGameBoard;
   private LocalLobby localLobby;
@@ -40,30 +42,66 @@ public class LocalModelContainer implements GameEventListener {
     this.socketId = socketId;
   }
 
-  // TODO add methods for getters (listers)
+  @Override
+  public void unknownResponse() {
+    view.postNotification(Notification.UNKNOWN_RESPONSE);
+  }
+
+  public void listGames(
+    Set<String> gameIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
+    Set<String> availableGames = localLobby.getAvailableGames();
+    Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
+    Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
+
+    if (gameIds.isEmpty()) {
+      view.postNotification(NotificationType.WARNING, "No games available");
+    } else {
+      availableGames.addAll(gameIds);
+      playerSlots.putAll(currentPlayers);
+      maxPlayerSlots.putAll(maxPlayers);
+    }
+    view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
+  }
 
   @Override
-  public void gameCreated(String gameId, int players) {
-    //TODO add createGameMessage
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
     Set<String> availableGames = localLobby.getAvailableGames();
+    Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
+    Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
+
     availableGames.add(gameId);
-    Map<String, Integer> playersPerGame = localLobby.getPlayersPerGame();
-    playersPerGame.put(gameId, players);
-    view.drawAvailableGames(availableGames, playersPerGame);
+    playerSlots.put(gameId, currentPlayers);
+    maxPlayerSlots.put(gameId, maxPlayers);
+
+    view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
   @Override
   public void gameDeleted(String gameId) {
-    // TODO add gameDeletedMessage
     Set<String> availableGames = localLobby.getAvailableGames();
+    Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
+    Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
+
     availableGames.remove(gameId);
-    Map<String, Integer> playersPerGame = localLobby.getPlayersPerGame();
-    playersPerGame.remove(gameId);
+    playerSlots.remove(gameId);
+    maxPlayerSlots.remove(gameId);
+
     view.postNotification(
       NotificationType.ERROR,
       "Game " + gameId + " not found. "
     );
-    view.drawAvailableGames(availableGames, localLobby.getPlayersPerGame());
+    view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
+  }
+
+  @Override
+  public void gameFull(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + gameId + " is full. "
+    );
   }
 
   public String getGameId() {
@@ -80,7 +118,7 @@ public class LocalModelContainer implements GameEventListener {
       localLobby = new LocalLobby(gameId);
       localGameBoard = new LocalGameBoard(
         gameId,
-        localLobby.getPlayersPerGame().get(gameId)
+        localLobby.getMaxPlayerSlots().get(gameId)
       );
 
       localLobby.getPlayers().add(this.socketId);
@@ -98,6 +136,10 @@ public class LocalModelContainer implements GameEventListener {
     }
   }
 
+  public void playerLeftLobby() {
+    playerLeftLobby(localLobby.getGameId(), this.socketId);
+  }
+
   @Override
   public void playerLeftLobby(String gameId, UUID socketID) {
     if (socketID == this.socketId) {
@@ -112,7 +154,7 @@ public class LocalModelContainer implements GameEventListener {
       localLobby.getPlayers().remove(socketID);
       view.postNotification(
         NotificationType.UPDATE,
-        "Player" + socketID + " joined game " + gameId + ". "
+        "Player" + socketID + " left the game lobby " + gameId + ". "
       );
       Map<UUID, String> nicknames = localLobby.getNicknames();
       nicknames.remove(socketID);
@@ -120,6 +162,10 @@ public class LocalModelContainer implements GameEventListener {
       tokens.remove(socketID);
       view.drawLobby(tokens, nicknames);
     }
+  }
+
+  public void playerSetToken(TokenColor color) {
+    playerSetToken(localLobby.getGameId(), this.socketId, color);
   }
 
   @Override
@@ -139,12 +185,41 @@ public class LocalModelContainer implements GameEventListener {
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
+  public void tokenTaken(TokenColor token) {
     view.postNotification(
-      NotificationType.UPDATE,
-      "Player " + socketID + " chose the nickname" + nickname + ". "
+      NotificationType.ERROR,
+      new String[] { "The", "token is already taken" },
+      token,
+      2
     );
+  }
+
+  public void playerSetNickname(String nickname) {
+    this.playerSetNickname(localLobby.getGameId(), this.socketId, nickname);
+  }
+
+  @Override
+  public void playerSetNickname(String gameId, UUID socketId, String nickname) {
+    if (this.socketId.equals(socketId)) {
+      view.postNotification(
+        NotificationType.UPDATE,
+        "You chose the nickname" + nickname + ". "
+      );
+    } else {
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Player " + socketId + " chose the nickname" + nickname + ". "
+      );
+    }
     view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+  }
+
+  @Override
+  public void nicknameTaken(String nickname) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "The nickname " + nickname + " is already taken. "
+    );
   }
 
   @Override
@@ -227,7 +302,9 @@ public class LocalModelContainer implements GameEventListener {
     Position position,
     int newPlayerScore,
     Map<ResourceType, Integer> updatedResources,
-    Map<ObjectType, Integer> updatedObjects
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {
     Card card = cardsLoader.getCardFromId(cardId);
     localGameBoard.getCurrentPlayer().addPlayedCards(card, side, position);
@@ -258,6 +335,9 @@ public class LocalModelContainer implements GameEventListener {
 
     localGameBoard.getCurrentPlayer().getResources().putAll(updatedResources);
     localGameBoard.getCurrentPlayer().getObjects().putAll(updatedObjects);
+
+    localGameBoard.getCurrentPlayer().setAvailableSpots(availablePositions);
+    localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenPositions);
 
     view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
   }

@@ -22,6 +22,7 @@ import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
@@ -30,6 +31,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -316,7 +318,11 @@ public class TCPConnectionHandler implements Runnable {
   private void handleMessage(JoinLobbyMessage message) {
     try {
       controller.joinLobby(message.getLobbyId(), socketId);
-      send(new ConfirmMessage());
+      send(
+        new LobbyStatusMessage(
+          controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
+        )
+      );
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage());
     } catch (LobbyFullException e) {
@@ -409,7 +415,13 @@ public class TCPConnectionHandler implements Runnable {
   }
 
   private void handleMessage(GetAvailableGameLobbiesMessage message) {
-    send(new AvailableGameLobbiesMessage(controller.getGames()));
+    send(
+      new AvailableGameLobbiesMessage(
+        controller.getGames(),
+        controller.getCurrentSlots(),
+        controller.getMaxSlots()
+      )
+    );
   }
 
   private void handleMessage(GetObjectiveCardsMessage message) {

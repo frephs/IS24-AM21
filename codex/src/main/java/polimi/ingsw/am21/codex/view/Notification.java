@@ -1,9 +1,9 @@
 package polimi.ingsw.am21.codex.view;
 
 public enum Notification {
-  CONNECTION_ENSTABLISHED(
+  CONNECTION_ESTABLISHED(
     NotificationType.RESPONSE,
-    "Connection was enstablished"
+    "Connection was established"
   ),
   CONNECTION_FAILED(NotificationType.ERROR, "Connection not available"),
   MESSAGE_NOT_SENT(NotificationType.ERROR, "The message was not sent"),

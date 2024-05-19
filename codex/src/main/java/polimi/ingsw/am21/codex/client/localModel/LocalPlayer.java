@@ -24,6 +24,9 @@ public class LocalPlayer {
     ObjectType.class
   );
 
+  private Set<Position> availableSpots;
+  private Set<Position> forbiddenSpots;
+
   private Map<Position, Pair<Card, CardSideType>> playedCards;
 
   public LocalPlayer(TokenColor token) {
@@ -88,5 +91,21 @@ public class LocalPlayer {
 
   public Map<ObjectType, Integer> getObjects() {
     return this.objects;
+  }
+
+  public Set<Position> getAvailableSpots() {
+    return availableSpots;
+  }
+
+  public void setAvailableSpots(Set<Position> availableSpots) {
+    this.availableSpots = availableSpots;
+  }
+
+  public Set<Position> getForbiddenSpots() {
+    return forbiddenSpots;
+  }
+
+  public void setForbiddenSpots(Set<Position> forbiddenSpots) {
+    this.forbiddenSpots = forbiddenSpots;
   }
 }

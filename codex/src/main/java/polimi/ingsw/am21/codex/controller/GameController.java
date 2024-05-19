@@ -44,6 +44,14 @@ public class GameController {
     return manager.getGames();
   }
 
+  public Map<String, Integer> getCurrentSlots() {
+    return manager.getCurrentSlots();
+  }
+
+  public Map<String, Integer> getMaxSlots() {
+    return manager.getMaxSlots();
+  }
+
   public Game getGame(String gameId) throws GameNotFoundException {
     return manager.getGame(gameId).orElseThrow(GameNotFoundException::new);
   }
@@ -194,7 +202,7 @@ public class GameController {
         );
     } catch (LobbyFullException ignored) {}
 
-    listeners.forEach(listener -> listener.gameCreated(gameId, players));
+    listeners.forEach(listener -> listener.gameCreated(gameId, 1, players));
   }
 
   public Boolean isLastRound(String gameId) throws GameNotFoundException {
@@ -288,7 +296,9 @@ public class GameController {
           position,
           currentPlayer.getPoints(),
           currentPlayer.getBoard().getResources(),
-          currentPlayer.getBoard().getObjects()
+          currentPlayer.getBoard().getObjects(),
+          currentPlayer.getBoard().getAvailableSpots(),
+          currentPlayer.getBoard().getForbiddenSpots()
         )
     );
   }

@@ -36,6 +36,11 @@ public interface ClientConnectionHandler {
     throws LobbyFullException, RemoteException, GameNotFoundException;
 
   /**
+   * leaves the game the player has joined, if any
+   * */
+  void leaveGameLobby();
+
+  /**
    * @param gameId the id of the game create and connect to
    */
   void createAndConnectToGame(String gameId, int numberPlayers)

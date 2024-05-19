@@ -23,6 +23,30 @@ public class GameManager {
       .collect(Collectors.toSet());
   }
 
+  public Map<String, Integer> getCurrentSlots() {
+    Map<String, Integer> currentPlayers = new HashMap<>();
+    games
+      .keySet()
+      .forEach(key -> {
+        currentPlayers.put(
+          key,
+          games.get(key).getMaxPlayers() -
+          games.get(key).getLobby().getRemainingPlayerSlots()
+        );
+      });
+    return currentPlayers;
+  }
+
+  public Map<String, Integer> getMaxSlots() {
+    Map<String, Integer> maxSlots = new HashMap<>();
+    games
+      .keySet()
+      .forEach(key -> {
+        maxSlots.put(key, games.get(key).getMaxPlayers());
+      });
+    return maxSlots;
+  }
+
   public Optional<Game> getGame(String gameName) {
     return Optional.ofNullable(games.get(gameName));
   }

@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.connection.server.TCP;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
@@ -36,7 +37,9 @@ public class TCPControllerListener implements GameEventListener {
     Position position,
     int newPlayerScore,
     Map<ResourceType, Integer> updatedResources,
-    Map<ObjectType, Integer> updatedObjects
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) {
     broadcast.accept(
       new CardPlacedMessage(
@@ -48,7 +51,9 @@ public class TCPControllerListener implements GameEventListener {
         position,
         newPlayerScore,
         updatedResources,
-        updatedObjects
+        updatedObjects,
+        availableSpots,
+        forbiddenSpots
       )
     );
   }
@@ -86,8 +91,10 @@ public class TCPControllerListener implements GameEventListener {
   }
 
   @Override
-  public void gameCreated(String gameId, int players) {
-    broadcast.accept(new GameCreatedMessage(gameId, players));
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    broadcast.accept(
+      new GameCreatedMessage(gameId, currentPlayers, maxPlayers)
+    );
   }
 
   @Override

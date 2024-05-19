@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.controller.messages.viewUpdate.game;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
@@ -20,6 +21,8 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
   private final int newPlayerScore;
   private final Map<ResourceType, Integer> updatedResources;
   private final Map<ObjectType, Integer> updatedObjects;
+  private final Set<Position> availableSpots;
+  private final Set<Position> forbiddenSpots;
 
   public CardPlacedMessage(
     String gameId,
@@ -30,7 +33,9 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
     Position position,
     int newPlayerScore,
     Map<ResourceType, Integer> updatedResources,
-    Map<ObjectType, Integer> updatedObjects
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {
     super(MessageType.CARD_PLACED);
     this.gameId = gameId;
@@ -46,6 +51,8 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
     this.updatedObjects = updatedObjects == null
       ? Map.of()
       : new HashMap<>(updatedObjects);
+    this.availableSpots = availablePositions;
+    this.forbiddenSpots = forbiddenPositions;
   }
 
   public String getGameId() {
@@ -84,6 +91,14 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
     return updatedObjects;
   }
 
+  public Set<Position> getAvailableSpots() {
+    return availableSpots;
+  }
+
+  public Set<Position> getForbiddenSpots() {
+    return forbiddenSpots;
+  }
+
   @Override
   public String toString() {
     return (
@@ -109,6 +124,10 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
       updatedResources +
       ", updatedObjects=" +
       updatedObjects +
+      ", availablePositions=" +
+      availableSpots +
+      ", forbiddenPositions=" +
+      forbiddenSpots +
       '}'
     );
   }
