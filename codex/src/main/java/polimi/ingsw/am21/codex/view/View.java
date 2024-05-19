@@ -27,7 +27,11 @@ public interface View {
   );
 
   // lobby
-  void drawAvailableGames(Set<String> gameIds, Map<String, Integer> players);
+  void drawAvailableGames(
+    Set<String> gameIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  );
 
   void drawAvailableTokenColors(Set<TokenColor> tokenColors);
 

@@ -44,6 +44,14 @@ public class GameController {
     return manager.getGames();
   }
 
+  public Map<String, Integer> getCurrentSlots() {
+    return manager.getCurrentSlots();
+  }
+
+  public Map<String, Integer> getMaxSlots() {
+    return manager.getMaxSlots();
+  }
+
   public Game getGame(String gameId) throws GameNotFoundException {
     return manager.getGame(gameId).orElseThrow(GameNotFoundException::new);
   }

@@ -30,6 +30,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -409,7 +410,13 @@ public class TCPConnectionHandler implements Runnable {
   }
 
   private void handleMessage(GetAvailableGameLobbiesMessage message) {
-    send(new AvailableGameLobbiesMessage(controller.getGames()));
+    send(
+      new AvailableGameLobbiesMessage(
+        controller.getGames(),
+        controller.getCurrentSlots(),
+        controller.getMaxSlots()
+      )
+    );
   }
 
   private void handleMessage(GetObjectiveCardsMessage message) {
