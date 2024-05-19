@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
+import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -109,7 +110,7 @@ public class LocalModelContainer
       localLobby = new LocalLobby(gameId);
       localGameBoard = new LocalGameBoard(
         gameId,
-        localLobby.getPlayersPerGame().get(gameId)
+        localLobby.getMaxPlayerSlots().get(gameId)
       );
 
       localLobby.getPlayers().add(this.socketId);
@@ -125,6 +126,10 @@ public class LocalModelContainer
         "Player" + socketId + " joined game " + gameId
       );
     }
+  }
+
+  public void playerLeftLobby() {
+    playerLeftLobby(localLobby.getGameId(), this.socketId);
   }
 
   @Override
@@ -151,6 +156,10 @@ public class LocalModelContainer
     }
   }
 
+  public void playerSetToken(TokenColor color) {
+    playerSetToken(localLobby.getGameId(), this.socketId, color);
+  }
+
   @Override
   public void playerSetToken(String gameId, UUID socketID, TokenColor token) {
     Set<TokenColor> availableTokens = localLobby.getAvailableTokens();
@@ -168,11 +177,32 @@ public class LocalModelContainer
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
+  public void tokenTaken(TokenColor token) {
     view.postNotification(
-      NotificationType.UPDATE,
-      "Player " + socketID + " chose the nickname" + nickname + ". "
+      NotificationType.ERROR,
+      new String[] { "The", "token is already taken" },
+      token,
+      2
     );
+  }
+
+  public void playerSetNickname(String nickname) {
+    this.playerSetNickname(localLobby.getGameId(), this.socketId, nickname);
+  }
+
+  @Override
+  public void playerSetNickname(String gameId, UUID socketId, String nickname) {
+    if (this.socketId.equals(socketId)) {
+      view.postNotification(
+        NotificationType.UPDATE,
+        "You chose the nickname" + nickname + ". "
+      );
+    } else {
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Player " + socketId + " chose the nickname" + nickname + ". "
+      );
+    }
     view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
   }
 
