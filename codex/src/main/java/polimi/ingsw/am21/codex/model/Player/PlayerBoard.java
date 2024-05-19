@@ -292,4 +292,12 @@ public class PlayerBoard {
   public Map<Position, PlayableCard> getPlayedCards() {
     return playedCards;
   }
+
+  public Set<Position> getAvailableSpots() {
+    return availableSpots;
+  }
+
+  public Set<Position> getForbiddenSpots() {
+    return forbiddenSpots;
+  }
 }

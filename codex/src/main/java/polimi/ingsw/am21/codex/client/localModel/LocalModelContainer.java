@@ -219,7 +219,9 @@ public class LocalModelContainer implements GameEventListener {
     Position position,
     int newPlayerScore,
     Map<ResourceType, Integer> updatedResources,
-    Map<ObjectType, Integer> updatedObjects
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {
     Card card = cardsLoader.getCardFromId(cardId);
     localGameBoard.getCurrentPlayer().addPlayedCards(card, side, position);
@@ -250,6 +252,9 @@ public class LocalModelContainer implements GameEventListener {
 
     localGameBoard.getCurrentPlayer().getResources().putAll(updatedResources);
     localGameBoard.getCurrentPlayer().getObjects().putAll(updatedObjects);
+
+    localGameBoard.getCurrentPlayer().setAvailableSpots(availablePositions);
+    localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenPositions);
 
     view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
   }

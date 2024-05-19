@@ -63,6 +63,8 @@ public interface GameEventListener {
     Position position,
     int newPlayerScore,
     Map<ResourceType, Integer> updatedResources,
-    Map<ObjectType, Integer> updatedObjects
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   );
 }

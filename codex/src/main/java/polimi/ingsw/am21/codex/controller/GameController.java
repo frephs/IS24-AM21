@@ -296,7 +296,9 @@ public class GameController {
           position,
           currentPlayer.getPoints(),
           currentPlayer.getBoard().getResources(),
-          currentPlayer.getBoard().getObjects()
+          currentPlayer.getBoard().getObjects(),
+          currentPlayer.getBoard().getAvailableSpots(),
+          currentPlayer.getBoard().getForbiddenSpots()
         )
     );
   }
