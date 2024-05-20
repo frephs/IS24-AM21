@@ -20,4 +20,16 @@ public enum TokenColor implements Colorable {
       case BLACK -> Color.BLACK;
     };
   }
+
+  /**
+   * Gets a TokenColor from a string corresponding to the enum keys
+   * @param color the string to convert
+   */
+  public static TokenColor fromString(String color) {
+    try {
+      return TokenColor.valueOf(color.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+  }
 }

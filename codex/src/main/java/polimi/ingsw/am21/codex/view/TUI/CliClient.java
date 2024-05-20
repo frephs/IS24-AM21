@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
+import java.rmi.RemoteException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Scanner;
@@ -10,6 +11,11 @@ import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
+import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 
@@ -44,6 +50,7 @@ public class CliClient {
         line = scanner.nextLine().trim();
         command = line.split(" ");
 
+        // TODO add lobby checks ???
         switch (command[0]) {
           case "exit":
             cli.postNotification(NotificationType.CONFIRM, "Closing...");
@@ -54,22 +61,79 @@ public class CliClient {
             // TODO
             break;
           case "list-games":
-            // TODO
+            client.listGames();
             break;
           case "join-game":
-            // TODO
+            if (command[1] == null) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: join-game <game-id>"
+              );
+              break;
+            }
+
+            try {
+              client.connectToGame(command[1]);
+            } catch (LobbyFullException e) {
+              cli.postNotification(NotificationType.ERROR, "Lobby is full");
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            }
             break;
           case "leave-game":
-            // TODO
+            client.leaveGameLobby();
             break;
           case "create-game":
-            // TODO
+            if (command[1] == null || command[2] == null) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: create-game <game-id> <number-of-players>"
+              );
+              break;
+            }
+
+            try {
+              client.createAndConnectToGame(
+                command[1],
+                Integer.parseInt(command[2])
+              );
+            } catch (EmptyDeckException e) {
+              throw new RuntimeException(e);
+            } catch (GameAlreadyStartedException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Game already started"
+              );
+            } catch (LobbyFullException e) {
+              cli.postNotification(NotificationType.ERROR, "Lobby is full");
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            }
             break;
           case "get-tokens":
-            // TODO
+            // TODO change interface method
             break;
           case "set-token":
-            // TODO
+            if (
+              command[1] == null || TokenColor.fromString(command[1]) == null
+            ) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: set-token <color>"
+              );
+              break;
+            }
+
+            try {
+              client.lobbySetToken(TokenColor.fromString(command[1]));
+            } catch (GameAlreadyStartedException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Game already started"
+              );
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            }
             break;
           case "set-nickname":
             // TODO
@@ -95,6 +159,8 @@ public class CliClient {
       } catch (IllegalStateException e) {
         // Scanner was closed
         break;
+      } catch (RemoteException e) {
+        throw new RuntimeException(e);
       } catch (NoSuchElementException ignored) {}
     }
 

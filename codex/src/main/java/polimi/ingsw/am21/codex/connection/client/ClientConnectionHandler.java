@@ -27,7 +27,7 @@ public interface ClientConnectionHandler {
   void disconnect();
 
   /**
-   * retrieves the list of available games
+   * Retrieves the list of available games and displays them in the view
    */
   void listGames() throws RemoteException;
 
@@ -38,8 +38,8 @@ public interface ClientConnectionHandler {
     throws LobbyFullException, RemoteException, GameNotFoundException;
 
   /**
-   * leaves the game the player has joined, if any
-   * */
+   * Leaves the game the player has joined, if any
+   */
   void leaveGameLobby();
 
   /**
@@ -59,10 +59,11 @@ public interface ClientConnectionHandler {
   void lobbySetToken(TokenColor color)
     throws GameAlreadyStartedException, GameNotFoundException;
 
+  // TODO it should not return them, but rather display them in the view.
+  //  Renaming the method to showAvailableToken would be more appropriate
   /**
    * @return the set of the token that are available
    */
-
   Set<TokenColor> getAvailableTokens();
 
   /**
