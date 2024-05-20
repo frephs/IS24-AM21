@@ -24,6 +24,8 @@ import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 public interface ClientConnectionHandler {
   void connect();
 
+  void disconnect();
+
   /**
    * retrieves the list of available games
    */

@@ -111,6 +111,11 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
+  public void disconnect() {
+    // TODO
+  }
+
+  @Override
   public void listGames() {
     this.send(new GetAvailableGameLobbiesMessage());
     this.callbackFunction = message -> {

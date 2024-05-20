@@ -48,6 +48,11 @@ public class RMIClientConnectionHandler
   }
 
   @Override
+  public void disconnect() {
+    // TODO
+  }
+
+  @Override
   public void listGames() {
     try {
       rmiConnectionHandler.getGames();
