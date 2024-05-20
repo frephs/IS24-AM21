@@ -207,8 +207,9 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void getTokens() {
-    //    this.send(new GetAvailableTokensMessage())
+  public Set<TokenColor> getAvailableTokens() {
+    // TODO
+    return null;
   }
 
   @Override

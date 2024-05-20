@@ -248,7 +248,8 @@ public class LocalModelContainer
     List<Integer> cardIds
   ) {
     List<Card> hand = cardsLoader.getCardsFromIds(cardIds);
-    localGameBoard.getPlayers().add(new LocalPlayer(nickname, color, hand));
+    // TODO
+    //    localGameBoard.getPlayers().add(new LocalPlayer(nickname, color, hand));
     view.postNotification(
       NotificationType.UPDATE,
       "Player " + nickname + " joined game " + gameId + ". "

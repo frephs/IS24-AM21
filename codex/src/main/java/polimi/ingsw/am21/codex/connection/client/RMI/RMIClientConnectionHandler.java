@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Set;
 import java.util.UUID;
-
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -27,7 +26,9 @@ import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
-public class RMIClientConnectionHandler implements Remote, ClientConnectionHandler{
+public class RMIClientConnectionHandler
+  implements Remote, ClientConnectionHandler {
+
   private LocalPlayer localPlayer;
   private final LocalModelContainer localModelContainer;
   private final RMIConnectionHandler rmiConnectionHandler;
@@ -36,16 +37,19 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
   public RMIClientConnectionHandler(RMIConnectionHandler rmiConnectionHandler) {
     this.rmiConnectionHandler = rmiConnectionHandler;
     index = UUID.randomUUID();
+    // TODO
+    this.localModelContainer = null;
   }
 
   @Override
   public void connect() {
-    localModelContainer = new LocalModelContainer(this.index, new );
+    // TODO
+    //    localModelContainer = new LocalModelContainer(this.index, new );
   }
 
   @Override
   public void listGames() {
-    try{
+    try {
       rmiConnectionHandler.getGames();
       //TODO add method to modify the local model
     } catch (RemoteException e) {
@@ -56,23 +60,27 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
 
   @Override
   public void connectToGame(String gameId) {
-    try{
+    try {
       rmiConnectionHandler.joinLobby(gameId, this.index);
       localModelContainer.playerJoinedLobby(gameId, this.index);
     } catch (GameAlreadyStartedException e) {
-        System.err.println("The game already started" + e.getMessage());
-        localModelContainer.playerLeftLobby(gameId, this.index);
-        e.printStackTrace();
+      System.err.println("The game already started" + e.getMessage());
+      localModelContainer.playerLeftLobby(gameId, this.index);
+      e.printStackTrace();
     } catch (LobbyFullException e) {
-        System.err.println("The lobby is full" + e.getMessage());
-        localModelContainer.playerLeftLobby(gameId, this.index);
-        e.printStackTrace();
+      System.err.println("The lobby is full" + e.getMessage());
+      localModelContainer.playerLeftLobby(gameId, this.index);
+      e.printStackTrace();
     } catch (GameNotFoundException e) {
-        System.err.println("The game was not found" + e.getMessage());
-
+      System.err.println("The game was not found" + e.getMessage());
     } catch (RemoteException e) {
-        System.err.println("A remote exception occurred" + e.getMessage());
+      System.err.println("A remote exception occurred" + e.getMessage());
     }
+  }
+
+  @Override
+  public void leaveGameLobby() {
+    // TODO
   }
 
   @Override
@@ -81,9 +89,9 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
     try {
       rmiConnectionHandler.createGame(gameId, this.index, numberPlayers);
       rmiConnectionHandler.joinLobby(gameId, this.index);
-      localModelContainer.gameCreated(gameId, numberPlayers);
+      // TODO
+      //      localModelContainer.gameCreated(gameId, numberPlayers);
       localModelContainer.playerJoinedLobby(gameId, this.index);
-
     } catch (GameAlreadyStartedException e) {
       System.err.println("The game already started" + e.getMessage());
     } catch (LobbyFullException e) {
@@ -93,7 +101,6 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
     } catch (EmptyDeckException e) {
       System.err.println("A remote exception occurred" + e.getMessage());
     }
-
   }
 
   //TODO how can i know which game started and which no?
@@ -102,9 +109,17 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
 
   @Override
   public void lobbySetToken(TokenColor color) {
-    try{
-      rmiConnectionHandler.lobbySetTokenColor(localModelContainer.getGameId(), this.index, color);
-      localModelContainer.playerSetToken(localModelContainer.getGameId(), this.index, color);
+    try {
+      rmiConnectionHandler.lobbySetTokenColor(
+        localModelContainer.getGameId(),
+        this.index,
+        color
+      );
+      localModelContainer.playerSetToken(
+        localModelContainer.getGameId(),
+        this.index,
+        color
+      );
       localPlayer = new LocalPlayer(color);
     } catch (GameAlreadyStartedException e) {
       System.err.println("The game already started" + e.getMessage());
@@ -121,7 +136,11 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
   @Override
   public void lobbySetNickname(String nickname) {
     try {
-      rmiConnectionHandler.lobbySetNickname(localModelContainer.getGameId(), this.index, nickname);
+      rmiConnectionHandler.lobbySetNickname(
+        localModelContainer.getGameId(),
+        this.index,
+        nickname
+      );
       this.localPlayer.setNickname(nickname);
     } catch (NicknameAlreadyTakenException e) {
       System.err.println("Nickname already taken" + e.getNickname());
@@ -131,13 +150,22 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
       System.err.println("The game was not found" + e.getMessage());
     }
   }
+
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
-    try{
-      rmiConnectionHandler.lobbySetObjectiveCard(localModelContainer.getGameId(), this.index, first);
-      localModelContainer.playerChoseObjectiveCard(localModelContainer.getGameId(), , this.index, first);
+    try {
+      rmiConnectionHandler.lobbySetObjectiveCard(
+        localModelContainer.getGameId(),
+        this.index,
+        first
+      );
+      // TODO
+      //      localModelContainer.playerChoseObjectiveCard(localModelContainer.getGameId(), , this.index, first);
     } catch (GameAlreadyStartedException e) {
-      localModelContainer.playerLeftLobby(localModelContainer.getGameId(), this.index);
+      localModelContainer.playerLeftLobby(
+        localModelContainer.getGameId(),
+        this.index
+      );
     } catch (GameNotFoundException e) {
       System.err.println("The game was not found");
     }
@@ -146,21 +174,23 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
   @Override
   public void lobbyJoinGame(CardSideType cardSide) {
     try {
-      rmiConnectionHandler.lobbyJoinGame(localModelContainer.getGameId(), this.index, cardSide);
-      localModelContainer.playerJoinedGame(localModelContainer.getGameId(), this.index, localPlayer.getNickname(), localPlayer.getToken(), );
-    } catch (GameNotReadyException e) {
-
-    } catch (GameAlreadyStartedException e) {
-      localModelContainer.playerLeftLobby(localModelContainer.getGameId(), this.index);
-    } catch (EmptyDeckException e) {
-
-    } catch (IllegalCardSideChoiceException e) {
-
-    } catch (IllegalPlacingPositionException e) {
-
-    } catch (GameNotFoundException e) {
-
-    }
+      rmiConnectionHandler.lobbyJoinGame(
+        localModelContainer.getGameId(),
+        this.index,
+        cardSide
+      );
+      // TODO
+      //      localModelContainer.playerJoinedGame(localModelContainer.getGameId(), this.index, localPlayer.getNickname(), localPlayer.getToken(), );
+    } catch (GameNotReadyException e) {} catch (GameAlreadyStartedException e) {
+      localModelContainer.playerLeftLobby(
+        localModelContainer.getGameId(),
+        this.index
+      );
+    } catch (EmptyDeckException e) {} catch (
+      IllegalCardSideChoiceException e
+    ) {} catch (IllegalPlacingPositionException e) {} catch (
+      GameNotFoundException e
+    ) {}
   }
 
   @Override
@@ -170,13 +200,14 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
     Position position
   )
     throws PlayerNotActive, IllegalCardSideChoiceException, RemoteException, IllegalPlacingPositionException, GameNotFoundException {
-    rmiConnectionHandler.placeCard(
-      localGameBoard.getGameId(),
-      localPlayer.getNickname(),
-      playerHandCardNumber,
-      side,
-      position
-    );
+    // TODO use localModelContainer
+    //    rmiConnectionHandler.placeCard(
+    //      localGameBoard.getGameId(),
+    //      localPlayer.getNickname(),
+    //      playerHandCardNumber,
+    //      side,
+    //      position
+    //    );
   }
 
   @Override
@@ -185,21 +216,23 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
     DrawingDeckType deckType
   )
     throws PlayerNotActive, GameOverException, EmptyDeckException, InvalidNextTurnCallException, GameNotFoundException {
-    rmiConnectionHandler.nextTurn(
-      localGameBoard.getGameId(),
-      localPlayer.getNickname(),
-      drawingSource,
-      deckType
-    );
+    // TODO use localModelContainer
+    //    rmiConnectionHandler.nextTurn(
+    //      localGameBoard.getGameId(),
+    //      localPlayer.getNickname(),
+    //      drawingSource,
+    //      deckType
+    //    );
   }
 
   @Override
   public void nextTurn()
     throws PlayerNotActive, GameOverException, InvalidNextTurnCallException, RemoteException, GameNotFoundException {
-    rmiConnectionHandler.nextTurn(
-      localGameBoard.getGameId(),
-      localPlayer.getNickname()
-    );
+    // TODO use localModelContainer
+    //    rmiConnectionHandler.nextTurn(
+    //      localGameBoard.getGameId(),
+    //      localPlayer.getNickname()
+    //    );
   }
 
   @Override
@@ -207,11 +240,4 @@ public class RMIClientConnectionHandler implements Remote, ClientConnectionHandl
     // TODO
     return null;
   }
-
-  @Override
-  public Set<TokenColor> getTokens() {
-    // TODO
-    return null;
-  }
 }
-
