@@ -23,6 +23,11 @@ public class GameManager {
       .collect(Collectors.toSet());
   }
 
+  /**
+   * Returns the current number of players in each game.
+   *
+   * @return a map with the game name as key and the number of players as value
+   */
   public Map<String, Integer> getCurrentSlots() {
     Map<String, Integer> currentPlayers = new HashMap<>();
     games
@@ -37,6 +42,11 @@ public class GameManager {
     return currentPlayers;
   }
 
+  /**
+   * Returns the maximum number of players in each game.
+   *
+   * @return a map with the game name as key and the maximum number of players as value
+   */
   public Map<String, Integer> getMaxSlots() {
     Map<String, Integer> maxSlots = new HashMap<>();
     games
