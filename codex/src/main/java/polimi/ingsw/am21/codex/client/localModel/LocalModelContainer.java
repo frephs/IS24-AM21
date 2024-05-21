@@ -46,6 +46,11 @@ public class LocalModelContainer
     view.postNotification(Notification.UNKNOWN_RESPONSE);
   }
 
+  @Override
+  public void actionNotAllowed() {
+    view.postNotification(NotificationType.WARNING, "Action not allowed");
+  }
+
   public void listGames(
     Set<String> gameIds,
     Map<String, Integer> currentPlayers,
@@ -67,6 +72,7 @@ public class LocalModelContainer
     view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
+  //TODO also connect the player
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
     Set<String> availableGames = localLobby.getAvailableGames();
@@ -102,6 +108,14 @@ public class LocalModelContainer
     view.postNotification(
       NotificationType.ERROR,
       "Game " + gameId + " is full. "
+    );
+  }
+
+  @Override
+  public void gameNotFound(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + gameId + "not found. "
     );
   }
 
@@ -199,6 +213,7 @@ public class LocalModelContainer
 
   @Override
   public void tokenTaken(TokenColor token) {
+    localLobby.getAvailableTokens().remove(token);
     view.postNotification(
       NotificationType.ERROR,
       new String[] { "The", "token is already taken" },
@@ -391,6 +406,14 @@ public class LocalModelContainer
         2
       );
     }
+  }
+
+  @Override
+  public void invalidCardPlacement(String reason) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Invalid card placement: " + reason
+    );
   }
 
   @Override
