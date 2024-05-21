@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -61,7 +61,7 @@ public class CliClient {
             // TODO
             break;
           case "list-games":
-            client.listGames();
+            client.getGames();
             break;
           case "join-game":
             if (command[1] == null) {
@@ -71,14 +71,7 @@ public class CliClient {
               );
               break;
             }
-
-            try {
-              client.connectToGame(command[1]);
-            } catch (LobbyFullException e) {
-              cli.postNotification(NotificationType.ERROR, "Lobby is full");
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.connectToGame(command[1]);
             break;
           case "leave-game":
             client.leaveGameLobby();
@@ -91,24 +84,10 @@ public class CliClient {
               );
               break;
             }
-
-            try {
-              client.createAndConnectToGame(
-                command[1],
-                Integer.parseInt(command[2])
-              );
-            } catch (EmptyDeckException e) {
-              throw new RuntimeException(e);
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (LobbyFullException e) {
-              cli.postNotification(NotificationType.ERROR, "Lobby is full");
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.createAndConnectToGame(
+              command[1],
+              Integer.parseInt(command[2])
+            );
             break;
           case "get-tokens":
             // TODO change interface method
@@ -124,16 +103,7 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbySetToken(TokenColor.fromString(command[1]));
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbySetToken(TokenColor.fromString(command[1]));
             break;
           case "set-nickname":
             // TODO
@@ -159,8 +129,6 @@ public class CliClient {
       } catch (IllegalStateException e) {
         // Scanner was closed
         break;
-      } catch (RemoteException e) {
-        throw new RuntimeException(e);
       } catch (NoSuchElementException ignored) {}
     }
 

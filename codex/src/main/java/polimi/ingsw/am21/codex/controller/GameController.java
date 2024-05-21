@@ -143,9 +143,6 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setObjectiveCard(socketID, first);
-    listeners.forEach(
-      listener -> listener.playerChoseObjectiveCard(gameId, socketID, first)
-    );
   }
 
   private void startGame(String gameId, Game game)

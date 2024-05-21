@@ -123,12 +123,9 @@ public class TCPControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerChoseObjectiveCard(
-    String gameId,
-    UUID socketID,
-    Boolean isFirst
-  ) {
+  public void playerChoseObjectiveCard(Boolean isFirst) {
     // TODO Do we need to add a broadcast message for this? Do other clients care?
+
   }
 
   @Override

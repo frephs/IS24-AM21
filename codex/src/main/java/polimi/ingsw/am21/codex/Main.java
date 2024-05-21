@@ -8,11 +8,15 @@ import java.rmi.registry.Registry;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import polimi.ingsw.am21.codex.client.ClientType;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
+import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
-import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.view.View;
 
 public class Main {
 
@@ -61,21 +65,37 @@ public class Main {
     }
   }
 
-  private static void startClient(ConnectionType connectionType, Integer port)
-    throws MalformedURLException, NotBoundException, RemoteException {
+  private static void startClient(
+    ClientType clientType,
+    ConnectionType connectionType,
+    Integer port
+  ) throws MalformedURLException, NotBoundException, RemoteException {
     //    throw new UnsupportedOperationException("Not implemented yet");
-    Registry registry = LocateRegistry.getRegistry(2024);
-    RMIConnectionHandler handler = (RMIConnectionHandler) registry.lookup(
-      "//127.0.0.1:" + port + "/RMIConnectionHandler"
-    );
-
-    try {
-      handler.createGame("test", UUID.randomUUID(), 4);
-    } catch (EmptyDeckException e) {
-      throw new RuntimeException(e);
+    View view;
+    ClientConnectionHandler client;
+    // TODO: implement
+    //
+    if (clientType == ClientType.CLI) {
+      //      // TODO: add cli`
+      //      // view = new CLICLient();
+    } else {
+      //      // TODO: add gui
+      //      // VIEW = new GUIClient();
     }
-
-    System.out.println(handler.getGames());
+    //
+    if (connectionType == ConnectionType.RMI) {
+      //      client = new RMIClientConnectionHandler(
+      //        view,
+      //        "127.0.0.1",
+      //        connectionType.getDefaultPort()
+      //      );
+    } else {
+      //      client = new TCPConnectionHandler(
+      //        view,
+      //        "127.0.0.1",
+      //        connectionType.getDefaultPort()
+      //      );
+    }
     //    System.out.println("Games: " + serverRMI.getGames().toString());
   }
 
@@ -112,6 +132,11 @@ public class Main {
       startServer(tcpPort.get(), rmiPort.get());
     } else {
       ConnectionType connectionType = ConnectionType.TCP;
+      ClientType clientType = ClientType.GUI;
+
+      if (Arrays.asList(args).contains("--cli")) {
+        clientType = ClientType.CLI;
+      }
 
       if (Arrays.asList(args).contains("--rmi")) {
         connectionType = ConnectionType.RMI;
@@ -128,7 +153,7 @@ public class Main {
           port.set(Integer.parseInt(arg.split("=")[1]));
         });
 
-      startClient(connectionType, port.get());
+      startClient(clientType, connectionType, port.get());
     }
   }
 }

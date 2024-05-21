@@ -47,7 +47,22 @@ public class LocalModelContainer
     view.postNotification(Notification.UNKNOWN_RESPONSE);
   }
 
-  public void listGames(
+  @Override
+  public void gameAlreadyStarted() {
+    view.postNotification(NotificationType.ERROR, "Game has already started");
+  }
+
+  @Override
+  public void gameNotStarted() {
+    view.postNotification(NotificationType.ERROR, "Game not started");
+  }
+
+  @Override
+  public void gameNotFound() {
+    view.postNotification(NotificationType.ERROR, "Game not found");
+  }
+
+  public void getGames(
     Set<String> gameIds,
     Map<String, Integer> currentPlayers,
     Map<String, Integer> maxPlayers
@@ -94,6 +109,14 @@ public class LocalModelContainer
       "Game " + gameId + " not found. "
     );
     view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
+  }
+
+  @Override
+  public void lobbyFull() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + localLobby.getGameId() + " lobby is full. "
+    );
   }
 
   @Override
@@ -223,11 +246,12 @@ public class LocalModelContainer
   }
 
   @Override
-  public void playerChoseObjectiveCard(
-    String gameId,
-    UUID socketID,
-    Boolean isFirst
-  ) {
+  public void notInGame() {
+    view.postNotification(NotificationType.ERROR, "You are not in a game. ");
+  }
+
+  @Override
+  public void playerChoseObjectiveCard(Boolean isFirst) {
     this.localGameBoard.setSecretObjective(
         isFirst
           ? this.localLobby.getAvailableObjectives().getFirst()
@@ -450,5 +474,29 @@ public class LocalModelContainer
       localGameBoard.getPlayers().size();
 
     localGameBoard.setCurrentPlayer(nextPlayerIndex);
+  }
+
+  @Override
+  public void playerNotActive() {
+    view.postNotification(NotificationType.ERROR, "It's not your turn. ");
+  }
+
+  @Override
+  public void invalidNextTurnCall() {
+    view.postNotification(NotificationType.ERROR, "Invalid next turn call. ");
+  }
+
+  @Override
+  public void gameOver() {
+    view.postNotification(NotificationType.WARNING, "Game over. ");
+  }
+
+  @Override
+  public void emptyDeck() {
+    view.postNotification(NotificationType.ERROR, "Deck is empty. ");
+  }
+
+  public View getView() {
+    return this.view;
   }
 }

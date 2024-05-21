@@ -23,7 +23,7 @@ public interface GameEventListener {
 
   void playerSetNickname(String gameId, UUID socketID, String nickname);
 
-  void playerChoseObjectiveCard(String gameId, UUID socketID, Boolean isFirst);
+  void playerChoseObjectiveCard(Boolean isFirst);
 
   void playerJoinedGame(
     String gameId,

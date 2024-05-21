@@ -15,6 +15,8 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.GameState;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
@@ -41,10 +43,6 @@ public class RMIConnectionHandlerImpl
     this.controller.addListener(eventListener);
   }
 
-  public Set<String> getGames() throws RemoteException {
-    return this.controller.getGames();
-  }
-
   public void joinLobby(String gameId, UUID connectionID)
     throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
     this.controller.joinLobby(gameId, connectionID);
@@ -57,6 +55,28 @@ public class RMIConnectionHandlerImpl
   )
     throws RemoteException, NicknameAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException {
     this.controller.lobbySetNickname(gameId, connectionID, username);
+  }
+
+  @Override
+  public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
+    throws RemoteException, GameNotFoundException, GameAlreadyStartedException {
+    this.controller.lobbyChooseObjective(gameId, socketID, first);
+  }
+
+  @Override
+  public void startGame(String gameId)
+    throws RemoteException, GameNotFoundException, GameNotReadyException, GameAlreadyStartedException {
+    this.controller.startGame(gameId);
+  }
+
+  @Override
+  public void joinGame(String gameId, UUID socketID, CardSideType sideType)
+    throws RemoteException, GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameAlreadyStartedException {}
+
+  @Override
+  public void leaveLobby(String gameId, UUID connectionID)
+    throws RemoteException, GameNotFoundException {
+    this.controller.removePlayerFromLobby(gameId, connectionID);
   }
 
   public void lobbySetTokenColor(
@@ -90,6 +110,11 @@ public class RMIConnectionHandlerImpl
     this.controller.createGame(gameId, socketID, players);
   }
 
+  @Override
+  public void deleteGame(String gameId) throws RemoteException {
+    this.controller.deleteGame(gameId);
+  }
+
   public void placeCard(
     String gameId,
     String playerNickname,
@@ -120,5 +145,15 @@ public class RMIConnectionHandlerImpl
   )
     throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException {
     this.controller.nextTurn(gameId, playerNickname, drawingSource, deckType);
+  }
+
+  public Set<String> getGames() throws RemoteException {
+    return this.controller.getGames();
+  }
+
+  @Override
+  public void removePlayerFromLobby(String gameId, UUID socketID)
+    throws RemoteException, GameNotFoundException {
+    this.controller.removePlayerFromLobby(gameId, socketID);
   }
 }

@@ -1,41 +1,23 @@
 package polimi.ingsw.am21.codex.connection.client;
 
-import java.rmi.RemoteException;
-import java.util.List;
 import java.util.Set;
-import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
-import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
-import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
-import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 public interface ClientConnectionHandler {
-  void connect();
-
-  void disconnect();
-
   /**
    * Retrieves the list of available games and displays them in the view
    */
-  void listGames() throws RemoteException;
+  void getGames();
 
   /**
    * @param gameId the id of the game to connect to
    */
-  void connectToGame(String gameId)
-    throws LobbyFullException, RemoteException, GameNotFoundException;
+  void connectToGame(String gameId);
 
   /**
    * Leaves the game the player has joined, if any
@@ -45,19 +27,12 @@ public interface ClientConnectionHandler {
   /**
    * @param gameId the id of the game create and connect to
    */
-  void createAndConnectToGame(String gameId, int numberPlayers)
-    throws RemoteException, EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException;
-
-  /**
-   * checks if the game you are connected to has started
-   */
-  void checkIfGameStarted() throws RemoteException;
+  void createAndConnectToGame(String gameId, int numberPlayers);
 
   /**
    * @param color the color of the chosen token color
    */
-  void lobbySetToken(TokenColor color)
-    throws GameAlreadyStartedException, GameNotFoundException;
+  void lobbySetToken(TokenColor color);
 
   // TODO it should not return them, but rather display them in the view.
   //  Renaming the method to showAvailableToken would be more appropriate
@@ -69,23 +44,20 @@ public interface ClientConnectionHandler {
   /**
    * @param nickname the nickname of the lobby player
    */
-  void lobbySetNickname(String nickname)
-    throws GameAlreadyStartedException, NicknameAlreadyTakenException, GameNotFoundException;
+  void lobbySetNickname(String nickname);
 
   /**
    * @param first true if the player selects the first card in the pair
    *              otherwise false
    */
-  void lobbyChooseObjectiveCard(Boolean first)
-    throws GameAlreadyStartedException, GameNotFoundException;
+  void lobbyChooseObjectiveCard(Boolean first);
 
   /**
    * Sets the chosen starter card side and make player join game
    *
    * @param cardSide the starter card side chosen by the player
    */
-  void lobbyJoinGame(CardSideType cardSide)
-    throws GameNotReadyException, GameAlreadyStartedException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException;
+  void lobbyJoinGame(CardSideType cardSide);
 
   /**
    * Places a card in the grid
@@ -98,8 +70,12 @@ public interface ClientConnectionHandler {
     Integer playerHandCardNumber,
     CardSideType side,
     Position position
-  )
-    throws PlayerNotActive, IllegalCardSideChoiceException, RemoteException, IllegalPlacingPositionException, GameNotFoundException;
+  );
+
+  /**
+   * Leaves lobby
+   */
+  void leaveLobby();
 
   /**
    *
@@ -108,17 +84,14 @@ public interface ClientConnectionHandler {
    * @param drawingSource the source were we get the card
    * @param deckType the type of card that we draw
    */
-  void nextTurn(DrawingCardSource drawingSource, DrawingDeckType deckType)
-    throws PlayerNotActive, GameOverException, EmptyDeckException, InvalidNextTurnCallException, GameNotFoundException;
+  void nextTurn(DrawingCardSource drawingSource, DrawingDeckType deckType);
 
   /**
    * Goes to next turn ( called only when the game is in the last round, since you cannot draw a card in that case)
    */
-  void nextTurn()
-    throws PlayerNotActive, GameOverException, InvalidNextTurnCallException, RemoteException, GameNotFoundException;
+  void nextTurn();
 
-  /**
-   * @return the state of the game
-   */
-  GameState getGameState();
+  void connect();
+
+  void disconnect();
 }

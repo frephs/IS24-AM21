@@ -11,4 +11,6 @@ module polimi.ingsw.am21.codex {
   opens polimi.ingsw.am21.codex to javafx.fxml;
   exports polimi.ingsw.am21.codex;
   exports polimi.ingsw.am21.codex.connection.server.RMI;
+  exports polimi.ingsw.am21.codex.connection;
+  opens polimi.ingsw.am21.codex.connection to javafx.fxml;
 }
