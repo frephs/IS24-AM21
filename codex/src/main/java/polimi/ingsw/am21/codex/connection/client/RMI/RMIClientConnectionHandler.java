@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.connection.client.RMI;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -67,7 +66,8 @@ public class RMIClientConnectionHandler
   public void connectToGame(String gameId) {
     try {
       rmiConnectionHandler.joinLobby(gameId, this.index);
-      localModelContainer.playerJoinedLobby(gameId, this.index);
+      // TODO
+      //      localModelContainer.playerJoinedLobby(gameId, this.index);
     } catch (GameAlreadyStartedException e) {
       System.err.println("The game already started" + e.getMessage());
       localModelContainer.playerLeftLobby(gameId, this.index);
@@ -96,7 +96,7 @@ public class RMIClientConnectionHandler
       rmiConnectionHandler.joinLobby(gameId, this.index);
       // TODO
       //      localModelContainer.gameCreated(gameId, numberPlayers);
-      localModelContainer.playerJoinedLobby(gameId, this.index);
+      //      localModelContainer.playerJoinedLobby(gameId, this.index);
     } catch (GameAlreadyStartedException e) {
       System.err.println("The game already started" + e.getMessage());
     } catch (LobbyFullException e) {
@@ -125,7 +125,8 @@ public class RMIClientConnectionHandler
         this.index,
         color
       );
-      localPlayer = new LocalPlayer(color);
+      // TODO
+      //      localPlayer = new LocalPlayer(color);
     } catch (GameAlreadyStartedException e) {
       System.err.println("The game already started" + e.getMessage());
     } catch (GameNotFoundException e) {
@@ -136,9 +137,7 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public Set<TokenColor> getAvailableTokens() {
-    return localModelContainer.getTokenColor();
-  }
+  public void getAvailableTokens() {}
 
   @Override
   public void lobbySetNickname(String nickname) {

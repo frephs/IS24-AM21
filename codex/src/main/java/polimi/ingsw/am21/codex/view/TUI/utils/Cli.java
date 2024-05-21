@@ -124,6 +124,11 @@ public class Cli implements View {
   }
 
   @Override
+  public void drawGameOver(List<LocalPlayer> players) {
+    // TODO
+  }
+
+  @Override
   public void drawCard(Card card) {
     // TODO
   }
@@ -138,6 +143,11 @@ public class Cli implements View {
     CardPair<Card> resourceCards,
     CardPair<Card> goldCards
   ) {
+    // TODO
+  }
+
+  @Override
+  public void drawWinner(String nickname) {
     // TODO
   }
 }

@@ -59,6 +59,26 @@ public class TCPControllerListener implements GameEventListener {
   }
 
   @Override
+  public void gameOver() {
+    // TODO
+  }
+
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    // TODO
+  }
+
+  @Override
+  public void remainingTurns(int remainingTurns) {
+    // TODO
+  }
+
+  @Override
+  public void winningPlayer(String nickname) {
+    // TODO
+  }
+
+  @Override
   public void changeTurn(
     String gameId,
     String playerId,
