@@ -31,6 +31,7 @@ public class LocalModelContainer
     this.socketId = socketID;
 
     cardsLoader.loadCards();
+    this.localLobby = new LocalLobby();
   }
 
   public LocalGameBoard getLocalGameBoard() {
@@ -217,13 +218,13 @@ public class LocalModelContainer
   public void playerSetToken(String gameId, UUID socketID, TokenColor token) {
     Set<TokenColor> availableTokens = localLobby.getAvailableTokens();
     availableTokens.remove(token);
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      new String[] { socketID.toString(), " chose the ", " token. " },
-      token,
-      2
-    );
+    getView()
+      .postNotification(
+        NotificationType.UPDATE,
+        new String[] { socketID.toString(), " chose the ", " token. " },
+        token,
+        2
+      );
 
     view.drawAvailableTokenColors(availableTokens);
     view.drawLobby(

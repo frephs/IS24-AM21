@@ -91,4 +91,6 @@ public interface RMIConnectionHandler extends Remote {
 
   public Set<TokenColor> getAvailableTokens(String gameId)
     throws RemoteException, GameNotFoundException;
+
+  public void registerClient(GameEventListener listener) throws RemoteException;
 }

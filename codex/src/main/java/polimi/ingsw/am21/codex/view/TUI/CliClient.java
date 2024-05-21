@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -45,14 +46,11 @@ public class CliClient {
 
     Cli cli = Cli.getInstance();
 
-    client = new TCPConnectionHandler(cli, address, port);
-
-    //    if (connectionType == ConnectionType.TCP) {
-    //      client = new TCPConnectionHandler(cli, address, port);
-    //    } else {
-    // // TODO what's the registry?
-    //      client = new RMIConnectionClient(address, port);
-    //    }
+    if (connectionType == ConnectionType.TCP) {
+      client = new TCPConnectionHandler(cli, address, port);
+    } else {
+      client = new RMIClientConnectionHandler(cli, address, port);
+    }
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 

@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view.TUI.utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -57,13 +58,32 @@ public class Cli implements View {
   @Override
   public void postNotification(
     NotificationType notificationType,
-    String[] messages,
+    String[] parts,
     Colorable colorable,
     int colorableIndex
   ) {
-    Arrays.stream(messages).forEach(
-      message -> postNotification(notificationType, message)
+    ArrayList<String> result = new ArrayList<>();
+    Arrays.stream(parts)
+      .limit(2)
+      .map(
+        e ->
+          CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
+      )
+      .forEach(result::add);
+    result.add(
+      CliUtils.colorize(
+        colorable,
+        colorableIndex == 0 ? ColorStyle.BOLD : ColorStyle.NORMAL
+      )
     );
+    Arrays.stream(parts)
+      .skip(2)
+      .map(
+        e ->
+          CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
+      )
+      .forEach(result::add);
+    System.out.println(String.join("", result));
   }
 
   @Override

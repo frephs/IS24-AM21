@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -49,6 +50,7 @@ public class RMIClientConnectionHandler
     this.port = port;
     this.socketID = UUID.randomUUID();
     this.localModel = new LocalModelContainer(socketID, view);
+    this.localPlayer = new LocalPlayer(null, null, List.of());
   }
 
   private View getView() {
@@ -143,7 +145,7 @@ public class RMIClientConnectionHandler
       try {
         rmiConnectionHandler.createGame(gameId, this.socketID, numberPlayers);
         // TODO
-        //      this.localModel.gameCreated(gameId, numberPlayers);
+        this.localModel.gameCreated(gameId, 0, numberPlayers);
         this.localModel.playerJoinedLobby(
             gameId,
             this.socketID,

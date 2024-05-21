@@ -85,6 +85,12 @@ public class RMIConnectionHandlerImpl
     return this.controller.getAvailableTokens(gameId);
   }
 
+  @Override
+  public void registerClient(GameEventListener listener)
+    throws RemoteException {
+    this.controller.addListener(listener);
+  }
+
   public void lobbySetTokenColor(
     String gameId,
     UUID connectionID,
