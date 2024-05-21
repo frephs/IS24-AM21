@@ -147,6 +147,12 @@ public class Cli implements View {
   }
 
   @Override
+  public void drawObjectiveCardChoice(CardPair<Card> cardPair) {}
+
+  @Override
+  public void drawStarterCardSides(Card cardId) {}
+
+  @Override
   public void drawWinner(String nickname) {
     // TODO
   }
