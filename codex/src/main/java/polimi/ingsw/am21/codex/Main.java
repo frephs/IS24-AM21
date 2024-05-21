@@ -8,6 +8,7 @@ import java.rmi.registry.Registry;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import polimi.ingsw.am21.codex.connection.client.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -17,6 +18,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 public class Main {
 
   private static void printHelp() {
+    printAsciiArt();
     System.out.println("Usage: ");
     System.out.println("Server mode: ");
     System.out.println("java -jar codex.jar --server");
@@ -132,5 +134,16 @@ public class Main {
 
       startClient(connectionType, port.get());
     }
+  }
+
+  static void printAsciiArt() {
+    System.out.println(
+      "_________            .___              \n" +
+      "\\_   ___ \\  ____   __| _/____ ___  ___ \n" +
+      "/    \\  \\/ /  _ \\ / __ |/ __ \\\\  \\/  / \n" +
+      "\\     \\___(  <_> ) /_/ \\  ___/ >    <  \n" +
+      " \\______  /\\____/\\____ |\\___  >__/\\_ \\ \n" +
+      "        \\/            \\/    \\/      \\/ "
+    );
   }
 }
