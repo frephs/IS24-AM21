@@ -16,6 +16,7 @@ import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.view.TUI.CliClient;
 import polimi.ingsw.am21.codex.view.View;
 
 public class Main {
@@ -73,31 +74,21 @@ public class Main {
   ) throws MalformedURLException, NotBoundException, RemoteException {
     //    throw new UnsupportedOperationException("Not implemented yet");
     View view;
-    ClientConnectionHandler client;
     // TODO: implement
     //
     if (clientType == ClientType.CLI) {
-      //      // TODO: add cli`
-      //      // view = new CLICLient();
+      CliClient client = new CliClient();
+      client.start(
+        connectionType,
+        "127.0.0.1",
+        connectionType.getDefaultPort()
+      );
     } else {
       //      // TODO: add gui
       //      // VIEW = new GUIClient();
     }
     //
-    if (connectionType == ConnectionType.RMI) {
-      //      client = new RMIClientConnectionHandler(
-      //        view,
-      //        "127.0.0.1",
-      //        connectionType.getDefaultPort()
-      //      );
-    } else {
-      //      client = new TCPConnectionHandler(
-      //        view,
-      //        "127.0.0.1",
-      //        connectionType.getDefaultPort()
-      //      );
-    }
-    //    System.out.println("Games: " + serverRMI.getGames().toString());
+
   }
 
   public static void main(String[] args)
