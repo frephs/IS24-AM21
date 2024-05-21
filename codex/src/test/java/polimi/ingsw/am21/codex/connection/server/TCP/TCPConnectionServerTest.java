@@ -16,9 +16,16 @@ import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.CreateGameMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.JoinLobbyMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetNicknameMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetTokenColorMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 class TCPConnectionServerTest {
+
+  ObjectOutputStream outputStream;
+  ObjectInputStream inputStream;
 
   @Test
   public void basic() {
@@ -44,8 +51,7 @@ class TCPConnectionServerTest {
       clientSocket = new Socket((String) null, 4567);
       clientSocket.setKeepAlive(true);
       System.out.println("Connected to server");
-      ObjectOutputStream outputStream;
-      ObjectInputStream inputStream;
+
       try {
         outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
         inputStream = new ObjectInputStream(clientSocket.getInputStream());
@@ -80,16 +86,21 @@ class TCPConnectionServerTest {
           }
         }
       });
-      try {
-        outputStream.writeObject(new CreateGameMessage("TestGame", 4));
-        outputStream.flush();
-        outputStream.reset();
-        outputStream.writeObject(new GetAvailableGameLobbiesMessage());
-        outputStream.flush();
-        outputStream.reset();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      List.of(
+        new CreateGameMessage("TestGame", 4),
+        new GetAvailableGameLobbiesMessage(),
+        new JoinLobbyMessage("TestGame"),
+        new SetTokenColorMessage(TokenColor.RED, "TestGame")
+        //        new SetNicknameMessage("TestNickname", "TestGame")
+      ).forEach(message -> {
+        try {
+          outputStream.writeObject(message);
+          outputStream.flush();
+          outputStream.reset();
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
 
       responsesLatch.await();
 
