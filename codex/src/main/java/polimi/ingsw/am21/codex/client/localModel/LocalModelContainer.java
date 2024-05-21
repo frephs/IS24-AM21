@@ -114,9 +114,13 @@ public class LocalModelContainer
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketId) {
+  public void playerJoinedLobby(
+    String gameId,
+    UUID socketId,
+    Set<TokenColor> availableTokenColors
+  ) {
     if (socketId == this.socketId) {
-      localLobby = new LocalLobby(gameId);
+      this.localLobby.setGameId(gameId);
       localGameBoard = new LocalGameBoard(
         gameId,
         localLobby.getMaxPlayerSlots().get(gameId)
@@ -127,12 +131,20 @@ public class LocalModelContainer
         NotificationType.RESPONSE,
         "You joined the lobby of the game" + gameId
       );
-    } else {
+    } else if (gameId.equals(localGameBoard.getGameId())) {
       //TODO(server) send a playerJoinedLobbyUpdate for every player that is already in the lobby, also token color and nickname should be sent if they set it.
       localLobby.getPlayers().add(this.socketId);
       view.postNotification(
         NotificationType.UPDATE,
-        "Player" + socketId + " joined game " + gameId
+        "Player" + socketId + " joined your game " + gameId
+      );
+    } else {
+      localLobby
+        .getPlayerSlots()
+        .computeIfPresent(gameId, (gameID, slots) -> slots - 1);
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Player " + socketId + " joined game " + gameId
       );
     }
   }
