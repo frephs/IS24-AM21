@@ -8,7 +8,6 @@ import java.rmi.registry.Registry;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import polimi.ingsw.am21.codex.connection.client.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.controller.GameController;
