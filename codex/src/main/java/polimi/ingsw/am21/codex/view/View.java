@@ -80,6 +80,10 @@ public interface View {
    * @param resourceCards The resource cards pair
    * @param goldCards The gold cards pair
    */
+
   void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
+
+  void drawObjectiveCardChoice(CardPair<Card> cardPair);
+  void drawStarterCardSides(Card cardId);
   void drawWinner(String nickname);
 }
