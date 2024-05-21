@@ -29,10 +29,12 @@ public class LocalPlayer {
 
   private final Map<Position, Pair<Card, CardSideType>> playedCards;
 
-  public LocalPlayer(TokenColor token) {
-    points = 0;
+  public LocalPlayer(String nickname, TokenColor token, List<Card> hand) {
+    this.nickname = nickname;
+    this.hand = hand;
     this.token = token;
     playedCards = new HashMap<>();
+    this.points = 0;
 
     Arrays.stream(ResourceType.values()).forEach(
       resourceType -> resources.put(resourceType, 0)
