@@ -103,8 +103,14 @@ public class TCPControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID) {
-    broadcast.accept(new PlayerJoinedLobbyMessage(gameId, socketID));
+  public void playerJoinedLobby(
+    String gameId,
+    UUID socketID,
+    Set<TokenColor> availableTokens
+  ) {
+    broadcast.accept(
+      new PlayerJoinedLobbyMessage(gameId, socketID, availableTokens)
+    );
   }
 
   @Override
