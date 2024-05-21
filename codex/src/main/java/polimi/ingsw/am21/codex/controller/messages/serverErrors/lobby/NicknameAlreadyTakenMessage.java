@@ -5,12 +5,19 @@ import polimi.ingsw.am21.codex.controller.messages.MessageType;
 
 public class NicknameAlreadyTakenMessage extends ErrorMessage {
 
-  public NicknameAlreadyTakenMessage() {
+  private final String nickname;
+
+  public NicknameAlreadyTakenMessage(String nickname) {
     super(MessageType.NICKNAME_ALREADY_TAKEN);
+    this.nickname = nickname;
+  }
+
+  public String getNickname() {
+    return nickname;
   }
 
   @Override
   public String toString() {
-    return getType().toString();
+    return getType().toString() + "{ nickname=" + nickname + " }";
   }
 }
