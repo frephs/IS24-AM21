@@ -71,4 +71,12 @@ public interface GameEventListener {
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
   );
+
+  void gameOver();
+
+  void playerScoresUpdate(Map<String, Integer> newScores);
+
+  void remainingTurns(int remainingTurns);
+
+  void winningPlayer(String nickname);
 }

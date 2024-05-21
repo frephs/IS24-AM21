@@ -452,4 +452,42 @@ public class LocalModelContainer
 
     localGameBoard.setCurrentPlayer(nextPlayerIndex);
   }
+
+  @Override
+  public void gameOver() {
+    view.drawGameOver(localGameBoard.getPlayers());
+  }
+
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    newScores.forEach((nickname, newScore) -> {
+      localGameBoard
+        .getPlayers()
+        .stream()
+        .filter(player -> player.getNickname().equals(nickname))
+        .forEach(player -> {
+          int diff = newScore - player.getPoints();
+          player.setPoints(newScore);
+          diffMessage(diff, "points");
+        });
+    });
+    view.drawLeaderBoard(localGameBoard.getPlayers());
+  }
+
+  @Override
+  public void remainingTurns(int remainingTurns) {
+    view.postNotification(
+      NotificationType.UPDATE,
+      remainingTurns + "turns left."
+    );
+  }
+
+  @Override
+  public void winningPlayer(String nickname) {
+    view.drawWinner(nickname);
+    //TODO Back to lobby
+    localLobby = null;
+    localGameBoard = null;
+    view.drawAvailableGames(Set.of(), null, null);
+  }
 }
