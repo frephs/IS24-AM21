@@ -15,7 +15,11 @@ public interface GameEventListener {
 
   void gameDeleted(String gameId);
 
-  void playerJoinedLobby(String gameId, UUID socketID);
+  void playerJoinedLobby(
+    String gameId,
+    UUID socketID,
+    Set<TokenColor> availableTokens
+  );
 
   void playerLeftLobby(String gameId, UUID socketID);
 
