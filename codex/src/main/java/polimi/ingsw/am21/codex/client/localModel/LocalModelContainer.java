@@ -51,6 +51,8 @@ public class LocalModelContainer
     Map<String, Integer> currentPlayers,
     Map<String, Integer> maxPlayers
   ) {
+    localLobby = new LocalLobby();
+
     Set<String> availableGames = localLobby.getAvailableGames();
     Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
     Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
