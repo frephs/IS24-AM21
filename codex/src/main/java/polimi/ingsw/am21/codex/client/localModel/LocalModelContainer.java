@@ -1,9 +1,12 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
+import java.rmi.RemoteException;
 import java.util.*;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
@@ -28,12 +31,24 @@ public class LocalModelContainer
 
   private UUID socketId;
 
+  private final RemoteGameEventListener listener;
+
   public LocalModelContainer(UUID socketID, View view) {
     this.view = view;
     this.socketId = socketID;
 
     cardsLoader.loadCards();
     this.localLobby = new LocalLobby();
+    try {
+      listener = new LocalModelGameEventListener(this);
+    } catch (RemoteException e) {
+      // TODO: handle this
+      throw new RuntimeException("Failed creating client", e);
+    }
+  }
+
+  public RemoteGameEventListener getRemoteListener() {
+    return listener;
   }
 
   public LocalGameBoard getLocalGameBoard() {

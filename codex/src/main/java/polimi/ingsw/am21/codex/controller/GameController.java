@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.controller;
 
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
@@ -7,6 +8,7 @@ import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -33,7 +35,7 @@ import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 public class GameController {
 
   GameManager manager;
-  List<GameEventListener> listeners;
+  List<RemoteGameEventListener> listeners;
 
   public GameController() {
     manager = new GameManager();
@@ -91,14 +93,18 @@ public class GameController {
         game.drawObjectiveCardPair(),
         game.drawStarterCard()
       );
-      listeners.forEach(
-        listener ->
+      listeners.forEach(listener -> {
+        try {
           listener.playerJoinedLobby(
             gameId,
             socketID,
             lobby.getAvailableColors()
-          )
-      );
+          );
+        } catch (RemoteException e) {
+          // TODO: Handle in a better way
+          throw new RuntimeException(e);
+        }
+      });
     } catch (EmptyDeckException e) {
       throw new RuntimeException("EmptyDeckException");
     }
@@ -118,9 +124,14 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setToken(socketID, color);
-    listeners.forEach(
-      listener -> listener.playerSetToken(gameId, socketID, color)
-    );
+    listeners.forEach(listener -> {
+      try {
+        listener.playerSetToken(gameId, socketID, color);
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public void lobbySetNickname(String gameId, UUID socketID, String nickname)
@@ -133,9 +144,14 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setNickname(socketID, nickname);
-    listeners.forEach(
-      listener -> listener.playerSetNickname(gameId, socketID, nickname)
-    );
+    listeners.forEach(listener -> {
+      try {
+        listener.playerSetNickname(gameId, socketID, nickname);
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
@@ -153,9 +169,14 @@ public class GameController {
   private void startGame(String gameId, Game game)
     throws GameNotReadyException, GameAlreadyStartedException {
     game.start();
-    listeners.forEach(
-      listener -> listener.gameStarted(gameId, game.getPlayerIds())
-    );
+    listeners.forEach(listener -> {
+      try {
+        listener.gameStarted(gameId, game.getPlayerIds());
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public void startGame(String gameId)
@@ -171,8 +192,8 @@ public class GameController {
       .getLobby()
       .finalizePlayer(socketID, sideType, game.drawHand());
     game.addPlayer(newPlayer);
-    listeners.forEach(
-      listener ->
+    listeners.forEach(listener -> {
+      try {
         listener.playerJoinedGame(
           gameId,
           socketID,
@@ -184,8 +205,12 @@ public class GameController {
             .stream()
             .map(PlayableCard::getId)
             .collect(Collectors.toList())
-        )
-    );
+        );
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
     if (game.getPlayersSpotsLeft() == 0) {
       this.startGame(gameId, game);
     }
@@ -204,7 +229,14 @@ public class GameController {
         );
     } catch (LobbyFullException ignored) {}
 
-    listeners.forEach(listener -> listener.gameCreated(gameId, 1, players));
+    listeners.forEach(listener -> {
+      try {
+        listener.gameCreated(gameId, 1, players);
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public Boolean isLastRound(String gameId) throws GameNotFoundException {
@@ -213,7 +245,14 @@ public class GameController {
 
   public void deleteGame(String gameId) {
     manager.deleteGame(gameId);
-    listeners.forEach(listener -> listener.gameDeleted(gameId));
+    listeners.forEach(listener -> {
+      try {
+        listener.gameDeleted(gameId);
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   private void checkIfCurrentPlayer(Game game, String playerNickname)
@@ -229,10 +268,14 @@ public class GameController {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
     game.nextTurn();
-    listeners.forEach(
-      listener ->
-        listener.changeTurn(gameId, playerNickname, game.isLastRound())
-    );
+    listeners.forEach(listener -> {
+      try {
+        listener.changeTurn(gameId, playerNickname, game.isLastRound());
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public void nextTurn(
@@ -248,8 +291,8 @@ public class GameController {
       drawingSource,
       deckType,
       (playerCardId, pairCardId) ->
-        listeners.forEach(
-          listener ->
+        listeners.forEach(listener -> {
+          try {
             listener.changeTurn(
               gameId,
               playerNickname,
@@ -258,12 +301,16 @@ public class GameController {
               deckType,
               playerCardId,
               pairCardId
-            )
-        )
+            );
+          } catch (RemoteException e) {
+            // TODO: handle in a better way
+            throw new RuntimeException(e);
+          }
+        })
     );
   }
 
-  public void addListener(GameEventListener listener) {
+  public void addListener(RemoteGameEventListener listener) {
     listeners.add(listener);
   }
 
@@ -287,8 +334,8 @@ public class GameController {
       side,
       position
     );
-    listeners.forEach(
-      listener ->
+    listeners.forEach(listener -> {
+      try {
         listener.cardPlaced(
           gameId,
           playerNickname,
@@ -301,8 +348,12 @@ public class GameController {
           currentPlayer.getBoard().getObjects(),
           currentPlayer.getBoard().getAvailableSpots(),
           currentPlayer.getBoard().getForbiddenSpots()
-        )
-    );
+        );
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public Set<TokenColor> getAvailableTokens(String gameId)

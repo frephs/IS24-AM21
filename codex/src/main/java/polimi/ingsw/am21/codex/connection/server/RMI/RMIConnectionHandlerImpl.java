@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.connection.server.RMI;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
@@ -9,6 +10,7 @@ import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -86,7 +88,7 @@ public class RMIConnectionHandlerImpl
   }
 
   @Override
-  public void registerClient(GameEventListener listener)
+  public void registerClient(RemoteGameEventListener listener)
     throws RemoteException {
     this.controller.addListener(listener);
   }

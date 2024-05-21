@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -12,24 +13,27 @@ import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public interface GameEventListener extends RemoteGameEventListener {
-  void gameCreated(String gameId, int currentPlayers, int maxPlayers);
+public interface RemoteGameEventListener extends Remote {
+  void gameCreated(String gameId, int currentPlayers, int maxPlayers)
+    throws RemoteException;
 
-  void gameDeleted(String gameId);
+  void gameDeleted(String gameId) throws RemoteException;
 
   void playerJoinedLobby(
     String gameId,
     UUID socketID,
     Set<TokenColor> availableTokens
-  );
+  ) throws RemoteException;
 
-  void playerLeftLobby(String gameId, UUID socketID);
+  void playerLeftLobby(String gameId, UUID socketID) throws RemoteException;
 
-  void playerSetToken(String gameId, UUID socketID, TokenColor token);
+  void playerSetToken(String gameId, UUID socketID, TokenColor token)
+    throws RemoteException;
 
-  void playerSetNickname(String gameId, UUID socketID, String nickname);
+  void playerSetNickname(String gameId, UUID socketID, String nickname)
+    throws RemoteException;
 
-  void playerChoseObjectiveCard(Boolean isFirst);
+  void playerChoseObjectiveCard(Boolean isFirst) throws RemoteException;
 
   void playerJoinedGame(
     String gameId,
@@ -37,9 +41,9 @@ public interface GameEventListener extends RemoteGameEventListener {
     String nickname,
     TokenColor color,
     List<Integer> handIDs
-  );
+  ) throws RemoteException;
 
-  void gameStarted(String gameId, List<String> players);
+  void gameStarted(String gameId, List<String> players) throws RemoteException;
 
   /**
    * @param playerId The player that has just finished their turn
@@ -52,12 +56,13 @@ public interface GameEventListener extends RemoteGameEventListener {
     DrawingDeckType deck,
     Integer cardId,
     Integer newPairCardId
-  );
+  ) throws RemoteException;
 
   /**
    * @param playerId The player that has just finished their turn
    */
-  void changeTurn(String gameId, String playerId, Boolean isLastRound);
+  void changeTurn(String gameId, String playerId, Boolean isLastRound)
+    throws RemoteException;
 
   /* current player placed a card */
   void cardPlaced(
@@ -72,13 +77,14 @@ public interface GameEventListener extends RemoteGameEventListener {
     Map<ObjectType, Integer> updatedObjects,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
-  );
+  ) throws RemoteException;
 
-  void gameOver();
+  void gameOver() throws RemoteException;
 
-  void playerScoresUpdate(Map<String, Integer> newScores);
+  void playerScoresUpdate(Map<String, Integer> newScores)
+    throws RemoteException;
 
-  void remainingTurns(int remainingTurns);
+  void remainingTurns(int remainingTurns) throws RemoteException;
 
-  void winningPlayer(String nickname);
+  void winningPlayer(String nickname) throws RemoteException;
 }

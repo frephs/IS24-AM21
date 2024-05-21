@@ -76,6 +76,9 @@ public class RMIClientConnectionHandler
       this.rmiConnectionHandler = (RMIConnectionHandler) registry.lookup(
         "//" + this.host + ":" + this.port + "/IS24-AM21-CODEX"
       );
+      this.rmiConnectionHandler.registerClient(
+          this.localModel.getRemoteListener()
+        );
       this.connectionEstablished();
     } catch (RemoteException | NotBoundException e) {
       this.connectionFailed();
