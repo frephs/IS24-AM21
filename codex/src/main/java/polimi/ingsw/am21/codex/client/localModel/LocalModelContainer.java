@@ -61,11 +61,6 @@ public class LocalModelContainer
     view.postNotification(NotificationType.ERROR, "Game not started");
   }
 
-  @Override
-  public void gameNotFound() {
-    view.postNotification(NotificationType.ERROR, "Game not found");
-  }
-
   public void getGames(
     Set<String> gameIds,
     Map<String, Integer> currentPlayers,
@@ -146,7 +141,7 @@ public class LocalModelContainer
     return localGameBoard.getGameId();
   }
 
-  public Set<TokenColor> getTokenColor() {
+  public Set<TokenColor> getAvailableTokens() {
     return localLobby.getAvailableTokens();
   }
 

@@ -5,7 +5,6 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface ClientConnectionHandler {
@@ -40,7 +39,7 @@ public interface ClientConnectionHandler {
    * @return the set of the token that are available
    */
 
-  void getAvailableTokens();
+  Set<TokenColor> getAvailableTokens();
 
   /**
    * @param nickname the nickname of the lobby player

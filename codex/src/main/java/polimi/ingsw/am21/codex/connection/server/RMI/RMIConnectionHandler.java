@@ -88,4 +88,7 @@ public interface RMIConnectionHandler extends Remote {
 
   public void leaveLobby(String gameId, UUID connectionID)
     throws RemoteException, GameNotFoundException;
+
+  public Set<TokenColor> getAvailableTokens(String gameId)
+    throws RemoteException, GameNotFoundException;
 }

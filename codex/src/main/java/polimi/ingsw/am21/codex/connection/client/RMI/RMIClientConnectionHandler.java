@@ -19,7 +19,6 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
@@ -100,13 +99,17 @@ public class RMIClientConnectionHandler
   public void connectToGame(String gameId) {
     try {
       rmiConnectionHandler.joinLobby(gameId, this.socketID);
-      this.localModel.playerJoinedLobby(gameId, this.socketID);
+      this.localModel.playerJoinedLobby(
+          gameId,
+          this.socketID,
+          this.localModel.getAvailableTokens()
+        );
     } catch (GameAlreadyStartedException e) {
       this.localModel.gameAlreadyStarted();
     } catch (LobbyFullException e) {
       this.localModel.lobbyFull();
     } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound();
+      this.localModel.gameNotFound(gameId);
     } catch (RemoteException e) {
       this.messageNotSent();
     }
@@ -126,7 +129,7 @@ public class RMIClientConnectionHandler
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound();
+      this.localModel.gameNotFound(localModel.getGameId());
       this.localModel.playerLeftLobby(
           this.localModel.getGameId(),
           this.socketID
@@ -137,10 +140,16 @@ public class RMIClientConnectionHandler
   @Override
   public void createAndConnectToGame(String gameId, int numberPlayers) {
     try {
-      rmiConnectionHandler.createGame(gameId, this.socketID, numberPlayers);
-      // TODO
-      //      this.localModel.gameCreated(gameId, numberPlayers);
-      this.localModel.playerJoinedLobby(gameId, this.socketID);
+      try {
+        rmiConnectionHandler.createGame(gameId, this.socketID, numberPlayers);
+        // TODO
+        //      this.localModel.gameCreated(gameId, numberPlayers);
+        this.localModel.playerJoinedLobby(
+            gameId,
+            this.socketID,
+            rmiConnectionHandler.getAvailableTokens(gameId)
+          );
+      } catch (GameNotFoundException ignored) {}
     } catch (EmptyDeckException e) { //    } //      System.err.println("A remote exception occurred" + e.getMessage()); //    } catch (EmptyDeckException e) { //      System.err.println("The game was not found" + e.getMessage()); //    } catch (GameNotFoundException e) { //      System.err.println("The lobby is full" + e.getMessage()); //    } catch (LobbyFullException e) { //      System.err.println("The game already started" + e.getMessage()); //    catch (GameAlreadyStartedException e) {
       throw new RuntimeException(e);
     } catch (RemoteException e) {
@@ -161,7 +170,8 @@ public class RMIClientConnectionHandler
           this.socketID,
           color
         );
-      localPlayer = new LocalPlayer(color);
+      // TODO: implement
+      //      localPlayer = new LocalPlayer(color);
     } catch (GameAlreadyStartedException e) {
       // TODO: update view
     } catch (GameNotFoundException e) {
@@ -173,7 +183,7 @@ public class RMIClientConnectionHandler
 
   @Override
   public Set<TokenColor> getAvailableTokens() {
-    return this.localModel.getTokenColor();
+    return this.localModel.getAvailableTokens();
   }
 
   @Override
@@ -206,7 +216,7 @@ public class RMIClientConnectionHandler
     } catch (GameAlreadyStartedException e) {
       this.localModel.gameAlreadyStarted();
     } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound();
+      this.localModel.gameNotFound(localModel.getGameId());
     } catch (RemoteException e) {
       this.messageNotSent();
     }
@@ -259,7 +269,7 @@ public class RMIClientConnectionHandler
           position
         );
     } catch (GameNotFoundException e) {
-      localModel.gameNotFound();
+      localModel.gameNotFound(this.localModel.getGameId());
     } catch (PlayerNotActive e) {
       localModel.playerNotActive();
     } catch (IllegalCardSideChoiceException e) {
@@ -289,7 +299,7 @@ public class RMIClientConnectionHandler
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound();
+      this.localModel.gameNotFound(this.localModel.getGameId());
     } catch (InvalidNextTurnCallException e) {
       this.localModel.invalidNextTurnCall();
     } catch (PlayerNotActive e) {
@@ -311,7 +321,7 @@ public class RMIClientConnectionHandler
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound();
+      this.localModel.gameNotFound(localModel.getGameId());
     } catch (InvalidNextTurnCallException e) {
       this.localModel.invalidNextTurnCall();
     } catch (PlayerNotActive e) {

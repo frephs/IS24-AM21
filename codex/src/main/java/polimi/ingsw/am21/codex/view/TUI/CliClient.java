@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.ConnectionType;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -143,21 +142,7 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbySetNickname(command[1]);
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (NicknameAlreadyTakenException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Nickname already taken"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbySetNickname(command[1]);
             break;
           case "choose-objective":
             if (!List.of("1", "2").contains(command[1])) {
@@ -168,16 +153,7 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbyChooseObjectiveCard(command[1].equals("1"));
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbyChooseObjectiveCard(command[1].equals("1"));
             break;
           case "start-game":
             if (!List.of("front", "back").contains(command[1])) {
@@ -188,31 +164,11 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbyJoinGame(
-                command[1].equals("front")
-                  ? CardSideType.FRONT
-                  : CardSideType.BACK
-              );
-            } catch (GameNotReadyException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not ready");
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (EmptyDeckException e) {
-              cli.postNotification(NotificationType.ERROR, "Empty deck");
-            } catch (IllegalCardSideChoiceException e) {
-              cli.postNotification(NotificationType.ERROR, "Invalid card side");
-            } catch (IllegalPlacingPositionException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Invalid placing position"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbyJoinGame(
+              command[1].equals("front")
+                ? CardSideType.FRONT
+                : CardSideType.BACK
+            );
             break;
           case "show":
             switch (command[1]) {
@@ -309,24 +265,11 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.placeCard(
-                handIndex,
-                CardSideType.valueOf(command[4].toUpperCase()),
-                position
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            } catch (PlayerNotActive e) {
-              cli.postNotification(NotificationType.ERROR, "Player not active");
-            } catch (IllegalCardSideChoiceException e) {
-              cli.postNotification(NotificationType.ERROR, "Invalid card side");
-            } catch (IllegalPlacingPositionException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Invalid placing position"
-              );
-            }
+            client.placeCard(
+              handIndex,
+              CardSideType.valueOf(command[4].toUpperCase()),
+              position
+            );
             break;
           case "draw":
             if (
@@ -346,34 +289,19 @@ public class CliClient {
               break;
             }
 
-            try {
-              if (command[1] != null) {
-                DrawingCardSource source = command[1].equals("deck")
-                  ? DrawingCardSource.Deck
-                  : (command[1].endsWith("1")
-                      ? DrawingCardSource.CardPairFirstCard
-                      : DrawingCardSource.CardPairSecondCard);
+            if (command[1] != null) {
+              DrawingCardSource source = command[1].equals("deck")
+                ? DrawingCardSource.Deck
+                : (command[1].endsWith("1")
+                    ? DrawingCardSource.CardPairFirstCard
+                    : DrawingCardSource.CardPairSecondCard);
 
-                DrawingDeckType type = command[1].startsWith("resource")
-                  ? DrawingDeckType.RESOURCE
-                  : DrawingDeckType.GOLD;
+              DrawingDeckType type = command[1].startsWith("resource")
+                ? DrawingDeckType.RESOURCE
+                : DrawingDeckType.GOLD;
 
-                client.nextTurn(source, type);
-              } else client.nextTurn();
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            } catch (PlayerNotActive e) {
-              cli.postNotification(NotificationType.ERROR, "Player not active");
-            } catch (GameOverException e) {
-              cli.postNotification(NotificationType.ERROR, "Game over");
-            } catch (EmptyDeckException e) {
-              cli.postNotification(NotificationType.ERROR, "Empty deck");
-            } catch (InvalidNextTurnCallException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Invalid next turn call"
-              );
-            }
+              client.nextTurn(source, type);
+            } else client.nextTurn();
             break;
           default:
             cli.postNotification(NotificationType.ERROR, "Invalid command");

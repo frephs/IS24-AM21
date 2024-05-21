@@ -13,7 +13,7 @@ public interface GameErrorListener {
 
   void gameAlreadyStarted();
   void gameNotStarted();
-  void gameNotFound();
+  void gameNotFound(String gameId);
   void notInGame();
   void playerNotActive();
   void invalidNextTurnCall();

@@ -304,4 +304,10 @@ public class GameController {
         )
     );
   }
+
+  public Set<TokenColor> getAvailableTokens(String gameId)
+    throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    return game.getLobby().getAvailableColors();
+  }
 }

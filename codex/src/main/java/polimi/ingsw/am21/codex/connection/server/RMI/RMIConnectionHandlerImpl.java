@@ -79,6 +79,12 @@ public class RMIConnectionHandlerImpl
     this.controller.removePlayerFromLobby(gameId, connectionID);
   }
 
+  @Override
+  public Set<TokenColor> getAvailableTokens(String gameId)
+    throws RemoteException, GameNotFoundException {
+    return this.controller.getAvailableTokens(gameId);
+  }
+
   public void lobbySetTokenColor(
     String gameId,
     UUID connectionID,

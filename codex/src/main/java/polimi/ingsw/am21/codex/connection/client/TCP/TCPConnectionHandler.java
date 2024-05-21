@@ -16,18 +16,14 @@ import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
-import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.GetGameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
-import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
 public class TCPConnectionHandler implements ClientConnectionHandler {
@@ -141,7 +137,8 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
         case GAME_NOT_FOUND -> localModel.gameDeleted(gameId);
         case GAME_FULL -> localModel.gameFull(gameId);
         //        case CONFIRM -> localModel.playerJoinedLobby(gameId, this.socketID);
-        default -> view.postNotification(Notification.UNKNOWN_RESPONSE);
+        default -> this.getView()
+          .postNotification(Notification.UNKNOWN_RESPONSE);
       }
     };
   }
@@ -186,8 +183,9 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void getAvailableTokens() {
+  public Set<TokenColor> getAvailableTokens() {
     // TODO
+    return null;
   }
 
   @Override
