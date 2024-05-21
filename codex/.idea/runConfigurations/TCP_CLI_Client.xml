@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TCP CLI Client" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="polimi.ingsw.am21.codex.Main" />
+    <module name="codex" />
+    <option name="PROGRAM_PARAMETERS" value="--cli" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

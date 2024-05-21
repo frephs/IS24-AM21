@@ -148,9 +148,6 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
     lobby.setObjectiveCard(socketID, first);
-    listeners.forEach(
-      listener -> listener.playerChoseObjectiveCard(gameId, socketID, first)
-    );
   }
 
   private void startGame(String gameId, Game game)
@@ -306,5 +303,11 @@ public class GameController {
           currentPlayer.getBoard().getForbiddenSpots()
         )
     );
+  }
+
+  public Set<TokenColor> getAvailableTokens(String gameId)
+    throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    return game.getLobby().getAvailableColors();
   }
 }

@@ -17,9 +17,7 @@ import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
-import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.GetGameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
@@ -38,15 +36,13 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
-import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
 public class TCPConnectionHandler implements ClientConnectionHandler {
 
-  private final String ip;
+  private final String host;
   private final int port;
 
   private Socket connection;
@@ -56,7 +52,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   private ObjectOutputStream outputStream;
 
   private final ExecutorService threadManager = Executors.newCachedThreadPool();
-  private final View view;
 
   private UUID socketID;
 
@@ -65,12 +60,11 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   private Consumer<Message> callbackFunction;
   private Boolean waiting = false;
 
-  public TCPConnectionHandler(View view, String ip, int port) {
+  public TCPConnectionHandler(View view, String host, int port) {
     this.socketID = UUID.randomUUID();
-    this.view = view;
     this.localModel = new LocalModelContainer(socketID, view);
 
-    this.ip = ip;
+    this.host = host;
     this.port = port;
     this.connect();
   }
@@ -84,21 +78,25 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
           outputStream.reset();
           this.waiting = true;
         } catch (IOException ignored) {
-          view.postNotification(Notification.CONNECTION_FAILED);
+          this.getView().postNotification(Notification.CONNECTION_FAILED);
         }
       } else {
-        view.postNotification(Notification.ALREADY_WAITING);
+        this.getView().postNotification(Notification.ALREADY_WAITING);
       }
     }
+  }
+
+  private View getView() {
+    return this.localModel.getView();
   }
 
   @Override
   public void connect() {
     while (!connected) {
       try {
-        this.connection = new Socket(ip, port);
+        this.connection = new Socket(host, port);
         connected = true;
-        this.view.postNotification(Notification.CONNECTION_ESTABLISHED);
+        this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
       } catch (IOException e) {
         connected = false;
         throw new RuntimeException(e);
@@ -110,7 +108,7 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       this.outputStream = new ObjectOutputStream(connection.getOutputStream());
       this.inputStream = new ObjectInputStream(connection.getInputStream());
     } catch (IOException e) {
-      view.postNotification(Notification.CONNECTION_FAILED);
+      this.getView().postNotification(Notification.CONNECTION_FAILED);
       throw new RuntimeException("Connection Failed! Please restart the game");
     }
   }
@@ -121,18 +119,19 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void listGames() {
+  public void getGames() {
     this.send(new GetAvailableGameLobbiesMessage());
     this.callbackFunction = message -> {
       switch (message.getType()) {
         case AVAILABLE_GAME_LOBBIES -> {
           AvailableGameLobbiesMessage availableGameLobbiesMessage =
             (AvailableGameLobbiesMessage) message;
-          view.drawAvailableGames(
-            availableGameLobbiesMessage.getLobbyIds(),
-            availableGameLobbiesMessage.getCurrentPlayers(),
-            availableGameLobbiesMessage.getMaxPlayers()
-          );
+          this.getView()
+            .drawAvailableGames(
+              availableGameLobbiesMessage.getLobbyIds(),
+              availableGameLobbiesMessage.getCurrentPlayers(),
+              availableGameLobbiesMessage.getMaxPlayers()
+            );
         }
         default -> localModel.unknownResponse();
       }
@@ -147,9 +146,8 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
         case GAME_NOT_FOUND -> localModel.gameDeleted(gameId);
         case GAME_FULL -> localModel.gameFull(gameId);
         //        case CONFIRM -> localModel.playerJoinedLobby(gameId, this.socketID);
-
-        case PLAYER_JOINED_LOBBY -> {}
-        default -> view.postNotification(Notification.UNKNOWN_RESPONSE);
+        default -> this.getView()
+          .postNotification(Notification.UNKNOWN_RESPONSE);
       }
     };
   }
@@ -177,31 +175,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void checkIfGameStarted() {
-    this.send(
-        new GetGameStatusMessage(localModel.getLocalGameBoard().getGameId())
-      );
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case GAME_STATUS -> {
-          GameStatusMessage gameStatusMessage = (GameStatusMessage) message;
-          switch (gameStatusMessage.getState()) {
-            case GAME_INIT -> view.postNotification(
-              NotificationType.WARNING,
-              "Game has not started yet"
-            );
-            //            case PLAYING -> {
-            //              localModel.gameStarted(
-            //
-            //              );
-            //            }
-          }
-        }
-      }
-    };
-  }
-
-  @Override
   public void lobbySetToken(TokenColor color) {
     this.send(
         new SetTokenColorMessage(
@@ -219,8 +192,9 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void getAvailableTokens() {
+  public Set<TokenColor> getAvailableTokens() {
     // TODO
+    return null;
   }
 
   @Override
@@ -249,12 +223,9 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       );
     this.callbackFunction = message -> {
       switch (message.getType()) {
-        case CONFIRM -> localModel.playerChoseObjectiveCard(
-          null,
-          this.socketID,
-          first
-        );
-        default -> view.postNotification(Notification.UNKNOWN_RESPONSE);
+        case CONFIRM -> localModel.playerChoseObjectiveCard(first);
+        default -> this.getView()
+          .postNotification(Notification.UNKNOWN_RESPONSE);
       }
     };
   }
@@ -301,14 +272,25 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
+  public void leaveLobby() {
+    this.send(new LeaveLobbyMessage());
+    this.callbackFunction = message -> {
+      switch (message.getType()) {
+        case CONFIRM -> localModel.playerLeftLobby();
+        default -> localModel.unknownResponse();
+      }
+    };
+  }
+
+  @Override
   public void nextTurn(
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
   ) {
     this.send(
         new NextTurnActionMessage(
-          localModel.getGameId(),
-          localModel.getLocalGameBoard().getPlayerNickname(),
+          this.localModel.getLocalGameBoard().getGameId(),
+          this.localModel.getLocalGameBoard().getPlayerNickname(),
           drawingSource,
           deckType
         )

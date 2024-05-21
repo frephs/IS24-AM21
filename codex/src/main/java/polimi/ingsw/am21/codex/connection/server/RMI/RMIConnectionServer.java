@@ -4,7 +4,7 @@ import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import polimi.ingsw.am21.codex.ConnectionType;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.controller.GameController;
 
 public class RMIConnectionServer {
@@ -27,7 +27,7 @@ public class RMIConnectionServer {
       );
 
       // Bind this object instance to the name we want
-      registry.rebind("//127.0.0.1:" + port + "/RMIConnectionHandler", handler);
+      registry.rebind("//127.0.0.1:" + port + "/IS24-AM21-CODEX", handler);
     } catch (RemoteException e) {
       //do nothing, error means registry already exists
       System.out.println("java RMI registry already exists.");

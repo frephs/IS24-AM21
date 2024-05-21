@@ -6,9 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.ConnectionType;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
@@ -38,7 +38,7 @@ public class CliClient {
 
   Scanner scanner = new Scanner(System.in);
 
-  void start(ConnectionType connectionType, String address, int port) {
+  public void start(ConnectionType connectionType, String address, int port) {
     String line;
     String[] command;
     ClientConnectionHandler client;
@@ -53,12 +53,14 @@ public class CliClient {
     // // TODO what's the registry?
     //      client = new RMIConnectionClient(address, port);
     //    }
-    client.connect();
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 
+    executorService.execute(client::connect);
+
     while (true) {
       try {
+        System.out.println("Select a command: ");
         line = scanner.nextLine().trim();
         command = line.split(" ");
 
@@ -89,7 +91,7 @@ public class CliClient {
             );
             break;
           case "list-games":
-            client.listGames();
+            client.getGames();
             break;
           case "join-game":
             if (command[1] == null) {
@@ -99,14 +101,7 @@ public class CliClient {
               );
               break;
             }
-
-            try {
-              client.connectToGame(command[1]);
-            } catch (LobbyFullException e) {
-              cli.postNotification(NotificationType.ERROR, "Lobby is full");
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.connectToGame(command[1]);
             break;
           case "leave-game":
             client.leaveGameLobby();
@@ -119,27 +114,13 @@ public class CliClient {
               );
               break;
             }
-
-            try {
-              client.createAndConnectToGame(
-                command[1],
-                Integer.parseInt(command[2])
-              );
-            } catch (EmptyDeckException e) {
-              throw new RuntimeException(e);
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (LobbyFullException e) {
-              cli.postNotification(NotificationType.ERROR, "Lobby is full");
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.createAndConnectToGame(
+              command[1],
+              Integer.parseInt(command[2])
+            );
             break;
           case "get-tokens":
-            // TODO change interface method
+            // TODO what should it do?
             break;
           case "set-token":
             if (
@@ -152,16 +133,7 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbySetToken(TokenColor.fromString(command[1]));
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbySetToken(TokenColor.fromString(command[1]));
             break;
           case "set-nickname":
             if (command[1] == null) {
@@ -172,21 +144,7 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbySetNickname(command[1]);
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (NicknameAlreadyTakenException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Nickname already taken"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbySetNickname(command[1]);
             break;
           case "choose-objective":
             if (!List.of("1", "2").contains(command[1])) {
@@ -197,16 +155,7 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbyChooseObjectiveCard(command[1].equals("1"));
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbyChooseObjectiveCard(command[1].equals("1"));
             break;
           case "start-game":
             if (!List.of("front", "back").contains(command[1])) {
@@ -217,31 +166,11 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.lobbyJoinGame(
-                command[1].equals("front")
-                  ? CardSideType.FRONT
-                  : CardSideType.BACK
-              );
-            } catch (GameNotReadyException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not ready");
-            } catch (GameAlreadyStartedException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Game already started"
-              );
-            } catch (EmptyDeckException e) {
-              cli.postNotification(NotificationType.ERROR, "Empty deck");
-            } catch (IllegalCardSideChoiceException e) {
-              cli.postNotification(NotificationType.ERROR, "Invalid card side");
-            } catch (IllegalPlacingPositionException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Invalid placing position"
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            }
+            client.lobbyJoinGame(
+              command[1].equals("front")
+                ? CardSideType.FRONT
+                : CardSideType.BACK
+            );
             break;
           case "show":
             switch (command[1]) {
@@ -338,24 +267,11 @@ public class CliClient {
               break;
             }
 
-            try {
-              client.placeCard(
-                handIndex,
-                CardSideType.valueOf(command[4].toUpperCase()),
-                position
-              );
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            } catch (PlayerNotActive e) {
-              cli.postNotification(NotificationType.ERROR, "Player not active");
-            } catch (IllegalCardSideChoiceException e) {
-              cli.postNotification(NotificationType.ERROR, "Invalid card side");
-            } catch (IllegalPlacingPositionException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Invalid placing position"
-              );
-            }
+            client.placeCard(
+              handIndex,
+              CardSideType.valueOf(command[4].toUpperCase()),
+              position
+            );
             break;
           case "draw":
             if (
@@ -375,43 +291,27 @@ public class CliClient {
               break;
             }
 
-            try {
-              if (command[1] != null) {
-                DrawingCardSource source = command[1].equals("deck")
-                  ? DrawingCardSource.Deck
-                  : (command[1].endsWith("1")
-                      ? DrawingCardSource.CardPairFirstCard
-                      : DrawingCardSource.CardPairSecondCard);
+            if (command[1] != null) {
+              DrawingCardSource source = command[1].equals("deck")
+                ? DrawingCardSource.Deck
+                : (command[1].endsWith("1")
+                    ? DrawingCardSource.CardPairFirstCard
+                    : DrawingCardSource.CardPairSecondCard);
 
-                DrawingDeckType type = command[1].startsWith("resource")
-                  ? DrawingDeckType.RESOURCE
-                  : DrawingDeckType.GOLD;
+              DrawingDeckType type = command[1].startsWith("resource")
+                ? DrawingDeckType.RESOURCE
+                : DrawingDeckType.GOLD;
 
-                client.nextTurn(source, type);
-              } else client.nextTurn();
-            } catch (GameNotFoundException e) {
-              cli.postNotification(NotificationType.ERROR, "Game not found");
-            } catch (PlayerNotActive e) {
-              cli.postNotification(NotificationType.ERROR, "Player not active");
-            } catch (GameOverException e) {
-              cli.postNotification(NotificationType.ERROR, "Game over");
-            } catch (EmptyDeckException e) {
-              cli.postNotification(NotificationType.ERROR, "Empty deck");
-            } catch (InvalidNextTurnCallException e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "Invalid next turn call"
-              );
-            }
+              client.nextTurn(source, type);
+            } else client.nextTurn();
             break;
           default:
             cli.postNotification(NotificationType.ERROR, "Invalid command");
         }
       } catch (IllegalStateException e) {
         // Scanner was closed
+        System.out.println("Scanner was closed");
         break;
-      } catch (RemoteException e) {
-        throw new RuntimeException(e);
       } catch (NoSuchElementException ignored) {}
     }
 

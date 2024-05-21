@@ -1,4 +1,4 @@
-package polimi.ingsw.am21.codex;
+package polimi.ingsw.am21.codex.connection;
 
 public enum ConnectionType {
   RMI,

@@ -40,9 +40,9 @@ class CliPrintableTest {
     );
 
     try {
-      System.out.println(resourceDeck.draw().cardToAscii(new HashMap<>()));
-      System.out.println(goldDeck.draw().cardToAscii(new HashMap<>()));
-      System.out.println(starterDeck.draw().cardToAscii(new HashMap<>()));
+      System.out.println(resourceDeck.draw().cardToAscii());
+      System.out.println(goldDeck.draw().cardToAscii());
+      System.out.println(starterDeck.draw().cardToAscii());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }

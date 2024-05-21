@@ -35,8 +35,9 @@ public interface View {
   void drawAvailableTokenColors(Set<TokenColor> tokenColors);
 
   void drawLobby(
-    Map<UUID, TokenColor> availableTokens,
-    Map<UUID, String> playerNicknames
+    Map<UUID, TokenColor> playerTokens,
+    Map<UUID, String> playerNicknames,
+    List<UUID> socketIds
   );
 
   // game
@@ -59,8 +60,6 @@ public interface View {
    * @param deck The deck that the card has been drawn from
    */
   void drawCardDrawn(DrawingDeckType deck);
-
-  void drawLeaderBoard();
 
   void drawCardPlacement(Card card, CardSideType side, Position position);
 

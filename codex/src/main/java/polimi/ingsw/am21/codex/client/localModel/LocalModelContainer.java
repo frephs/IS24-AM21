@@ -53,7 +53,17 @@ public class LocalModelContainer
     view.postNotification(NotificationType.WARNING, "Action not allowed");
   }
 
-  public void listGames(
+  @Override
+  public void gameAlreadyStarted() {
+    view.postNotification(NotificationType.ERROR, "Game has already started");
+  }
+
+  @Override
+  public void gameNotStarted() {
+    view.postNotification(NotificationType.ERROR, "Game not started");
+  }
+
+  public void getGames(
     Set<String> gameIds,
     Map<String, Integer> currentPlayers,
     Map<String, Integer> maxPlayers
@@ -106,6 +116,14 @@ public class LocalModelContainer
   }
 
   @Override
+  public void lobbyFull() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + localLobby.getGameId() + " lobby is full. "
+    );
+  }
+
+  @Override
   public void gameFull(String gameId) {
     view.postNotification(
       NotificationType.ERROR,
@@ -125,7 +143,7 @@ public class LocalModelContainer
     return localGameBoard.getGameId();
   }
 
-  public Set<TokenColor> getTokenColor() {
+  public Set<TokenColor> getAvailableTokens() {
     return localLobby.getAvailableTokens();
   }
 
@@ -202,7 +220,7 @@ public class LocalModelContainer
       nicknames.remove(socketID);
       Map<UUID, TokenColor> tokens = localLobby.getTokens();
       tokens.remove(socketID);
-      view.drawLobby(tokens, nicknames);
+      view.drawLobby(tokens, nicknames, localLobby.getPlayers());
     }
   }
 
@@ -223,7 +241,11 @@ public class LocalModelContainer
     );
 
     view.drawAvailableTokenColors(availableTokens);
-    view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+    view.drawLobby(
+      localLobby.getTokens(),
+      localLobby.getNicknames(),
+      localLobby.getPlayers()
+    );
   }
 
   @Override
@@ -254,7 +276,11 @@ public class LocalModelContainer
         "Player " + socketId + " chose the nickname" + nickname + ". "
       );
     }
-    view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+    view.drawLobby(
+      localLobby.getTokens(),
+      localLobby.getNicknames(),
+      localLobby.getPlayers()
+    );
   }
 
   @Override
@@ -274,11 +300,12 @@ public class LocalModelContainer
   }
 
   @Override
-  public void playerChoseObjectiveCard(
-    String gameId,
-    UUID socketID,
-    Boolean isFirst
-  ) {
+  public void notInGame() {
+    view.postNotification(NotificationType.ERROR, "You are not in a game. ");
+  }
+
+  @Override
+  public void playerChoseObjectiveCard(Boolean isFirst) {
     this.localGameBoard.setSecretObjective(
         isFirst
           ? this.localLobby.getAvailableObjectives().getFirst()
@@ -564,5 +591,24 @@ public class LocalModelContainer
     localLobby = null;
     localGameBoard = null;
     view.drawAvailableGames(Set.of(), null, null);
+  }
+
+  @Override
+  public void playerNotActive() {
+    view.postNotification(NotificationType.ERROR, "It's not your turn. ");
+  }
+
+  @Override
+  public void invalidNextTurnCall() {
+    view.postNotification(NotificationType.ERROR, "Invalid next turn call. ");
+  }
+
+  @Override
+  public void emptyDeck() {
+    view.postNotification(NotificationType.ERROR, "Deck is empty. ");
+  }
+
+  public View getView() {
+    return this.view;
   }
 }
