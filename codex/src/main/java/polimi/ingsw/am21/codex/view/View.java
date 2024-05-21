@@ -66,6 +66,8 @@ public interface View {
 
   void drawGame(List<LocalPlayer> players);
 
+  void drawGameOver(List<LocalPlayer> players);
+
   void drawCard(Card card);
 
   /**
@@ -79,4 +81,5 @@ public interface View {
    * @param goldCards The gold cards pair
    */
   void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
+  void drawWinner(String nickname);
 }
