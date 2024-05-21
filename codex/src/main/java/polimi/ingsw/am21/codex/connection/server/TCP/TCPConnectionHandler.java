@@ -291,7 +291,7 @@ public class TCPConnectionHandler implements Runnable {
     } catch (
       IllegalPlacingPositionException | IllegalCardSideChoiceException e
     ) {
-      send(new InvalidCardPlacementMessage());
+      send(new InvalidCardPlacementMessage(e.getMessage()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getGameId()));
     }
@@ -347,7 +347,7 @@ public class TCPConnectionHandler implements Runnable {
     } catch (
       IllegalCardSideChoiceException | IllegalPlacingPositionException e
     ) {
-      send(new InvalidCardPlacementMessage());
+      send(new InvalidCardPlacementMessage(e.getMessage()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     }
