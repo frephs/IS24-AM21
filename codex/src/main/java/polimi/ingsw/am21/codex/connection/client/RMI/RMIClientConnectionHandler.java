@@ -130,6 +130,8 @@ public class RMIClientConnectionHandler
       System.err.println("The game already started" + e.getMessage());
     } catch (GameNotFoundException e) {
       System.err.println("The game was not found" + e.getMessage());
+    } catch (RemoteException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -153,6 +155,8 @@ public class RMIClientConnectionHandler
       System.err.println("The game already started" + e.getMessage());
     } catch (GameNotFoundException e) {
       System.err.println("The game was not found" + e.getMessage());
+    } catch (RemoteException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -173,6 +177,8 @@ public class RMIClientConnectionHandler
       );
     } catch (GameNotFoundException e) {
       System.err.println("The game was not found");
+    } catch (RemoteException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -191,11 +197,17 @@ public class RMIClientConnectionHandler
         localModelContainer.getGameId(),
         this.index
       );
-    } catch (EmptyDeckException e) {} catch (
-      IllegalCardSideChoiceException e
-    ) {} catch (IllegalPlacingPositionException e) {} catch (
-      GameNotFoundException e
-    ) {}
+    } catch (EmptyDeckException e) {
+      // TODO
+    } catch (IllegalCardSideChoiceException e) {
+      // TODO
+    } catch (IllegalPlacingPositionException e) {
+      // TODO
+    } catch (GameNotFoundException e) {
+      // TODO
+    } catch (RemoteException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

@@ -63,6 +63,8 @@ public class Main {
 
   private static void startClient(ConnectionType connectionType, Integer port)
     throws MalformedURLException, NotBoundException, RemoteException {
+    // TODO
+
     //    throw new UnsupportedOperationException("Not implemented yet");
     Registry registry = LocateRegistry.getRegistry(2024);
     RMIConnectionHandler handler = (RMIConnectionHandler) registry.lookup(
