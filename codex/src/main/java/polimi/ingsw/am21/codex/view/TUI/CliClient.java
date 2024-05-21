@@ -1,21 +1,33 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
 import java.rmi.RemoteException;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
+import javafx.util.Pair;
+import polimi.ingsw.am21.codex.ConnectionType;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
+import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
+import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 
@@ -58,7 +70,23 @@ public class CliClient {
             scanner.close();
             break;
           case "help":
-            // TODO
+            cli.postNotification(
+              NotificationType.RESPONSE,
+              """
+              Available commands:
+              list-games
+              join-game <game-id>
+              leave-game
+              create-game <game-id> <number-of-players>
+              get-tokens
+              set-token <color>
+              set-nickname <nickname>
+              choose-objective <1|2>
+              start-game <front|back>
+              show <playerboard|leaderboard|card|hand|objective|pairs>
+              place <hand number> <row> <column> <front|back>
+              draw [deck|resource1|resource2|gold1|gold2]"""
+            );
             break;
           case "list-games":
             client.listGames();
@@ -136,22 +164,245 @@ public class CliClient {
             }
             break;
           case "set-nickname":
-            // TODO
+            if (command[1] == null) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: set-nickname <nickname>"
+              );
+              break;
+            }
+
+            try {
+              client.lobbySetNickname(command[1]);
+            } catch (GameAlreadyStartedException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Game already started"
+              );
+            } catch (NicknameAlreadyTakenException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Nickname already taken"
+              );
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            }
             break;
           case "choose-objective":
-            // TODO
+            if (!List.of("1", "2").contains(command[1])) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: choose-objective <1|2>"
+              );
+              break;
+            }
+
+            try {
+              client.lobbyChooseObjectiveCard(command[1].equals("1"));
+            } catch (GameAlreadyStartedException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Game already started"
+              );
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            }
             break;
           case "start-game":
-            // TODO
+            if (!List.of("front", "back").contains(command[1])) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: start-game <front|back>"
+              );
+              break;
+            }
+
+            try {
+              client.lobbyJoinGame(
+                command[1].equals("front")
+                  ? CardSideType.FRONT
+                  : CardSideType.BACK
+              );
+            } catch (GameNotReadyException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not ready");
+            } catch (GameAlreadyStartedException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Game already started"
+              );
+            } catch (EmptyDeckException e) {
+              cli.postNotification(NotificationType.ERROR, "Empty deck");
+            } catch (IllegalCardSideChoiceException e) {
+              cli.postNotification(NotificationType.ERROR, "Invalid card side");
+            } catch (IllegalPlacingPositionException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid placing position"
+              );
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            }
             break;
           case "show":
-            // TODO board, card at position, hand, objective, pairs
+            switch (command[1]) {
+              case "playerboard":
+                final String nickname = command[2];
+                cli.drawPlayerBoard(
+                  game
+                    .getPlayers()
+                    .stream()
+                    .filter(player -> player.getNickname().equals(nickname))
+                    .findFirst()
+                    .orElse(game.getPlayer())
+                );
+                break;
+              case "leaderboard":
+                cli.drawLeaderBoard(game.getPlayers());
+                break;
+              case "card":
+                Position pos;
+
+                try {
+                  pos = new Position(
+                    Integer.parseInt(command[2]),
+                    Integer.parseInt(command[3])
+                  );
+                } catch (NumberFormatException e) {
+                  cli.postNotification(
+                    NotificationType.ERROR,
+                    "Invalid command. Usage: show card <row> <column>"
+                  );
+                  break;
+                }
+
+                Pair<Card, CardSideType> entry = game
+                  .getPlayer()
+                  .getPlayedCards()
+                  .get(pos);
+
+                if (entry != null) cli.drawCard(entry.getKey());
+                else cli.postNotification(
+                  NotificationType.ERROR,
+                  "No card at position " + pos
+                );
+                break;
+              case "hand":
+                cli.drawHand(game.getPlayer().getHand());
+                break;
+              case "objective":
+                cli.drawCard(game.getSecretObjective());
+                break;
+              case "pairs":
+                cli.drawPairs(game.getResourceCards(), game.getGoldCards());
+                break;
+              default:
+                cli.postNotification(
+                  NotificationType.ERROR,
+                  "Invalid command. Usage: show <playerboard|leaderboard|card|hand|objective|pairs>"
+                );
+            }
             break;
           case "place":
-            // TODO
+            if (
+              !Stream.of(
+                command[1],
+                command[2],
+                command[3],
+                command[4]
+              ).allMatch(Objects::nonNull) ||
+              !Stream.of(command[1], command[2], command[3]).allMatch(
+                s -> s.matches("\\d+")
+              ) ||
+              !List.of("front", "back").contains(command[4])
+            ) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: place <hand number> <row> <column> <front|back>"
+              );
+              break;
+            }
+
+            Integer handIndex;
+            Position position;
+            try {
+              handIndex = Integer.parseInt(command[1]);
+              position = new Position(
+                Integer.parseInt(command[2]),
+                Integer.parseInt(command[3])
+              );
+            } catch (NumberFormatException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: place <hand number> <row> <column> <front|back>"
+              );
+              break;
+            }
+
+            try {
+              client.placeCard(
+                handIndex,
+                CardSideType.valueOf(command[4].toUpperCase()),
+                position
+              );
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            } catch (PlayerNotActive e) {
+              cli.postNotification(NotificationType.ERROR, "Player not active");
+            } catch (IllegalCardSideChoiceException e) {
+              cli.postNotification(NotificationType.ERROR, "Invalid card side");
+            } catch (IllegalPlacingPositionException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid placing position"
+              );
+            }
             break;
           case "draw":
-            // TODO (counts as next turn action)
+            if (
+              command[1] != null &&
+              !List.of(
+                "deck",
+                "resource1",
+                "resource2",
+                "gold1",
+                "gold2"
+              ).contains(command[1])
+            ) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid command. Usage: draw [deck|resource1|resource2|gold1|gold2]"
+              );
+              break;
+            }
+
+            try {
+              if (command[1] != null) {
+                DrawingCardSource source = command[1].equals("deck")
+                  ? DrawingCardSource.Deck
+                  : (command[1].endsWith("1")
+                      ? DrawingCardSource.CardPairFirstCard
+                      : DrawingCardSource.CardPairSecondCard);
+
+                DrawingDeckType type = command[1].startsWith("resource")
+                  ? DrawingDeckType.RESOURCE
+                  : DrawingDeckType.GOLD;
+
+                client.nextTurn(source, type);
+              } else client.nextTurn();
+            } catch (GameNotFoundException e) {
+              cli.postNotification(NotificationType.ERROR, "Game not found");
+            } catch (PlayerNotActive e) {
+              cli.postNotification(NotificationType.ERROR, "Player not active");
+            } catch (GameOverException e) {
+              cli.postNotification(NotificationType.ERROR, "Game over");
+            } catch (EmptyDeckException e) {
+              cli.postNotification(NotificationType.ERROR, "Empty deck");
+            } catch (InvalidNextTurnCallException e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "Invalid next turn call"
+              );
+            }
             break;
           default:
             cli.postNotification(NotificationType.ERROR, "Invalid command");

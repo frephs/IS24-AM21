@@ -27,11 +27,12 @@ public class LocalPlayer {
   private Set<Position> availableSpots;
   private Set<Position> forbiddenSpots;
 
-  private Map<Position, Pair<Card, CardSideType>> playedCards;
+  private final Map<Position, Pair<Card, CardSideType>> playedCards;
 
   public LocalPlayer(TokenColor token) {
     points = 0;
     this.token = token;
+    playedCards = new HashMap<>();
 
     Arrays.stream(ResourceType.values()).forEach(
       resourceType -> resources.put(resourceType, 0)
@@ -45,6 +46,7 @@ public class LocalPlayer {
   public void setNickname(String nickname) {
     this.nickname = nickname;
   }
+
   public void setHand(List<Card> hand) {
     this.hand = hand;
   }

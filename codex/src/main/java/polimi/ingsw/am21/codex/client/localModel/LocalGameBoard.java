@@ -18,6 +18,9 @@ public class LocalGameBoard {
   private int playerNumber;
 
   private int currentPlayer;
+  /**
+   * Index of the player associated with the client
+   */
   private int playerIndex;
 
   public LocalPlayer getCurrentPlayer() {
@@ -42,6 +45,13 @@ public class LocalGameBoard {
 
   public String getGameId() {
     return this.gameId;
+  }
+
+  /**
+   * Gets the local player associated with the client
+   */
+  public LocalPlayer getPlayer() {
+    return players.get(playerIndex);
   }
 
   public String getPlayerNickname() {

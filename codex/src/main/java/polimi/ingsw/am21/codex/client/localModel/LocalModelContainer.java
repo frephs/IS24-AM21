@@ -7,7 +7,6 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -403,9 +402,9 @@ public class LocalModelContainer
           );
         }
 
-        view.drawCardDraw(deck, newPairCard);
+        view.drawCardDrawn(deck, newPairCard);
       }
-      case Deck -> view.drawCardDraw(deck);
+      case Deck -> view.drawCardDrawn(deck);
     }
 
     view.postNotification(

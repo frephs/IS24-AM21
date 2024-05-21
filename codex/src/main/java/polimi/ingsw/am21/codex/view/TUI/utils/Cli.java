@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -94,12 +95,12 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawCardDraw(DrawingDeckType deck, Card card) {
+  public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
   }
 
   @Override
-  public void drawCardDraw(DrawingDeckType deck) {
+  public void drawCardDrawn(DrawingDeckType deck) {
     // TODO
   }
 
@@ -124,6 +125,19 @@ public class Cli implements View {
 
   @Override
   public void drawCard(Card card) {
+    // TODO
+  }
+
+  @Override
+  public void drawHand(List<Card> hand) {
+    // TODO
+  }
+
+  @Override
+  public void drawPairs(
+    CardPair<Card> resourceCards,
+    CardPair<Card> goldCards
+  ) {
     // TODO
   }
 }
