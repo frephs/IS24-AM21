@@ -187,7 +187,7 @@ public class LocalModelContainer
       nicknames.remove(socketID);
       Map<UUID, TokenColor> tokens = localLobby.getTokens();
       tokens.remove(socketID);
-      view.drawLobby(tokens, nicknames);
+      view.drawLobby(tokens, nicknames, localLobby.getPlayers());
     }
   }
 
@@ -208,7 +208,11 @@ public class LocalModelContainer
     );
 
     view.drawAvailableTokenColors(availableTokens);
-    view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+    view.drawLobby(
+      localLobby.getTokens(),
+      localLobby.getNicknames(),
+      localLobby.getPlayers()
+    );
   }
 
   @Override
@@ -239,7 +243,11 @@ public class LocalModelContainer
         "Player " + socketId + " chose the nickname" + nickname + ". "
       );
     }
-    view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+    view.drawLobby(
+      localLobby.getTokens(),
+      localLobby.getNicknames(),
+      localLobby.getPlayers()
+    );
   }
 
   @Override

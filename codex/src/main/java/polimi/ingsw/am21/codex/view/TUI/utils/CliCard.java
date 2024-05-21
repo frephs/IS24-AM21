@@ -4,6 +4,20 @@ import java.util.Map;
 
 public interface CliCard {
   String cardToString();
+
+  /**
+   * Converts the card to an ASCII representation
+   * @return The rendered ASCII string
+   */
+  default String cardToAscii() {
+    return cardToAscii(Map.of());
+  }
+
+  /**
+   * Converts the card to an ASCII representation
+   * @param cardStringMap Maps the position of the item to the corresponding string to render inside the card
+   * @return The rendered ASCII string
+   */
   String cardToAscii(Map<Integer, String> cardStringMap);
 
   static String playableCardToAscii(Map<Integer, String> cardStringMap) {

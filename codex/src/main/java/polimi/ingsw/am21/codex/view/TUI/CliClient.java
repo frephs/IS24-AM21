@@ -139,7 +139,7 @@ public class CliClient {
             }
             break;
           case "get-tokens":
-            // TODO change interface method
+            // TODO what should it do?
             break;
           case "set-token":
             if (
