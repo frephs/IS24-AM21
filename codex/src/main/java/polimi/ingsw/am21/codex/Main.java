@@ -21,6 +21,7 @@ import polimi.ingsw.am21.codex.view.View;
 public class Main {
 
   private static void printHelp() {
+    printAsciiArt();
     System.out.println("Usage: ");
     System.out.println("Server mode: ");
     System.out.println("java -jar codex.jar --server");
@@ -155,5 +156,16 @@ public class Main {
 
       startClient(clientType, connectionType, port.get());
     }
+  }
+
+  static void printAsciiArt() {
+    System.out.println(
+      "_________            .___              \n" +
+      "\\_   ___ \\  ____   __| _/____ ___  ___ \n" +
+      "/    \\  \\/ /  _ \\ / __ |/ __ \\\\  \\/  / \n" +
+      "\\     \\___(  <_> ) /_/ \\  ___/ >    <  \n" +
+      " \\______  /\\____/\\____ |\\___  >__/\\_ \\ \n" +
+      "        \\/            \\/    \\/      \\/ "
+    );
   }
 }

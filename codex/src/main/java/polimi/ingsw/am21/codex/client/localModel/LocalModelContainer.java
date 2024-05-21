@@ -7,7 +7,6 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -48,6 +47,11 @@ public class LocalModelContainer
   }
 
   @Override
+  public void actionNotAllowed() {
+    view.postNotification(NotificationType.WARNING, "Action not allowed");
+  }
+
+  @Override
   public void gameAlreadyStarted() {
     view.postNotification(NotificationType.ERROR, "Game has already started");
   }
@@ -67,6 +71,8 @@ public class LocalModelContainer
     Map<String, Integer> currentPlayers,
     Map<String, Integer> maxPlayers
   ) {
+    localLobby = new LocalLobby();
+
     Set<String> availableGames = localLobby.getAvailableGames();
     Map<String, Integer> playerSlots = localLobby.getPlayerSlots();
     Map<String, Integer> maxPlayerSlots = localLobby.getMaxPlayerSlots();
@@ -81,6 +87,7 @@ public class LocalModelContainer
     view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
+  //TODO also connect the player
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
     Set<String> availableGames = localLobby.getAvailableGames();
@@ -127,6 +134,14 @@ public class LocalModelContainer
     );
   }
 
+  @Override
+  public void gameNotFound(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + gameId + "not found. "
+    );
+  }
+
   public String getGameId() {
     return localGameBoard.getGameId();
   }
@@ -136,9 +151,13 @@ public class LocalModelContainer
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketId) {
+  public void playerJoinedLobby(
+    String gameId,
+    UUID socketId,
+    Set<TokenColor> availableTokenColors
+  ) {
     if (socketId == this.socketId) {
-      localLobby = new LocalLobby(gameId);
+      this.localLobby.setGameId(gameId);
       localGameBoard = new LocalGameBoard(
         gameId,
         localLobby.getMaxPlayerSlots().get(gameId)
@@ -149,12 +168,20 @@ public class LocalModelContainer
         NotificationType.RESPONSE,
         "You joined the lobby of the game" + gameId
       );
-    } else {
+    } else if (gameId.equals(localGameBoard.getGameId())) {
       //TODO(server) send a playerJoinedLobbyUpdate for every player that is already in the lobby, also token color and nickname should be sent if they set it.
       localLobby.getPlayers().add(this.socketId);
       view.postNotification(
         NotificationType.UPDATE,
-        "Player" + socketId + " joined game " + gameId
+        "Player" + socketId + " joined your game " + gameId
+      );
+    } else {
+      localLobby
+        .getPlayerSlots()
+        .computeIfPresent(gameId, (gameID, slots) -> slots - 1);
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Player " + socketId + " joined game " + gameId
       );
     }
   }
@@ -183,7 +210,7 @@ public class LocalModelContainer
       nicknames.remove(socketID);
       Map<UUID, TokenColor> tokens = localLobby.getTokens();
       tokens.remove(socketID);
-      view.drawLobby(tokens, nicknames);
+      view.drawLobby(tokens, nicknames, localLobby.getPlayers());
     }
   }
 
@@ -204,11 +231,16 @@ public class LocalModelContainer
     );
 
     view.drawAvailableTokenColors(availableTokens);
-    view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+    view.drawLobby(
+      localLobby.getTokens(),
+      localLobby.getNicknames(),
+      localLobby.getPlayers()
+    );
   }
 
   @Override
   public void tokenTaken(TokenColor token) {
+    localLobby.getAvailableTokens().remove(token);
     view.postNotification(
       NotificationType.ERROR,
       new String[] { "The", "token is already taken" },
@@ -234,7 +266,11 @@ public class LocalModelContainer
         "Player " + socketId + " chose the nickname" + nickname + ". "
       );
     }
-    view.drawLobby(localLobby.getTokens(), localLobby.getNicknames());
+    view.drawLobby(
+      localLobby.getTokens(),
+      localLobby.getNicknames(),
+      localLobby.getPlayers()
+    );
   }
 
   @Override
@@ -285,36 +321,44 @@ public class LocalModelContainer
   @Override
   public void gameStarted(String gameId, List<String> players) {
     Map<String, Integer> nicknameToIndex = new HashMap<>();
-    for (int i = 0; i < players.size(); i++) {
-      String currentNickname = players.get(i);
-      if (
-        Objects.equals(
-          currentNickname,
-          localLobby.getNicknames().get(this.socketId)
-        )
-      ) {
-        localGameBoard.setPlayerIndex(i);
+
+    if (this.localGameBoard.getGameId().equals(gameId)) {
+      for (int i = 0; i < players.size(); i++) {
+        String currentNickname = players.get(i);
+        if (
+          Objects.equals(
+            currentNickname,
+            localLobby.getNicknames().get(this.socketId)
+          )
+        ) {
+          localGameBoard.setPlayerIndex(i);
+        }
+        nicknameToIndex.put(currentNickname, i);
       }
-      nicknameToIndex.put(currentNickname, i);
-    }
 
-    this.localGameBoard.getPlayers()
-      .sort(
-        Comparator.comparingInt(
-          player ->
-            nicknameToIndex.getOrDefault(
-              player.getNickname(),
-              Integer.MAX_VALUE
-            )
-        )
+      this.localGameBoard.getPlayers()
+        .sort(
+          Comparator.comparingInt(
+            player ->
+              nicknameToIndex.getOrDefault(
+                player.getNickname(),
+                Integer.MAX_VALUE
+              )
+          )
+        );
+
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Your game " + gameId + " started. "
       );
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Game " + gameId + " started. "
-    );
-
-    view.drawGame(localGameBoard.getPlayers());
+      view.drawGame(localGameBoard.getPlayers());
+    } else {
+      gameDeleted(gameId);
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Game " + gameId + " started without you"
+      );
+    }
   }
 
   @Override
@@ -397,6 +441,14 @@ public class LocalModelContainer
   }
 
   @Override
+  public void invalidCardPlacement(String reason) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Invalid card placement: " + reason
+    );
+  }
+
+  @Override
   public void changeTurn(
     String gameId,
     String playerId,
@@ -427,9 +479,9 @@ public class LocalModelContainer
           );
         }
 
-        view.drawCardDraw(deck, newPairCard);
+        view.drawCardDrawn(deck, newPairCard);
       }
-      case Deck -> view.drawCardDraw(deck);
+      case Deck -> view.drawCardDrawn(deck);
     }
 
     view.postNotification(
@@ -477,6 +529,44 @@ public class LocalModelContainer
   }
 
   @Override
+  public void gameOver() {
+    view.drawGameOver(localGameBoard.getPlayers());
+  }
+
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    newScores.forEach((nickname, newScore) -> {
+      localGameBoard
+        .getPlayers()
+        .stream()
+        .filter(player -> player.getNickname().equals(nickname))
+        .forEach(player -> {
+          int diff = newScore - player.getPoints();
+          player.setPoints(newScore);
+          diffMessage(diff, "points");
+        });
+    });
+    view.drawLeaderBoard(localGameBoard.getPlayers());
+  }
+
+  @Override
+  public void remainingTurns(int remainingTurns) {
+    view.postNotification(
+      NotificationType.UPDATE,
+      remainingTurns + "turns left."
+    );
+  }
+
+  @Override
+  public void winningPlayer(String nickname) {
+    view.drawWinner(nickname);
+    //TODO Back to lobby
+    localLobby = null;
+    localGameBoard = null;
+    view.drawAvailableGames(Set.of(), null, null);
+  }
+
+  @Override
   public void playerNotActive() {
     view.postNotification(NotificationType.ERROR, "It's not your turn. ");
   }
@@ -484,11 +574,6 @@ public class LocalModelContainer
   @Override
   public void invalidNextTurnCall() {
     view.postNotification(NotificationType.ERROR, "Invalid next turn call. ");
-  }
-
-  @Override
-  public void gameOver() {
-    view.postNotification(NotificationType.WARNING, "Game over. ");
   }
 
   @Override

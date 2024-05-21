@@ -5,8 +5,10 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 public interface GameErrorListener {
   void lobbyFull();
   void gameFull(String gameId);
-  void nicknameTaken(String nickname);
   void tokenTaken(TokenColor token);
+  void nicknameTaken(String nickname);
+
+  void actionNotAllowed();
   void unknownResponse();
 
   void gameAlreadyStarted();
@@ -17,4 +19,5 @@ public interface GameErrorListener {
   void invalidNextTurnCall();
   void gameOver();
   void emptyDeck();
+  void invalidCardPlacement(String reason);
 }

@@ -15,7 +15,11 @@ public interface GameEventListener {
 
   void gameDeleted(String gameId);
 
-  void playerJoinedLobby(String gameId, UUID socketID);
+  void playerJoinedLobby(
+    String gameId,
+    UUID socketID,
+    Set<TokenColor> availableTokens
+  );
 
   void playerLeftLobby(String gameId, UUID socketID);
 
@@ -67,4 +71,12 @@ public interface GameEventListener {
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
   );
+
+  void gameOver();
+
+  void playerScoresUpdate(Map<String, Integer> newScores);
+
+  void remainingTurns(int remainingTurns);
+
+  void winningPlayer(String nickname);
 }

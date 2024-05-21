@@ -264,7 +264,7 @@ public class TCPConnectionHandler implements Runnable {
         );
       }
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getGameId()));
     } catch (
       PlayerNotActive
       | GameOverException
@@ -291,9 +291,9 @@ public class TCPConnectionHandler implements Runnable {
     } catch (
       IllegalPlacingPositionException | IllegalCardSideChoiceException e
     ) {
-      send(new InvalidCardPlacementMessage());
+      send(new InvalidCardPlacementMessage(e.getMessage()));
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getGameId()));
     }
   }
 
@@ -324,9 +324,9 @@ public class TCPConnectionHandler implements Runnable {
         )
       );
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (LobbyFullException e) {
-      send(new GameFullMessage());
+      send(new GameFullMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
       send(new ActionNotAllowedMessage());
     }
@@ -347,9 +347,9 @@ public class TCPConnectionHandler implements Runnable {
     } catch (
       IllegalCardSideChoiceException | IllegalPlacingPositionException e
     ) {
-      send(new InvalidCardPlacementMessage());
+      send(new InvalidCardPlacementMessage(e.getMessage()));
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getLobbyId()));
     }
   }
 
@@ -362,7 +362,7 @@ public class TCPConnectionHandler implements Runnable {
       );
       send(new ConfirmMessage());
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
       send(new ActionNotAllowedMessage());
     }
@@ -377,9 +377,9 @@ public class TCPConnectionHandler implements Runnable {
       );
       send(new ConfirmMessage());
     } catch (NicknameAlreadyTakenException e) {
-      send(new NicknameAlreadyTakenMessage());
+      send(new NicknameAlreadyTakenMessage(message.getNickname()));
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
       send(new ActionNotAllowedMessage());
     }
@@ -396,9 +396,9 @@ public class TCPConnectionHandler implements Runnable {
       send(new ConfirmMessage());
       // Broadcast of available colors triggered by controller emitter
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (TokenAlreadyTakenException e) {
-      send(new TokenColorAlreadyTakenMessage());
+      send(new TokenColorAlreadyTakenMessage(message.getColor()));
     } catch (GameAlreadyStartedException e) {
       send(new ActionNotAllowedMessage());
     }
@@ -410,7 +410,7 @@ public class TCPConnectionHandler implements Runnable {
 
       send(new GameStatusMessage(game.getState()));
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getGameId()));
     }
   }
 
@@ -441,7 +441,7 @@ public class TCPConnectionHandler implements Runnable {
         )
       );
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getGameId()));
     }
   }
 
@@ -452,7 +452,7 @@ public class TCPConnectionHandler implements Runnable {
 
       send(new StarterCardSidesMessage(starterCard.getId()));
     } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage());
+      send(new GameNotFoundMessage(message.getGameId()));
     }
   }
 

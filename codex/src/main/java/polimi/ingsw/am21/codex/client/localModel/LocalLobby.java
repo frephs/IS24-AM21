@@ -22,9 +22,7 @@ public class LocalLobby {
 
   private String gameId;
 
-  LocalLobby(String gameId) {
-    this.gameId = gameId;
-  }
+  LocalLobby() {}
 
   public Map<String, Integer> getMaxPlayerSlots() {
     return maxPlayerSlots;

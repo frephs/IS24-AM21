@@ -140,9 +140,8 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       switch (message.getType()) {
         case GAME_NOT_FOUND -> localModel.gameDeleted(gameId);
         case GAME_FULL -> localModel.gameFull(gameId);
-        case CONFIRM -> localModel.playerJoinedLobby(gameId, this.socketID);
-        default -> this.getView()
-          .postNotification(Notification.UNKNOWN_RESPONSE);
+        //        case CONFIRM -> localModel.playerJoinedLobby(gameId, this.socketID);
+        default -> view.postNotification(Notification.UNKNOWN_RESPONSE);
       }
     };
   }
@@ -187,9 +186,8 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public Set<TokenColor> getAvailableTokens() {
+  public void getAvailableTokens() {
     // TODO
-    return null;
   }
 
   @Override

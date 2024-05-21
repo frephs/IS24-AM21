@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.Lobby;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -288,7 +289,7 @@ public class Lobby {
   /**
    * Gets a list of all the available token colors in the lobby
    */
-  public List<TokenColor> getAvailableColors() {
+  public Set<TokenColor> getAvailableColors() {
     return Arrays.stream(TokenColor.values())
       .filter(
         color ->
@@ -303,7 +304,7 @@ public class Lobby {
                   .orElse(false)
             )
       )
-      .toList();
+      .collect(Collectors.toSet());
   }
 
   /**

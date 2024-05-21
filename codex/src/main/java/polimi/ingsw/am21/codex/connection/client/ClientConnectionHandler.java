@@ -39,7 +39,8 @@ public interface ClientConnectionHandler {
   /**
    * @return the set of the token that are available
    */
-  Set<TokenColor> getAvailableTokens();
+
+  void getAvailableTokens();
 
   /**
    * @param nickname the nickname of the lobby player

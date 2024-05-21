@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -36,8 +35,9 @@ public interface View {
   void drawAvailableTokenColors(Set<TokenColor> tokenColors);
 
   void drawLobby(
-    Map<UUID, TokenColor> availableTokens,
-    Map<UUID, String> playerNicknames
+    Map<UUID, TokenColor> playerTokens,
+    Map<UUID, String> playerNicknames,
+    List<UUID> socketIds
   );
 
   // game
@@ -48,14 +48,37 @@ public interface View {
 
   void drawPlayerBoard(LocalPlayer player);
 
-  void drawCardDraw(DrawingDeckType deck, Card card);
-  void drawCardDraw(DrawingDeckType deck);
+  /**
+   * Displays that the client player has drawn a card from a deck
+   * @param deck The deck the card has been drawn from
+   * @param card The card that has been drawn
+   */
+  void drawCardDrawn(DrawingDeckType deck, Card card);
 
-  void drawLeaderBoard();
+  /**
+   * Displays that a card has been drawn from a deck
+   * @param deck The deck that the card has been drawn from
+   */
+  void drawCardDrawn(DrawingDeckType deck);
 
   void drawCardPlacement(Card card, CardSideType side, Position position);
 
   void drawGame(List<LocalPlayer> players);
 
+  void drawGameOver(List<LocalPlayer> players);
+
   void drawCard(Card card);
+
+  /**
+   * Displays the hand of the client player
+   */
+  void drawHand(List<Card> hand);
+
+  /**
+   * Displays the pairs the players can draw from
+   * @param resourceCards The resource cards pair
+   * @param goldCards The gold cards pair
+   */
+  void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
+  void drawWinner(String nickname);
 }

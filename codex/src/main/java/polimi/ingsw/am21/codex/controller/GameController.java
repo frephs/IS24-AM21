@@ -92,7 +92,12 @@ public class GameController {
         game.drawStarterCard()
       );
       listeners.forEach(
-        listener -> listener.playerJoinedLobby(gameId, socketID)
+        listener ->
+          listener.playerJoinedLobby(
+            gameId,
+            socketID,
+            lobby.getAvailableColors()
+          )
       );
     } catch (EmptyDeckException e) {
       throw new RuntimeException("EmptyDeckException");

@@ -8,6 +8,7 @@ public enum Notification {
   CONNECTION_FAILED(NotificationType.ERROR, "Connection not available"),
   MESSAGE_NOT_SENT(NotificationType.ERROR, "The message was not sent"),
 
+  UNKNOWN_MESSAGE(NotificationType.ERROR, "Unknown message"),
   UNKNOWN_RESPONSE(NotificationType.ERROR, "Unknown response to your request"),
   ALREADY_WAITING(
     NotificationType.WARNING,
