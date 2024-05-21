@@ -274,36 +274,44 @@ public class LocalModelContainer
   @Override
   public void gameStarted(String gameId, List<String> players) {
     Map<String, Integer> nicknameToIndex = new HashMap<>();
-    for (int i = 0; i < players.size(); i++) {
-      String currentNickname = players.get(i);
-      if (
-        Objects.equals(
-          currentNickname,
-          localLobby.getNicknames().get(this.socketId)
-        )
-      ) {
-        localGameBoard.setPlayerIndex(i);
+
+    if (this.localGameBoard.getGameId().equals(gameId)) {
+      for (int i = 0; i < players.size(); i++) {
+        String currentNickname = players.get(i);
+        if (
+          Objects.equals(
+            currentNickname,
+            localLobby.getNicknames().get(this.socketId)
+          )
+        ) {
+          localGameBoard.setPlayerIndex(i);
+        }
+        nicknameToIndex.put(currentNickname, i);
       }
-      nicknameToIndex.put(currentNickname, i);
-    }
 
-    this.localGameBoard.getPlayers()
-      .sort(
-        Comparator.comparingInt(
-          player ->
-            nicknameToIndex.getOrDefault(
-              player.getNickname(),
-              Integer.MAX_VALUE
-            )
-        )
+      this.localGameBoard.getPlayers()
+        .sort(
+          Comparator.comparingInt(
+            player ->
+              nicknameToIndex.getOrDefault(
+                player.getNickname(),
+                Integer.MAX_VALUE
+              )
+          )
+        );
+
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Your game " + gameId + " started. "
       );
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Game " + gameId + " started. "
-    );
-
-    view.drawGame(localGameBoard.getPlayers());
+      view.drawGame(localGameBoard.getPlayers());
+    } else {
+      gameDeleted(gameId);
+      view.postNotification(
+        NotificationType.UPDATE,
+        "Game " + gameId + " started without you"
+      );
+    }
   }
 
   @Override
