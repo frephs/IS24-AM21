@@ -1,1 +1,1 @@
-cd codex && mvn compile
+cd codex && mvn clean compile
