@@ -84,6 +84,14 @@ public class LocalModelContainer
     view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
+  public void listGames(
+    Set<String> gameIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
+    view.drawAvailableGames(gameIds, currentPlayers, maxPlayers);
+  }
+
   //TODO also connect the player
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {

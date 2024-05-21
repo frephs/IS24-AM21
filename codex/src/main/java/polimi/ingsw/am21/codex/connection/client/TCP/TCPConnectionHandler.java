@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +19,7 @@ import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnAc
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
@@ -36,6 +38,7 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.View;
@@ -307,8 +310,8 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       );
   }
 
-  @Override
   public GameState getGameState() {
+    //TODO
     return null;
   }
 
