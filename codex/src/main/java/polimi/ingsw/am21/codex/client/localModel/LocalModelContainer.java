@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -8,6 +9,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
@@ -83,6 +85,14 @@ public class LocalModelContainer
     view.drawAvailableGames(availableGames, playerSlots, maxPlayerSlots);
   }
 
+  public void listGames(
+    Set<String> gameIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
+    view.drawAvailableGames(gameIds, currentPlayers, maxPlayers);
+  }
+
   //TODO also connect the player
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
@@ -146,6 +156,19 @@ public class LocalModelContainer
     return localLobby.getAvailableTokens();
   }
 
+  public void loadGameLobby(Map<UUID, Pair<String, TokenColor>> players) {
+    players.forEach((uuid, nicknameTokenPair) -> {
+      playerJoinedLobby(
+        localLobby.getGameId(),
+        uuid,
+        localLobby.getAvailableTokens()
+      );
+
+      playerSetNickname(nicknameTokenPair.getKey());
+      playerSetToken(nicknameTokenPair.getValue());
+    });
+  }
+
   @Override
   public void playerJoinedLobby(
     String gameId,
@@ -159,14 +182,14 @@ public class LocalModelContainer
         localLobby.getMaxPlayerSlots().get(gameId)
       );
 
-      localLobby.getPlayers().add(this.socketId);
+      localLobby.getPlayers().add(socketId);
       view.postNotification(
         NotificationType.RESPONSE,
         "You joined the lobby of the game" + gameId
       );
     } else if (gameId.equals(localGameBoard.getGameId())) {
       //TODO(server) send a playerJoinedLobbyUpdate for every player that is already in the lobby, also token color and nickname should be sent if they set it.
-      localLobby.getPlayers().add(this.socketId);
+      localLobby.getPlayers().add(socketId);
       view.postNotification(
         NotificationType.UPDATE,
         "Player" + socketId + " joined your game " + gameId
@@ -277,6 +300,14 @@ public class LocalModelContainer
     );
   }
 
+  public void playerGetObjectiveCard(Pair<Integer, Integer> cardIdPair) {
+    localLobby.setAvailableObjectives(
+      cardsLoader.getCardFromId(cardIdPair.getKey()),
+      cardsLoader.getCardFromId(cardIdPair.getValue())
+    );
+    view.drawObjectiveCardChoice(localLobby.getAvailableObjectives());
+  }
+
   @Override
   public void notInGame() {
     view.postNotification(NotificationType.ERROR, "You are not in a game. ");
@@ -293,6 +324,10 @@ public class LocalModelContainer
         NotificationType.RESPONSE,
         "Secret objective chosen. "
       );
+  }
+
+  public void playerGetStarterCardSides(int cardId) {
+    view.drawStarterCardSides(cardsLoader.getCardFromId(cardId));
   }
 
   @Override
@@ -551,6 +586,11 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       remainingTurns + "turns left."
     );
+  }
+
+  public void gameStatusUpdate(GameState state) {
+    view.postNotification(NotificationType.UPDATE, "Game state: " + state);
+    //TODO switch on the game STATE
   }
 
   @Override

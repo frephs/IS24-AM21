@@ -13,18 +13,36 @@ import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
+import polimi.ingsw.am21.codex.controller.messages.ErrorMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
+import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
+import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
 public class TCPConnectionHandler implements ClientConnectionHandler {
@@ -54,11 +72,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
     this.host = host;
     this.port = port;
     this.connect();
-  }
-
-  private void consumeCallback(Message message) {
-    this.callbackFunction.accept(message);
-    this.callbackFunction = null;
   }
 
   private void send(ClientMessage message) {
@@ -290,7 +303,309 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void nextTurn() {}
+  public void nextTurn() {
+    this.send(
+        new NextTurnActionMessage(
+          localModel.getGameId(),
+          localModel.getLocalGameBoard().getPlayerNickname()
+        )
+      );
+  }
 
-  public void handleMessage() {}
+  public GameState getGameState() {
+    //TODO
+    return null;
+  }
+
+  /*
+   * ----------------------
+   * MESSAGE PARSING
+   * ----------------------
+   * */
+
+  private void consumeCallback(Message message) {
+    this.callbackFunction.accept(message);
+    this.callbackFunction = null;
+  }
+
+  public void parseMessage(Message message) {
+    switch (message.getType()) {
+      /*
+       * Server Responses
+       * */
+      // Lobby
+      case AVAILABLE_GAME_LOBBIES -> handleMessage(
+        (AvailableGameLobbiesMessage) message
+      );
+      case LOBBY_STATUS -> handleMessage((LobbyStatusMessage) message);
+      case OBJECTIVE_CARDS -> handleMessage((ObjectiveCardsMessage) message);
+      case STARTER_CARD_SIDES -> handleMessage(
+        (StarterCardSidesMessage) message
+      );
+      // Game
+      case GAME_STATUS -> handleMessage((GameStatusMessage) message);
+      /*
+       * Server Errors
+       * */
+      case ACTION_NOT_ALLOWED -> handleMessage(
+        (ActionNotAllowedMessage) message
+      );
+      case UNKNOWN_MESSAGE_TYPE -> handleMessage(
+        (UnknownMessageTypeMessage) message
+      );
+      case NOT_A_CLIENT_MESSAGE -> handleMessage(
+        (NotAClientMessageMessage) message
+      );
+      // lobby
+      case GAME_FULL -> handleMessage((GameFullMessage) message);
+      case GAME_NOT_FOUND -> handleMessage((GameNotFoundMessage) message);
+      case NICKNAME_ALREADY_TAKEN -> handleMessage(
+        (NicknameAlreadyTakenMessage) message
+      );
+      case TOKEN_COLOR_ALREADY_TAKEN -> handleMessage(
+        (TokenColorAlreadyTakenMessage) message
+      );
+      // game
+      case INVALID_CARD_PLACEMENT -> handleMessage(
+        (InvalidCardPlacementMessage) message
+      );
+      /*
+       * View Updating Messages
+       * */
+
+      // Lobby
+      case GAME_CREATED -> handleMessage((GameCreatedMessage) message);
+      case GAME_DELETED -> handleMessage((GameDeletedMessage) message);
+      case GAME_STARTED -> handleMessage((GameStartedMessage) message);
+      case PLAYER_JOINED_LOBBY -> handleMessage(
+        (PlayerJoinedLobbyMessage) message
+      );
+      case PLAYER_LEFT_LOBBY -> handleMessage((PlayerLeftLobbyMessage) message);
+      case PLAYER_SET_NICKNAME -> handleMessage(
+        (PlayerSetNicknameMessage) message
+      );
+      case PLAYER_SET_TOKEN_COLOR -> handleMessage(
+        (PlayerSetTokenColorMessage) message
+      );
+      //GAME
+      case CARD_PLACED -> handleMessage((CardPlacedMessage) message);
+      case GAME_OVER -> handleMessage((GameOverMessage) message);
+      case NEXT_TURN_UPDATE -> handleMessage((NextTurnUpdateMessage) message);
+      case PLAYER_JOINED_GAME -> handleMessage(
+        (PlayerJoinedGameMessage) message
+      );
+      case PLAYER_SCORES_UPDATE -> handleMessage(
+        (PlayerScoresUpdateMessage) message
+      );
+      case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
+      case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
+      default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
+    }
+  }
+
+  //TODO
+  //  public void handleMessage(Message message) {
+  //    if (this.waiting) {
+  //      switch(message.getType()){
+  //        case
+  //      }
+  //      consumeCallback(message);
+  //    } else {
+  //      parseMessage(message);
+  //    }
+  //  }
+  /*
+   * -------------------------
+   * SERVER RESPONSES HANDLERS
+   * -------------------------
+   * */
+
+  public void handleMessage(GameStatusMessage message) {
+    localModel.gameStatusUpdate(message.getState());
+  }
+
+  public void handleMessage(LobbyStatusMessage message) {
+    localModel.loadGameLobby(message.getPlayers());
+  }
+
+  public void handleMessage(AvailableGameLobbiesMessage message) {
+    localModel.listGames(
+      message.getLobbyIds(),
+      message.getCurrentPlayers(),
+      message.getMaxPlayers()
+    );
+  }
+
+  public void handleMessage(ObjectiveCardsMessage message) {
+    localModel.playerGetObjectiveCard(message.getIdPair());
+  }
+
+  public void handleMessage(StarterCardSidesMessage message) {
+    localModel.playerGetStarterCardSides(message.getCardId());
+  }
+
+  /*
+   * ------------------------
+   * SERVER ERRORS HANDLERS
+   * ------------------------
+   */
+
+  //game
+
+  public void handleMessage(InvalidCardPlacementMessage message) {
+    localModel.invalidCardPlacement(message.getReason());
+  }
+
+  //lobby
+
+  public void handleMessage(GameFullMessage message) {
+    localModel.gameFull(message.getGameId());
+  }
+
+  public void handleMessage(GameNotFoundMessage message) {
+    localModel.gameNotFound(message.getGameId());
+  }
+
+  public void handleMessage(NicknameAlreadyTakenMessage message) {
+    localModel.nicknameTaken(message.getNickname());
+  }
+
+  public void handleMessage(TokenColorAlreadyTakenMessage message) {
+    localModel.tokenTaken(message.getToken());
+  }
+
+  public void handleMessage(ActionNotAllowedMessage message) {
+    localModel.actionNotAllowed();
+  }
+
+  public void handleMessage(UnknownMessageTypeMessage message) {
+    getView()
+      .postNotification(
+        NotificationType.WARNING,
+        "You sent a message unknown to the server "
+      );
+  }
+
+  public void handleMessage(NotAClientMessageMessage message) {
+    getView()
+      .postNotification(
+        NotificationType.WARNING,
+        "You sent a message which is not a client's message"
+      );
+  }
+
+  public void unhandledMessage() {
+    getView()
+      .postNotification(
+        NotificationType.ERROR,
+        "The server sent you a message which you currently don't handle"
+      );
+  }
+
+  /*
+   * ----------------------
+   * VIEW UPDATES HANDLERS
+   * ----------------------
+   */
+
+  // LOBBY
+  public void handleMessage(GameCreatedMessage message) {
+    localModel.gameCreated(
+      message.getGameId(),
+      message.getPlayers(),
+      message.getMaxPlayers()
+    );
+  }
+
+  public void handleMessage(GameDeletedMessage message) {
+    localModel.gameDeleted(message.getGameId());
+  }
+
+  public void handleMessage(GameStartedMessage message) {
+    localModel.gameStarted(message.getGameId(), message.getPlayerIds());
+  }
+
+  public void handleMessage(PlayerJoinedLobbyMessage message) {
+    localModel.playerJoinedLobby(
+      message.getLobbyId(),
+      message.getSocketId(),
+      message.getAvailableTokenColors()
+    );
+  }
+
+  public void handleMessage(PlayerLeftLobbyMessage message) {
+    localModel.playerLeftLobby(message.getLobbyId(), message.getSocketId());
+  }
+
+  public void handleMessage(PlayerSetNicknameMessage message) {
+    localModel.playerSetNickname(
+      message.getGameId(),
+      message.getSocketId(),
+      message.getNickname()
+    );
+  }
+
+  public void handleMessage(PlayerSetTokenColorMessage message) {
+    localModel.playerSetToken(
+      message.getGameId(),
+      message.getSocketId(),
+      message.getColor()
+    );
+  }
+
+  // GAME
+
+  public void handleMessage(CardPlacedMessage message) {
+    localModel.cardPlaced(
+      message.getGameId(),
+      message.getPlayerId(),
+      message.getPlayerHandCardNumber(),
+      message.getCardId(),
+      message.getSide(),
+      message.getPosition(),
+      message.getNewPlayerScore(),
+      message.getUpdatedResources(),
+      message.getUpdatedObjects(),
+      message.getAvailableSpots(),
+      message.getForbiddenSpots()
+    );
+  }
+
+  public void handleMessage(GameOverMessage message) {
+    localModel.gameOver();
+  }
+
+  public void handleMessage(NextTurnUpdateMessage message) {
+    localModel.changeTurn(
+      message.getGameId(),
+      message.getNickname(),
+      message.isLastRound(),
+      message.getCardSource(),
+      message.getDeck(),
+      message.getDrawnCardId(),
+      message.getNewPairCardId()
+    );
+  }
+
+  public void handleMessage(PlayerJoinedGameMessage message) {
+    localModel.playerJoinedGame(
+      message.getGameId(),
+      message.getSocketId(),
+      message.getNickname(),
+      message.getColor(),
+      message.getHandIDs()
+    );
+  }
+
+  public void handleMessage(PlayerScoresUpdateMessage message) {
+    localModel.playerScoresUpdate(message.getNewScores());
+  }
+
+  public void handleMessage(RemainingTurnsMessage message) {
+    localModel.remainingTurns(message.getTurns());
+  }
+
+  public void handleMessage(WinningPlayerMessage message) {
+    localModel.winningPlayer(message.getWinnerNickname());
+  }
 }

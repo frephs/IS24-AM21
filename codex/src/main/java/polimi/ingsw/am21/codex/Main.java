@@ -8,7 +8,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import polimi.ingsw.am21.codex.client.ClientType;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.Server;
+import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.view.TUI.CliClient;
+import polimi.ingsw.am21.codex.view.View;
 
 public class Main {
 
@@ -64,25 +66,22 @@ public class Main {
     Integer port
   ) throws MalformedURLException, NotBoundException, RemoteException {
     //    throw new UnsupportedOperationException("Not implemented yet");
+    View view;
     // TODO: implement
-    CliClient client = new CliClient();
-    client.start(connectionType, "127.0.0.1", port);
-    // TODO
+    //
+    if (clientType == ClientType.CLI) {
+      CliClient client = new CliClient();
+      client.start(
+        connectionType,
+        "127.0.0.1",
+        connectionType.getDefaultPort()
+      );
+    } else {
+      //      // TODO: add gui
+      //      // VIEW = new GUIClient();
+    }
+    //
 
-    //    //    throw new UnsupportedOperationException("Not implemented yet");
-    //    Registry registry = LocateRegistry.getRegistry(2024);
-    //    RMIConnectionHandler handler = (RMIConnectionHandler) registry.lookup(
-    //      "//127.0.0.1:" + port + "/RMIConnectionHandler"
-    //    );
-    //
-    //    try {
-    //      handler.createGame("test", UUID.randomUUID(), 4);
-    //    } catch (EmptyDeckException e) {
-    //      throw new RuntimeException(e);
-    //    }
-    //
-    //    System.out.println(handler.getGames());
-    //    System.out.println("Games: " + serverRMI.getGames().toString());
   }
 
   public static void main(String[] args)
