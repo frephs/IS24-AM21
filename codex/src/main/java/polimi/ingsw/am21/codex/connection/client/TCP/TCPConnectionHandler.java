@@ -41,6 +41,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
+import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
 public class TCPConnectionHandler implements ClientConnectionHandler {
@@ -397,7 +398,7 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       );
       case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
-      default -> view.postNotification(Notification.UNKNOWN_MESSAGE);
+      default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
     }
   }
 
@@ -477,24 +478,27 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   public void handleMessage(UnknownMessageTypeMessage message) {
-    view.postNotification(
-      NotificationType.WARNING,
-      "You sent a message unknown to the server "
-    );
+    getView()
+      .postNotification(
+        NotificationType.WARNING,
+        "You sent a message unknown to the server "
+      );
   }
 
   public void handleMessage(NotAClientMessageMessage message) {
-    view.postNotification(
-      NotificationType.WARNING,
-      "You sent a message which is not a client's message"
-    );
+    getView()
+      .postNotification(
+        NotificationType.WARNING,
+        "You sent a message which is not a client's message"
+      );
   }
 
   public void unhandledMessage() {
-    view.postNotification(
-      NotificationType.ERROR,
-      "The server sent you a message which you currently don't handle"
-    );
+    getView()
+      .postNotification(
+        NotificationType.ERROR,
+        "The server sent you a message which you currently don't handle"
+      );
   }
 
   /*
