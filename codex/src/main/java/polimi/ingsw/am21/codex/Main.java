@@ -3,17 +3,10 @@ package polimi.ingsw.am21.codex;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import polimi.ingsw.am21.codex.client.ClientType;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
-import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
-import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.view.TUI.CliClient;
@@ -94,6 +87,8 @@ public class Main {
   public static void main(String[] args)
     throws MalformedURLException, NotBoundException, RemoteException {
     //TODO: cli helper to handle all launching modes
+
+    //    printAsciiArt();
 
     if (Arrays.asList(args).contains("--help")) {
       printHelp();

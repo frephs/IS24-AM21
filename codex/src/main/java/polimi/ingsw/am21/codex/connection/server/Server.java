@@ -30,9 +30,9 @@ public class Server {
 
   public void start()
     throws MalformedURLException, RemoteException, PortUnreachableException {
-    //    System.out.println("Starting TCP server on port " + this.tcpPort);
-    //    this.tcpServer.start();
     System.out.println("Starting RMI server on port " + this.rmiPort);
     this.rmiServer.start();
+    System.out.println("Starting TCP server on port " + this.tcpPort);
+    this.tcpServer.start();
   }
 }

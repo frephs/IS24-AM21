@@ -38,7 +38,7 @@ public class CliClient {
 
   Scanner scanner = new Scanner(System.in);
 
-  void start(ConnectionType connectionType, String address, int port) {
+  public void start(ConnectionType connectionType, String address, int port) {
     String line;
     String[] command;
     ClientConnectionHandler client;
@@ -53,12 +53,14 @@ public class CliClient {
     // // TODO what's the registry?
     //      client = new RMIConnectionClient(address, port);
     //    }
-    client.connect();
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 
+    executorService.execute(client::connect);
+
     while (true) {
       try {
+        System.out.println("Select a command: ");
         line = scanner.nextLine().trim();
         command = line.split(" ");
 
@@ -308,6 +310,7 @@ public class CliClient {
         }
       } catch (IllegalStateException e) {
         // Scanner was closed
+        System.out.println("Scanner was closed");
         break;
       } catch (NoSuchElementException ignored) {}
     }
