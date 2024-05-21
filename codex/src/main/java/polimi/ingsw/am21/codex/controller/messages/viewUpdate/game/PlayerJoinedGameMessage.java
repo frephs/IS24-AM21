@@ -33,6 +33,22 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
     return gameId;
   }
 
+  public UUID getSocketId() {
+    return socketId;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
+
+  public TokenColor getColor() {
+    return color;
+  }
+
+  public List<Integer> getHandIDs() {
+    return handIDs;
+  }
+
   @Override
   public String toString() {
     return (
