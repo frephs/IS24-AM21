@@ -38,7 +38,7 @@ public class CliClient {
 
   Scanner scanner = new Scanner(System.in);
 
-  void start(ConnectionType connectionType, String address, int port) {
+  public void start(ConnectionType connectionType, String address, int port) {
     String line;
     String[] command;
     ClientConnectionHandler client;
