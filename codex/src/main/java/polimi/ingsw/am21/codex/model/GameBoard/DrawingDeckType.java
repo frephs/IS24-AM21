@@ -1,6 +1,8 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
-public enum DrawingDeckType {
+import java.io.Serializable;
+
+public enum DrawingDeckType implements Serializable {
   RESOURCE,
   GOLD;
 
