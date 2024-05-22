@@ -75,20 +75,28 @@ public class CliClient {
               commandHandler ->
                 cli.postNotification(
                   NotificationType.WARNING,
-                  "Invalid command. Try with: " + commandHandler.getUsage()
+                  "Invalid command. You maybe looking for: " +
+                  commandHandler.getUsage()
                 )
             );
-          } else {
-            matchingCommands.forEach(
-              commandHandlers ->
-                commandHandlers.handle(
-                  line.split(" "),
-                  cli,
-                  scanner,
-                  client,
-                  localModel
-                )
-            );
+          } else if (!line.isEmpty()) {
+            try {
+              matchingCommands.forEach(
+                commandHandlers ->
+                  commandHandlers.handle(
+                    line.split(" "),
+                    cli,
+                    scanner,
+                    client,
+                    localModel
+                  )
+              );
+            } catch (Exception e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "An error occurred while executing the command"
+              );
+            }
           }
         } else {
           cli.postNotification(
