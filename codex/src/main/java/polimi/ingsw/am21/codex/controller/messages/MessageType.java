@@ -1,51 +1,93 @@
 package polimi.ingsw.am21.codex.controller.messages;
 
-public enum MessageType {
-  CONFIRM,
-  NEXT_TURN_ACTION,
-  PLACE_CARD,
-  CREATE_GAME,
+import java.io.Serializable;
 
-  JOIN_LOBBY,
-  LEAVE_LOBBY,
-  SELECT_OBJECTIVE,
-  SELECT_CARD_SIDE,
-  SET_NICKNAME,
-  SET_TOKEN_COLOR,
+public enum MessageType implements Serializable {
+  CONFIRM(MessageTypeCategory.SERVER_CONFIRM),
 
-  GET_GAME_STATUS,
-  GET_AVAILABLE_GAME_LOBBIES,
-  GET_OBJECTIVE_CARDS,
-  GET_STARTER_CARD_SIDE,
+  NEXT_TURN_ACTION(MessageTypeCategory.CLIENT_ACTION),
+  PLACE_CARD(MessageTypeCategory.CLIENT_ACTION),
+  CREATE_GAME(MessageTypeCategory.CLIENT_ACTION),
 
-  GAME_STATUS,
-  LOBBY_STATUS,
-  AVAILABLE_GAME_LOBBIES,
-  OBJECTIVE_CARDS,
-  STARTER_CARD_SIDES,
+  JOIN_LOBBY(MessageTypeCategory.CLIENT_ACTION),
+  LEAVE_LOBBY(MessageTypeCategory.CLIENT_ACTION),
+  SELECT_OBJECTIVE(MessageTypeCategory.CLIENT_ACTION),
+  SELECT_CARD_SIDE(MessageTypeCategory.CLIENT_ACTION),
+  SET_NICKNAME(MessageTypeCategory.CLIENT_ACTION),
+  SET_TOKEN_COLOR(MessageTypeCategory.CLIENT_ACTION),
 
-  INVALID_CARD_PLACEMENT,
-  GAME_FULL,
-  GAME_NOT_FOUND,
-  NICKNAME_ALREADY_TAKEN,
-  TOKEN_COLOR_ALREADY_TAKEN,
-  ACTION_NOT_ALLOWED,
-  NOT_A_CLIENT_MESSAGE,
-  UNKNOWN_MESSAGE_TYPE,
+  GET_GAME_STATUS(MessageTypeCategory.CLIENT_REQUEST),
+  GET_AVAILABLE_GAME_LOBBIES(MessageTypeCategory.CLIENT_REQUEST),
+  GET_OBJECTIVE_CARDS(MessageTypeCategory.CLIENT_REQUEST),
+  GET_STARTER_CARD_SIDE(MessageTypeCategory.CLIENT_REQUEST),
 
-  CARD_PLACED,
-  GAME_OVER,
-  NEXT_TURN_UPDATE,
-  PLAYER_JOINED_GAME,
-  PLAYER_SCORES_UPDATE,
-  REMAINING_TURNS,
-  WINNING_PLAYER,
-  AVAILABLE_TOKEN_COLORS,
-  GAME_CREATED,
-  GAME_DELETED,
-  GAME_STARTED,
-  PLAYER_JOINED_LOBBY,
-  PLAYER_LEFT_LOBBY,
-  PLAYER_SET_NICKNAME,
-  PLAYER_SET_TOKEN_COLOR,
+  GAME_STATUS(MessageTypeCategory.SERVER_RESPONSE),
+  LOBBY_STATUS(MessageTypeCategory.SERVER_RESPONSE),
+  AVAILABLE_GAME_LOBBIES(MessageTypeCategory.SERVER_RESPONSE),
+  OBJECTIVE_CARDS(MessageTypeCategory.SERVER_RESPONSE),
+  STARTER_CARD_SIDES(MessageTypeCategory.SERVER_RESPONSE),
+
+  INVALID_CARD_PLACEMENT(MessageTypeCategory.SERVER_ERROR),
+  GAME_FULL(MessageTypeCategory.SERVER_ERROR),
+  GAME_NOT_FOUND(MessageTypeCategory.SERVER_ERROR),
+  NICKNAME_ALREADY_TAKEN(MessageTypeCategory.SERVER_ERROR),
+  TOKEN_COLOR_ALREADY_TAKEN(MessageTypeCategory.SERVER_ERROR),
+  ACTION_NOT_ALLOWED(MessageTypeCategory.SERVER_ERROR),
+  NOT_A_CLIENT_MESSAGE(MessageTypeCategory.SERVER_ERROR),
+  UNKNOWN_MESSAGE_TYPE(MessageTypeCategory.SERVER_ERROR),
+
+  CARD_PLACED(MessageTypeCategory.VIEW_UPDATE),
+  GAME_OVER(MessageTypeCategory.VIEW_UPDATE),
+  NEXT_TURN_UPDATE(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_JOINED_GAME(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_SCORES_UPDATE(MessageTypeCategory.VIEW_UPDATE),
+  REMAINING_TURNS(MessageTypeCategory.VIEW_UPDATE),
+  WINNING_PLAYER(MessageTypeCategory.VIEW_UPDATE),
+  AVAILABLE_TOKEN_COLORS(MessageTypeCategory.VIEW_UPDATE),
+  GAME_CREATED(MessageTypeCategory.VIEW_UPDATE),
+  GAME_DELETED(MessageTypeCategory.VIEW_UPDATE),
+  GAME_STARTED(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_JOINED_LOBBY(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_LEFT_LOBBY(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_SET_NICKNAME(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_SET_TOKEN_COLOR(MessageTypeCategory.VIEW_UPDATE);
+
+  private enum MessageTypeCategory implements Serializable {
+    VIEW_UPDATE,
+    SERVER_CONFIRM,
+    SERVER_ERROR,
+    SERVER_RESPONSE,
+    CLIENT_REQUEST,
+    CLIENT_ACTION,
+  }
+
+  private final MessageTypeCategory messageTypeCategory;
+
+  MessageType(MessageTypeCategory messageTypeCategory) {
+    this.messageTypeCategory = messageTypeCategory;
+  }
+
+  public Boolean isViewUpdate() {
+    return this.messageTypeCategory == MessageTypeCategory.VIEW_UPDATE;
+  }
+
+  public Boolean isServerConfirm() {
+    return this.messageTypeCategory == MessageTypeCategory.SERVER_CONFIRM;
+  }
+
+  public Boolean isServerError() {
+    return this.messageTypeCategory == MessageTypeCategory.SERVER_ERROR;
+  }
+
+  public Boolean isServerResponse() {
+    return this.messageTypeCategory == MessageTypeCategory.SERVER_RESPONSE;
+  }
+
+  public Boolean isClientRequest() {
+    return this.messageTypeCategory == MessageTypeCategory.CLIENT_REQUEST;
+  }
+
+  public Boolean isClientAction() {
+    return this.messageTypeCategory == MessageTypeCategory.CLIENT_ACTION;
+  }
 }
