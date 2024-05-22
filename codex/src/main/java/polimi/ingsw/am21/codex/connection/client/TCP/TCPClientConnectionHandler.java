@@ -75,6 +75,8 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
     this.host = host;
     this.port = port;
     this.connect();
+    this.startMessageParser();
+    this.startMessageHandler();
   }
 
   /**
@@ -116,6 +118,35 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
               socket.getInetAddress() +
               "interrupted, exiting."
             );
+          break;
+        }
+      }
+    });
+  }
+
+  private void startMessageHandler() {
+    threadManager.execute(() -> {
+      while (true) synchronized (incomingMessages) {
+        try {
+          while (incomingMessages.isEmpty()) incomingMessages.wait();
+
+          parseMessage(incomingMessages.poll());
+        } catch (InterruptedException e) {
+          System.err.println(
+            "Message handler thread for " +
+            socket.getInetAddress() +
+            " interrupted, exiting."
+          );
+          break;
+        } catch (Exception e) {
+          System.err.println(
+            "Caught controller exception while handling message from " +
+            socket.getInetAddress() +
+            ". Closing connection."
+          );
+          e.printStackTrace();
+
+          this.disconnect();
           break;
         }
       }
