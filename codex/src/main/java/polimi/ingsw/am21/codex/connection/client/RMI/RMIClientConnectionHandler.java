@@ -11,7 +11,7 @@ import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionHandler;
+import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -43,7 +43,7 @@ public class RMIClientConnectionHandler
   private final String host;
   private final Integer port;
 
-  private RMIConnectionHandler rmiConnectionHandler;
+  private RMIServerConnectionHandler rmiConnectionHandler;
 
   public RMIClientConnectionHandler(View view, String host, Integer port) {
     this.host = host;
@@ -73,7 +73,7 @@ public class RMIClientConnectionHandler
   public void connect() {
     try {
       Registry registry = LocateRegistry.getRegistry(this.port);
-      this.rmiConnectionHandler = (RMIConnectionHandler) registry.lookup(
+      this.rmiConnectionHandler = (RMIServerConnectionHandler) registry.lookup(
         "//" + this.host + ":" + this.port + "/IS24-AM21-CODEX"
       );
       this.rmiConnectionHandler.registerClient(

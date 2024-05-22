@@ -7,12 +7,12 @@ import java.rmi.registry.Registry;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.controller.GameController;
 
-public class RMIConnectionServer {
+public class RMIServer {
 
   GameController controller;
   Integer port;
 
-  public RMIConnectionServer(Integer port, GameController controller) {
+  public RMIServer(Integer port, GameController controller) {
     this.controller = controller;
     this.port = port;
   }
@@ -22,9 +22,8 @@ public class RMIConnectionServer {
     try { //special exception handler for registry creation
       Registry registry = LocateRegistry.createRegistry(port);
       System.out.println("java RMI registry created.");
-      RMIConnectionHandlerImpl handler = new RMIConnectionHandlerImpl(
-        new GameController()
-      );
+      RMIServerConnectionHandlerImpl handler =
+        new RMIServerConnectionHandlerImpl(new GameController());
 
       // Bind this object instance to the name we want
       registry.rebind("//127.0.0.1:" + port + "/IS24-AM21-CODEX", handler);

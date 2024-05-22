@@ -1,8 +1,6 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -13,7 +11,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.TCP.TCPConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -39,7 +37,7 @@ public class CliClient {
     cli = Cli.getInstance();
 
     if (connectionType == ConnectionType.TCP) {
-      client = new TCPConnectionHandler(cli, address, port);
+      client = new TCPClientConnectionHandler(cli, address, port);
     } else {
       client = new RMIClientConnectionHandler(cli, address, port);
     }

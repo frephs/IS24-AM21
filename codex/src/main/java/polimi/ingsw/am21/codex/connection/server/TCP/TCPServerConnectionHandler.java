@@ -31,7 +31,6 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -48,7 +47,7 @@ import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 /** Runnable that handles a TCP connection */
-public class TCPConnectionHandler implements Runnable {
+public class TCPServerConnectionHandler implements Runnable {
 
   /**
    * The socket handling the TCP connection
@@ -84,13 +83,13 @@ public class TCPConnectionHandler implements Runnable {
   /**
    * The map of active connection handlers, used to handle message broadcasting
    */
-  private final Map<UUID, TCPConnectionHandler> activeHandlers;
+  private final Map<UUID, TCPServerConnectionHandler> activeHandlers;
 
-  public TCPConnectionHandler(
+  public TCPServerConnectionHandler(
     Socket socket,
     GameController controller,
     UUID socketId,
-    Map<UUID, TCPConnectionHandler> activeHandlers
+    Map<UUID, TCPServerConnectionHandler> activeHandlers
   ) {
     this.socket = socket;
     try {

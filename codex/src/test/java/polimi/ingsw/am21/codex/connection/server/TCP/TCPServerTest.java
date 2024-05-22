@@ -17,12 +17,11 @@ import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.CreateGameMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.JoinLobbyMessage;
-import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetNicknameMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetTokenColorMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-class TCPConnectionServerTest {
+class TCPServerTest {
 
   ObjectOutputStream outputStream;
   ObjectInputStream inputStream;
@@ -33,10 +32,7 @@ class TCPConnectionServerTest {
     final CountDownLatch responsesLatch = new CountDownLatch(3);
     Socket clientSocket;
 
-    TCPConnectionServer server = new TCPConnectionServer(
-      4567,
-      new GameController()
-    );
+    TCPServer server = new TCPServer(4567, new GameController());
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
       executor.execute(() -> {
         try {

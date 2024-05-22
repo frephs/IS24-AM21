@@ -3,15 +3,15 @@ package polimi.ingsw.am21.codex.connection.server;
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
 import java.rmi.RemoteException;
-import polimi.ingsw.am21.codex.connection.server.RMI.RMIConnectionServer;
-import polimi.ingsw.am21.codex.connection.server.TCP.TCPConnectionServer;
+import polimi.ingsw.am21.codex.connection.server.RMI.RMIServer;
+import polimi.ingsw.am21.codex.connection.server.TCP.TCPServer;
 import polimi.ingsw.am21.codex.controller.GameController;
 
 public class Server {
 
   GameController controller;
-  RMIConnectionServer rmiServer;
-  TCPConnectionServer tcpServer;
+  RMIServer rmiServer;
+  TCPServer tcpServer;
 
   Integer rmiPort;
   Integer tcpPort;
@@ -20,8 +20,8 @@ public class Server {
     this.tcpPort = tcpPort;
     this.rmiPort = rmiPort;
     this.controller = controller;
-    this.tcpServer = new TCPConnectionServer(tcpPort, controller);
-    this.rmiServer = new RMIConnectionServer(rmiPort, controller);
+    this.tcpServer = new TCPServer(tcpPort, controller);
+    this.rmiServer = new RMIServer(rmiPort, controller);
   }
 
   public Server(Integer tcpPort, Integer rmiPort) {

@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.controller.GameController;
 
-public class TCPConnectionServer {
+public class TCPServer {
 
   /**
    * The port to run the TCP server on
@@ -25,23 +25,23 @@ public class TCPConnectionServer {
   /**
    * A map with the socket ids as keys and the corresponding connection handlers as values
    */
-  private final Map<UUID, TCPConnectionHandler> activeHandlers;
+  private final Map<UUID, TCPServerConnectionHandler> activeHandlers;
 
   /**
    * The listener for the controller associated to this server
    */
-  private final TCPControllerListener controllerListener;
+  private final TCPServerControllerListener controllerListener;
 
   private ServerSocket serverSocket;
   private final CountDownLatch serverReadyLatch;
 
-  public TCPConnectionServer(Integer port, GameController controller) {
+  public TCPServer(Integer port, GameController controller) {
     this.port = port;
     this.controller = controller;
     this.activeHandlers = new HashMap<>();
 
-    this.controllerListener = new TCPControllerListener(message -> {
-      for (TCPConnectionHandler handler : activeHandlers.values()) {
+    this.controllerListener = new TCPServerControllerListener(message -> {
+      for (TCPServerConnectionHandler handler : activeHandlers.values()) {
         handler.send(message);
       }
     });
@@ -67,7 +67,7 @@ public class TCPConnectionServer {
             "Client connected from " + connectionSocket.getInetAddress()
           );
 
-          TCPConnectionHandler handler = new TCPConnectionHandler(
+          TCPServerConnectionHandler handler = new TCPServerConnectionHandler(
             connectionSocket,
             controller,
             socketId,

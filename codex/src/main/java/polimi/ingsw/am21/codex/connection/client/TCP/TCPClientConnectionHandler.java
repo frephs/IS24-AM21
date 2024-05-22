@@ -44,7 +44,7 @@ import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
-public class TCPConnectionHandler implements ClientConnectionHandler {
+public class TCPClientConnectionHandler implements ClientConnectionHandler {
 
   private final String host;
   private final int port;
@@ -66,7 +66,7 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
 
   private final Queue<Message> incomingMessages;
 
-  public TCPConnectionHandler(View view, String host, int port) {
+  public TCPClientConnectionHandler(View view, String host, int port) {
     this.socketID = UUID.randomUUID();
     this.localModel = new LocalModelContainer(socketID, view);
 
