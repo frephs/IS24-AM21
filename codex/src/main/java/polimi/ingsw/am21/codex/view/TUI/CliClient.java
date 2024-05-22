@@ -94,7 +94,8 @@ public class CliClient {
             } catch (Exception e) {
               cli.postNotification(
                 NotificationType.ERROR,
-                "An error occurred while executing the command"
+                "An error occurred while executing the command. \n" +
+                e.getMessage()
               );
             }
           }
@@ -465,7 +466,7 @@ public class CliClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "draw [deck|resource1|resource2|gold1|gold2]",
+        "draw <deck|resource1|resource2|gold1|gold2>",
         "Draw a card"
       ) {
         @Override
@@ -489,19 +490,31 @@ public class CliClient {
             // Handle invalid command
             return;
           }
-          if (command[1] != null) {
-            DrawingCardSource source = command[1].equals("deck")
-              ? DrawingCardSource.Deck
-              : (command[1].endsWith("1")
-                  ? DrawingCardSource.CardPairFirstCard
-                  : DrawingCardSource.CardPairSecondCard);
-            DrawingDeckType type = command[1].startsWith("resource")
-              ? DrawingDeckType.RESOURCE
-              : DrawingDeckType.GOLD;
-            client.nextTurn(source, type);
-          } else {
-            client.nextTurn();
-          }
+
+          DrawingCardSource source = command[1].equals("deck")
+            ? DrawingCardSource.Deck
+            : (command[1].endsWith("1")
+                ? DrawingCardSource.CardPairFirstCard
+                : DrawingCardSource.CardPairSecondCard);
+          DrawingDeckType type = command[1].startsWith("resource")
+            ? DrawingDeckType.RESOURCE
+            : DrawingDeckType.GOLD;
+          client.nextTurn(source, type);
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler("draw", "Pass your turn when no cards are available") {
+        @Override
+        public void handle(
+          String[] command,
+          Cli cli,
+          Scanner scanner,
+          ClientConnectionHandler client,
+          LocalModelContainer localModel
+        ) {
+          client.nextTurn();
         }
       }
     );
