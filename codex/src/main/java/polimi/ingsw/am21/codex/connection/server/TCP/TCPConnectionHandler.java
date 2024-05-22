@@ -164,9 +164,9 @@ public class TCPConnectionHandler implements Runnable {
           System.err.println(
             "IOException caught when parsing message from " +
             socket.getInetAddress() +
-            ". Parser is exiting.\n" +
-            e
+            ". Parser is exiting.\n"
           );
+          e.printStackTrace();
           break;
         } catch (InterruptedException e) {
           System.err.println(

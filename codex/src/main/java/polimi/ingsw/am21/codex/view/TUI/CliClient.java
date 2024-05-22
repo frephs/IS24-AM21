@@ -44,12 +44,6 @@ public class CliClient {
       client = new RMIClientConnectionHandler(cli, address, port);
     }
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
-
-    //executorService.execute(client::connect);
-    //this way we connect first and ask for commands after
-    client.connect();
-
     initializeCommandHandlers();
 
     while (true) {
