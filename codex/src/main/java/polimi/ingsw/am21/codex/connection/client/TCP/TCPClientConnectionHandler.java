@@ -61,7 +61,6 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
 
   private final LocalModelContainer localModel;
 
-  private Consumer<Message> callbackFunction;
   private Boolean waiting = false;
 
   private final Queue<Message> incomingMessages;
@@ -211,21 +210,6 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
   @Override
   public void getGames() {
     this.send(new GetAvailableGameLobbiesMessage());
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case AVAILABLE_GAME_LOBBIES -> {
-          AvailableGameLobbiesMessage availableGameLobbiesMessage =
-            (AvailableGameLobbiesMessage) message;
-          this.getView()
-            .drawAvailableGames(
-              availableGameLobbiesMessage.getLobbyIds(),
-              availableGameLobbiesMessage.getCurrentPlayers(),
-              availableGameLobbiesMessage.getMaxPlayers()
-            );
-        }
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
@@ -240,13 +224,8 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
 
   @Override
   public void createAndConnectToGame(String gameId, int players) {
+    // TODO this is actually only creating the game, we're not connecting to it
     this.send(new CreateGameMessage(gameId, players));
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case CONFIRM -> localModel.gameCreated(gameId, 1, players);
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
@@ -257,13 +236,6 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
           localModel.getLocalGameBoard().getGameId()
         )
       );
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case TOKEN_COLOR_ALREADY_TAKEN -> localModel.tokenTaken(color);
-        case CONFIRM -> localModel.playerSetToken(color);
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override

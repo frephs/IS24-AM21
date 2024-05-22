@@ -34,12 +34,25 @@ public class Cli implements View {
     return colored;
   }
 
+  public void printPrompt() {
+    System.out.print("\rEnter a command: ");
+  }
+
+  public void printUpdate(String string) {
+    System.out.println(
+      "\r" +
+      string +
+      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
+    );
+    printPrompt();
+  }
+
   @Override
   public void postNotification(
     NotificationType notificationType,
     String message
   ) {
-    System.out.println(
+    printUpdate(
       CliUtils.colorize(
         message,
         notificationType.getColor(),
@@ -83,7 +96,7 @@ public class Cli implements View {
           CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
       )
       .forEach(result::add);
-    System.out.println(String.join("", result));
+    printUpdate(String.join("", result));
   }
 
   @Override
@@ -93,7 +106,7 @@ public class Cli implements View {
     Map<String, Integer> maxPlayers
   ) {
     gameIds.forEach(gameId -> {
-      System.out.println(
+      printUpdate(
         "Game ID: " +
         gameId +
         " - Players: " +
@@ -106,7 +119,7 @@ public class Cli implements View {
 
   @Override
   public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
-    System.out.println(
+    printUpdate(
       "Available token colors: " +
       tokenColors
         .stream()
@@ -121,7 +134,7 @@ public class Cli implements View {
     Map<UUID, String> playerNicknames,
     List<UUID> socketIds
   ) {
-    System.out.println(
+    printUpdate(
       "Lobby: " +
       socketIds
         .stream()
@@ -142,7 +155,7 @@ public class Cli implements View {
 
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
-    System.out.println(
+    printUpdate(
       "Leaderboard:\n" +
       players
         .stream()
@@ -171,7 +184,7 @@ public class Cli implements View {
   @Override
   public void drawPlayerBoards(List<LocalPlayer> players) {
     players.forEach(player -> {
-      System.out.println(
+      printUpdate(
         "Player " +
         CliUtils.colorize(
           player.getNickname(),
@@ -190,7 +203,7 @@ public class Cli implements View {
       .getPlayedCards()
       .forEach(
         (position, placedCard) ->
-          System.out.println(
+          printUpdate(
             "Card " +
             (placedCard.getKey().getId()) +
             " placed at " +
@@ -203,14 +216,12 @@ public class Cli implements View {
 
   @Override
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
-    System.out.println(
-      "Card drawn from deck " + deck + ":\n" + card.cardToAscii()
-    );
+    printUpdate("Card drawn from deck " + deck + ":\n" + card.cardToAscii());
   }
 
   @Override
   public void drawCardDrawn(DrawingDeckType deck) {
-    System.out.println("Card drawn from deck " + deck);
+    printUpdate("Card drawn from deck " + deck);
   }
 
   @Override
@@ -219,29 +230,29 @@ public class Cli implements View {
     CardSideType side,
     Position position
   ) {
-    System.out.println(
+    printUpdate(
       "Card " + card.getId() + " placed at " + position + " on side " + side
     );
   }
 
   @Override
   public void drawGame(List<LocalPlayer> players) {
-    System.out.println("Game started with " + players.size() + " players");
+    printUpdate("Game started with " + players.size() + " players");
   }
 
   @Override
   public void drawGameOver(List<LocalPlayer> players) {
-    System.out.println("Game over");
+    printUpdate("Game over");
   }
 
   @Override
   public void drawCard(Card card) {
-    System.out.println("Card drawn:\n" + card.cardToAscii());
+    printUpdate("Card drawn:\n" + card.cardToAscii());
   }
 
   @Override
   public void drawHand(List<Card> hand) {
-    System.out.println(
+    printUpdate(
       "Hand:\n" +
       hand.stream().map(Card::cardToAscii).collect(Collectors.joining("\n"))
     );
@@ -252,7 +263,7 @@ public class Cli implements View {
     CardPair<Card> resourceCards,
     CardPair<Card> goldCards
   ) {
-    System.out.println(
+    printUpdate(
       "Resource cards pair:\n" +
       resourceCards.getFirst().cardToAscii() +
       "\n" +
@@ -273,7 +284,7 @@ public class Cli implements View {
 
   @Override
   public void drawWinner(String nickname) {
-    System.out.println(
+    printUpdate(
       CliUtils.colorize("Winner: " + nickname, Color.GREEN, ColorStyle.BOLD)
     );
   }

@@ -46,7 +46,7 @@ public class CliClient {
 
     while (true) {
       try {
-        System.out.print("Enter a command:\n > ");
+        cli.printPrompt();
         String line = scanner.nextLine().trim();
         String[] command = line.split(" ");
 
