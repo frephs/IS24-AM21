@@ -32,8 +32,6 @@ public class CliClient {
   ClientConnectionHandler client;
 
   public void start(ConnectionType connectionType, String address, int port) {
-    ClientConnectionHandler client;
-
     cli = Cli.getInstance();
 
     if (connectionType == ConnectionType.TCP) {
@@ -74,14 +72,7 @@ public class CliClient {
           } else if (!line.isEmpty()) {
             try {
               matchingCommands.forEach(
-                commandHandlers ->
-                  commandHandlers.handle(
-                    line.split(" "),
-                    cli,
-                    scanner,
-                    client,
-                    localModel
-                  )
+                commandHandlers -> commandHandlers.handle(line.split(" "))
               );
             } catch (Exception e) {
               cli.postNotification(
@@ -129,13 +120,7 @@ public class CliClient {
       return matcher.matches();
     }
 
-    public abstract void handle(
-      String[] command,
-      Cli cli,
-      Scanner scanner,
-      ClientConnectionHandler client,
-      LocalModelContainer localModel
-    );
+    public abstract void handle(String[] command);
 
     public String getUsage() {
       return usage;
@@ -152,13 +137,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("exit", "Exit the program") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           cli.postNotification(NotificationType.CONFIRM, "Closing...");
           client.disconnect();
           scanner.close();
@@ -178,13 +157,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("help", "Display available commands") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           List<String> commands = new ArrayList<>();
           List<String> usages = new ArrayList<>();
           List<String> descriptions = new ArrayList<>();
@@ -207,28 +180,14 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("list-games", "List available games") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
-          // TODO implement list-games command
-        }
+        public void handle(String[] command) {}
       }
     );
 
     commandHandlers.add(
       new CommandHandler("join-game <game-id>", "Join a game") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.connectToGame(command[1]);
         }
       }
@@ -237,13 +196,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("leave-game", "Leave the current game") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.leaveGameLobby();
         }
       }
@@ -255,13 +208,7 @@ public class CliClient {
         "Create a new game"
       ) {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.createAndConnectToGame(
             command[1],
             Integer.parseInt(command[2])
@@ -273,13 +220,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("get-tokens", "Get the available tokens") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           // TODO implement get-tokens command
         }
       }
@@ -288,13 +229,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("set-token <color>", "Set the token color") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.lobbySetToken(TokenColor.fromString(command[1]));
         }
       }
@@ -303,13 +238,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("set-nickname <nickname>", "Set the nickname") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.lobbySetNickname(command[1]);
         }
       }
@@ -321,13 +250,7 @@ public class CliClient {
         "Choose the objective card"
       ) {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.lobbyChooseObjectiveCard(command[1].equals("1"));
         }
       }
@@ -339,13 +262,7 @@ public class CliClient {
         "Choose the starter card side"
       ) {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.lobbyJoinGame(
             command[1].equals("front") ? CardSideType.FRONT : CardSideType.BACK
           );
@@ -359,13 +276,7 @@ public class CliClient {
         "Show game information"
       ) {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           switch (command[1]) {
             case "playerboard":
               final String nickname = command[2];
@@ -427,13 +338,7 @@ public class CliClient {
         "Place a card on the game board"
       ) {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           if (
             command.length < 5 ||
             !Stream.of(command[1], command[2], command[3]).allMatch(
@@ -471,13 +376,7 @@ public class CliClient {
         "Draw a card"
       ) {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           if (
             command.length < 2 ||
             !List.of(
@@ -508,13 +407,7 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("draw", "Pass your turn when no cards are available") {
         @Override
-        public void handle(
-          String[] command,
-          Cli cli,
-          Scanner scanner,
-          ClientConnectionHandler client,
-          LocalModelContainer localModel
-        ) {
+        public void handle(String[] command) {
           client.nextTurn();
         }
       }
