@@ -35,7 +35,7 @@ public class Cli implements View {
   }
 
   public void printPrompt() {
-    System.out.print("\rEnter a command: ");
+    System.out.print("\r> ");
   }
 
   public void printUpdate(String string) {
@@ -115,12 +115,16 @@ public class Cli implements View {
   ) {
     gameIds.forEach(gameId -> {
       printUpdate(
-        "Game ID: " +
-        gameId +
-        " - Players: " +
-        currentPlayers.get(gameId) +
-        "/" +
-        maxPlayers.get(gameId)
+        CliUtils.getTable(
+          new String[] { "GameId", "Current players", "Players" },
+          Stream.of(gameId).collect(Collectors.toList()),
+          Stream.of(currentPlayers.get(gameId).toString()).collect(
+            Collectors.toList()
+          ),
+          Stream.of(maxPlayers.get(gameId).toString()).collect(
+            Collectors.toList()
+          )
+        )
       );
     });
   }
