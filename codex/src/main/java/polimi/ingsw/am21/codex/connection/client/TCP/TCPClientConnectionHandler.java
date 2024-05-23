@@ -7,10 +7,8 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
@@ -44,38 +42,29 @@ import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
-public class TCPClientConnectionHandler implements ClientConnectionHandler {
-
-  private final String host;
-  private final int port;
+public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   private Socket socket;
-  private boolean connected = false;
 
   private ObjectInputStream inputStream;
   private ObjectOutputStream outputStream;
 
   private final ExecutorService threadManager = Executors.newCachedThreadPool();
 
-  private UUID socketID;
-
-  private final LocalModelContainer localModel;
-
   private Boolean waiting = false;
 
   private final Queue<Message> incomingMessages;
 
-  public TCPClientConnectionHandler(View view, String host, int port) {
-    this.socketID = UUID.randomUUID();
-    this.localModel = new LocalModelContainer(socketID, view);
-
+  public TCPClientConnectionHandler(
+    String host,
+    int port,
+    LocalModelContainer localModel
+  ) {
+    super(host, port, localModel);
     this.incomingMessages = new ArrayDeque<>();
-
-    this.host = host;
-    this.port = port;
-    this.connect();
     this.startMessageParser();
     this.startMessageHandler();
+    this.connect();
   }
 
   /**
@@ -165,9 +154,7 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
             }
           }
         } catch (IOException e) {
-          this.getView().postNotification(Notification.CONNECTION_FAILED);
-          this.getView()
-            .postNotification(NotificationType.ERROR, e.getMessage());
+          connectionFailed(e);
         }
       } else {
         this.getView().postNotification(Notification.ALREADY_WAITING);
@@ -185,20 +172,17 @@ public class TCPClientConnectionHandler implements ClientConnectionHandler {
       try {
         this.socket = new Socket(host, port);
         connected = true;
-        this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
+        connectionEstablished();
       } catch (IOException e) {
-        connected = false;
-        throw new RuntimeException(e);
+        connectionFailed(e);
       }
     }
-
     try {
       assert socket != null;
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
       this.inputStream = new ObjectInputStream(socket.getInputStream());
     } catch (IOException e) {
-      this.getView().postNotification(Notification.CONNECTION_FAILED);
-      throw new RuntimeException("Connection Failed! Please restart the game");
+      connectionFailed(e);
     }
   }
 

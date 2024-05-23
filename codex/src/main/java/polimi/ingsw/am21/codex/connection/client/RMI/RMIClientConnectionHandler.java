@@ -5,7 +5,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -28,45 +27,21 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
-import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.View;
 
 public class RMIClientConnectionHandler
-  implements Remote, ClientConnectionHandler {
-
-  private LocalPlayer localPlayer;
-  private LocalModelContainer localModel;
-  private final UUID socketID;
-
-  private Boolean connected;
-
-  private final String host;
-  private final Integer port;
+  extends ClientConnectionHandler
+  implements Remote {
 
   private RMIServerConnectionHandler rmiConnectionHandler;
 
-  public RMIClientConnectionHandler(View view, String host, Integer port) {
-    this.host = host;
-    this.port = port;
-    this.socketID = UUID.randomUUID();
-    this.localModel = new LocalModelContainer(socketID, view);
-    this.localPlayer = new LocalPlayer(null, null, List.of());
-  }
-
-  private View getView() {
-    return this.localModel.getView();
-  }
-
-  private void messageNotSent() {
-    this.getView().postNotification(Notification.MESSAGE_NOT_SENT);
-  }
-
-  private void connectionFailed() {
-    this.getView().postNotification(Notification.CONNECTION_FAILED);
-  }
-
-  private void connectionEstablished() {
-    this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
+  public RMIClientConnectionHandler(
+    String host,
+    Integer port,
+    LocalModelContainer localModel
+  ) {
+    super(host, port, localModel);
+    this.connect();
   }
 
   @Override
@@ -81,7 +56,7 @@ public class RMIClientConnectionHandler
         );
       this.connectionEstablished();
     } catch (RemoteException | NotBoundException e) {
-      this.connectionFailed();
+      this.connectionFailed(e);
     }
   }
 
@@ -199,12 +174,14 @@ public class RMIClientConnectionHandler
         this.socketID,
         nickname
       );
-      this.localPlayer.setNickname(nickname);
+      this.localModel.getLocalGameBoard().getPlayer().setNickname(nickname);
     } catch (NicknameAlreadyTakenException e) {
       this.localModel.nicknameTaken(nickname);
     } catch (GameAlreadyStartedException e) {
       this.localModel.gameAlreadyStarted();
-    } catch (GameNotFoundException e) {} catch (RemoteException e) {
+    } catch (GameNotFoundException e) {
+      this.localModel.gameNotFound(localModel.getGameId());
+    } catch (RemoteException e) {
       this.messageNotSent();
     }
   }
@@ -244,11 +221,11 @@ public class RMIClientConnectionHandler
         );
     } catch (EmptyDeckException e) {
       // TODO:
-    } catch (IllegalCardSideChoiceException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalPlacingPositionException e) {
-      throw new RuntimeException(e);
-    } catch (GameNotFoundException e) {
+    } catch (
+      IllegalCardSideChoiceException
+      | IllegalPlacingPositionException
+      | GameNotFoundException e
+    ) {
       throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
@@ -268,7 +245,7 @@ public class RMIClientConnectionHandler
     try {
       this.rmiConnectionHandler.placeCard(
           this.localModel.getGameId(),
-          this.localPlayer.getNickname(),
+          this.localModel.getLocalGameBoard().getPlayer().getNickname(),
           playerHandCardNumber,
           side,
           position
@@ -297,7 +274,7 @@ public class RMIClientConnectionHandler
     try {
       this.rmiConnectionHandler.nextTurn(
           localModel.getGameId(),
-          localPlayer.getNickname(),
+          localModel.getLocalGameBoard().getPlayer().getNickname(),
           drawingSource,
           deckType
         );
@@ -321,7 +298,7 @@ public class RMIClientConnectionHandler
     try {
       rmiConnectionHandler.nextTurn(
         localModel.getGameId(),
-        localPlayer.getNickname()
+        localModel.getLocalGameBoard().getPlayer().getNickname()
       );
     } catch (RemoteException e) {
       this.messageNotSent();
