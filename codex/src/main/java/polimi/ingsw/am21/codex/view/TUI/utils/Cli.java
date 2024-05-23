@@ -47,6 +47,14 @@ public class Cli implements View {
     printPrompt();
   }
 
+  public void displayException(Exception e) {
+    CliUtils.colorize(
+      e.getMessage() + "\n " + Arrays.toString(e.getStackTrace()),
+      Color.RED,
+      ColorStyle.UNDERLINED
+    );
+  }
+
   @Override
   public void postNotification(
     NotificationType notificationType,

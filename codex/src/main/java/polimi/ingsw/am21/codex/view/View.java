@@ -25,6 +25,8 @@ public interface View {
     int colorableIndex
   );
 
+  void displayException(Exception e);
+
   // lobby
   void drawAvailableGames(
     Set<String> gameIds,
