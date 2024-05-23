@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -58,13 +59,16 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public TCPClientConnectionHandler(
     String host,
     int port,
-    LocalModelContainer localModel
+    LocalModelContainer localModel,
+    UUID socketId
   ) {
-    super(host, port, localModel);
+    super(host, port, localModel, socketId);
     this.incomingMessages = new ArrayDeque<>();
+
+    this.connect();
+
     this.startMessageParser();
     this.startMessageHandler();
-    this.connect();
   }
 
   /**

@@ -8,7 +8,6 @@ import java.rmi.registry.Registry;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
-import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
@@ -27,7 +26,6 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
-import polimi.ingsw.am21.codex.view.View;
 
 public class RMIClientConnectionHandler
   extends ClientConnectionHandler
@@ -38,9 +36,10 @@ public class RMIClientConnectionHandler
   public RMIClientConnectionHandler(
     String host,
     Integer port,
-    LocalModelContainer localModel
+    LocalModelContainer localModel,
+    UUID socketId
   ) {
-    super(host, port, localModel);
+    super(host, port, localModel, socketId);
     this.connect();
   }
 

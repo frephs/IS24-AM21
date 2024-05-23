@@ -17,7 +17,7 @@ public abstract class ClientConnectionHandler {
   protected LocalModelContainer localModel;
   protected final UUID socketID;
 
-  protected Boolean connected;
+  protected Boolean connected = false;
 
   protected final String host;
   protected final Integer port;
@@ -26,13 +26,12 @@ public abstract class ClientConnectionHandler {
   public ClientConnectionHandler(
     String host,
     Integer port,
-    LocalModelContainer localModel
+    LocalModelContainer localModel,
+    UUID socketID
   ) {
-    this.socketID = UUID.randomUUID();
-
     this.host = host;
     this.port = port;
-
+    this.socketID = socketID;
     this.localModel = localModel;
   }
 

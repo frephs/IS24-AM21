@@ -24,20 +24,34 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class CliClient {
 
-  private LocalModelContainer localModel;
+  private UUID socketId;
+
   private final ContextContainer context = new ContextContainer();
 
   Scanner scanner = new Scanner(System.in);
-  Cli cli;
+  Cli cli = Cli.getInstance();
   ClientConnectionHandler client;
 
-  public void start(ConnectionType connectionType, String address, int port) {
-    cli = Cli.getInstance();
+  private final LocalModelContainer localModel = new LocalModelContainer(
+    socketId,
+    cli
+  );
 
+  public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
-      client = new TCPClientConnectionHandler(address, port, localModel);
+      client = new TCPClientConnectionHandler(
+        address,
+        port,
+        localModel,
+        socketId
+      );
     } else {
-      client = new RMIClientConnectionHandler(address, port, localModel);
+      client = new RMIClientConnectionHandler(
+        address,
+        port,
+        localModel,
+        socketId
+      );
     }
 
     cli.postNotification(
