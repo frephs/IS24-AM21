@@ -25,7 +25,7 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 public class CliClient {
 
   private LocalModelContainer localModel;
-  private ClientContext context = ClientContext.LOBBY;
+  private final ContextContainer context = new ContextContainer();
 
   Scanner scanner = new Scanner(System.in);
   Cli cli;
@@ -35,10 +35,15 @@ public class CliClient {
     cli = Cli.getInstance();
 
     if (connectionType == ConnectionType.TCP) {
-      client = new TCPClientConnectionHandler(cli, address, port);
+      client = new TCPClientConnectionHandler(address, port, localModel);
     } else {
-      client = new RMIClientConnectionHandler(cli, address, port);
+      client = new RMIClientConnectionHandler(address, port, localModel);
     }
+
+    cli.postNotification(
+      NotificationType.CONFIRM,
+      "TUI is active, you can submit commands. Write help to see the commands available in your context."
+    );
 
     initializeCommandHandlers();
 
@@ -50,6 +55,12 @@ public class CliClient {
 
         Set<CommandHandler> matchingCommands = commandHandlers
           .stream()
+          .filter(
+            commandHandler ->
+              commandHandler.getContext() == null ||
+              commandHandler.getContext() == ClientContext.ALL ||
+              commandHandler.getContext() == context.get()
+          )
           .filter(
             commandHandler -> commandHandler.getUsage().startsWith(command[0])
           )
@@ -102,10 +113,22 @@ public class CliClient {
 
     private final String usage;
     private final String description;
+    private final ClientContext context;
+
+    public CommandHandler(
+      String usage,
+      String description,
+      ClientContext context
+    ) {
+      this.usage = usage;
+      this.description = description;
+      this.context = context;
+    }
 
     public CommandHandler(String usage, String description) {
       this.usage = usage;
       this.description = description;
+      context = null;
     }
 
     public boolean matchUsageString(String input) {
@@ -129,9 +152,36 @@ public class CliClient {
     public String getDescription() {
       return description;
     }
+
+    public ClientContext getContext() {
+      return context;
+    }
   }
 
   private final List<CommandHandler> commandHandlers = new LinkedList<>();
+
+  private class ContextContainer {
+
+    private ClientContext context;
+
+    ContextContainer() {
+      context = null;
+    }
+
+    public ClientContext get() {
+      return context;
+    }
+
+    private void set(ClientContext context) {
+      this.context = context;
+      if (context != null) {
+        cli.postNotification(
+          NotificationType.RESPONSE,
+          "You are now in the " + context.toString().toLowerCase()
+        );
+      }
+    }
+  }
 
   private void initializeCommandHandlers() {
     commandHandlers.add(
@@ -150,6 +200,7 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.connect();
+          context.set(null);
         }
       }
     );
@@ -161,10 +212,18 @@ public class CliClient {
           List<String> commands = new ArrayList<>();
           List<String> usages = new ArrayList<>();
           List<String> descriptions = new ArrayList<>();
-          commandHandlers.forEach(commandHandler -> {
-            usages.add(commandHandler.getUsage());
-            descriptions.add(commandHandler.getDescription());
-          });
+          commandHandlers
+            .stream()
+            .filter(
+              commandHandler ->
+                commandHandler.getContext() == null ||
+                commandHandler.getContext() == ClientContext.ALL ||
+                commandHandler.getContext().equals(context.get())
+            )
+            .forEach(commandHandler -> {
+              usages.add(commandHandler.getUsage());
+              descriptions.add(commandHandler.getDescription());
+            });
           cli.postNotification(
             NotificationType.RESPONSE,
             CliUtils.getTable(
@@ -189,12 +248,17 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
+          context.set(null);
         }
       }
     );
 
     commandHandlers.add(
-      new CommandHandler("leave-game", "Leave the current game") {
+      new CommandHandler(
+        "leave-game",
+        "Leave the current game",
+        ClientContext.ALL
+      ) {
         @Override
         public void handle(String[] command) {
           client.leaveGameLobby();
@@ -213,12 +277,17 @@ public class CliClient {
             command[1],
             Integer.parseInt(command[2])
           );
+          context.set(ClientContext.LOBBY);
         }
       }
     );
 
     commandHandlers.add(
-      new CommandHandler("get-tokens", "Get the available tokens") {
+      new CommandHandler(
+        "get-tokens",
+        "Get the available tokens",
+        ClientContext.LOBBY
+      ) {
         @Override
         public void handle(String[] command) {
           // TODO implement get-tokens command
@@ -227,7 +296,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("set-token <color>", "Set the token color") {
+      new CommandHandler(
+        "set-token <color>",
+        "Set the token color",
+        ClientContext.LOBBY
+      ) {
         @Override
         public void handle(String[] command) {
           client.lobbySetToken(TokenColor.fromString(command[1]));
@@ -236,7 +309,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("set-nickname <nickname>", "Set the nickname") {
+      new CommandHandler(
+        "set-nickname <nickname>",
+        "Set the nickname",
+        ClientContext.LOBBY
+      ) {
         @Override
         public void handle(String[] command) {
           client.lobbySetNickname(command[1]);
@@ -247,7 +324,8 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler(
         "choose-objective <1|2>",
-        "Choose the objective card"
+        "Choose the objective card",
+        ClientContext.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -259,12 +337,28 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler(
         "choose-starter-card-side <front|back>",
-        "Choose the starter card side"
+        "Choose the starter card side",
+        ClientContext.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
           client.lobbyJoinGame(
             command[1].equals("front") ? CardSideType.FRONT : CardSideType.BACK
+          );
+          context.set(ClientContext.GAME);
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler("show context", "Show the client current context") {
+        @Override
+        public void handle(String[] command) {
+          cli.postNotification(
+            NotificationType.RESPONSE,
+            (context.get() != null)
+              ? "You are now in the " + context.get().toString().toLowerCase()
+              : "You have not joined any lobby or game yet"
           );
         }
       }
@@ -272,8 +366,9 @@ public class CliClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "show <playerboard|leaderboard|card|hand|objective|pairs>",
-        "Show game information"
+        "show <context|playerboard|leaderboard|card|hand|objective|pairs>",
+        "Show game information",
+        ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -335,7 +430,8 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler(
         "place <hand number> <row> <column> <front|back>",
-        "Place a card on the game board"
+        "Place a card on the game board",
+        ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -373,7 +469,8 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler(
         "draw <deck|resource1|resource2|gold1|gold2>",
-        "Draw a card"
+        "Draw a card",
+        ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -405,7 +502,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("draw", "Pass your turn when no cards are available") {
+      new CommandHandler(
+        "draw",
+        "Pass your turn when no cards to draw are available",
+        ClientContext.GAME
+      ) {
         @Override
         public void handle(String[] command) {
           client.nextTurn();
