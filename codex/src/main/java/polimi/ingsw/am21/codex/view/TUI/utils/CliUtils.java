@@ -104,8 +104,9 @@ public class CliUtils {
 
     int[] maxWidths = new int[columns.length];
     for (int i = 0; i < columns.length; i++) {
+      columns[i].addFirst(headers[i]);
       for (String value : columns[i]) {
-        maxWidths[i] = Math.max(maxWidths[i], value.length());
+        maxWidths[i] = Math.max(maxWidths[i], value.length()) + 2;
       }
     }
 
@@ -119,7 +120,7 @@ public class CliUtils {
     int numRows = Arrays.stream(columns).mapToInt(List::size).max().orElse(0);
 
     // Append table data
-    for (int row = 0; row < numRows; row++) {
+    for (int row = 1; row < numRows; row++) {
       for (int col = 0; col < columns.length; col++) {
         if (row < columns[col].size()) {
           sb.append(
