@@ -159,7 +159,7 @@ public class LocalModelContainer
   public void gameNotFound(String gameId) {
     view.postNotification(
       NotificationType.ERROR,
-      "Game " + gameId + "not found. "
+      "Game " + gameId + " not found. "
     );
   }
 
@@ -232,7 +232,7 @@ public class LocalModelContainer
 
       view.postNotification(
         NotificationType.RESPONSE,
-        "You left the lobby of the game" + gameId + ". "
+        "You left the lobby of the game " + gameId + ". "
       );
     } else {
       localLobby.getPlayers().remove(socketID);
@@ -277,7 +277,7 @@ public class LocalModelContainer
     localLobby.getAvailableTokens().remove(token);
     view.postNotification(
       NotificationType.ERROR,
-      new String[] { "The", "token is already taken" },
+      new String[] { "The", " token is already taken" },
       token,
       2
     );
@@ -325,7 +325,7 @@ public class LocalModelContainer
 
   @Override
   public void notInGame() {
-    view.postNotification(NotificationType.ERROR, "You are not in a game. ");
+    view.postNotification(NotificationType.ERROR, "You are not in any game. ");
   }
 
   @Override
