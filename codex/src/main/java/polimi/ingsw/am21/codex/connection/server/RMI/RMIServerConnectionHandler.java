@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.connection.server.RMI;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -25,6 +26,10 @@ import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 public interface RMIServerConnectionHandler extends Remote {
   public Set<String> getGames() throws RemoteException;
+
+  public Map<String, Integer> getGamesCurrentPlayers() throws RemoteException;
+
+  public Map<String, Integer> getGamesMaxPlayers() throws RemoteException;
 
   public void removePlayerFromLobby(String gameId, UUID socketID)
     throws RemoteException, GameNotFoundException;

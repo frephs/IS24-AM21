@@ -2,8 +2,10 @@ package polimi.ingsw.am21.codex.connection.server.RMI;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -161,6 +163,16 @@ public class RMIServerConnectionHandlerImpl
 
   public Set<String> getGames() throws RemoteException {
     return this.controller.getGames();
+  }
+
+  @Override
+  public Map<String, Integer> getGamesCurrentPlayers() throws RemoteException {
+    return this.controller.getCurrentSlots();
+  }
+
+  @Override
+  public Map<String, Integer> getGamesMaxPlayers() throws RemoteException {
+    return this.controller.getMaxSlots();
   }
 
   @Override

@@ -196,7 +196,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public void getGames() {
+  public void listGames() {
     this.send(new GetAvailableGameLobbiesMessage());
   }
 
