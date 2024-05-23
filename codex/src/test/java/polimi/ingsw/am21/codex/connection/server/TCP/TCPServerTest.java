@@ -17,6 +17,7 @@ import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.CreateGameMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.JoinLobbyMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetNicknameMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetTokenColorMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -29,7 +30,20 @@ class TCPServerTest {
   @Test
   public void basic() {
     List<Message> receivedMessages = new java.util.ArrayList<>();
-    final CountDownLatch responsesLatch = new CountDownLatch(3);
+
+    // Please note that this list is not evaluated in order
+    List<MessageType> expectedMessages = List.of(
+      MessageType.GAME_CREATED,
+      MessageType.AVAILABLE_GAME_LOBBIES,
+      MessageType.PLAYER_JOINED_LOBBY,
+      MessageType.LOBBY_STATUS,
+      MessageType.PLAYER_SET_TOKEN_COLOR,
+      MessageType.PLAYER_SET_NICKNAME
+    );
+
+    final CountDownLatch responsesLatch = new CountDownLatch(
+      expectedMessages.size()
+    );
     Socket clientSocket;
 
     TCPServer server = new TCPServer(4567, new GameController());
@@ -86,8 +100,8 @@ class TCPServerTest {
         new CreateGameMessage("TestGame", 4),
         new GetAvailableGameLobbiesMessage(),
         new JoinLobbyMessage("TestGame"),
-        new SetTokenColorMessage(TokenColor.RED, "TestGame")
-        //        new SetNicknameMessage("TestNickname", "TestGame")
+        new SetTokenColorMessage(TokenColor.RED, "TestGame"),
+        new SetNicknameMessage("TestNickname", "TestGame")
       ).forEach(message -> {
         try {
           outputStream.writeObject(message);
@@ -105,13 +119,7 @@ class TCPServerTest {
           .stream()
           .map(Message::getType)
           .toList()
-          .containsAll(
-            List.of(
-              MessageType.GAME_CREATED,
-              MessageType.AVAILABLE_GAME_LOBBIES,
-              MessageType.CONFIRM
-            )
-          )
+          .containsAll(expectedMessages)
       );
       server.stop();
       clientSocket.close();
