@@ -3,8 +3,6 @@ package polimi.ingsw.am21.codex.controller.messages;
 import java.io.Serializable;
 
 public enum MessageType implements Serializable {
-  CONFIRM(MessageTypeCategory.SERVER_CONFIRM),
-
   NEXT_TURN_ACTION(MessageTypeCategory.CLIENT_ACTION),
   PLACE_CARD(MessageTypeCategory.CLIENT_ACTION),
   CREATE_GAME(MessageTypeCategory.CLIENT_ACTION),
