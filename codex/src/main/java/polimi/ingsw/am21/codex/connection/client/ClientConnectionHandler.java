@@ -42,7 +42,7 @@ public abstract class ClientConnectionHandler {
   /**
    * Retrieves the list of available games and displays them in the view
    */
-  public abstract void getGames();
+  public abstract void listGames();
 
   /**
    * @param gameId the id of the game to connect to

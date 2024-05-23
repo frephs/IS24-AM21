@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -60,15 +61,17 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public void disconnect() {
-    // TODO
-  }
+  public void disconnect() {}
 
   @Override
-  public void getGames() {
+  public void listGames() {
     try {
       Set<String> games = rmiConnectionHandler.getGames();
-      //TODO: update view
+      Map<String, Integer> currentPlayers =
+        rmiConnectionHandler.getGamesCurrentPlayers();
+      Map<String, Integer> maxPlayers =
+        rmiConnectionHandler.getGamesMaxPlayers();
+      localModel.listGames(games, currentPlayers, maxPlayers);
     } catch (RemoteException e) {
       this.messageNotSent();
     }

@@ -24,7 +24,8 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class CliClient {
 
-  private UUID socketId;
+  private final UUID socketId = UUID.randomUUID();
+  //TODO Fix
 
   private final ContextContainer context = new ContextContainer();
 
@@ -253,7 +254,9 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler("list-games", "List available games") {
         @Override
-        public void handle(String[] command) {}
+        public void handle(String[] command) {
+          client.listGames();
+        }
       }
     );
 

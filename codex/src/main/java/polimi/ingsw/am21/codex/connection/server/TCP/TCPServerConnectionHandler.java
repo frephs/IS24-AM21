@@ -284,7 +284,6 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getSide(),
         message.getPosition()
       );
-      send(new ConfirmMessage());
     } catch (PlayerNotActive e) {
       send(new ActionNotAllowedMessage());
     } catch (
@@ -303,7 +302,6 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.getPlayers()
       );
-      send(new ConfirmMessage());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }
@@ -338,7 +336,6 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.getCardSideType()
       );
-      send(new ConfirmMessage());
     } catch (
       GameNotReadyException | GameAlreadyStartedException | EmptyDeckException e
     ) {
@@ -359,7 +356,6 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.isFirst()
       );
-      send(new ConfirmMessage());
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
@@ -374,7 +370,6 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.getNickname()
       );
-      send(new ConfirmMessage());
     } catch (NicknameAlreadyTakenException e) {
       send(new NicknameAlreadyTakenMessage(message.getNickname()));
     } catch (GameNotFoundException e) {
@@ -391,9 +386,6 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.getColor()
       );
-
-      send(new ConfirmMessage());
-      // Broadcast of available colors triggered by controller emitter
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (TokenAlreadyTakenException e) {

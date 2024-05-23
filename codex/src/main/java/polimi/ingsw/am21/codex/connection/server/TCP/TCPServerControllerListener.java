@@ -150,8 +150,7 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void playerChoseObjectiveCard(Boolean isFirst) {
-    // TODO Do we need to add a broadcast message for this? Do other clients care?
-
+    // TODO
   }
 
   @Override
