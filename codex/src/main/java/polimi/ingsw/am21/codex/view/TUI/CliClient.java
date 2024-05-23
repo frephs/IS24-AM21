@@ -167,6 +167,15 @@ public class CliClient {
     );
 
     commandHandlers.add(
+      new CommandHandler("reconnect", "Connect to the server") {
+        @Override
+        public void handle(String[] command) {
+          client.connect();
+        }
+      }
+    );
+
+    commandHandlers.add(
       new CommandHandler("help", "Display available commands") {
         @Override
         public void handle(
