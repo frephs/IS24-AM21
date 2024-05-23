@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -31,6 +30,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -59,10 +59,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public TCPClientConnectionHandler(
     String host,
     int port,
-    LocalModelContainer localModel,
-    UUID socketId
+    LocalModelContainer localModel
   ) {
-    super(host, port, localModel, socketId);
+    super(host, port, localModel);
     this.incomingMessages = new ArrayDeque<>();
 
     this.connect();
@@ -389,6 +388,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
       case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
+      // Init
+      case SOCKET_ID -> handleMessage((SocketIdMessage) message);
       default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
     }
   }
@@ -586,5 +587,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   public void handleMessage(WinningPlayerMessage message) {
     localModel.winningPlayer(message.getWinnerNickname());
+  }
+
+  public void handleMessage(SocketIdMessage message) {
+    this.socketID = message.getSocketId();
   }
 }

@@ -33,6 +33,7 @@ class TCPServerTest {
 
     // Please note that this list is not evaluated in order
     List<MessageType> expectedMessages = List.of(
+      MessageType.SOCKET_ID,
       MessageType.GAME_CREATED,
       MessageType.AVAILABLE_GAME_LOBBIES,
       MessageType.PLAYER_JOINED_LOBBY,

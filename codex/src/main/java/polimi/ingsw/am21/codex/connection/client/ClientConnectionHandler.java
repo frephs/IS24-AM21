@@ -15,7 +15,7 @@ import polimi.ingsw.am21.codex.view.View;
 public abstract class ClientConnectionHandler {
 
   protected LocalModelContainer localModel;
-  protected final UUID socketID;
+  protected UUID socketID;
 
   protected Boolean connected = false;
 
@@ -26,12 +26,10 @@ public abstract class ClientConnectionHandler {
   public ClientConnectionHandler(
     String host,
     Integer port,
-    LocalModelContainer localModel,
-    UUID socketID
+    LocalModelContainer localModel
   ) {
     this.host = host;
     this.port = port;
-    this.socketID = socketID;
     this.localModel = localModel;
   }
 

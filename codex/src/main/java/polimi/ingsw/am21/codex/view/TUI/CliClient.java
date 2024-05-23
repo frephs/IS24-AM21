@@ -40,19 +40,9 @@ public class CliClient {
 
   public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
-      client = new TCPClientConnectionHandler(
-        address,
-        port,
-        localModel,
-        socketId
-      );
+      client = new TCPClientConnectionHandler(address, port, localModel);
     } else {
-      client = new RMIClientConnectionHandler(
-        address,
-        port,
-        localModel,
-        socketId
-      );
+      client = new RMIClientConnectionHandler(address, port, localModel);
     }
 
     cli.postNotification(

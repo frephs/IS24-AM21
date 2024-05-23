@@ -37,10 +37,9 @@ public class RMIClientConnectionHandler
   public RMIClientConnectionHandler(
     String host,
     Integer port,
-    LocalModelContainer localModel,
-    UUID socketId
+    LocalModelContainer localModel
   ) {
-    super(host, port, localModel, socketId);
+    super(host, port, localModel);
     this.connect();
   }
 
