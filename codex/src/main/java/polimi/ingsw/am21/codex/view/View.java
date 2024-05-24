@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalMenu;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -28,19 +30,11 @@ public interface View {
   void displayException(Exception e);
 
   // lobby
-  void drawAvailableGames(
-    Set<String> gameIds,
-    Map<String, Integer> currentPlayers,
-    Map<String, Integer> maxPlayers
-  );
+  void drawAvailableGames(List<GameEntry> games);
 
   void drawAvailableTokenColors(Set<TokenColor> tokenColors);
 
-  void drawLobby(
-    Map<UUID, TokenColor> playerTokens,
-    Map<UUID, String> playerNicknames,
-    List<UUID> socketIds
-  );
+  void drawLobby(Map<UUID, LocalPlayer> players);
 
   // game
 

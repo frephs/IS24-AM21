@@ -3,6 +3,8 @@ package polimi.ingsw.am21.codex.view.TUI.utils;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalMenu;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -108,25 +110,25 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawAvailableGames(
-    Set<String> gameIds,
-    Map<String, Integer> currentPlayers,
-    Map<String, Integer> maxPlayers
-  ) {
-    gameIds.forEach(gameId -> {
-      printUpdate(
-        CliUtils.getTable(
-          new String[] { "GameId", "Current players", "Players" },
-          Stream.of(gameId).collect(Collectors.toList()),
-          Stream.of(currentPlayers.get(gameId).toString()).collect(
-            Collectors.toList()
-          ),
-          Stream.of(maxPlayers.get(gameId).toString()).collect(
-            Collectors.toList()
-          )
-        )
-      );
-    });
+  public void drawAvailableGames(List<GameEntry> gameEntries) {
+    printUpdate(
+      CliUtils.getTable(
+        new String[] {
+          "GameId",
+          "Current number of players",
+          "Max number of players",
+        },
+        gameEntries.stream().map(GameEntry::getGameId).toList(),
+        gameEntries
+          .stream()
+          .map(gameEntry -> String.valueOf(gameEntry.getCurrentPlayers()))
+          .toList(),
+        gameEntries
+          .stream()
+          .map(gameEntry -> String.valueOf(gameEntry.getMaxPlayers()))
+          .toList()
+      )
+    );
   }
 
   @Override
@@ -141,21 +143,18 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawLobby(
-    Map<UUID, TokenColor> playerTokens,
-    Map<UUID, String> playerNicknames,
-    List<UUID> socketIds
-  ) {
+  public void drawLobby(Map<UUID, LocalPlayer> players) {
     printUpdate(
       "Lobby: " +
-      socketIds
+      players
+        .values()
         .stream()
-        .map(socketId -> {
-          String nickname = playerNicknames.get(socketId);
-          TokenColor token = playerTokens.get(socketId);
+        .map(localPlayer -> {
+          String nickname = localPlayer.getNickname();
+          TokenColor token = localPlayer.getToken();
           return (
             CliUtils.colorize(
-              nickname != null ? nickname : "<pending>",
+              (nickname != null) ? nickname : "<pending>",
               token != null ? token.getColor() : Color.GRAY,
               ColorStyle.NORMAL
             )
