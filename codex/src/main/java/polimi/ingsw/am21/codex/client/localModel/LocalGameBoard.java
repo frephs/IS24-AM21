@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 
 public class LocalGameBoard {
 
@@ -15,33 +14,38 @@ public class LocalGameBoard {
 
   private Card secretObjective;
 
-  private int playerNumber;
+  /**
+   * Number of players the game contains
+   * */
+  private final int playerNumber;
 
-  private int currentPlayer;
+  private String currentPlayer;
+
   /**
    * Index of the player associated with the client
    */
+  private int myPlayerIndex;
   private int playerIndex;
-
-  public LocalPlayer getCurrentPlayer() {
-    return players.get(currentPlayer);
-  }
-
-  public int getCurrentPlayerIndex() {
-    return currentPlayer;
-  }
-
-  public void setCurrentPlayer(int currentPlayer) {
-    this.currentPlayer = currentPlayer;
-  }
-
-  private final List<LocalPlayer> players;
 
   public LocalGameBoard(String gameId, int players) {
     this.gameId = gameId;
     this.playerNumber = players;
     this.players = new ArrayList<>(players);
   }
+
+  public LocalPlayer getCurrentPlayer() {
+    return players
+      .stream()
+      .filter(player -> player.getNickname().equals(currentPlayer))
+      .findFirst()
+      .orElse(null);
+  }
+
+  public void setCurrentPlayer(String currentPlayer) {
+    this.currentPlayer = currentPlayer;
+  }
+
+  private final List<LocalPlayer> players;
 
   public String getGameId() {
     return this.gameId;
@@ -55,7 +59,7 @@ public class LocalGameBoard {
   }
 
   public String getPlayerNickname() {
-    return players.get(playerIndex).getNickname();
+    return getPlayer().getNickname();
   }
 
   public void setPlayerIndex(int playerIndex) {

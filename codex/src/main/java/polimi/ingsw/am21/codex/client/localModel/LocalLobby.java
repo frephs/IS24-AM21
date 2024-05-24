@@ -8,48 +8,27 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class LocalLobby {
 
-  private final Set<TokenColor> availableTokens = new HashSet<>(4);
-  private final Set<String> availableGames = new HashSet<>();
-
-  private Map<String, Integer> playerSlots = new HashMap();
-  private Map<String, Integer> maxPlayerSlots = new HashMap();
+  private final Set<TokenColor> availableTokens;
 
   private CardPair<Card> availableObjectives;
 
-  private final List<UUID> players = new LinkedList<>();
-  private final Map<UUID, String> nicknames = new HashMap<>();
-  private final Map<UUID, TokenColor> tokens = new HashMap<>();
+  /**
+   * Players of the lobby you chose.
+   * */
+  private final Map<UUID, LocalPlayer> players = new HashMap<>();
 
-  private String gameId;
+  /**
+   * The gameId of the lobby you chose.
+   * */
+  private final String gameId;
 
-  LocalLobby() {}
-
-  public Map<String, Integer> getMaxPlayerSlots() {
-    return maxPlayerSlots;
-  }
-
-  public Map<String, Integer> getPlayerSlots() {
-    return playerSlots;
-  }
-
-  public Map<UUID, TokenColor> getTokens() {
-    return tokens;
-  }
-
-  public Map<UUID, String> getNicknames() {
-    return nicknames;
+  LocalLobby(String gameId, Set<TokenColor> availableTokens) {
+    this.gameId = gameId;
+    this.availableTokens = availableTokens;
   }
 
   public String getGameId() {
     return gameId;
-  }
-
-  public void setGameId(String gameId) {
-    this.gameId = gameId;
-  }
-
-  public Set<String> getAvailableGames() {
-    return availableGames;
   }
 
   public Set<TokenColor> getAvailableTokens() {
@@ -64,7 +43,7 @@ public class LocalLobby {
     this.availableObjectives = new CardPair<>(first, second);
   }
 
-  public List<UUID> getPlayers() {
+  public Map<UUID, LocalPlayer> getPlayers() {
     return players;
   }
 }
