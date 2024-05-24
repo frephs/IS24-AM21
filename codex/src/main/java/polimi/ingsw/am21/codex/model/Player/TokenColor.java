@@ -1,9 +1,10 @@
 package polimi.ingsw.am21.codex.model.Player;
 
+import java.io.Serializable;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
-public enum TokenColor implements Colorable {
+public enum TokenColor implements Colorable, Serializable {
   RED,
   BLUE,
   GREEN,

@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.StringUtils;
@@ -95,5 +96,46 @@ public class CliUtils {
       return colorize(colorable, style, colorableSize).length();
     }
     return colorable.toString().length();
+  }
+
+  @SafeVarargs
+  public static String getTable(String[] headers, List<String>... columns) {
+    StringBuilder sb = new StringBuilder();
+
+    int[] maxWidths = new int[columns.length];
+    for (int i = 0; i < columns.length; i++) {
+      columns[i].addFirst(headers[i]);
+      for (String value : columns[i]) {
+        maxWidths[i] = Math.max(maxWidths[i], value.length()) + 2;
+      }
+    }
+
+    for (int i = 0; i < columns.length; i++) {
+      sb.append(
+        String.format("%-" + (maxWidths[i] + 2) + "s", "[" + headers[i] + "]")
+      );
+    }
+    sb.append("\n");
+
+    int numRows = Arrays.stream(columns).mapToInt(List::size).max().orElse(0);
+
+    // Append table data
+    for (int row = 1; row < numRows; row++) {
+      for (int col = 0; col < columns.length; col++) {
+        if (row < columns[col].size()) {
+          sb.append(
+            String.format(
+              "%-" + (maxWidths[col] + 2) + "s",
+              columns[col].get(row)
+            )
+          );
+        } else {
+          sb.append(String.format("%-" + (maxWidths[col] + 2) + "s", "")); // Append empty string if no value
+        }
+      }
+      sb.append("\n");
+    }
+
+    return sb.toString();
   }
 }

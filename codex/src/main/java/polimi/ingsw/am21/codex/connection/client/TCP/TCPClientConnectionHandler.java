@@ -4,18 +4,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.rmi.RemoteException;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
-import polimi.ingsw.am21.codex.controller.messages.ErrorMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
-import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -33,6 +30,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -45,45 +43,121 @@ import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
-public class TCPConnectionHandler implements ClientConnectionHandler {
+public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
-  private final String host;
-  private final int port;
-
-  private Socket connection;
-  private boolean connected = false;
+  private Socket socket;
 
   private ObjectInputStream inputStream;
   private ObjectOutputStream outputStream;
 
   private final ExecutorService threadManager = Executors.newCachedThreadPool();
 
-  private UUID socketID;
-
-  private final LocalModelContainer localModel;
-
-  private Consumer<Message> callbackFunction;
   private Boolean waiting = false;
 
-  public TCPConnectionHandler(View view, String host, int port) {
-    this.socketID = UUID.randomUUID();
-    this.localModel = new LocalModelContainer(socketID, view);
+  private final Queue<Message> incomingMessages;
 
-    this.host = host;
-    this.port = port;
+  public TCPClientConnectionHandler(
+    String host,
+    int port,
+    LocalModelContainer localModel
+  ) {
+    super(host, port, localModel);
+    this.incomingMessages = new ArrayDeque<>();
+
     this.connect();
+
+    this.startMessageParser();
+    this.startMessageHandler();
+  }
+
+  /**
+   * Runs a thread that synchronously loads incoming messages from
+   * inputStream to incomingMessages
+   */
+  private void startMessageParser() {
+    threadManager.execute(() -> {
+      while (true) synchronized (incomingMessages) {
+        try {
+          Object receviedObject = inputStream.readObject();
+          if (
+            !(receviedObject instanceof Message)
+          ) throw new ClassNotFoundException();
+
+          // This casting to Message is safe since we're checking for the
+          // parsed class above.
+          incomingMessages.add((Message) receviedObject);
+
+          incomingMessages.notifyAll();
+          incomingMessages.wait(1);
+        } catch (ClassNotFoundException e) {
+          getView().postNotification(Notification.UNKNOWN_MESSAGE);
+        } catch (IOException e) {
+          getView()
+            .postNotification(
+              NotificationType.ERROR,
+              "IOException caught when parsing message from " +
+              socket.getInetAddress() +
+              ". Parser is exiting.\n" +
+              e
+            );
+          break;
+        } catch (InterruptedException e) {
+          getView()
+            .postNotification(
+              NotificationType.ERROR,
+              "Parser thread for " +
+              socket.getInetAddress() +
+              "interrupted, exiting."
+            );
+          break;
+        }
+      }
+    });
+  }
+
+  private void startMessageHandler() {
+    threadManager.execute(() -> {
+      while (true) synchronized (incomingMessages) {
+        try {
+          while (incomingMessages.isEmpty()) incomingMessages.wait();
+
+          parseMessage(incomingMessages.poll());
+        } catch (InterruptedException e) {
+          System.err.println(
+            "Message handler thread for " +
+            socket.getInetAddress() +
+            " interrupted, exiting."
+          );
+          break;
+        } catch (Exception e) {
+          System.err.println(
+            "Caught controller exception while handling message from " +
+            socket.getInetAddress() +
+            ". Closing connection."
+          );
+          e.printStackTrace();
+
+          this.disconnect();
+          break;
+        }
+      }
+    });
   }
 
   private void send(ClientMessage message) {
     synchronized (outputStream) {
-      if (waiting) {
+      if (!waiting) {
         try {
-          outputStream.writeObject(message);
-          outputStream.flush();
-          outputStream.reset();
-          this.waiting = true;
-        } catch (IOException ignored) {
-          this.getView().postNotification(Notification.CONNECTION_FAILED);
+          if (socket.isConnected() && !socket.isClosed()) {
+            outputStream.writeObject(message);
+            outputStream.flush();
+            outputStream.reset();
+            if (message.getType().isClientRequest()) {
+              this.waiting = true;
+            }
+          }
+        } catch (IOException e) {
+          connectionFailed(e);
         }
       } else {
         this.getView().postNotification(Notification.ALREADY_WAITING);
@@ -99,22 +173,19 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   public void connect() {
     while (!connected) {
       try {
-        this.connection = new Socket(host, port);
+        this.socket = new Socket(host, port);
         connected = true;
-        this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
+        connectionEstablished();
       } catch (IOException e) {
-        connected = false;
-        throw new RuntimeException(e);
+        connectionFailed(e);
       }
     }
-
     try {
-      assert connection != null;
-      this.outputStream = new ObjectOutputStream(connection.getOutputStream());
-      this.inputStream = new ObjectInputStream(connection.getInputStream());
+      assert socket != null;
+      this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+      this.inputStream = new ObjectInputStream(socket.getInputStream());
     } catch (IOException e) {
-      this.getView().postNotification(Notification.CONNECTION_FAILED);
-      throw new RuntimeException("Connection Failed! Please restart the game");
+      connectionFailed(e);
     }
   }
 
@@ -124,59 +195,24 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
   }
 
   @Override
-  public void getGames() {
+  public void listGames() {
     this.send(new GetAvailableGameLobbiesMessage());
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case AVAILABLE_GAME_LOBBIES -> {
-          AvailableGameLobbiesMessage availableGameLobbiesMessage =
-            (AvailableGameLobbiesMessage) message;
-          this.getView()
-            .drawAvailableGames(
-              availableGameLobbiesMessage.getLobbyIds(),
-              availableGameLobbiesMessage.getCurrentPlayers(),
-              availableGameLobbiesMessage.getMaxPlayers()
-            );
-        }
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
   public void connectToGame(String gameId) {
     this.send(new JoinLobbyMessage(gameId));
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case GAME_NOT_FOUND -> localModel.gameDeleted(gameId);
-        case GAME_FULL -> localModel.gameFull(gameId);
-        //        case CONFIRM -> localModel.playerJoinedLobby(gameId, this.socketID);
-        default -> this.getView()
-          .postNotification(Notification.UNKNOWN_RESPONSE);
-      }
-    };
   }
 
   @Override
   public void leaveGameLobby() {
     this.send(new LeaveLobbyMessage());
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case CONFIRM -> localModel.playerLeftLobby();
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
   public void createAndConnectToGame(String gameId, int players) {
+    // TODO this is actually only creating the game, we're not connecting to it
     this.send(new CreateGameMessage(gameId, players));
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case CONFIRM -> localModel.gameCreated(gameId, 1, players);
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
@@ -187,13 +223,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
           localModel.getLocalGameBoard().getGameId()
         )
       );
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case TOKEN_COLOR_ALREADY_TAKEN -> localModel.tokenTaken(color);
-        case CONFIRM -> localModel.playerSetToken(color);
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
@@ -210,12 +239,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
           localModel.getLocalGameBoard().getGameId()
         )
       );
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case NICKNAME_ALREADY_TAKEN -> localModel.nicknameTaken(nickname);
-        case CONFIRM -> localModel.playerSetNickname(nickname);
-      }
-    };
   }
 
   @Override
@@ -226,13 +249,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
           localModel.getLocalGameBoard().getGameId()
         )
       );
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case CONFIRM -> localModel.playerChoseObjectiveCard(first);
-        default -> this.getView()
-          .postNotification(Notification.UNKNOWN_RESPONSE);
-      }
-    };
   }
 
   @Override
@@ -243,12 +259,6 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
           localModel.getLocalGameBoard().getGameId()
         )
       );
-    //    this.callbackFunction = (message) -> {
-    //      switch (message.getType()){
-    //        case CONFIRM -> localModel.
-    //      }
-    //
-    //    };
   }
 
   @Override
@@ -267,24 +277,11 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
           position
         )
       );
-
-    this.callbackFunction = message -> {
-      //      switch (message.getType()){
-      //        case
-      //        case CONFIRM ->
-      //      }
-    };
   }
 
   @Override
   public void leaveLobby() {
     this.send(new LeaveLobbyMessage());
-    this.callbackFunction = message -> {
-      switch (message.getType()) {
-        case CONFIRM -> localModel.playerLeftLobby();
-        default -> localModel.unknownResponse();
-      }
-    };
   }
 
   @Override
@@ -323,16 +320,13 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
    * ----------------------
    * */
 
-  private void consumeCallback(Message message) {
-    this.callbackFunction.accept(message);
-    this.callbackFunction = null;
-  }
-
   public void parseMessage(Message message) {
+    if (message.getType().isServerResponse()) {
+      this.waiting = false;
+    }
+
     switch (message.getType()) {
-      /*
-       * Server Responses
-       * */
+      // Server Responses
       // Lobby
       case AVAILABLE_GAME_LOBBIES -> handleMessage(
         (AvailableGameLobbiesMessage) message
@@ -344,9 +338,7 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       );
       // Game
       case GAME_STATUS -> handleMessage((GameStatusMessage) message);
-      /*
-       * Server Errors
-       * */
+      // Server Errors
       case ACTION_NOT_ALLOWED -> handleMessage(
         (ActionNotAllowedMessage) message
       );
@@ -369,10 +361,7 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       case INVALID_CARD_PLACEMENT -> handleMessage(
         (InvalidCardPlacementMessage) message
       );
-      /*
-       * View Updating Messages
-       * */
-
+      // View Updating Messages
       // Lobby
       case GAME_CREATED -> handleMessage((GameCreatedMessage) message);
       case GAME_DELETED -> handleMessage((GameDeletedMessage) message);
@@ -387,7 +376,7 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       case PLAYER_SET_TOKEN_COLOR -> handleMessage(
         (PlayerSetTokenColorMessage) message
       );
-      //GAME
+      // Game
       case CARD_PLACED -> handleMessage((CardPlacedMessage) message);
       case GAME_OVER -> handleMessage((GameOverMessage) message);
       case NEXT_TURN_UPDATE -> handleMessage((NextTurnUpdateMessage) message);
@@ -399,21 +388,12 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
       );
       case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
+      // Init
+      case SOCKET_ID -> handleMessage((SocketIdMessage) message);
       default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
     }
   }
 
-  //TODO
-  //  public void handleMessage(Message message) {
-  //    if (this.waiting) {
-  //      switch(message.getType()){
-  //        case
-  //      }
-  //      consumeCallback(message);
-  //    } else {
-  //      parseMessage(message);
-  //    }
-  //  }
   /*
    * -------------------------
    * SERVER RESPONSES HANDLERS
@@ -607,5 +587,9 @@ public class TCPConnectionHandler implements ClientConnectionHandler {
 
   public void handleMessage(WinningPlayerMessage message) {
     localModel.winningPlayer(message.getWinnerNickname());
+  }
+
+  public void handleMessage(SocketIdMessage message) {
+    this.socketID = message.getSocketId();
   }
 }

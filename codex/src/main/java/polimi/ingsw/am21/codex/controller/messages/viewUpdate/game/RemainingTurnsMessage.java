@@ -5,9 +5,9 @@ import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 
 public class RemainingTurnsMessage extends ViewUpdatingMessage {
 
-  private final int turns;
+  private final Integer turns;
 
-  public RemainingTurnsMessage(int turns) {
+  public RemainingTurnsMessage(Integer turns) {
     super(MessageType.REMAINING_TURNS);
     this.turns = turns;
   }

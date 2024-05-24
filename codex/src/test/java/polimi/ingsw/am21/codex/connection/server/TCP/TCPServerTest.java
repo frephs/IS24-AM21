@@ -22,7 +22,7 @@ import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetTokenC
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-class TCPConnectionServerTest {
+class TCPServerTest {
 
   ObjectOutputStream outputStream;
   ObjectInputStream inputStream;
@@ -30,13 +30,24 @@ class TCPConnectionServerTest {
   @Test
   public void basic() {
     List<Message> receivedMessages = new java.util.ArrayList<>();
-    final CountDownLatch responsesLatch = new CountDownLatch(3);
+
+    // Please note that this list is not evaluated in order
+    List<MessageType> expectedMessages = List.of(
+      MessageType.SOCKET_ID,
+      MessageType.GAME_CREATED,
+      MessageType.AVAILABLE_GAME_LOBBIES,
+      MessageType.PLAYER_JOINED_LOBBY,
+      MessageType.LOBBY_STATUS,
+      MessageType.PLAYER_SET_TOKEN_COLOR,
+      MessageType.PLAYER_SET_NICKNAME
+    );
+
+    final CountDownLatch responsesLatch = new CountDownLatch(
+      expectedMessages.size()
+    );
     Socket clientSocket;
 
-    TCPConnectionServer server = new TCPConnectionServer(
-      4567,
-      new GameController()
-    );
+    TCPServer server = new TCPServer(4567, new GameController());
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
       executor.execute(() -> {
         try {
@@ -90,8 +101,8 @@ class TCPConnectionServerTest {
         new CreateGameMessage("TestGame", 4),
         new GetAvailableGameLobbiesMessage(),
         new JoinLobbyMessage("TestGame"),
-        new SetTokenColorMessage(TokenColor.RED, "TestGame")
-        //        new SetNicknameMessage("TestNickname", "TestGame")
+        new SetTokenColorMessage(TokenColor.RED, "TestGame"),
+        new SetNicknameMessage("TestNickname", "TestGame")
       ).forEach(message -> {
         try {
           outputStream.writeObject(message);
@@ -109,13 +120,7 @@ class TCPConnectionServerTest {
           .stream()
           .map(Message::getType)
           .toList()
-          .containsAll(
-            List.of(
-              MessageType.GAME_CREATED,
-              MessageType.AVAILABLE_GAME_LOBBIES,
-              MessageType.CONFIRM
-            )
-          )
+          .containsAll(expectedMessages)
       );
       server.stop();
       clientSocket.close();

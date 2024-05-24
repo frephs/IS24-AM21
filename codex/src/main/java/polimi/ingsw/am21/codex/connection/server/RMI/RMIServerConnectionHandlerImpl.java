@@ -1,10 +1,11 @@
 package polimi.ingsw.am21.codex.connection.server.RMI;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -17,7 +18,6 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
@@ -28,13 +28,13 @@ import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
-public class RMIConnectionHandlerImpl
+public class RMIServerConnectionHandlerImpl
   extends UnicastRemoteObject
-  implements RMIConnectionHandler {
+  implements RMIServerConnectionHandler {
 
   GameController controller;
 
-  public RMIConnectionHandlerImpl(GameController controller)
+  public RMIServerConnectionHandlerImpl(GameController controller)
     throws RemoteException {
     super();
     this.controller = controller;
@@ -163,6 +163,16 @@ public class RMIConnectionHandlerImpl
 
   public Set<String> getGames() throws RemoteException {
     return this.controller.getGames();
+  }
+
+  @Override
+  public Map<String, Integer> getGamesCurrentPlayers() throws RemoteException {
+    return this.controller.getCurrentSlots();
+  }
+
+  @Override
+  public Map<String, Integer> getGamesMaxPlayers() throws RemoteException {
+    return this.controller.getMaxSlots();
   }
 
   @Override

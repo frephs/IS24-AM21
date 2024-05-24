@@ -31,7 +31,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMe
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -48,7 +48,7 @@ import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 /** Runnable that handles a TCP connection */
-public class TCPConnectionHandler implements Runnable {
+public class TCPServerConnectionHandler implements Runnable {
 
   /**
    * The socket handling the TCP connection
@@ -84,13 +84,13 @@ public class TCPConnectionHandler implements Runnable {
   /**
    * The map of active connection handlers, used to handle message broadcasting
    */
-  private final Map<UUID, TCPConnectionHandler> activeHandlers;
+  private final Map<UUID, TCPServerConnectionHandler> activeHandlers;
 
-  public TCPConnectionHandler(
+  public TCPServerConnectionHandler(
     Socket socket,
     GameController controller,
     UUID socketId,
-    Map<UUID, TCPConnectionHandler> activeHandlers
+    Map<UUID, TCPServerConnectionHandler> activeHandlers
   ) {
     this.socket = socket;
     try {
@@ -127,6 +127,7 @@ public class TCPConnectionHandler implements Runnable {
     });
     startMessageParser();
     startMessageHandler();
+    send(new SocketIdMessage(socketId));
   }
 
   /**
@@ -164,9 +165,9 @@ public class TCPConnectionHandler implements Runnable {
           System.err.println(
             "IOException caught when parsing message from " +
             socket.getInetAddress() +
-            ". Parser is exiting.\n" +
-            e
+            ". Parser is exiting.\n"
           );
+          e.printStackTrace();
           break;
         } catch (InterruptedException e) {
           System.err.println(
@@ -285,7 +286,6 @@ public class TCPConnectionHandler implements Runnable {
         message.getSide(),
         message.getPosition()
       );
-      send(new ConfirmMessage());
     } catch (PlayerNotActive e) {
       send(new ActionNotAllowedMessage());
     } catch (
@@ -304,7 +304,6 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getPlayers()
       );
-      send(new ConfirmMessage());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }
@@ -339,7 +338,6 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getCardSideType()
       );
-      send(new ConfirmMessage());
     } catch (
       GameNotReadyException | GameAlreadyStartedException | EmptyDeckException e
     ) {
@@ -360,7 +358,6 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.isFirst()
       );
-      send(new ConfirmMessage());
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
@@ -375,7 +372,6 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getNickname()
       );
-      send(new ConfirmMessage());
     } catch (NicknameAlreadyTakenException e) {
       send(new NicknameAlreadyTakenMessage(message.getNickname()));
     } catch (GameNotFoundException e) {
@@ -392,9 +388,6 @@ public class TCPConnectionHandler implements Runnable {
         socketId,
         message.getColor()
       );
-
-      send(new ConfirmMessage());
-      // Broadcast of available colors triggered by controller emitter
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (TokenAlreadyTakenException e) {

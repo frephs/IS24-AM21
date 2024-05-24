@@ -14,11 +14,11 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
 
   private final String gameId;
   private final String playerId;
-  private final int playerHandCardNumber;
-  private final int cardId;
+  private final Integer playerHandCardNumber;
+  private final Integer cardId;
   private final CardSideType side;
   private final Position position;
-  private final int newPlayerScore;
+  private final Integer newPlayerScore;
   private final Map<ResourceType, Integer> updatedResources;
   private final Map<ObjectType, Integer> updatedObjects;
   private final Set<Position> availableSpots;
@@ -31,7 +31,7 @@ public class CardPlacedMessage extends ViewUpdatingMessage {
     Integer cardId,
     CardSideType side,
     Position position,
-    int newPlayerScore,
+    Integer newPlayerScore,
     Map<ResourceType, Integer> updatedResources,
     Map<ObjectType, Integer> updatedObjects,
     Set<Position> availablePositions,

@@ -19,11 +19,11 @@ import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public class TCPControllerListener implements GameEventListener {
+public class TCPServerControllerListener implements GameEventListener {
 
   private final Consumer<Message> broadcast;
 
-  public TCPControllerListener(Consumer<Message> broadcast) {
+  public TCPServerControllerListener(Consumer<Message> broadcast) {
     this.broadcast = broadcast;
   }
 
@@ -150,8 +150,7 @@ public class TCPControllerListener implements GameEventListener {
 
   @Override
   public void playerChoseObjectiveCard(Boolean isFirst) {
-    // TODO Do we need to add a broadcast message for this? Do other clients care?
-
+    // TODO
   }
 
   @Override
