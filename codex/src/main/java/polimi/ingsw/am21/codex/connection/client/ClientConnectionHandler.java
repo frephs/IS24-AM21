@@ -37,6 +37,12 @@ public abstract class ClientConnectionHandler {
     return localModel.getView();
   }
 
+  /*
+   * -----------------
+   * COMMAND SENDERS
+   * -----------------
+   * */
+
   /**
    * Retrieves the list of available games and displays them in the view
    */
@@ -122,6 +128,12 @@ public abstract class ClientConnectionHandler {
    * Goes to next turn ( called only when the game is in the last round, since you cannot draw a card in that case)
    */
   public abstract void nextTurn();
+
+  /*
+   * -----------------
+   * CONNECTION HANDLING
+   * -----------------
+   * */
 
   public abstract void connect();
 
