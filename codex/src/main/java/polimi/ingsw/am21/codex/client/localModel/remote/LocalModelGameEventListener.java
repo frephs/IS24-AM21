@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.client.localModel.remote;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
@@ -77,9 +76,19 @@ public class LocalModelGameEventListener
     UUID socketID,
     String nickname,
     TokenColor color,
-    List<Integer> handIDs
+    List<Integer> handIDs,
+    Integer starterCardId,
+    CardSideType starterSide
   ) throws RemoteException {
-    listener.playerJoinedGame(gameId, socketID, nickname, color, handIDs);
+    listener.playerJoinedGame(
+      gameId,
+      socketID,
+      nickname,
+      color,
+      handIDs,
+      starterCardId,
+      starterSide
+    );
   }
 
   @Override

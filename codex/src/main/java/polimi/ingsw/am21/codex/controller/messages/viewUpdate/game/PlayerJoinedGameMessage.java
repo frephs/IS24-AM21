@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
@@ -13,13 +14,17 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
   private final String nickname;
   private final TokenColor color;
   private final List<Integer> handIDs;
+  private final Integer starterCardID;
+  private final CardSideType starterSideType;
 
   public PlayerJoinedGameMessage(
     String gameId,
     UUID socketId,
     String nickname,
     TokenColor color,
-    List<Integer> handIDs
+    List<Integer> handIDs,
+    Integer starterCardID,
+    CardSideType starterSideType
   ) {
     super(MessageType.PLAYER_JOINED_GAME);
     this.gameId = gameId;
@@ -27,6 +32,8 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
     this.nickname = nickname;
     this.color = color;
     this.handIDs = handIDs;
+    this.starterCardID = starterCardID;
+    this.starterSideType = starterSideType;
   }
 
   public String getGameId() {
@@ -49,6 +56,14 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
     return handIDs;
   }
 
+  public Integer getStarterCardID() {
+    return starterCardID;
+  }
+
+  public CardSideType getStarterSideType() {
+    return starterSideType;
+  }
+
   @Override
   public String toString() {
     return (
@@ -65,6 +80,10 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
       color +
       ", handIDs=" +
       handIDs +
+      ", starterCardID=" +
+      starterCardID +
+      ", starterSideType=" +
+      starterSideType +
       '}'
     );
   }

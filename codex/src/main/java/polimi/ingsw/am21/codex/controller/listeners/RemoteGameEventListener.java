@@ -9,8 +9,6 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
-import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface RemoteGameEventListener extends Remote {
@@ -40,7 +38,9 @@ public interface RemoteGameEventListener extends Remote {
     UUID socketID,
     String nickname,
     TokenColor color,
-    List<Integer> handIDs
+    List<Integer> handIDs,
+    Integer starterCard,
+    CardSideType starterSide
   ) throws RemoteException;
 
   void gameStarted(String gameId, List<String> players) throws RemoteException;

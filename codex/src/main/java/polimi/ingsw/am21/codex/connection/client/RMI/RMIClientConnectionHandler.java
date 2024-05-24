@@ -7,7 +7,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
@@ -70,7 +69,7 @@ public class RMIClientConnectionHandler
         rmiConnectionHandler.getGamesCurrentPlayers();
       Map<String, Integer> maxPlayers =
         rmiConnectionHandler.getGamesMaxPlayers();
-      localModel.listGames(games, currentPlayers, maxPlayers);
+      localModel.createGames(games, currentPlayers, maxPlayers);
     } catch (RemoteException e) {
       this.messageNotSent();
     }
@@ -88,7 +87,7 @@ public class RMIClientConnectionHandler
     } catch (GameAlreadyStartedException e) {
       this.localModel.gameAlreadyStarted();
     } catch (LobbyFullException e) {
-      this.localModel.lobbyFull();
+      this.localModel.lobbyFull(gameId);
     } catch (GameNotFoundException e) {
       this.localModel.gameNotFound(gameId);
     } catch (RemoteException e) {

@@ -204,7 +204,14 @@ public class GameController {
             .getHand()
             .stream()
             .map(PlayableCard::getId)
-            .collect(Collectors.toList())
+            .collect(Collectors.toList()),
+          newPlayer.getBoard().getPlayedCards().get(new Position()).getId(),
+          newPlayer
+            .getBoard()
+            .getPlayedCards()
+            .get(new Position())
+            .getPlayedSideType()
+            .orElse(CardSideType.FRONT)
         );
       } catch (RemoteException e) {
         // TODO: handle in a better way
@@ -270,7 +277,11 @@ public class GameController {
     game.nextTurn();
     listeners.forEach(listener -> {
       try {
-        listener.changeTurn(gameId, playerNickname, game.isLastRound());
+        listener.changeTurn(
+          gameId,
+          game.getCurrentPlayer().getNickname(),
+          game.isLastRound()
+        );
       } catch (RemoteException e) {
         // TODO: handle in a better way
         throw new RuntimeException(e);

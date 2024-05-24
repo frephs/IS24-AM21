@@ -1,15 +1,9 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
-import java.rmi.RemoteException;
 import java.util.*;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
-import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
-import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface GameEventListener extends RemoteGameEventListener {
@@ -36,7 +30,9 @@ public interface GameEventListener extends RemoteGameEventListener {
     UUID socketID,
     String nickname,
     TokenColor color,
-    List<Integer> handIDs
+    List<Integer> handIDs,
+    Integer starterCardID,
+    CardSideType starterSide
   );
 
   void gameStarted(String gameId, List<String> players);

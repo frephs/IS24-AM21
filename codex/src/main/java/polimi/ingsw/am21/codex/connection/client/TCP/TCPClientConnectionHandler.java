@@ -303,7 +303,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public void nextTurn() {
     this.send(
         new NextTurnActionMessage(
-          localModel.getGameId(),
+          localModel.getLocalGameBoard().getGameId(),
           localModel.getLocalGameBoard().getPlayerNickname()
         )
       );
@@ -409,7 +409,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
-    localModel.listGames(
+    localModel.createGames(
       message.getLobbyIds(),
       message.getCurrentPlayers(),
       message.getMaxPlayers()
@@ -417,7 +417,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(ObjectiveCardsMessage message) {
-    localModel.playerGetObjectiveCard(message.getIdPair());
+    localModel.listObjectiveCards(message.getIdPair());
   }
 
   public void handleMessage(StarterCardSidesMessage message) {
@@ -439,7 +439,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   //lobby
 
   public void handleMessage(GameFullMessage message) {
-    localModel.gameFull(message.getGameId());
+    localModel.lobbyFull(message.getGameId());
   }
 
   public void handleMessage(GameNotFoundMessage message) {
@@ -573,7 +573,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getSocketId(),
       message.getNickname(),
       message.getColor(),
-      message.getHandIDs()
+      message.getHandIDs(),
+      message.getStarterCardID(),
+      message.getStarterSideType()
     );
   }
 

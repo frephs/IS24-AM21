@@ -159,10 +159,20 @@ public class TCPServerControllerListener implements GameEventListener {
     UUID socketID,
     String nickname,
     TokenColor color,
-    List<Integer> handIDs
+    List<Integer> handIDs,
+    Integer starterCard,
+    CardSideType starterSide
   ) {
     broadcast.accept(
-      new PlayerJoinedGameMessage(gameId, socketID, nickname, color, handIDs)
+      new PlayerJoinedGameMessage(
+        gameId,
+        socketID,
+        nickname,
+        color,
+        handIDs,
+        starterCard,
+        starterSide
+      )
     );
   }
 }
