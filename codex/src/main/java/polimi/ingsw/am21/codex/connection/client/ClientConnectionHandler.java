@@ -21,7 +21,6 @@ public abstract class ClientConnectionHandler {
 
   protected final String host;
   protected final Integer port;
-  protected View view;
 
   public ClientConnectionHandler(
     String host,

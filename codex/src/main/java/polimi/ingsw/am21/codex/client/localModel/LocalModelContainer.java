@@ -260,6 +260,7 @@ public class LocalModelContainer
         "Player " + socketId + " joined game " + gameId
       );
     }
+    view.drawLobby(lobby.getPlayers());
   }
 
   /**

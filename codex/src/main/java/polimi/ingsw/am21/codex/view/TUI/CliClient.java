@@ -93,9 +93,9 @@ public class CliClient {
             } catch (Exception e) {
               cli.postNotification(
                 NotificationType.ERROR,
-                "An error occurred while executing the command. \n" +
-                e.getMessage()
+                "An error occurred while executing the command. \n"
               );
+              cli.displayException(e);
             }
           }
         } else {

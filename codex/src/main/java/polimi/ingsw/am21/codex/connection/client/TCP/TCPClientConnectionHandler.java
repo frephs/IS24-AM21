@@ -94,9 +94,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               NotificationType.ERROR,
               "IOException caught when parsing message from " +
               socket.getInetAddress() +
-              ". Parser is exiting.\n" +
-              e
+              ". Parser is exiting.\n"
             );
+          getView().displayException(e);
           break;
         } catch (InterruptedException e) {
           getView()
@@ -106,6 +106,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               socket.getInetAddress() +
               "interrupted, exiting."
             );
+          getView().displayException(e);
           break;
         }
       }
@@ -127,12 +128,12 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           );
           break;
         } catch (Exception e) {
+          getView().displayException(e);
           System.err.println(
-            "Caught controller exception while handling message from " +
+            "Caught handler exception while handling message from " +
             socket.getInetAddress() +
             ". Closing connection."
           );
-          e.printStackTrace();
 
           this.disconnect();
           break;
@@ -151,6 +152,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
             outputStream.reset();
             if (message.getType().isClientRequest()) {
               this.waiting = true;
+              getView()
+                .postNotification(
+                  NotificationType.WARNING,
+                  "Sending request. "
+                );
             }
           }
         } catch (IOException e) {
@@ -323,6 +329,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public void parseMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
+      getView()
+        .postNotification(NotificationType.CONFIRM, "Response received. ");
     }
 
     switch (message.getType()) {
