@@ -67,7 +67,6 @@ public class LocalModelContainer
   }
 
   public LocalGameBoard getLocalGameBoard() {
-    // TODO remove every usage
     return localGameBoard;
   }
 
