@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -99,7 +100,10 @@ public class CliUtils {
   }
 
   @SafeVarargs
-  public static String getTable(String[] headers, List<String>... columns) {
+  public static String getTable(
+    String[] headers,
+    ArrayList<String>... columns
+  ) {
     StringBuilder sb = new StringBuilder();
 
     int[] maxWidths = new int[columns.length];

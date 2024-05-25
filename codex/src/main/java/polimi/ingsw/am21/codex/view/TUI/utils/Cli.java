@@ -118,15 +118,21 @@ public class Cli implements View {
           "Current number of players",
           "Max number of players",
         },
-        gameEntries.stream().map(GameEntry::getGameId).toList(),
-        gameEntries
-          .stream()
-          .map(gameEntry -> String.valueOf(gameEntry.getCurrentPlayers()))
-          .toList(),
-        gameEntries
-          .stream()
-          .map(gameEntry -> String.valueOf(gameEntry.getMaxPlayers()))
-          .toList()
+        new ArrayList<>(
+          gameEntries.stream().map(GameEntry::getGameId).toList()
+        ),
+        new ArrayList<>(
+          gameEntries
+            .stream()
+            .map(gameEntry -> String.valueOf(gameEntry.getCurrentPlayers()))
+            .toList()
+        ),
+        new ArrayList<>(
+          gameEntries
+            .stream()
+            .map(gameEntry -> String.valueOf(gameEntry.getMaxPlayers()))
+            .toList()
+        )
       )
     );
   }

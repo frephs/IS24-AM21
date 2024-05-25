@@ -214,9 +214,8 @@ public class CliClient {
       new CommandHandler("help", "Display available commands") {
         @Override
         public void handle(String[] command) {
-          List<String> commands = new ArrayList<>();
-          List<String> usages = new ArrayList<>();
-          List<String> descriptions = new ArrayList<>();
+          ArrayList<String> usages = new ArrayList<>();
+          ArrayList<String> descriptions = new ArrayList<>();
           commandHandlers
             .stream()
             .filter(

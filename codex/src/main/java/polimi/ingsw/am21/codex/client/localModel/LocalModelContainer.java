@@ -117,8 +117,8 @@ public class LocalModelContainer
               )
             )
       );
+      listGames();
     }
-    listGames();
   }
 
   public void listGames() {
