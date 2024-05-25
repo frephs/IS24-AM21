@@ -153,9 +153,9 @@ public class RMIClientConnectionHandler
       // TODO: implement
       //      localPlayer = new LocalPlayer(color);
     } catch (GameAlreadyStartedException e) {
-      // TODO: update view
+      localModel.gameAlreadyStarted();
     } catch (GameNotFoundException e) {
-      // TODO: update view
+      localModel.gameNotFound(this.localModel.getGameId());
     } catch (RemoteException e) {
       this.messageNotSent();
     }
@@ -220,7 +220,7 @@ public class RMIClientConnectionHandler
           this.socketID
         );
     } catch (EmptyDeckException e) {
-      // TODO:
+      localModel.emptyDeck();
     } catch (
       IllegalCardSideChoiceException
       | IllegalPlacingPositionException
@@ -310,6 +310,16 @@ public class RMIClientConnectionHandler
       this.localModel.playerNotActive();
     } catch (GameOverException e) {
       this.localModel.gameOver();
+    }
+  }
+
+  @Override
+  public void deleteGame(String gameId) {
+    try {
+      rmiConnectionHandler.deleteGame(gameId);
+      localModel.gameDeleted(gameId);
+    } catch (RemoteException e) {
+      this.messageNotSent();
     }
   }
 }
