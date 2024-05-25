@@ -65,9 +65,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     this.incomingMessages = new ArrayDeque<>();
 
     this.connect();
-
-    this.startMessageParser();
-    this.startMessageHandler();
   }
 
   /**
@@ -184,6 +181,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       assert socket != null;
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
       this.inputStream = new ObjectInputStream(socket.getInputStream());
+
+      this.startMessageParser();
+      this.startMessageHandler();
     } catch (IOException e) {
       connectionFailed(e);
     }
