@@ -152,7 +152,6 @@ public class LocalModelContainer
 
   @Override
   public void gameDeleted(String gameId) {
-    // TODO implement this in TCP (send a delete game message)
     // TODO delete game on gameOver
     menu.getGames().remove(gameId);
 

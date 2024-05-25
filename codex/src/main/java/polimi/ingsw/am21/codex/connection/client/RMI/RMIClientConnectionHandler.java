@@ -130,7 +130,7 @@ public class RMIClientConnectionHandler
             rmiConnectionHandler.getAvailableTokens(gameId)
           );
       } catch (GameNotFoundException ignored) {}
-    } catch (EmptyDeckException e) { //    } //      System.err.println("A remote exception occurred" + e.getMessage()); //    } catch (EmptyDeckException e) { //      System.err.println("The game was not found" + e.getMessage()); //    } catch (GameNotFoundException e) { //      System.err.println("The lobby is full" + e.getMessage()); //    } catch (LobbyFullException e) { //      System.err.println("The game already started" + e.getMessage()); //    catch (GameAlreadyStartedException e) {
+    } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
@@ -214,7 +214,9 @@ public class RMIClientConnectionHandler
       );
       // TODO
       //      this.localModel.playerJoinedGame(this.localModel.getGameId(), this.socketID, localPlayer.getNickname(), localPlayer.getToken(), );
-    } catch (GameNotReadyException e) {} catch (GameAlreadyStartedException e) {
+    } catch (GameNotReadyException e) {
+      this.localModel.gameNotStarted();
+    } catch (GameAlreadyStartedException e) {
       this.localModel.playerLeftLobby(
           this.localModel.getGameId(),
           this.socketID
@@ -255,16 +257,27 @@ public class RMIClientConnectionHandler
     } catch (PlayerNotActive e) {
       localModel.playerNotActive();
     } catch (IllegalCardSideChoiceException e) {
-      // TODO: add IllegalCardSideChoiceException handling
+      localModel.invalidCardPlacement("Illegal Card Side Choice");
+      throw new RuntimeException(e);
     } catch (IllegalPlacingPositionException e) {
-      // TODO: add IllegalPlacingPositionException handling
+      localModel.invalidCardPlacement("Illegal Placing Position");
+      throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
     }
   }
 
   @Override
-  public void leaveLobby() {}
+  public void leaveLobby() {
+    try {
+      rmiConnectionHandler.leaveLobby(this.localModel.getGameId(), this.socketID);
+      this.localModel.playerLeftLobby(this.localModel.getGameId(), this.socketID);
+    } catch (GameNotFoundException e) {
+      this.localModel.gameNotFound(this.localModel.getGameId());
+    } catch (RemoteException e) {
+      this.messageNotSent();
+    }
+  }
 
   @Override
   public void nextTurn(
