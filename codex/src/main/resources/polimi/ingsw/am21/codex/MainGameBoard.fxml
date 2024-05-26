@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.MainGameBoard">
+   <children>
+      <AnchorPane layoutX="-1.0" layoutY="-1.0" prefHeight="400.0" prefWidth="252.0">
+         <children>
+            <Label layoutX="14.0" layoutY="13.0" prefHeight="34.0" prefWidth="90.0" text="Score board" />
+         </children>
+      </AnchorPane>
+      <Separator layoutX="248.0" layoutY="-2.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="6.0" />
+      <AnchorPane layoutX="251.0" layoutY="67.0" prefHeight="400.0" prefWidth="262.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="88.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Separator layoutX="5.0" layoutY="145.0" prefHeight="3.0" prefWidth="241.0" />
+            <Separator layoutX="5.0" layoutY="269.0" prefHeight="3.0" prefWidth="242.0" />
+            <Label layoutX="14.0" layoutY="38.0" text="Resource card" />
+            <Label layoutX="14.0" layoutY="158.0" text="Gold card" />
+            <Label layoutX="14.0" layoutY="279.0" text="Common objective card" />
+            <Label layoutX="81.0" layoutY="14.0" text="Drawing deck" />
+            <Separator layoutX="254.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="400.0" prefWidth="6.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="509.0" layoutY="1.0" prefHeight="400.0" prefWidth="90.0">
+         <children>
+            <Button layoutX="12.0" layoutY="34.0" mnemonicParsing="false" text="My game" />
+            <ChoiceBox layoutX="15.0" layoutY="124.0" prefHeight="26.0" prefWidth="60.0" />
+            <Label layoutX="15.0" layoutY="97.0" text="Other player" />
+            <Button layoutX="28.0" layoutY="187.0" mnemonicParsing="false" text="Chat" />
+            <Button layoutX="25.0" layoutY="239.0" mnemonicParsing="false" text="Help" />
+         </children></AnchorPane>
+   </children>
+</AnchorPane>
