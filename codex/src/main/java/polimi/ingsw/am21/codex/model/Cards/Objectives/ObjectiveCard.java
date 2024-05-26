@@ -42,8 +42,13 @@ public class ObjectiveCard extends Card implements CliCard {
 
   @Override
   public String cardToString() {
-    // TODO: Implement TUI method
-    return "";
+    return (
+      "Gain " +
+      points +
+      ((points > 1) ? " points" : " point") +
+      " for each " +
+      objective.cardToString()
+    );
   }
 
   public String cardToAscii(Map<Integer, String> cardStringMap) {
