@@ -57,6 +57,7 @@
             </AnchorPane>
             <Separator layoutX="488.0" orientation="VERTICAL" prefHeight="283.0" prefWidth="13.0" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="488.0" AnchorPane.rightAnchor="112.0" AnchorPane.topAnchor="0.0" />
             <Button layoutX="528.0" layoutY="163.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="53.0" text="Chat" />
+            <Button layoutX="534.0" layoutY="215.0" mnemonicParsing="false" text="Help" />
          </children></AnchorPane>
    </children>
 </AnchorPane>
