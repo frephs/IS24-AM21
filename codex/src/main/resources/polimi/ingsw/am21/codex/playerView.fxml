@@ -14,8 +14,8 @@
          <children>
             <Label layoutX="31.0" layoutY="14.0" text="Other" />
             <Button layoutX="7.0" layoutY="49.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="91.0" text="Main GameBoard" />
-            <ChoiceBox layoutX="3.0" layoutY="113.0" prefHeight="26.0" prefWidth="100.0" />
-            <Label layoutX="20.0" layoutY="89.0" text="Other player" />
+            <ChoiceBox layoutX="3.0" layoutY="113.0" prefHeight="26.0" prefWidth="91.0" />
+            <Label layoutX="8.0" layoutY="89.0" prefHeight="18.0" prefWidth="78.0" text="Other player" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="153.0" layoutY="330.0" prefHeight="113.0" prefWidth="613.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -56,6 +56,7 @@
                </children>
             </AnchorPane>
             <Separator layoutX="488.0" orientation="VERTICAL" prefHeight="283.0" prefWidth="13.0" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="488.0" AnchorPane.rightAnchor="112.0" AnchorPane.topAnchor="0.0" />
+            <Button layoutX="528.0" layoutY="163.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="53.0" text="Chat" />
          </children></AnchorPane>
    </children>
 </AnchorPane>
