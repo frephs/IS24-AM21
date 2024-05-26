@@ -325,7 +325,7 @@ public class GameController {
     listeners.add(listener);
   }
 
-  public void removeListener(GameEventListener listener) {
+  public void removeListener(RemoteGameEventListener listener) {
     listeners.remove(listener);
   }
 
