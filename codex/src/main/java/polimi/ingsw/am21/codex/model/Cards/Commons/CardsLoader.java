@@ -154,7 +154,7 @@ public final class CardsLoader {
         >();
 
         for (int j = 0; j < geometryObjectivesArray.length(); j++) {
-          if (!geometryObjectivesArray.isNull(i)) {
+          if (!geometryObjectivesArray.isNull(j)) {
             AdjacentPosition position =
               CardsLoader.cardGeometryPositionFromJSONIndex(j);
             ResourceType resource = ResourceType.fromString(
