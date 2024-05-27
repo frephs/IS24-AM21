@@ -406,8 +406,6 @@ public class LocalModelContainer
     Integer starterCardID,
     CardSideType starterSide
   ) {
-    //TODO send a player joined game message for every player already in game if a player joins "late" the lobby (expand joinlobbystatusMessage)
-
     List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
     lobby.getPlayers().get(socketID).setHand(hand);
 

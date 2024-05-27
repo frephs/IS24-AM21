@@ -229,7 +229,7 @@ public class Lobby {
 
     playerBuilder.setStarterCardSide(cardSide);
     playerBuilder.setHand(hand);
-    Player player = playerBuilder.build();
+    Player player = playerBuilder.build(socketId);
     lobbyPlayers.remove(socketId);
     return player;
   }

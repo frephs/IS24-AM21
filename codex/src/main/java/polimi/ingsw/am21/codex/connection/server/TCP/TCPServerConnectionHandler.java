@@ -43,6 +43,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -317,11 +318,23 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(JoinLobbyMessage message) {
     try {
       controller.joinLobby(message.getLobbyId(), socketId);
-      send(
-        new LobbyStatusMessage(
-          controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
-        )
+
+      Map<UUID, Pair<String, TokenColor>> playersInfo = new HashMap<>();
+      controller
+        .getGame(message.getLobbyId())
+        .getPlayers()
+        .forEach(
+          player ->
+            playersInfo.put(
+              player.getSocketId(),
+              new Pair<>(player.getNickname(), player.getToken())
+            )
+        );
+      playersInfo.putAll(
+        controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
       );
+
+      send(new LobbyStatusMessage(playersInfo));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (LobbyFullException e) {
