@@ -228,6 +228,7 @@ public class LocalModelContainer
         "Player" + socketId + " joined your game " + gameId
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
+      view.drawLobby(lobby.getPlayers());
     } else if (socketId.equals(this.socketId)) {
       lobby = new LocalLobby(gameId, availableTokenColors);
       localGameBoard = new LocalGameBoard(
@@ -240,13 +241,13 @@ public class LocalModelContainer
         NotificationType.RESPONSE,
         "You joined the lobby of the game: " + gameId
       );
+      view.drawLobby(lobby.getPlayers());
     } else {
       view.postNotification(
         NotificationType.UPDATE,
         "Player " + socketId + " joined game " + gameId
       );
     }
-    view.drawLobby(lobby.getPlayers());
   }
 
   /**

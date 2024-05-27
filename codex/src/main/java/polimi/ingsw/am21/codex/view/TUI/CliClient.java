@@ -251,6 +251,7 @@ public class CliClient {
         public void handle(String[] command) {
           client.connectToGame(command[1]);
           context.set(ClientContext.LOBBY);
+          // TODO printed lobby is outdated
         }
       }
     );
