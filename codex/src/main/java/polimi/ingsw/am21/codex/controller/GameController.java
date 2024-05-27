@@ -219,22 +219,13 @@ public class GameController {
     }
   }
 
-  public void createGame(String gameId, UUID socketID, Integer players)
+  public void createGame(String gameId, Integer players)
     throws EmptyDeckException {
-    try {
-      Game newGame = manager.createGame(gameId, players);
-      newGame
-        .getLobby()
-        .addPlayer(
-          socketID,
-          newGame.drawObjectiveCardPair(),
-          newGame.drawStarterCard()
-        );
-    } catch (LobbyFullException ignored) {}
+    manager.createGame(gameId, players);
 
     listeners.forEach(listener -> {
       try {
-        listener.gameCreated(gameId, 1, players);
+        listener.gameCreated(gameId, 0, players);
       } catch (RemoteException e) {
         // TODO: handle in a better way
         throw new RuntimeException(e);

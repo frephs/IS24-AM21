@@ -300,11 +300,7 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(CreateGameMessage message) {
     try {
-      controller.createGame(
-        message.getGameId(),
-        socketId,
-        message.getPlayers()
-      );
+      controller.createGame(message.getGameId(), message.getPlayers());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }
@@ -420,7 +416,7 @@ public class TCPServerConnectionHandler implements Runnable {
     }
   }
 
-  private void handleMessage(GetAvailableGameLobbiesMessage message) {
+  private void handleMessage(GetAvailableGameLobbiesMessage ignored) {
     send(
       new AvailableGameLobbiesMessage(
         controller.getGames(),

@@ -200,6 +200,8 @@ public class LocalModelContainer
         playerSetToken(uuid, tokenColor);
       }
     });
+
+    listLobbyPlayers();
   }
 
   public void listLobbyPlayers() {
@@ -224,6 +226,9 @@ public class LocalModelContainer
         return gameEntry;
       });
 
+    // Do not draw the lobby in this method, let it be drawn by lobbyStatus
+    // This way we prevent an outdated lobby from being drawn
+
     if (lobby != null && lobby.getGameId().equals(gameId)) {
       addToLobby(socketId);
       view.postNotification(
@@ -231,7 +236,6 @@ public class LocalModelContainer
         "Player" + socketId + " joined your game " + gameId
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
-      view.drawLobby(lobby.getPlayers());
     } else if (socketId.equals(this.socketId)) {
       lobby = new LocalLobby(gameId);
       localGameBoard = new LocalGameBoard(
@@ -244,7 +248,6 @@ public class LocalModelContainer
         NotificationType.RESPONSE,
         "You joined the lobby of the game: " + gameId
       );
-      view.drawLobby(lobby.getPlayers());
     } else {
       view.postNotification(
         NotificationType.UPDATE,

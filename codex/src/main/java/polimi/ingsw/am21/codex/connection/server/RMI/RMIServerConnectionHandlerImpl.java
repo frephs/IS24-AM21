@@ -5,7 +5,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -121,7 +120,7 @@ public class RMIServerConnectionHandlerImpl
 
   public void createGame(String gameId, UUID socketID, Integer players)
     throws RemoteException, EmptyDeckException {
-    this.controller.createGame(gameId, socketID, players);
+    this.controller.createGame(gameId, players);
   }
 
   @Override

@@ -507,6 +507,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getPlayers(),
       message.getMaxPlayers()
     );
+    getView()
+      .postNotification(
+        NotificationType.RESPONSE,
+        "New game created: " + message.getGameId()
+      );
   }
 
   public void handleMessage(GameDeletedMessage message) {
