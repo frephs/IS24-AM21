@@ -132,23 +132,6 @@ public class LocalModelContainer
       .put(gameId, new GameEntry(gameId, currentPlayers, maxPlayers));
   }
 
-  public void gameCreatedAndConnected(
-    String gameId,
-    UUID gameCreatorId,
-    int currentPlayers,
-    int maxPlayers
-  ) {
-    gameCreated(gameId, 1, maxPlayers);
-
-    playerJoinedLobby(
-      gameId,
-      gameCreatorId,
-      Arrays.stream(TokenColor.values()).collect(Collectors.toSet())
-    );
-
-    listGames();
-  }
-
   @Override
   public void gameDeleted(String gameId) {
     // TODO delete game on gameOver
@@ -207,6 +190,10 @@ public class LocalModelContainer
         playerSetToken(uuid, tokenColor);
       }
     });
+  }
+
+  public void listLobbyPlayers() {
+    view.drawLobby(lobby.getPlayers());
   }
 
   /**
