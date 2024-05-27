@@ -119,7 +119,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         try {
           while (incomingMessages.isEmpty()) incomingMessages.wait();
 
-          parseMessage(incomingMessages.poll());
+          handleMessage(incomingMessages.poll());
         } catch (InterruptedException e) {
           System.err.println(
             "Message handler thread for " +
@@ -338,7 +338,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    * ----------------------
    * */
 
-  public void parseMessage(Message message) {
+  public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
       getView()
@@ -612,6 +612,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(SocketIdMessage message) {
-    this.socketID = message.getSocketId();
+    localModel.setSocketId(message.getSocketId());
   }
 }

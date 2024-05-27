@@ -24,19 +24,13 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class CliClient {
 
-  private final UUID socketId = UUID.randomUUID();
-  //TODO Fix
-
   private final ContextContainer context = new ContextContainer();
 
   Scanner scanner = new Scanner(System.in);
   Cli cli = Cli.getInstance();
   ClientConnectionHandler client;
 
-  private final LocalModelContainer localModel = new LocalModelContainer(
-    socketId,
-    cli
-  );
+  private final LocalModelContainer localModel = new LocalModelContainer(cli);
 
   public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
@@ -255,7 +249,7 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
-          context.set(null);
+          context.set(ClientContext.LOBBY);
         }
       }
     );
