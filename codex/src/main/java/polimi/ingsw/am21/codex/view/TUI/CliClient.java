@@ -21,7 +21,6 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
-import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class CliClient {
 

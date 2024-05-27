@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;

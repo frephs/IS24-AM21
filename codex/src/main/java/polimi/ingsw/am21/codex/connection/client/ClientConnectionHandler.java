@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.connection.client;
 
-import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;

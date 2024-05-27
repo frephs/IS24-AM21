@@ -476,21 +476,23 @@ public class LocalModelContainer
       "point"
     );
 
-    Arrays.stream(ResourceType.values()).forEach(resourceType -> {
-      diffMessage(
-        updatedResources.get(resourceType) -
-        localGameBoard.getCurrentPlayer().getResources().get(resourceType),
-        resourceType
-      );
-    });
+    Arrays.stream(ResourceType.values()).forEach(
+      resourceType ->
+        diffMessage(
+          updatedResources.get(resourceType) -
+          localGameBoard.getCurrentPlayer().getResources().get(resourceType),
+          resourceType
+        )
+    );
 
-    Arrays.stream(ObjectType.values()).forEach(objectType -> {
-      diffMessage(
-        updatedObjects.get(objectType) -
-        localGameBoard.getCurrentPlayer().getResources().get(objectType),
-        objectType
-      );
-    });
+    Arrays.stream(ObjectType.values()).forEach(
+      objectType ->
+        diffMessage(
+          updatedObjects.get(objectType) -
+          localGameBoard.getCurrentPlayer().getObjects().get(objectType),
+          objectType
+        )
+    );
 
     localGameBoard.getCurrentPlayer().getResources().putAll(updatedResources);
     localGameBoard.getCurrentPlayer().getObjects().putAll(updatedObjects);
@@ -614,7 +616,7 @@ public class LocalModelContainer
 
   @Override
   public void playerScoresUpdate(Map<String, Integer> newScores) {
-    newScores.forEach((nickname, newScore) -> {
+    newScores.forEach((nickname, newScore) ->
       localGameBoard
         .getPlayers()
         .stream()
@@ -623,8 +625,7 @@ public class LocalModelContainer
           int diff = newScore - player.getPoints();
           player.setPoints(newScore);
           diffMessage(diff, "points");
-        });
-    });
+        }));
     view.drawLeaderBoard(localGameBoard.getPlayers());
   }
 

@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -453,7 +452,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.invalidCardPlacement(message.getReason());
   }
 
-  public void handleMessage(GameAlreadyStartedMessage message) {
+  public void handleMessage(GameAlreadyStartedMessage ignored) {
     localModel.gameAlreadyStarted();
   }
 
@@ -475,11 +474,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.tokenTaken(message.getToken());
   }
 
-  public void handleMessage(ActionNotAllowedMessage message) {
+  public void handleMessage(ActionNotAllowedMessage ignored) {
     localModel.actionNotAllowed();
   }
 
-  public void handleMessage(UnknownMessageTypeMessage message) {
+  public void handleMessage(UnknownMessageTypeMessage ignored) {
     getView()
       .postNotification(
         NotificationType.WARNING,
@@ -487,19 +486,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
   }
 
-  public void handleMessage(NotAClientMessageMessage message) {
+  public void handleMessage(NotAClientMessageMessage ignored) {
     getView()
       .postNotification(
         NotificationType.WARNING,
         "You sent a message which is not a client's message"
-      );
-  }
-
-  public void unhandledMessage() {
-    getView()
-      .postNotification(
-        NotificationType.ERROR,
-        "The server sent you a message which you currently don't handle"
       );
   }
 
@@ -568,7 +559,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     );
   }
 
-  public void handleMessage(GameOverMessage message) {
+  public void handleMessage(GameOverMessage ignored) {
     localModel.gameOver();
   }
 
