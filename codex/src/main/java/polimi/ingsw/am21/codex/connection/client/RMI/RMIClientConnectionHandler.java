@@ -76,6 +76,16 @@ public class RMIClientConnectionHandler
   }
 
   @Override
+  public void createGame(String gameId, int players) {
+    try {
+      rmiConnectionHandler.createGame(gameId, this.socketID, players);
+      this.localModel.gameCreated(gameId, 0, players);
+    } catch (RemoteException | EmptyDeckException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
   public void connectToGame(String gameId) {
     try {
       rmiConnectionHandler.joinLobby(gameId, this.socketID);
@@ -122,7 +132,6 @@ public class RMIClientConnectionHandler
     try {
       try {
         rmiConnectionHandler.createGame(gameId, this.socketID, numberPlayers);
-        // TODO
         this.localModel.gameCreated(gameId, 0, numberPlayers);
         this.localModel.playerJoinedLobby(
             gameId,
@@ -270,8 +279,14 @@ public class RMIClientConnectionHandler
   @Override
   public void leaveLobby() {
     try {
-      rmiConnectionHandler.leaveLobby(this.localModel.getGameId(), this.socketID);
-      this.localModel.playerLeftLobby(this.localModel.getGameId(), this.socketID);
+      rmiConnectionHandler.leaveLobby(
+        this.localModel.getGameId(),
+        this.socketID
+      );
+      this.localModel.playerLeftLobby(
+          this.localModel.getGameId(),
+          this.socketID
+        );
     } catch (GameNotFoundException e) {
       this.localModel.gameNotFound(this.localModel.getGameId());
     } catch (RemoteException e) {

@@ -261,6 +261,19 @@ public class CliClient {
 
     commandHandlers.add(
       new CommandHandler(
+        "show lobby",
+        "List the available players and see their status",
+        ClientContext.LOBBY
+      ) {
+        @Override
+        public void handle(String[] command) {
+          localModel.listLobbyPlayers();
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
         "leave-game",
         "Leave the current game",
         ClientContext.ALL
@@ -279,11 +292,31 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
+          client.createGame(command[1], Integer.parseInt(command[2]));
+          cli.postNotification(
+            NotificationType.WARNING,
+            "executing the correct one"
+          );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "create-game-join <game-id> <number-of-players>",
+        "Create a new game and join it."
+      ) {
+        @Override
+        public void handle(String[] command) {
           client.createAndConnectToGame(
             command[1],
             Integer.parseInt(command[2])
           );
           context.set(ClientContext.LOBBY);
+          cli.postNotification(
+            NotificationType.WARNING,
+            "executing the wrong one"
+          );
         }
       }
     );

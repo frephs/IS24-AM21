@@ -177,6 +177,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     while (!connected) {
       try {
         this.socket = new Socket(host, port);
+        this.socket.setTcpNoDelay(true);
         connected = true;
         connectionEstablished();
       } catch (IOException e) {
@@ -206,6 +207,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
+  public void createGame(String gameId, int players) {
+    this.send(new CreateGameMessage(gameId, players));
+  }
+
+  @Override
   public void connectToGame(String gameId) {
     this.send(new JoinLobbyMessage(gameId));
   }
@@ -217,14 +223,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void createAndConnectToGame(String gameId, int players) {
-    // TODO this is actually only creating the game, we're not connecting to it
     this.send(new CreateGameMessage(gameId, players));
+    this.send(new JoinLobbyMessage(gameId));
   }
 
   @Override
   public void deleteGame(String gameId) {
-   //TODO implement this method
-   //send a delete game message
+    //TODO implement this method
+    //send a delete game message
   }
 
   @Override

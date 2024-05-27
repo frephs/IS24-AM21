@@ -48,6 +48,12 @@ public abstract class ClientConnectionHandler {
   public abstract void listGames();
 
   /**
+   * @param gameId the id of the game to create
+   * @param players the number of players in the game
+   * */
+  public abstract void createGame(String gameId, int players);
+
+  /**
    * @param gameId the id of the game to connect to
    */
   public abstract void connectToGame(String gameId);
