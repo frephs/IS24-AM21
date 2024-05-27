@@ -69,11 +69,6 @@ public abstract class ClientConnectionHandler {
   public abstract void createAndConnectToGame(String gameId, int numberPlayers);
 
   /**
-   * @param gameId the id of the game you want to delete
-   */
-  public abstract void deleteGame(String gameId);
-
-  /**
    * @param color the color of the chosen token color
    */
   public abstract void lobbySetToken(TokenColor color);

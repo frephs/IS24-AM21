@@ -340,14 +340,4 @@ public class RMIClientConnectionHandler
       this.localModel.gameOver();
     }
   }
-
-  @Override
-  public void deleteGame(String gameId) {
-    try {
-      rmiConnectionHandler.deleteGame(gameId);
-      localModel.gameDeleted(gameId);
-    } catch (RemoteException e) {
-      this.messageNotSent();
-    }
-  }
 }

@@ -229,12 +229,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public void deleteGame(String gameId) {
-    //TODO implement this method
-    //send a delete game message
-  }
-
-  @Override
   public void lobbySetToken(TokenColor color) {
     this.send(
         new SetTokenColorMessage(
