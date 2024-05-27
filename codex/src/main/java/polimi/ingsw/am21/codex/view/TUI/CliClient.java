@@ -294,10 +294,6 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.createGame(command[1], Integer.parseInt(command[2]));
-          cli.postNotification(
-            NotificationType.WARNING,
-            "executing the correct one"
-          );
         }
       }
     );
@@ -314,10 +310,6 @@ public class CliClient {
             Integer.parseInt(command[2])
           );
           context.set(ClientContext.LOBBY);
-          cli.postNotification(
-            NotificationType.WARNING,
-            "executing the wrong one"
-          );
         }
       }
     );
