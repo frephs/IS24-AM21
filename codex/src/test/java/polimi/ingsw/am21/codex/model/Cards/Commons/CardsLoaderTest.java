@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.GameBoard.GameBoard;
 
 class CardsLoaderTest {
 
@@ -28,5 +29,11 @@ class CardsLoaderTest {
     assertEquals(goldDeck.cardsLeft(), 40);
     assertEquals(starterDeck.cardsLeft(), 6);
     assertEquals(objectiveDeck.cardsLeft(), 16);
+
+    GameBoard gm = new GameBoard(new CardsLoader());
+    assertEquals(gm.goldCardsLeft(), 38);
+    assertEquals(gm.resourceCardsLeft(), 38);
+    assertEquals(gm.objectiveCardsLeft(), 14);
+    assertEquals(gm.starterCardsLeft(), 6);
   }
 }
