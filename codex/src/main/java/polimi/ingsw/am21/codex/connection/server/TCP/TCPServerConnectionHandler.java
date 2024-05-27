@@ -14,7 +14,6 @@ import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
-import polimi.ingsw.am21.codex.controller.messages.ConfirmMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -26,6 +25,7 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessa
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
@@ -327,7 +327,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (LobbyFullException e) {
       send(new GameFullMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -338,9 +338,7 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.getCardSideType()
       );
-    } catch (
-      GameNotReadyException | GameAlreadyStartedException | EmptyDeckException e
-    ) {
+    } catch (GameNotReadyException | EmptyDeckException e) {
       send(new ActionNotAllowedMessage());
     } catch (
       IllegalCardSideChoiceException | IllegalPlacingPositionException e
@@ -348,6 +346,8 @@ public class TCPServerConnectionHandler implements Runnable {
       send(new InvalidCardPlacementMessage(e.getMessage()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
+    } catch (GameAlreadyStartedException e) {
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -361,7 +361,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -377,7 +377,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -393,7 +393,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (TokenAlreadyTakenException e) {
       send(new TokenColorAlreadyTakenMessage(message.getColor()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 

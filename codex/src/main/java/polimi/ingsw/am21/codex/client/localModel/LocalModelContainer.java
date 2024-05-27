@@ -86,7 +86,6 @@ public class LocalModelContainer
 
   @Override
   public void gameAlreadyStarted() {
-    // TODO use this in TCP
     view.postNotification(NotificationType.ERROR, "Game has already started");
   }
 

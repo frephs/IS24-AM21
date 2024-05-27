@@ -25,6 +25,7 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSides
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
@@ -359,6 +360,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       // Game
       case GAME_STATUS -> handleMessage((GameStatusMessage) message);
       // Server Errors
+      case GAME_ALREADY_STARTED -> handleMessage(
+        (GameAlreadyStartedMessage) message
+      );
       case ACTION_NOT_ALLOWED -> handleMessage(
         (ActionNotAllowedMessage) message
       );
@@ -454,6 +458,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   public void handleMessage(InvalidCardPlacementMessage message) {
     localModel.invalidCardPlacement(message.getReason());
+  }
+
+  public void handleMessage(GameAlreadyStartedMessage message) {
+    localModel.gameAlreadyStarted();
   }
 
   //lobby
