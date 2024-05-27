@@ -67,7 +67,8 @@ public class CliClient {
               commandHandler.getContext() == context.get()
           )
           .filter(
-            commandHandler -> commandHandler.getUsage().startsWith(command[0])
+            commandHandler ->
+              commandHandler.getUsage().split(" ")[0].equals(command[0])
           )
           .collect(Collectors.toSet());
 
