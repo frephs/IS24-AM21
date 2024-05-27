@@ -318,16 +318,7 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
-          localModel.getAvailableTokens();
-          cli.postNotification(
-            NotificationType.RESPONSE,
-            "Available tokens: " +
-            localModel
-              .getAvailableTokens()
-              .stream()
-              .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
-              .collect(Collectors.joining(" "))
-          );
+          client.showAvailableTokens();
         }
       }
     );

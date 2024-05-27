@@ -95,11 +95,7 @@ public class GameController {
       );
       listeners.forEach(listener -> {
         try {
-          listener.playerJoinedLobby(
-            gameId,
-            socketID,
-            lobby.getAvailableColors()
-          );
+          listener.playerJoinedLobby(gameId, socketID);
         } catch (RemoteException e) {
           // TODO: Handle in a better way
           throw new RuntimeException(e);

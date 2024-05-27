@@ -1,14 +1,13 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class LocalLobby {
-
-  private final Set<TokenColor> availableTokens;
 
   private CardPair<Card> availableObjectives;
 
@@ -22,9 +21,8 @@ public class LocalLobby {
    * */
   private final String gameId;
 
-  LocalLobby(String gameId, Set<TokenColor> availableTokens) {
+  LocalLobby(String gameId) {
     this.gameId = gameId;
-    this.availableTokens = availableTokens;
   }
 
   public String getGameId() {
@@ -32,7 +30,15 @@ public class LocalLobby {
   }
 
   public Set<TokenColor> getAvailableTokens() {
-    return availableTokens;
+    return Arrays.stream(TokenColor.values())
+      .filter(
+        tokenColor ->
+          players
+            .values()
+            .stream()
+            .noneMatch(player -> tokenColor.equals(player.getToken()))
+      )
+      .collect(Collectors.toSet());
   }
 
   public CardPair<Card> getAvailableObjectives() {

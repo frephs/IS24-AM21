@@ -239,9 +239,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public Set<TokenColor> getAvailableTokens() {
-    // TODO
-    return null;
+  public void showAvailableTokens() {
+    localModel.showAvailableTokens();
   }
 
   @Override
@@ -528,11 +527,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerJoinedLobbyMessage message) {
-    localModel.playerJoinedLobby(
-      message.getLobbyId(),
-      message.getSocketId(),
-      message.getAvailableTokenColors()
-    );
+    localModel.playerJoinedLobby(message.getLobbyId(), message.getSocketId());
   }
 
   public void handleMessage(PlayerLeftLobbyMessage message) {

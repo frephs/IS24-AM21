@@ -39,12 +39,9 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void playerJoinedLobby(
-    String gameId,
-    UUID socketID,
-    Set<TokenColor> availableTokens
-  ) throws RemoteException {
-    listener.playerJoinedLobby(gameId, socketID, availableTokens);
+  public void playerJoinedLobby(String gameId, UUID socketID)
+    throws RemoteException {
+    listener.playerJoinedLobby(gameId, socketID);
   }
 
   @Override

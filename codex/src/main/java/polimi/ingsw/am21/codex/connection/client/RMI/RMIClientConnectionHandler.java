@@ -89,11 +89,7 @@ public class RMIClientConnectionHandler
   public void connectToGame(String gameId) {
     try {
       rmiConnectionHandler.joinLobby(gameId, this.socketID);
-      this.localModel.playerJoinedLobby(
-          gameId,
-          this.socketID,
-          this.localModel.getAvailableTokens()
-        );
+      this.localModel.playerJoinedLobby(gameId, this.socketID);
     } catch (GameAlreadyStartedException e) {
       this.localModel.gameAlreadyStarted();
     } catch (LobbyFullException e) {
@@ -130,15 +126,9 @@ public class RMIClientConnectionHandler
   @Override
   public void createAndConnectToGame(String gameId, int numberPlayers) {
     try {
-      try {
-        rmiConnectionHandler.createGame(gameId, this.socketID, numberPlayers);
-        this.localModel.gameCreated(gameId, 0, numberPlayers);
-        this.localModel.playerJoinedLobby(
-            gameId,
-            this.socketID,
-            rmiConnectionHandler.getAvailableTokens(gameId)
-          );
-      } catch (GameNotFoundException ignored) {}
+      rmiConnectionHandler.createGame(gameId, this.socketID, numberPlayers);
+      this.localModel.gameCreated(gameId, 0, numberPlayers);
+      this.localModel.playerJoinedLobby(gameId, this.socketID);
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     } catch (RemoteException e) {
@@ -171,8 +161,8 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public Set<TokenColor> getAvailableTokens() {
-    return this.localModel.getAvailableTokens();
+  public void showAvailableTokens() {
+    this.localModel.showAvailableTokens();
   }
 
   @Override

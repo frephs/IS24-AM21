@@ -73,13 +73,10 @@ public abstract class ClientConnectionHandler {
    */
   public abstract void lobbySetToken(TokenColor color);
 
-  // TODO it should not return them, but rather display them in the view.
-  //  Renaming the method to showAvailableToken would be more appropriate
   /**
-   * @return the set of the token that are available
+   * Shows the available tokens in the view
    */
-
-  public abstract Set<TokenColor> getAvailableTokens();
+  public abstract void showAvailableTokens();
 
   /**
    * @param nickname the nickname of the lobby player
