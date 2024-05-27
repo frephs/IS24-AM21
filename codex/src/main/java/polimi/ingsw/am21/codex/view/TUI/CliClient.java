@@ -133,6 +133,7 @@ public class CliClient {
     }
 
     public boolean matchUsageString(String input) {
+      // TODO fix this regex
       String regex = usage
         .replaceAll("<[^>]+>", "\\\\S+")
         .replaceAll("\\[([^\\]]+)\\]", "(?:$1)?")
@@ -185,6 +186,8 @@ public class CliClient {
   }
 
   private void initializeCommandHandlers() {
+    // TODO add optional arguments to usages
+
     commandHandlers.add(
       new CommandHandler("exit", "Exit the program") {
         @Override
@@ -207,7 +210,7 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("help", "Display available commands") {
+      new CommandHandler("help [test]", "Display available commands") {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
@@ -417,20 +420,40 @@ public class CliClient {
               cli.drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
               break;
             case "card":
-              Position pos = new Position();
+              // TODO right now, just go by id; in the future we can switch to something better
+
+              // Parse the card id
+              int cardId;
               try {
-                // TODO handle position parsing
+                cardId = Integer.parseInt(command[2]);
               } catch (NumberFormatException e) {
-                // Handle invalid command
+                // TODO Handle invalid command
                 return;
               }
-              Pair<Card, CardSideType> entry = localModel
+
+              // TODO find a way to display ANY possible card, not just the played/playable ones
+              Card card = localModel
                 .getLocalGameBoard()
-                .getPlayer()
-                .getPlayedCards()
-                .get(pos);
-              if (entry != null) {
-                // TODO handle card display
+                .getPlayers()
+                .stream()
+                .flatMap(player ->
+                  Stream.concat(
+                    // Get cards from the player hands
+                    player.getHand().stream(),
+                    // Get cards from the player boards
+                    player.getPlayedCards().values().stream().map(Pair::getKey)
+                  ))
+                .filter(c -> c.getId() == cardId)
+                .findFirst()
+                .orElse(null);
+
+              if (card == null) {
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Card not found"
+                );
+              } else {
+                cli.drawCard(card);
               }
               break;
             case "hand":
@@ -448,8 +471,7 @@ public class CliClient {
               );
               break;
             default:
-              // Handle invalid command
-              return;
+            // TODO Handle invalid command
           }
         }
       }
@@ -470,7 +492,7 @@ public class CliClient {
             ) ||
             !List.of("front", "back").contains(command[4])
           ) {
-            // Handle invalid command
+            // TODO Handle invalid command
             return;
           }
           int handIndex;
@@ -482,7 +504,7 @@ public class CliClient {
               Integer.parseInt(command[3])
             );
           } catch (NumberFormatException e) {
-            // Handle invalid command
+            // TODO Handle invalid command
             return;
           }
           client.placeCard(
@@ -512,7 +534,7 @@ public class CliClient {
               "gold2"
             ).contains(command[1])
           ) {
-            // Handle invalid command
+            // TODO Handle invalid command
             return;
           }
 

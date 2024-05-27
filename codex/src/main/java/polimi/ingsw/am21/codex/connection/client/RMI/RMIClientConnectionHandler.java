@@ -59,7 +59,9 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public void disconnect() {}
+  public void disconnect() {
+    // TODO
+  }
 
   @Override
   public void listGames() {
