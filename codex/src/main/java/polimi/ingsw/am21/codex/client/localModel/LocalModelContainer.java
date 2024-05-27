@@ -46,10 +46,8 @@ public class LocalModelContainer
 
   private final RemoteGameEventListener listener;
 
-  public LocalModelContainer(UUID socketID, View view) {
+  public LocalModelContainer(View view) {
     this.view = view;
-    this.socketId = socketID;
-    // TODO receive socketId from the server
 
     cardsLoader.loadCards();
 
@@ -59,6 +57,10 @@ public class LocalModelContainer
       // TODO: handle this
       throw new RuntimeException("Failed creating client", e);
     }
+  }
+
+  public void setSocketId(UUID socketId) {
+    this.socketId = socketId;
   }
 
   public RemoteGameEventListener getRemoteListener() {
@@ -226,7 +228,7 @@ public class LocalModelContainer
         "Player" + socketId + " joined your game " + gameId
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
-    } else if (socketId == this.socketId) {
+    } else if (socketId.equals(this.socketId)) {
       lobby = new LocalLobby(gameId, availableTokenColors);
       localGameBoard = new LocalGameBoard(
         gameId,
@@ -236,7 +238,7 @@ public class LocalModelContainer
 
       view.postNotification(
         NotificationType.RESPONSE,
-        "You joined the lobby of the game" + gameId
+        "You joined the lobby of the game: " + gameId
       );
     } else {
       view.postNotification(
