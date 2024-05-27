@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.NicknameStep">
+   <children>
+      <ImageView fitHeight="485.0" fitWidth="410.0" layoutX="72.0" layoutY="-1.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="C:\Users\Sara\Desktop\IS24-AM21\codex\src\main\resources\starterImage.jpg" />
+         </image></ImageView>
+      <AnchorPane layoutX="177.0" layoutY="108.0" prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <ImageView fitHeight="200.0" fitWidth="200.0" layoutY="-1.0" opacity="0.87" pickOnBounds="true">
+               <image>
+                  <Image url="C:\Users\Sara\Desktop\IS24-AM21\codex\src\main\resources\white_background.jpg" />
+               </image>
+            </ImageView>
+            <Label layoutX="38.0" layoutY="40.0" prefHeight="35.0" prefWidth="141.0" text="Insert your nickname">
+               <font>
+                  <Font name="Arial Nova Light Italic" size="15.0" />
+               </font></Label>
+            <TextField layoutX="26.0" layoutY="75.0" prefHeight="35.0" prefWidth="150.0" />
+            <Button layoutX="74.0" layoutY="133.0" mnemonicParsing="false" text="Enter" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
