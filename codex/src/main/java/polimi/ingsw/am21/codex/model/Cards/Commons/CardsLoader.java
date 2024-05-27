@@ -33,6 +33,7 @@ public final class CardsLoader {
       "src/main/java/polimi/ingsw/am21/codex/model/Cards/Resources/cards" +
       ".json"
     );
+    this.loadCards();
   }
 
   /**
@@ -77,10 +78,10 @@ public final class CardsLoader {
     List<PlayableCard> goldCardsList,
     List<ObjectiveCard> objectiveCardsList
   ) {
-    starterCardsList.clear();
-    resourceCardsList.clear();
-    goldCardsList.clear();
-    objectiveCardsList.clear();
+    this.starterCardsList.clear();
+    this.resourceCardsList.clear();
+    this.goldCardsList.clear();
+    this.objectiveCardsList.clear();
     this.loadCards();
     starterCardsList.addAll(this.starterCardsList);
     resourceCardsList.addAll(this.resourceCardsList);
@@ -110,22 +111,18 @@ public final class CardsLoader {
   }
 
   public List<PlayableCard> loadStarterCards() {
-    this.loadCards();
     return new ArrayList<PlayableCard>(this.starterCardsList);
   }
 
   public List<PlayableCard> loadGoldCards() {
-    this.loadCards();
     return new ArrayList<PlayableCard>(this.goldCardsList);
   }
 
   public List<PlayableCard> loadResourceCards() {
-    this.loadCards();
     return new ArrayList<>(this.resourceCardsList);
   }
 
   public List<ObjectiveCard> loadObjectiveCards() {
-    this.loadCards();
     return new ArrayList<>(this.objectiveCardsList);
   }
 
