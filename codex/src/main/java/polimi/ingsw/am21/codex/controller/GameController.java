@@ -307,7 +307,7 @@ public class GameController {
               .playerChoseObjectiveCard(
                 gameId,
                 socketID,
-                lobby.getPlayerNickname(socketID)
+                lobby.getPlayerNickname(socketID).orElse(null)
               );
           }
         } catch (RemoteException e) {

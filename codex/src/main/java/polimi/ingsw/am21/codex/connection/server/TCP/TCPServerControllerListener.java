@@ -142,7 +142,7 @@ public class TCPServerControllerListener implements GameEventListener {
   public void playerChoseObjectiveCard(
     String gameId,
     UUID socketID,
-    Optional<String> nickname
+    String nickname
   ) {}
 
   @Override

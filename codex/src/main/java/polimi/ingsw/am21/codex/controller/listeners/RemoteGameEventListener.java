@@ -27,11 +27,8 @@ public interface RemoteGameEventListener extends Remote {
   void playerSetNickname(String gameId, UUID socketID, String nickname)
     throws RemoteException;
 
-  void playerChoseObjectiveCard(
-    String gameId,
-    UUID socketID,
-    Optional<String> nickname
-  ) throws RemoteException;
+  void playerChoseObjectiveCard(String gameId, UUID socketID, String nickname)
+    throws RemoteException;
 
   void playerJoinedGame(
     String gameId,

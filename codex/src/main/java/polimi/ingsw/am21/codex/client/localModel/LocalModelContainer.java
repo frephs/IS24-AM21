@@ -372,12 +372,12 @@ public class LocalModelContainer
   public void playerChoseObjectiveCard(
     String gameId,
     UUID socketID,
-    Optional<String> nickname
+    String nickname
   ) {
     view.postNotification(
       NotificationType.UPDATE,
       "Player " +
-      nickname.orElse(socketID.toString()) +
+      Optional.ofNullable(nickname).orElse(socketID.toString()) +
       " chose an objective card."
     );
   }

@@ -63,7 +63,7 @@ public class LocalModelGameEventListener
   public void playerChoseObjectiveCard(
     String gameId,
     UUID socketID,
-    Optional<String> nickname
+    String nickname
   ) throws RemoteException {
     listener.playerChoseObjectiveCard(gameId, socketID, nickname);
   }

@@ -23,7 +23,7 @@ public class RMIServer {
       Registry registry = LocateRegistry.createRegistry(port);
       System.out.println("java RMI registry created.");
       RMIServerConnectionHandlerImpl handler =
-        new RMIServerConnectionHandlerImpl(new GameController());
+        new RMIServerConnectionHandlerImpl(this.controller);
 
       // Bind this object instance to the name we want
       registry.rebind("//127.0.0.1:" + port + "/IS24-AM21-CODEX", handler);
