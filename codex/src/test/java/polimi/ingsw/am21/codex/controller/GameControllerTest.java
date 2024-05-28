@@ -41,14 +41,14 @@ class GameControllerTest {
     final String gameId2 = "test2";
 
     controller.createGame(gameId1, 4);
-    assertEquals(1, controller.getCurrentSlots().get(gameId1));
+    assertEquals(0, controller.getCurrentSlots().get(gameId1));
 
     controller.joinLobby(gameId1, UUID.randomUUID());
-    assertEquals(2, controller.getCurrentSlots().get(gameId1));
+    assertEquals(1, controller.getCurrentSlots().get(gameId1));
 
     controller.createGame(gameId2, 4);
-    assertEquals(2, controller.getCurrentSlots().get(gameId1));
-    assertEquals(1, controller.getCurrentSlots().get(gameId2));
+    assertEquals(1, controller.getCurrentSlots().get(gameId1));
+    assertEquals(0, controller.getCurrentSlots().get(gameId2));
   }
 
   @Test
