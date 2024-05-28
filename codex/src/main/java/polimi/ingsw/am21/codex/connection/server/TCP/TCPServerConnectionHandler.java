@@ -164,7 +164,7 @@ public class TCPServerConnectionHandler implements Runnable {
           send(new UnknownMessageTypeMessage());
         } catch (IOException e) {
           System.err.println(
-            "IOException caught when parsing message from " +
+            "IOException caught when parsing message from client at " +
             socket.getInetAddress() +
             ". Parser is exiting.\n"
           );

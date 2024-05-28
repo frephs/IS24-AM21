@@ -65,8 +65,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   ) {
     super(host, port, localModel);
     this.incomingMessages = new ArrayDeque<>();
-
-    this.connect();
   }
 
   /**
@@ -94,7 +92,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           getView()
             .postNotification(
               NotificationType.ERROR,
-              "IOException caught when parsing message from " +
+              "IOException caught when parsing message from server at " +
               socket.getInetAddress() +
               ". Parser is exiting.\n"
             );

@@ -40,7 +40,6 @@ public class RMIClientConnectionHandler
     LocalModelContainer localModel
   ) {
     super(host, port, localModel);
-    this.connect();
   }
 
   private UUID getSocketID() {

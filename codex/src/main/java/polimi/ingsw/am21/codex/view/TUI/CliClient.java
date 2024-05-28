@@ -38,6 +38,7 @@ public class CliClient {
     } else {
       client = new RMIClientConnectionHandler(address, port, localModel);
     }
+    client.connect();
 
     cli.postNotification(
       NotificationType.CONFIRM,
