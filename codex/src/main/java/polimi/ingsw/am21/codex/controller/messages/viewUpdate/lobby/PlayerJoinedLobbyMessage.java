@@ -1,10 +1,8 @@
 package polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby;
 
-import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class PlayerJoinedLobbyMessage extends ViewUpdatingMessage {
 

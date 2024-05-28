@@ -209,7 +209,7 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("help [test]", "Display available commands") {
+      new CommandHandler("help", "Display available commands") {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
