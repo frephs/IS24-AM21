@@ -50,10 +50,16 @@ public class Cli implements View {
   }
 
   public void displayException(Exception e) {
-    CliUtils.colorize(
-      e.getMessage() + "\n " + Arrays.toString(e.getStackTrace()),
-      Color.RED,
-      ColorStyle.UNDERLINED
+    printUpdate(
+      CliUtils.colorize(
+        e.getMessage() +
+        "\n " +
+        Stream.of(e.getStackTrace())
+          .map(StackTraceElement::toString)
+          .collect(Collectors.joining("\n")),
+        Color.RED,
+        ColorStyle.UNDERLINED
+      )
     );
   }
 

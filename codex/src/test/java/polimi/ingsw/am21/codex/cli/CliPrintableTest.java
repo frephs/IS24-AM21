@@ -21,7 +21,6 @@ class CliPrintableTest {
   @Test
   void printCards() {
     CardsLoader cardsLoader = new CardsLoader();
-    List<Deck<Card>> decks = new LinkedList<>();
 
     Deck<PlayableCard> resourceDeck = new Deck<PlayableCard>(
       cardsLoader.loadResourceCards()
@@ -43,6 +42,7 @@ class CliPrintableTest {
       System.out.println(resourceDeck.draw().cardToAscii());
       System.out.println(goldDeck.draw().cardToAscii());
       System.out.println(starterDeck.draw().cardToAscii());
+      System.out.println(objectiveDeck.draw().cardToString());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }

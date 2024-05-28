@@ -8,8 +8,9 @@ public enum TokenColor implements Colorable, Serializable {
   RED,
   BLUE,
   GREEN,
-  YELLOW,
-  BLACK;
+  YELLOW;
+
+  //BLACK;
 
   @Override
   public Color getColor() {
@@ -18,7 +19,7 @@ public enum TokenColor implements Colorable, Serializable {
       case BLUE -> Color.BLUE;
       case GREEN -> Color.GREEN;
       case YELLOW -> Color.YELLOW;
-      case BLACK -> Color.BLACK;
+      //case BLACK -> Color.BLACK;
     };
   }
 

@@ -27,10 +27,10 @@ class GameControllerTest {
   void getGames() throws EmptyDeckException {
     assertEquals(0, controller.getGames().size());
 
-    controller.createGame("test", UUID.randomUUID(), 4);
+    controller.createGame("test", 4);
     assertEquals(1, controller.getGames().size());
 
-    controller.createGame("test2", UUID.randomUUID(), 4);
+    controller.createGame("test2", 4);
     assertEquals(2, controller.getGames().size());
   }
 
@@ -40,13 +40,13 @@ class GameControllerTest {
     final String gameId1 = "test1";
     final String gameId2 = "test2";
 
-    controller.createGame(gameId1, UUID.randomUUID(), 4);
+    controller.createGame(gameId1, 4);
     assertEquals(1, controller.getCurrentSlots().get(gameId1));
 
     controller.joinLobby(gameId1, UUID.randomUUID());
     assertEquals(2, controller.getCurrentSlots().get(gameId1));
 
-    controller.createGame(gameId2, UUID.randomUUID(), 4);
+    controller.createGame(gameId2, 4);
     assertEquals(2, controller.getCurrentSlots().get(gameId1));
     assertEquals(1, controller.getCurrentSlots().get(gameId2));
   }
@@ -56,10 +56,10 @@ class GameControllerTest {
     final String gameId1 = "test1";
     final String gameId2 = "test2";
 
-    controller.createGame(gameId1, UUID.randomUUID(), 4);
+    controller.createGame(gameId1, 4);
     assertEquals(4, controller.getMaxSlots().get(gameId1));
 
-    controller.createGame(gameId2, UUID.randomUUID(), 2);
+    controller.createGame(gameId2, 2);
     assertEquals(4, controller.getMaxSlots().get(gameId1));
     assertEquals(2, controller.getMaxSlots().get(gameId2));
   }
@@ -70,7 +70,7 @@ class GameControllerTest {
 
     assertThrows(GameNotFoundException.class, () -> controller.getGame(gameId));
 
-    controller.createGame(gameId, UUID.randomUUID(), 4);
+    controller.createGame(gameId, 4);
 
     AtomicReference<Game> result = new AtomicReference<>();
     assertDoesNotThrow(() -> result.set(controller.getGame(gameId)));
@@ -83,7 +83,7 @@ class GameControllerTest {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 
-    controller.createGame(gameId, UUID.randomUUID(), 4);
+    controller.createGame(gameId, 4);
     controller.joinLobby(gameId, playerId);
     assertDoesNotThrow(
       () -> controller.removePlayerFromLobby(gameId, playerId)
@@ -106,7 +106,7 @@ class GameControllerTest {
       () -> controller.joinLobby(gameId, playerId)
     );
 
-    controller.createGame(gameId, UUID.randomUUID(), 4);
+    controller.createGame(gameId, 4);
     assertDoesNotThrow(() -> controller.joinLobby(gameId, playerId));
   }
 
@@ -122,7 +122,7 @@ class GameControllerTest {
       () -> controller.lobbySetTokenColor(gameId, playerId1, null)
     );
 
-    controller.createGame(gameId, UUID.randomUUID(), 4);
+    controller.createGame(gameId, 4);
     controller.joinLobby(gameId, playerId1);
     assertTrue(
       controller
@@ -192,7 +192,7 @@ class GameControllerTest {
       () -> controller.lobbySetNickname(gameId, playerId, "test")
     );
 
-    controller.createGame(gameId, UUID.randomUUID(), 4);
+    controller.createGame(gameId, 4);
     controller.joinLobby(gameId, playerId);
     assertDoesNotThrow(
       () -> controller.lobbySetNickname(gameId, playerId, "test")
@@ -210,7 +210,7 @@ class GameControllerTest {
       () -> controller.lobbyChooseObjective(gameId, playerId, true)
     );
 
-    controller.createGame(gameId, UUID.randomUUID(), 4);
+    controller.createGame(gameId, 4);
     controller.joinLobby(gameId, playerId);
     assertDoesNotThrow(
       () -> controller.lobbyChooseObjective(gameId, playerId, true)
@@ -229,7 +229,7 @@ class GameControllerTest {
     //      () -> controller.startGame(gameId)
     //    );
     //
-    //    controller.createGame(gameId, UUID.randomUUID(), 4);
+    //    controller.createGame(gameId, 4);
     //    assertDoesNotThrow(() -> controller.startGame(gameId));
   }
 

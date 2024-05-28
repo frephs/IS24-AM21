@@ -17,11 +17,7 @@ public interface RemoteGameEventListener extends Remote {
 
   void gameDeleted(String gameId) throws RemoteException;
 
-  void playerJoinedLobby(
-    String gameId,
-    UUID socketID,
-    Set<TokenColor> availableTokens
-  ) throws RemoteException;
+  void playerJoinedLobby(String gameId, UUID socketID) throws RemoteException;
 
   void playerLeftLobby(String gameId, UUID socketID) throws RemoteException;
 

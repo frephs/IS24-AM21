@@ -11,8 +11,6 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
-// TODO investigate "Raw use of parameterized class 'Corner'" warning
-
 public abstract class PlayableSide implements CliCard {
 
   /**
@@ -65,26 +63,26 @@ public abstract class PlayableSide implements CliCard {
 
   public String cardToAscii(Map<Integer, String> cardStringMap) {
     // corners
-    corners.forEach((cornerPosition, corner) -> {
-      corner
-        .getContent()
-        .ifPresentOrElse(
-          content ->
-            cardStringMap.put(
-              cornerPosition.getIndex(),
-              CliUtils.colorize(content, ColorStyle.BOLD, 1)
-            ),
-          () -> cardStringMap.put(cornerPosition.getIndex(), " ")
-        );
-    });
-
+    corners.forEach(
+      (cornerPosition, corner) ->
+        corner
+          .getContent()
+          .ifPresentOrElse(
+            content ->
+              cardStringMap.put(
+                cornerPosition.getIndex(),
+                CliUtils.colorize(content, ColorStyle.BOLD, 1)
+              ),
+            () -> cardStringMap.put(cornerPosition.getIndex(), " ")
+          )
+    );
 
     return CliCard.playableCardToAscii(cardStringMap);
   }
 
   @Override
   public String cardToString() {
-    //TODO add cardToString implementation
+    // TODO add cardToString implementation
     return "";
   }
 }

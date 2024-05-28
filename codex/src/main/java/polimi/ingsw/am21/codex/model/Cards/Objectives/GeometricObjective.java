@@ -1,13 +1,17 @@
 package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.AdjacentPosition;
 import polimi.ingsw.am21.codex.model.Cards.EdgePosition;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class GeometricObjective extends Objective implements CliCard {
 
@@ -17,7 +21,7 @@ public class GeometricObjective extends Objective implements CliCard {
   private final Map<AdjacentPosition, ResourceType> geometry;
 
   public GeometricObjective(Map<AdjacentPosition, ResourceType> geometry) {
-    this.geometry = geometry;
+    this.geometry = new HashMap<>(geometry);
   }
 
   /**
@@ -72,8 +76,26 @@ public class GeometricObjective extends Objective implements CliCard {
 
   @Override
   public String cardToString() {
-    //TODO add cardToString implementation
-    return "";
+    return (
+      "group of cards positioned as following: \n" +
+      geometry
+        .entrySet()
+        .stream()
+        .map(
+          adjacentPositionResourceTypeEntry ->
+            adjacentPositionResourceTypeEntry
+              .getKey()
+              .toString()
+              .replaceAll("_", " ")
+              .toLowerCase() +
+            ": " +
+            CliUtils.colorize(
+              adjacentPositionResourceTypeEntry.getValue(),
+              ColorStyle.UNDERLINED
+            )
+        )
+        .collect(Collectors.collectingAndThen(Collectors.joining(", "), s -> s))
+    );
   }
 
   @Override

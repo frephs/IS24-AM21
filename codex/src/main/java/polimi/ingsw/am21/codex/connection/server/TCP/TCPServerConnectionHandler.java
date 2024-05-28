@@ -14,7 +14,6 @@ import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
-import polimi.ingsw.am21.codex.controller.messages.ConfirmMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -26,6 +25,7 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessa
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
@@ -43,6 +43,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
+import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -299,11 +300,7 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(CreateGameMessage message) {
     try {
-      controller.createGame(
-        message.getGameId(),
-        socketId,
-        message.getPlayers()
-      );
+      controller.createGame(message.getGameId(), message.getPlayers());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }
@@ -317,17 +314,29 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(JoinLobbyMessage message) {
     try {
       controller.joinLobby(message.getLobbyId(), socketId);
-      send(
-        new LobbyStatusMessage(
-          controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
-        )
+
+      Map<UUID, Pair<String, TokenColor>> playersInfo = new HashMap<>();
+      controller
+        .getGame(message.getLobbyId())
+        .getPlayers()
+        .forEach(
+          player ->
+            playersInfo.put(
+              player.getSocketId(),
+              new Pair<>(player.getNickname(), player.getToken())
+            )
+        );
+      playersInfo.putAll(
+        controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
       );
+
+      send(new LobbyStatusMessage(playersInfo));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (LobbyFullException e) {
       send(new GameFullMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -338,9 +347,7 @@ public class TCPServerConnectionHandler implements Runnable {
         socketId,
         message.getCardSideType()
       );
-    } catch (
-      GameNotReadyException | GameAlreadyStartedException | EmptyDeckException e
-    ) {
+    } catch (GameNotReadyException | EmptyDeckException e) {
       send(new ActionNotAllowedMessage());
     } catch (
       IllegalCardSideChoiceException | IllegalPlacingPositionException e
@@ -348,6 +355,8 @@ public class TCPServerConnectionHandler implements Runnable {
       send(new InvalidCardPlacementMessage(e.getMessage()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
+    } catch (GameAlreadyStartedException e) {
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -361,7 +370,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -377,7 +386,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getLobbyId()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -393,7 +402,7 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (TokenAlreadyTakenException e) {
       send(new TokenColorAlreadyTakenMessage(message.getColor()));
     } catch (GameAlreadyStartedException e) {
-      send(new ActionNotAllowedMessage());
+      send(new GameAlreadyStartedMessage());
     }
   }
 
@@ -407,7 +416,7 @@ public class TCPServerConnectionHandler implements Runnable {
     }
   }
 
-  private void handleMessage(GetAvailableGameLobbiesMessage message) {
+  private void handleMessage(GetAvailableGameLobbiesMessage ignored) {
     send(
       new AvailableGameLobbiesMessage(
         controller.getGames(),

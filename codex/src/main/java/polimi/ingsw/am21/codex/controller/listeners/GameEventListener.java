@@ -11,11 +11,7 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   void gameDeleted(String gameId);
 
-  void playerJoinedLobby(
-    String gameId,
-    UUID socketID,
-    Set<TokenColor> availableTokens
-  );
+  void playerJoinedLobby(String gameId, UUID socketID);
 
   void playerLeftLobby(String gameId, UUID socketID);
 

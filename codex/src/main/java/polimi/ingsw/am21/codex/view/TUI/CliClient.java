@@ -24,19 +24,13 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class CliClient {
 
-  private final UUID socketId = UUID.randomUUID();
-  //TODO Fix
-
   private final ContextContainer context = new ContextContainer();
 
   Scanner scanner = new Scanner(System.in);
   Cli cli = Cli.getInstance();
   ClientConnectionHandler client;
 
-  private final LocalModelContainer localModel = new LocalModelContainer(
-    socketId,
-    cli
-  );
+  private final LocalModelContainer localModel = new LocalModelContainer(cli);
 
   public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
@@ -67,7 +61,8 @@ public class CliClient {
               commandHandler.getContext() == context.get()
           )
           .filter(
-            commandHandler -> commandHandler.getUsage().startsWith(command[0])
+            commandHandler ->
+              commandHandler.getUsage().split(" ")[0].equals(command[0])
           )
           .collect(Collectors.toSet());
 
@@ -93,9 +88,9 @@ public class CliClient {
             } catch (Exception e) {
               cli.postNotification(
                 NotificationType.ERROR,
-                "An error occurred while executing the command. \n" +
-                e.getMessage()
+                "An error occurred while executing the command. \n"
               );
+              cli.displayException(e);
             }
           }
         } else {
@@ -137,6 +132,7 @@ public class CliClient {
     }
 
     public boolean matchUsageString(String input) {
+      // TODO fix this regex
       String regex = usage
         .replaceAll("<[^>]+>", "\\\\S+")
         .replaceAll("\\[([^\\]]+)\\]", "(?:$1)?")
@@ -189,6 +185,8 @@ public class CliClient {
   }
 
   private void initializeCommandHandlers() {
+    // TODO add optional arguments to usages
+
     commandHandlers.add(
       new CommandHandler("exit", "Exit the program") {
         @Override
@@ -211,7 +209,7 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("help", "Display available commands") {
+      new CommandHandler("help [test]", "Display available commands") {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
@@ -254,7 +252,21 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
-          context.set(null);
+          context.set(ClientContext.LOBBY);
+          // TODO printed lobby is outdated
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "show lobby",
+        "List the available players and see their status",
+        ClientContext.LOBBY
+      ) {
+        @Override
+        public void handle(String[] command) {
+          localModel.listLobbyPlayers();
         }
       }
     );
@@ -279,6 +291,18 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
+          client.createGame(command[1], Integer.parseInt(command[2]));
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "create-game-join <game-id> <number-of-players>",
+        "Create a new game and join it."
+      ) {
+        @Override
+        public void handle(String[] command) {
           client.createAndConnectToGame(
             command[1],
             Integer.parseInt(command[2])
@@ -296,7 +320,7 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
-          // TODO implement get-tokens command
+          client.showAvailableTokens();
         }
       }
     );
@@ -395,20 +419,40 @@ public class CliClient {
               cli.drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
               break;
             case "card":
-              Position pos = new Position();
+              // TODO right now, just go by id; in the future we can switch to something better
+
+              // Parse the card id
+              int cardId;
               try {
-                // TODO handle position parsing
+                cardId = Integer.parseInt(command[2]);
               } catch (NumberFormatException e) {
-                // Handle invalid command
+                // TODO Handle invalid command
                 return;
               }
-              Pair<Card, CardSideType> entry = localModel
+
+              // TODO find a way to display ANY possible card, not just the played/playable ones
+              Card card = localModel
                 .getLocalGameBoard()
-                .getPlayer()
-                .getPlayedCards()
-                .get(pos);
-              if (entry != null) {
-                // TODO handle card display
+                .getPlayers()
+                .stream()
+                .flatMap(player ->
+                  Stream.concat(
+                    // Get cards from the player hands
+                    player.getHand().stream(),
+                    // Get cards from the player boards
+                    player.getPlayedCards().values().stream().map(Pair::getKey)
+                  ))
+                .filter(c -> c.getId() == cardId)
+                .findFirst()
+                .orElse(null);
+
+              if (card == null) {
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Card not found"
+                );
+              } else {
+                cli.drawCard(card);
               }
               break;
             case "hand":
@@ -426,8 +470,7 @@ public class CliClient {
               );
               break;
             default:
-              // Handle invalid command
-              return;
+            // TODO Handle invalid command
           }
         }
       }
@@ -448,7 +491,7 @@ public class CliClient {
             ) ||
             !List.of("front", "back").contains(command[4])
           ) {
-            // Handle invalid command
+            // TODO Handle invalid command
             return;
           }
           int handIndex;
@@ -460,7 +503,7 @@ public class CliClient {
               Integer.parseInt(command[3])
             );
           } catch (NumberFormatException e) {
-            // Handle invalid command
+            // TODO Handle invalid command
             return;
           }
           client.placeCard(
@@ -490,7 +533,7 @@ public class CliClient {
               "gold2"
             ).contains(command[1])
           ) {
-            // Handle invalid command
+            // TODO Handle invalid command
             return;
           }
 

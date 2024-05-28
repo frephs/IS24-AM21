@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import polimi.ingsw.am21.codex.model.Game;
 
 public class GameManager {
 
@@ -32,13 +31,14 @@ public class GameManager {
     Map<String, Integer> currentPlayers = new HashMap<>();
     games
       .keySet()
-      .forEach(key -> {
-        currentPlayers.put(
-          key,
-          games.get(key).getMaxPlayers() -
-          games.get(key).getLobby().getRemainingPlayerSlots()
-        );
-      });
+      .forEach(
+        key ->
+          currentPlayers.put(
+            key,
+            games.get(key).getMaxPlayers() -
+            games.get(key).getLobby().getRemainingPlayerSlots()
+          )
+      );
     return currentPlayers;
   }
 
@@ -51,9 +51,7 @@ public class GameManager {
     Map<String, Integer> maxSlots = new HashMap<>();
     games
       .keySet()
-      .forEach(key -> {
-        maxSlots.put(key, games.get(key).getMaxPlayers());
-      });
+      .forEach(key -> maxSlots.put(key, games.get(key).getMaxPlayers()));
     return maxSlots;
   }
 

@@ -148,6 +148,13 @@ public class Game {
   }
 
   /**
+   * Gets the players in the game.
+   */
+  public List<Player> getPlayers() {
+    return this.players;
+  }
+
+  /**
    * Gets the nicknames of the players in the game.
    */
   public List<String> getPlayerIds() {

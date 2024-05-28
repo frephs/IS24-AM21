@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.connection.client;
 
-import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -21,7 +20,6 @@ public abstract class ClientConnectionHandler {
 
   protected final String host;
   protected final Integer port;
-  protected View view;
 
   public ClientConnectionHandler(
     String host,
@@ -50,6 +48,12 @@ public abstract class ClientConnectionHandler {
   public abstract void listGames();
 
   /**
+   * @param gameId the id of the game to create
+   * @param players the number of players in the game
+   * */
+  public abstract void createGame(String gameId, int players);
+
+  /**
    * @param gameId the id of the game to connect to
    */
   public abstract void connectToGame(String gameId);
@@ -65,22 +69,14 @@ public abstract class ClientConnectionHandler {
   public abstract void createAndConnectToGame(String gameId, int numberPlayers);
 
   /**
-   * @param gameId the id of the game you want to delete
-   */
-  public abstract void deleteGame(String gameId);
-
-  /**
    * @param color the color of the chosen token color
    */
   public abstract void lobbySetToken(TokenColor color);
 
-  // TODO it should not return them, but rather display them in the view.
-  //  Renaming the method to showAvailableToken would be more appropriate
   /**
-   * @return the set of the token that are available
+   * Shows the available tokens in the view
    */
-
-  public abstract Set<TokenColor> getAvailableTokens();
+  public abstract void showAvailableTokens();
 
   /**
    * @param nickname the nickname of the lobby player

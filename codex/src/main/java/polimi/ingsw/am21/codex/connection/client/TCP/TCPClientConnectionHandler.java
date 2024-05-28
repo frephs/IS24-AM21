@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -25,6 +24,7 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSides
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
@@ -65,9 +65,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     this.incomingMessages = new ArrayDeque<>();
 
     this.connect();
-
-    this.startMessageParser();
-    this.startMessageHandler();
   }
 
   /**
@@ -97,9 +94,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               NotificationType.ERROR,
               "IOException caught when parsing message from " +
               socket.getInetAddress() +
-              ". Parser is exiting.\n" +
-              e
+              ". Parser is exiting.\n"
             );
+          getView().displayException(e);
           break;
         } catch (InterruptedException e) {
           getView()
@@ -109,6 +106,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               socket.getInetAddress() +
               "interrupted, exiting."
             );
+          getView().displayException(e);
           break;
         }
       }
@@ -121,7 +119,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         try {
           while (incomingMessages.isEmpty()) incomingMessages.wait();
 
-          parseMessage(incomingMessages.poll());
+          handleMessage(incomingMessages.poll());
         } catch (InterruptedException e) {
           System.err.println(
             "Message handler thread for " +
@@ -130,12 +128,12 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           );
           break;
         } catch (Exception e) {
+          getView().displayException(e);
           System.err.println(
-            "Caught controller exception while handling message from " +
+            "Caught handler exception while handling message from " +
             socket.getInetAddress() +
             ". Closing connection."
           );
-          e.printStackTrace();
 
           this.disconnect();
           break;
@@ -154,6 +152,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
             outputStream.reset();
             if (message.getType().isClientRequest()) {
               this.waiting = true;
+              getView()
+                .postNotification(
+                  NotificationType.WARNING,
+                  "Sending request. "
+                );
             }
           }
         } catch (IOException e) {
@@ -174,6 +177,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     while (!connected) {
       try {
         this.socket = new Socket(host, port);
+        this.socket.setTcpNoDelay(true);
         connected = true;
         connectionEstablished();
       } catch (IOException e) {
@@ -184,6 +188,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       assert socket != null;
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
       this.inputStream = new ObjectInputStream(socket.getInputStream());
+
+      this.startMessageParser();
+      this.startMessageHandler();
     } catch (IOException e) {
       connectionFailed(e);
     }
@@ -200,6 +207,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
+  public void createGame(String gameId, int players) {
+    this.send(new CreateGameMessage(gameId, players));
+  }
+
+  @Override
   public void connectToGame(String gameId) {
     this.send(new JoinLobbyMessage(gameId));
   }
@@ -211,14 +223,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void createAndConnectToGame(String gameId, int players) {
-    // TODO this is actually only creating the game, we're not connecting to it
     this.send(new CreateGameMessage(gameId, players));
-  }
-
-  @Override
-  public void deleteGame(String gameId) {
-   //TODO implement this method
-   //send a delete game message
+    this.send(new JoinLobbyMessage(gameId));
   }
 
   @Override
@@ -232,9 +238,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public Set<TokenColor> getAvailableTokens() {
-    // TODO
-    return null;
+  public void showAvailableTokens() {
+    localModel.showAvailableTokens();
   }
 
   @Override
@@ -326,9 +331,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    * ----------------------
    * */
 
-  public void parseMessage(Message message) {
+  public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
+      getView()
+        .postNotification(NotificationType.CONFIRM, "Response received. ");
     }
 
     switch (message.getType()) {
@@ -345,6 +352,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       // Game
       case GAME_STATUS -> handleMessage((GameStatusMessage) message);
       // Server Errors
+      case GAME_ALREADY_STARTED -> handleMessage(
+        (GameAlreadyStartedMessage) message
+      );
       case ACTION_NOT_ALLOWED -> handleMessage(
         (ActionNotAllowedMessage) message
       );
@@ -442,6 +452,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.invalidCardPlacement(message.getReason());
   }
 
+  public void handleMessage(GameAlreadyStartedMessage ignored) {
+    localModel.gameAlreadyStarted();
+  }
+
   //lobby
 
   public void handleMessage(GameFullMessage message) {
@@ -460,11 +474,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.tokenTaken(message.getToken());
   }
 
-  public void handleMessage(ActionNotAllowedMessage message) {
+  public void handleMessage(ActionNotAllowedMessage ignored) {
     localModel.actionNotAllowed();
   }
 
-  public void handleMessage(UnknownMessageTypeMessage message) {
+  public void handleMessage(UnknownMessageTypeMessage ignored) {
     getView()
       .postNotification(
         NotificationType.WARNING,
@@ -472,19 +486,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
   }
 
-  public void handleMessage(NotAClientMessageMessage message) {
+  public void handleMessage(NotAClientMessageMessage ignored) {
     getView()
       .postNotification(
         NotificationType.WARNING,
         "You sent a message which is not a client's message"
-      );
-  }
-
-  public void unhandledMessage() {
-    getView()
-      .postNotification(
-        NotificationType.ERROR,
-        "The server sent you a message which you currently don't handle"
       );
   }
 
@@ -501,6 +507,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getPlayers(),
       message.getMaxPlayers()
     );
+    getView()
+      .postNotification(
+        NotificationType.RESPONSE,
+        "New game created: " + message.getGameId()
+      );
   }
 
   public void handleMessage(GameDeletedMessage message) {
@@ -512,11 +523,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerJoinedLobbyMessage message) {
-    localModel.playerJoinedLobby(
-      message.getLobbyId(),
-      message.getSocketId(),
-      message.getAvailableTokenColors()
-    );
+    localModel.playerJoinedLobby(message.getLobbyId(), message.getSocketId());
   }
 
   public void handleMessage(PlayerLeftLobbyMessage message) {
@@ -557,7 +564,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     );
   }
 
-  public void handleMessage(GameOverMessage message) {
+  public void handleMessage(GameOverMessage ignored) {
     localModel.gameOver();
   }
 
@@ -598,6 +605,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(SocketIdMessage message) {
-    this.socketID = message.getSocketId();
+    localModel.setSocketId(message.getSocketId());
   }
 }

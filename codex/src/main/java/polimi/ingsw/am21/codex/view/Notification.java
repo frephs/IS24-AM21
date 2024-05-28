@@ -5,7 +5,7 @@ public enum Notification {
     NotificationType.RESPONSE,
     "Connection was established"
   ),
-  CONNECTION_FAILED(NotificationType.ERROR, "Connection not available"),
+  CONNECTION_FAILED(NotificationType.ERROR, "Connection failure"),
   MESSAGE_NOT_SENT(NotificationType.ERROR, "The message was not sent"),
 
   UNKNOWN_MESSAGE(NotificationType.ERROR, "Unknown message"),

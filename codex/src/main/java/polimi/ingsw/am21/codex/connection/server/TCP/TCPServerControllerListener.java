@@ -5,9 +5,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.messages.Message;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.PlayerJoinedGameMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
@@ -58,22 +56,22 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void gameOver() {
-    // TODO
+    broadcast.accept(new GameOverMessage());
   }
 
   @Override
   public void playerScoresUpdate(Map<String, Integer> newScores) {
-    // TODO
+    broadcast.accept(new PlayerScoresUpdateMessage(newScores));
   }
 
   @Override
   public void remainingTurns(int remainingTurns) {
-    // TODO
+    broadcast.accept(new RemainingTurnsMessage(remainingTurns));
   }
 
   @Override
   public void winningPlayer(String nickname) {
-    // TODO
+    broadcast.accept(new WinningPlayerMessage(nickname));
   }
 
   @Override
@@ -121,14 +119,8 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerJoinedLobby(
-    String gameId,
-    UUID socketID,
-    Set<TokenColor> availableTokens
-  ) {
-    broadcast.accept(
-      new PlayerJoinedLobbyMessage(gameId, socketID, availableTokens)
-    );
+  public void playerJoinedLobby(String gameId, UUID socketID) {
+    broadcast.accept(new PlayerJoinedLobbyMessage(gameId, socketID));
   }
 
   @Override

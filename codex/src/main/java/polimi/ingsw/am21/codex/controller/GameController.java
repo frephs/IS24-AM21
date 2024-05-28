@@ -172,9 +172,7 @@ public class GameController {
       }
       this.getLobbyListeners(gameId).forEach(listener -> {
           try {
-            listener
-              .getValue()
-              .playerJoinedLobby(gameId, socketID, lobby.getAvailableColors());
+            listener.getValue().playerJoinedLobby(gameId, socketID);
           } catch (RemoteException e) {
             // TODO: Handle in a better way
             throw new RuntimeException(e);
@@ -378,22 +376,13 @@ public class GameController {
     }
   }
 
-  public void createGame(String gameId, UUID socketID, Integer players)
+  public void createGame(String gameId, Integer players)
     throws EmptyDeckException {
-    try {
-      Game newGame = manager.createGame(gameId, players);
-      newGame
-        .getLobby()
-        .addPlayer(
-          socketID,
-          newGame.drawObjectiveCardPair(),
-          newGame.drawStarterCard()
-        );
-    } catch (LobbyFullException ignored) {}
+    manager.createGame(gameId, players);
 
     this.getGameListeners(gameId).forEach(listener -> {
         try {
-          listener.getValue().gameCreated(gameId, 1, players);
+          listener.getValue().gameCreated(gameId, 0, players);
         } catch (RemoteException e) {
           // TODO: handle in a better way
           throw new RuntimeException(e);

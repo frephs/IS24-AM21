@@ -17,6 +17,8 @@ import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
@@ -46,10 +48,8 @@ public class LocalModelContainer
 
   private final RemoteGameEventListener listener;
 
-  public LocalModelContainer(UUID socketID, View view) {
+  public LocalModelContainer(View view) {
     this.view = view;
-    this.socketId = socketID;
-    // TODO receive socketId from the server
 
     cardsLoader.loadCards();
 
@@ -59,6 +59,10 @@ public class LocalModelContainer
       // TODO: handle this
       throw new RuntimeException("Failed creating client", e);
     }
+  }
+
+  public void setSocketId(UUID socketId) {
+    this.socketId = socketId;
   }
 
   public RemoteGameEventListener getRemoteListener() {
@@ -71,7 +75,6 @@ public class LocalModelContainer
   }
 
   public LocalGameBoard getLocalGameBoard() {
-    // TODO remove every usage
     return localGameBoard;
   }
 
@@ -89,7 +92,6 @@ public class LocalModelContainer
 
   @Override
   public void gameAlreadyStarted() {
-    // TODO use this in TCP
     view.postNotification(NotificationType.ERROR, "Game has already started");
   }
 
@@ -137,23 +139,6 @@ public class LocalModelContainer
       .put(gameId, new GameEntry(gameId, currentPlayers, maxPlayers));
   }
 
-  public void gameCreatedAndConnected(
-    String gameId,
-    UUID gameCreatorId,
-    int currentPlayers,
-    int maxPlayers
-  ) {
-    gameCreated(gameId, 1, maxPlayers);
-
-    playerJoinedLobby(
-      gameId,
-      gameCreatorId,
-      Arrays.stream(TokenColor.values()).collect(Collectors.toSet())
-    );
-
-    listGames();
-  }
-
   @Override
   public void gameDeleted(String gameId) {
     // TODO delete game on gameOver
@@ -193,9 +178,16 @@ public class LocalModelContainer
     view.postNotification(NotificationType.ERROR, "You are not in any lobby. ");
   }
 
-  public Set<TokenColor> getAvailableTokens() {
-    //TODO use this in TCP? or remove it in RMI
-    return lobby.getAvailableTokens();
+  public void showAvailableTokens() {
+    getView()
+      .postNotification(
+        NotificationType.RESPONSE,
+        "Available tokens: " +
+        this.lobby.getAvailableTokens()
+          .stream()
+          .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
+          .collect(Collectors.joining(" "))
+      );
   }
 
   public void loadGameLobby(Map<UUID, Pair<String, TokenColor>> players) {
@@ -212,6 +204,12 @@ public class LocalModelContainer
         playerSetToken(uuid, tokenColor);
       }
     });
+
+    listLobbyPlayers();
+  }
+
+  public void listLobbyPlayers() {
+    view.drawLobby(lobby.getPlayers());
   }
 
   /**
@@ -220,14 +218,9 @@ public class LocalModelContainer
    * Creates a lobby if you join a lobby.
    * @param gameId the id of the game lobby
    * @param socketId the id of the player that joined the lobby
-   * @param availableTokenColors the available token colors in the game
    * */
   @Override
-  public void playerJoinedLobby(
-    String gameId,
-    UUID socketId,
-    Set<TokenColor> availableTokenColors
-  ) {
+  public void playerJoinedLobby(String gameId, UUID socketId) {
     //TODO check player joins are not filtered by the server to my lobby.
     //TODO check if tcp and rmi servers send a message / call the methods when a "late" player joins (lobbystatusmessage)
     menu
@@ -237,6 +230,9 @@ public class LocalModelContainer
         return gameEntry;
       });
 
+    // Do not draw the lobby in this method, let it be drawn by lobbyStatus
+    // This way we prevent an outdated lobby from being drawn
+
     if (lobby != null && lobby.getGameId().equals(gameId)) {
       addToLobby(socketId);
       view.postNotification(
@@ -244,8 +240,8 @@ public class LocalModelContainer
         "Player" + socketId + " joined your game " + gameId
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
-    } else if (socketId == this.socketId) {
-      lobby = new LocalLobby(gameId, availableTokenColors);
+    } else if (socketId.equals(this.socketId)) {
+      lobby = new LocalLobby(gameId);
       localGameBoard = new LocalGameBoard(
         gameId,
         menu.getGames().get(gameId).getMaxPlayers()
@@ -254,7 +250,7 @@ public class LocalModelContainer
 
       view.postNotification(
         NotificationType.RESPONSE,
-        "You joined the lobby of the game" + gameId
+        "You joined the lobby of the game: " + gameId
       );
     } else {
       view.postNotification(
@@ -434,8 +430,6 @@ public class LocalModelContainer
     Integer starterCardID,
     CardSideType starterSide
   ) {
-    //TODO send a player joined game message for every player already in game if a player joins "late" the lobby (expand joinlobbystatusMessage)
-
     List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
     lobby.getPlayers().get(socketID).setHand(hand);
 
@@ -502,21 +496,23 @@ public class LocalModelContainer
       "point"
     );
 
-    Arrays.stream(ResourceType.values()).forEach(resourceType -> {
-      diffMessage(
-        updatedResources.get(resourceType) -
-        localGameBoard.getCurrentPlayer().getResources().get(resourceType),
-        resourceType
-      );
-    });
+    Arrays.stream(ResourceType.values()).forEach(
+      resourceType ->
+        diffMessage(
+          updatedResources.get(resourceType) -
+          localGameBoard.getCurrentPlayer().getResources().get(resourceType),
+          resourceType
+        )
+    );
 
-    Arrays.stream(ObjectType.values()).forEach(objectType -> {
-      diffMessage(
-        updatedObjects.get(objectType) -
-        localGameBoard.getCurrentPlayer().getResources().get(objectType),
-        objectType
-      );
-    });
+    Arrays.stream(ObjectType.values()).forEach(
+      objectType ->
+        diffMessage(
+          updatedObjects.get(objectType) -
+          localGameBoard.getCurrentPlayer().getObjects().get(objectType),
+          objectType
+        )
+    );
 
     localGameBoard.getCurrentPlayer().getResources().putAll(updatedResources);
     localGameBoard.getCurrentPlayer().getObjects().putAll(updatedObjects);
@@ -640,7 +636,7 @@ public class LocalModelContainer
 
   @Override
   public void playerScoresUpdate(Map<String, Integer> newScores) {
-    newScores.forEach((nickname, newScore) -> {
+    newScores.forEach((nickname, newScore) ->
       localGameBoard
         .getPlayers()
         .stream()
@@ -649,8 +645,7 @@ public class LocalModelContainer
           int diff = newScore - player.getPoints();
           player.setPoints(newScore);
           diffMessage(diff, "points");
-        });
-    });
+        }));
     view.drawLeaderBoard(localGameBoard.getPlayers());
   }
 
