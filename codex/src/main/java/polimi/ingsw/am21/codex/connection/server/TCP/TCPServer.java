@@ -107,6 +107,7 @@ public class TCPServer {
       serverSocket.close();
     } catch (IOException ignored) {}
     controller.unregisterGlobalListener(controllerListener);
+    System.out.println("TCP Server stopped.");
   }
 
   public CountDownLatch getServerReadyLatch() {

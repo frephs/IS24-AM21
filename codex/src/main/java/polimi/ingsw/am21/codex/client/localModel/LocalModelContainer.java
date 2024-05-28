@@ -435,6 +435,8 @@ public class LocalModelContainer
     Integer starterCardID,
     CardSideType starterSide
   ) {
+    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
+
     List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
     lobby.getPlayers().get(socketID).setHand(hand);
 
@@ -468,12 +470,11 @@ public class LocalModelContainer
             player -> players.indexOf(player.getNickname())
           )
         );
-    } else {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "Game " + gameId + " started without you"
-      );
     }
+    view.postNotification(
+      NotificationType.UPDATE,
+      "Game " + gameId + " started."
+    );
   }
 
   @Override

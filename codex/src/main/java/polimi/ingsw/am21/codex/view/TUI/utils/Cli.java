@@ -214,7 +214,7 @@ public class Cli implements View {
           player.getToken().getColor(),
           ColorStyle.NORMAL
         ) +
-        ":\n"
+        ":"
       );
       drawPlayerBoard(player);
     });

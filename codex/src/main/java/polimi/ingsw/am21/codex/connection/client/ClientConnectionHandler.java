@@ -166,7 +166,7 @@ public abstract class ClientConnectionHandler {
     this.getView()
       .postNotification(
         NotificationType.WARNING,
-        "Try reconnecting using: reconnect [host port]"
+        "Try reconnecting using: reconnect [" + host + " " + port + "]"
       );
   }
 
