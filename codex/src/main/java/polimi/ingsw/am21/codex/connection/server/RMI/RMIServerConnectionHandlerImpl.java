@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -16,6 +17,7 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
@@ -172,6 +174,31 @@ public class RMIServerConnectionHandlerImpl
   @Override
   public Map<String, Integer> getGamesMaxPlayers() throws RemoteException {
     return this.controller.getMaxSlots();
+  }
+
+  @Override
+  public Pair<Integer, Integer> getLobbyObjectiveCards(
+    String gameId,
+    UUID socketID
+  ) throws RemoteException, GameNotFoundException {
+    return controller
+      .getGame(gameId)
+      .getLobby()
+      .getPlayerObjectiveCards(socketID)
+      .map(p -> new Pair<>(p.getFirst().getId(), p.getSecond().getId()))
+      .orElseThrow(
+        () -> new RuntimeException("No player objective cards found.")
+      );
+  }
+
+  @Override
+  public Integer getLobbyStarterCard(String gameId, UUID socketID)
+    throws RemoteException, GameNotFoundException, PlayerNotFoundException {
+    return controller
+      .getGame(gameId)
+      .getLobby()
+      .getStarterCard(socketID)
+      .getId();
   }
 
   @Override

@@ -379,7 +379,6 @@ public class LocalModelContainer
   }
 
   public void listObjectiveCards(Pair<Integer, Integer> cardIdPair) {
-    //TODO use this in RMI
     lobby.setAvailableObjectives(
       cardsLoader.getCardFromId(cardIdPair.getKey()),
       cardsLoader.getCardFromId(cardIdPair.getValue())

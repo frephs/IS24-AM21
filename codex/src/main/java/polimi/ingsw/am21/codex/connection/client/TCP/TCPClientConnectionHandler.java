@@ -16,6 +16,8 @@ import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnAc
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetObjectiveCardsMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetStarterCardSideMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
@@ -229,12 +231,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbySetToken(TokenColor color) {
-    this.send(
-        new SetTokenColorMessage(
-          color,
-          localModel.getLocalGameBoard().getGameId()
-        )
-      );
+    this.send(new SetTokenColorMessage(color, localModel.getGameId()));
   }
 
   @Override
@@ -244,32 +241,27 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbySetNickname(String nickname) {
-    this.send(
-        new SetNicknameMessage(
-          nickname,
-          localModel.getLocalGameBoard().getGameId()
-        )
-      );
+    this.send(new SetNicknameMessage(nickname, localModel.getGameId()));
+  }
+
+  @Override
+  public void getObjectiveCards() {
+    this.send(new GetObjectiveCardsMessage(localModel.getGameId()));
   }
 
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
-    this.send(
-        new SelectObjectiveMessage(
-          first,
-          localModel.getLocalGameBoard().getGameId()
-        )
-      );
+    this.send(new SelectObjectiveMessage(first, localModel.getGameId()));
+  }
+
+  @Override
+  public void getStarterCard() {
+    this.send(new GetStarterCardSideMessage(localModel.getGameId()));
   }
 
   @Override
   public void lobbyJoinGame(CardSideType cardSide) {
-    this.send(
-        new SelectCardSideMessage(
-          cardSide,
-          localModel.getLocalGameBoard().getGameId()
-        )
-      );
+    this.send(new SelectCardSideMessage(cardSide, localModel.getGameId()));
   }
 
   @Override
@@ -281,7 +273,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     this.send(
         //TODO: maybe change these messages so a basic authentication is implemented
         new PlaceCardMessage(
-          localModel.getLocalGameBoard().getGameId(),
+          localModel.getGameId(),
           localModel.getLocalGameBoard().getPlayerNickname(),
           playerHandCardNumber,
           side,
@@ -302,7 +294,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   ) {
     this.send(
         new NextTurnActionMessage(
-          this.localModel.getLocalGameBoard().getGameId(),
+          this.localModel.getGameId(),
           this.localModel.getLocalGameBoard().getPlayerNickname(),
           drawingSource,
           deckType
@@ -314,7 +306,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public void nextTurn() {
     this.send(
         new NextTurnActionMessage(
-          localModel.getLocalGameBoard().getGameId(),
+          localModel.getGameId(),
           localModel.getLocalGameBoard().getPlayerNickname()
         )
       );

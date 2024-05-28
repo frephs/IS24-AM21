@@ -353,13 +353,44 @@ public class CliClient {
 
     commandHandlers.add(
       new CommandHandler(
+        "get-objectives",
+        "Get the available objectives to choose from",
+        ClientContext.LOBBY
+      ) {
+        @Override
+        public void handle(String[] command) {
+          client.getObjectiveCards();
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
         "choose-objective <1|2>",
         "Choose the objective card",
         ClientContext.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
+          if (!List.of("1", "2").contains(command[1])) {
+            // TODO Handle invalid command
+            return;
+          }
+
           client.lobbyChooseObjectiveCard(command[1].equals("1"));
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "get-starter-card",
+        "Get the starter card to place",
+        ClientContext.LOBBY
+      ) {
+        @Override
+        public void handle(String[] command) {
+          client.getStarterCard();
         }
       }
     );
@@ -372,6 +403,11 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
+          if (!List.of("front", "back").contains(command[1])) {
+            // TODO Handle invalid command
+            return;
+          }
+
           client.lobbyJoinGame(
             command[1].equals("front") ? CardSideType.FRONT : CardSideType.BACK
           );
