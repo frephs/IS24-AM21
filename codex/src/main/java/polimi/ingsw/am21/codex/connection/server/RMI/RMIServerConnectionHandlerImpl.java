@@ -40,11 +40,6 @@ public class RMIServerConnectionHandlerImpl
     this.controller = controller;
   }
 
-  public void setClient(GameEventListener eventListener)
-    throws RemoteException {
-    this.controller.addListener(eventListener);
-  }
-
   public void joinLobby(String gameId, UUID connectionID)
     throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
     this.controller.joinLobby(gameId, connectionID);
@@ -88,9 +83,11 @@ public class RMIServerConnectionHandlerImpl
   }
 
   @Override
-  public void registerClient(RemoteGameEventListener listener)
-    throws RemoteException {
-    this.controller.addListener(listener);
+  public void registerListener(
+    UUID connectionID,
+    RemoteGameEventListener listener
+  ) throws RemoteException {
+    this.controller.registerListener(connectionID, listener);
   }
 
   public void lobbySetTokenColor(

@@ -23,7 +23,11 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   void playerSetNickname(String gameId, UUID socketID, String nickname);
 
-  void playerChoseObjectiveCard(Boolean isFirst);
+  void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    Optional<String> nickname
+  );
 
   void playerJoinedGame(
     String gameId,

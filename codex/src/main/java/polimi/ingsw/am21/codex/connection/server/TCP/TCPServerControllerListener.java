@@ -1,9 +1,7 @@
 package polimi.ingsw.am21.codex.connection.server.TCP;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.rmi.RemoteException;
+import java.util.*;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.messages.Message;
@@ -149,9 +147,11 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerChoseObjectiveCard(Boolean isFirst) {
-    // TODO
-  }
+  public void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    Optional<String> nickname
+  ) {}
 
   @Override
   public void playerJoinedGame(

@@ -49,7 +49,7 @@ public class TCPServer {
   }
 
   public void start() throws PortUnreachableException {
-    controller.addListener(controllerListener);
+    controller.registerGlobalListener(controllerListener);
 
     // Using try-with-resources here will automatically shut down the executor if
     // no longer needed, as it implements the AutoCloseable interface.
@@ -66,6 +66,16 @@ public class TCPServer {
           System.out.println(
             "Client connected from " + connectionSocket.getInetAddress()
           );
+
+          // TODO: Alternative listener handling: multiple listeners for each client
+          //          controller.registerListener(
+          //            socketId,
+          //            new TCPServerControllerListener(message -> {
+          //              for (TCPServerConnectionHandler handler : activeHandlers.values()) {
+          //                handler.send(message);
+          //              }
+          //            })
+          //          );
 
           TCPServerConnectionHandler handler = new TCPServerConnectionHandler(
             connectionSocket,
@@ -88,7 +98,7 @@ public class TCPServer {
       // Propagate the error so that the RMI client can be closed as well
       throw new PortUnreachableException();
     } finally {
-      controller.removeListener(controllerListener);
+      controller.unregisterGlobalListener(controllerListener);
     }
   }
 
@@ -96,7 +106,7 @@ public class TCPServer {
     try {
       serverSocket.close();
     } catch (IOException ignored) {}
-    controller.removeListener(controllerListener);
+    controller.unregisterGlobalListener(controllerListener);
   }
 
   public CountDownLatch getServerReadyLatch() {

@@ -252,7 +252,7 @@ class GameControllerTest {
   void testNextTurn() {}
 
   @Test
-  void addListener() {}
+  void registerListener() {}
 
   @Test
   void removeListener() {}

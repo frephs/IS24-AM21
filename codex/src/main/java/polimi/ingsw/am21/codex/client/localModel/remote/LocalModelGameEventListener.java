@@ -2,10 +2,7 @@ package polimi.ingsw.am21.codex.client.localModel.remote;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -66,8 +63,12 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void playerChoseObjectiveCard(Boolean isFirst) throws RemoteException {
-    listener.playerChoseObjectiveCard(isFirst);
+  public void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    Optional<String> nickname
+  ) throws RemoteException {
+    listener.playerChoseObjectiveCard(gameId, socketID, nickname);
   }
 
   @Override

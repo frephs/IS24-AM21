@@ -31,6 +31,7 @@ public abstract class ClientConnectionHandler {
     this.host = host;
     this.port = port;
     this.localModel = localModel;
+    this.socketID = UUID.randomUUID();
   }
 
   View getView() {

@@ -66,6 +66,10 @@ public class LocalModelContainer
     return listener;
   }
 
+  public UUID getSocketID() {
+    return socketId;
+  }
+
   public LocalGameBoard getLocalGameBoard() {
     // TODO remove every usage
     return localGameBoard;
@@ -369,6 +373,32 @@ public class LocalModelContainer
   }
 
   @Override
+  public void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    Optional<String> nickname
+  ) {
+    view.postNotification(
+      NotificationType.UPDATE,
+      "Player " +
+      nickname.orElse(socketID.toString()) +
+      " chose an objective card."
+    );
+  }
+
+  public void playerChoseObjectiveCard(Boolean isFirst) {
+    this.localGameBoard.setSecretObjective(
+        isFirst
+          ? this.lobby.getAvailableObjectives().getFirst()
+          : this.lobby.getAvailableObjectives().getSecond()
+      );
+    this.view.postNotification(
+        NotificationType.RESPONSE,
+        "Secret objective chosen. "
+      );
+  }
+
+  @Override
   public void nicknameTaken(String nickname) {
     view.postNotification(
       NotificationType.ERROR,
@@ -383,19 +413,6 @@ public class LocalModelContainer
       cardsLoader.getCardFromId(cardIdPair.getValue())
     );
     view.drawObjectiveCardChoice(lobby.getAvailableObjectives());
-  }
-
-  @Override
-  public void playerChoseObjectiveCard(Boolean isFirst) {
-    this.localGameBoard.setSecretObjective(
-        isFirst
-          ? this.lobby.getAvailableObjectives().getFirst()
-          : this.lobby.getAvailableObjectives().getSecond()
-      );
-    this.view.postNotification(
-        NotificationType.RESPONSE,
-        "Secret objective chosen. "
-      );
   }
 
   public void playerGetStarterCardSides(int cardId) {
