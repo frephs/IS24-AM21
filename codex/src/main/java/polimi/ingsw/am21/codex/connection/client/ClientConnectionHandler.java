@@ -84,10 +84,20 @@ public abstract class ClientConnectionHandler {
   public abstract void lobbySetNickname(String nickname);
 
   /**
+   * Gets the objective cards the client should choose from
+   */
+  public abstract void getObjectiveCards();
+
+  /**
    * @param first true if the player selects the first card in the pair
    *              otherwise false
    */
   public abstract void lobbyChooseObjectiveCard(Boolean first);
+
+  /**
+   * Gets the starter card the player has to place
+   */
+  public abstract void getStarterCard();
 
   /**
    * Sets the chosen starter card side and make player join game

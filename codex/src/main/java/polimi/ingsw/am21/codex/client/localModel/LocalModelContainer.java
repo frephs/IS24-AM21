@@ -197,11 +197,11 @@ public class LocalModelContainer
       addToLobby(uuid);
       String nickname = nicknameTokenPair.getKey();
       if (nickname != null) {
-        playerSetNickname(uuid, nickname);
+        setPlayerNickname(uuid, nickname);
       }
       TokenColor tokenColor = nicknameTokenPair.getValue();
       if (tokenColor != null) {
-        playerSetToken(uuid, tokenColor);
+        setPlayerToken(uuid, tokenColor);
       }
     });
 
@@ -300,20 +300,21 @@ public class LocalModelContainer
     }
   }
 
-  public void playerSetToken(UUID socketId, TokenColor color) {
-    playerSetToken(lobby.getGameId(), socketId, color);
-  }
-
-  public void listTokenColors() {
-    view.drawAvailableTokenColors(lobby.getAvailableTokens());
-  }
-
-  @Override
-  public void playerSetToken(String gameId, UUID socketId, TokenColor token) {
+  /**
+   * Internal utility to set the token, without displaying anything in the view
+   */
+  private void setPlayerToken(UUID socketId, TokenColor token) {
     Set<TokenColor> availableTokens = lobby.getAvailableTokens();
     availableTokens.remove(token);
 
     lobby.getPlayers().get(socketId).setToken(token);
+  }
+
+  @Override
+  public void playerSetToken(String gameId, UUID socketId, TokenColor token) {
+    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
+
+    setPlayerToken(socketId, token);
 
     if (socketId.equals(this.socketId)) {
       getView()
@@ -346,23 +347,28 @@ public class LocalModelContainer
     );
   }
 
-  private void playerSetNickname(UUID socketId, String nickname) {
-    this.playerSetNickname(lobby.getGameId(), socketId, nickname);
+  /**
+   * Internal utility to set the nickname, without displaying anything in the view
+   */
+  private void setPlayerNickname(UUID socketId, String nickname) {
+    lobby.getPlayers().get(socketId).setNickname(nickname);
   }
 
   @Override
   public void playerSetNickname(String gameId, UUID socketId, String nickname) {
-    lobby.getPlayers().get(socketId).setNickname(nickname);
+    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
+
+    setPlayerNickname(socketId, nickname);
 
     if (this.socketId.equals(socketId)) {
       view.postNotification(
         NotificationType.UPDATE,
-        "You chose the nickname" + nickname + ". "
+        "You chose the nickname \"" + nickname + "\""
       );
     } else {
       view.postNotification(
         NotificationType.UPDATE,
-        "Player " + socketId + " chose the nickname" + nickname + ". "
+        "Player " + socketId + " chose the nickname \"" + nickname + "\""
       );
     }
     view.drawLobby(lobby.getPlayers());
@@ -398,12 +404,11 @@ public class LocalModelContainer
   public void nicknameTaken(String nickname) {
     view.postNotification(
       NotificationType.ERROR,
-      "The nickname " + nickname + " is already taken. "
+      "The nickname " + nickname + " is already taken."
     );
   }
 
   public void listObjectiveCards(Pair<Integer, Integer> cardIdPair) {
-    //TODO use this in RMI
     lobby.setAvailableObjectives(
       cardsLoader.getCardFromId(cardIdPair.getKey()),
       cardsLoader.getCardFromId(cardIdPair.getValue())

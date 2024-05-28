@@ -200,6 +200,22 @@ public class RMIClientConnectionHandler
   }
 
   @Override
+  public void getObjectiveCards() {
+    try {
+      localModel.listObjectiveCards(
+        rmiConnectionHandler.getLobbyObjectiveCards(
+          this.localModel.getGameId(),
+          this.socketID
+        )
+      );
+    } catch (GameNotFoundException e) {
+      this.localModel.gameNotFound(localModel.getGameId());
+    } catch (RemoteException e) {
+      this.messageNotSent();
+    }
+  }
+
+  @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
     try {
       rmiConnectionHandler.lobbyChooseObjective(
@@ -210,6 +226,22 @@ public class RMIClientConnectionHandler
       this.localModel.playerChoseObjectiveCard(first);
     } catch (GameAlreadyStartedException e) {
       this.localModel.gameAlreadyStarted();
+    } catch (GameNotFoundException e) {
+      this.localModel.gameNotFound(localModel.getGameId());
+    } catch (RemoteException e) {
+      this.messageNotSent();
+    }
+  }
+
+  @Override
+  public void getStarterCard() {
+    try {
+      localModel.playerGetStarterCardSides(
+        rmiConnectionHandler.getLobbyStarterCard(
+          localModel.getGameId(),
+          socketID
+        )
+      );
     } catch (GameNotFoundException e) {
       this.localModel.gameNotFound(localModel.getGameId());
     } catch (RemoteException e) {

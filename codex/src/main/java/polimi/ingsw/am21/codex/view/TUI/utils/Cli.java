@@ -300,10 +300,19 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawObjectiveCardChoice(CardPair<Card> cardPair) {}
+  public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
+    printUpdate(
+      "Objective cards pair:\n" +
+      cardPair.getFirst().cardToAscii() +
+      "\n" +
+      cardPair.getSecond().cardToAscii()
+    );
+  }
 
   @Override
-  public void drawStarterCardSides(Card cardId) {}
+  public void drawStarterCardSides(Card cardId) {
+    printUpdate("Starter card sides:\n" + cardId.cardToAscii());
+  }
 
   @Override
   public void drawWinner(String nickname) {

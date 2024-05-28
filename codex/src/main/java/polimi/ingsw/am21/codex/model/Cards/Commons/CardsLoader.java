@@ -99,14 +99,13 @@ public final class CardsLoader {
 
   public Card getCardFromId(int id) {
     this.loadCards();
-    if (cardList != null) {
+    if (cardList == null) {
       this.cardList = new ArrayList<Card>();
       cardList.addAll(resourceCardsList);
       cardList.addAll(goldCardsList);
       cardList.addAll(starterCardsList);
       cardList.addAll(objectiveCardsList);
     }
-    assert cardList != null;
     return cardList.get(id);
   }
 
