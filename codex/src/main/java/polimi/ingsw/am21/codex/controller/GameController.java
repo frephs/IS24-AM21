@@ -170,7 +170,10 @@ public class GameController {
           new UserGameContext(gameId, UserGameContextStatus.IN_LOBBY)
         );
       }
-      this.getLobbyListeners(gameId).forEach(listener -> {
+      this.getLobbyListeners(gameId)
+        .stream()
+        .filter(listener -> listener.getValue() != null)
+        .forEach(listener -> {
           try {
             listener.getValue().playerJoinedLobby(gameId, socketID);
           } catch (RemoteException e) {

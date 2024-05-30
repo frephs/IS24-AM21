@@ -84,16 +84,19 @@ class GameControllerTest {
     final UUID playerId = UUID.randomUUID();
 
     controller.createGame(gameId, 4);
+    assertEquals(0, controller.getCurrentSlots().get(gameId));
     controller.joinLobby(gameId, playerId);
+    assertEquals(1, controller.getCurrentSlots().get(gameId));
     assertDoesNotThrow(
       () -> controller.removePlayerFromLobby(gameId, playerId)
     );
+    assertEquals(0, controller.getCurrentSlots().get(gameId));
     controller.joinLobby(gameId, playerId);
     assertDoesNotThrow(
       () ->
         controller.removePlayerFromLobby(controller.getGame(gameId), playerId)
     );
-    assertEquals(1, controller.getCurrentSlots().get(gameId));
+    assertEquals(0, controller.getCurrentSlots().get(gameId));
   }
 
   @Test
