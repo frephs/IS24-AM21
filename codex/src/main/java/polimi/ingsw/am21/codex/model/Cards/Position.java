@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 public class Position {
 
-  private final int x, y;
+  private final Integer x, y;
 
   public Position(int x, int y) {
     this.x = x;
