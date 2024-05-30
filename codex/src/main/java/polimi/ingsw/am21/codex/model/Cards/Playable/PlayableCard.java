@@ -1,10 +1,13 @@
 package polimi.ingsw.am21.codex.model.Cards.Playable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class PlayableCard extends Card {
 
@@ -121,5 +124,22 @@ public class PlayableCard extends Card {
       this.getPlayedSide()
         .map(side -> side.getEvaluator().apply(playerBoard, coveredCorners))
         .orElse(0);
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    String frontSideString = frontSide.cardToAscii(new HashMap<>());
+    String backSideString = backSide.cardToAscii(new HashMap<>());
+    return CliUtils.joinMinLines(frontSideString, backSideString);
+  }
+
+  public String cardToString() {
+    // TODO: Implement TUI method
+    return "";
   }
 }

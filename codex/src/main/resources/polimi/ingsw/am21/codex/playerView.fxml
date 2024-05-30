@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.PlayerView">
+   <children>
+      <AnchorPane layoutX="122.0" layoutY="7.0" prefHeight="280.0" prefWidth="510.0" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label layoutX="14.0" layoutY="14.0" text="Game Board" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="511.0" layoutY="40.0" prefHeight="280.0" prefWidth="95.0" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="510.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label layoutX="31.0" layoutY="14.0" text="Other" />
+            <Button layoutX="7.0" layoutY="49.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="91.0" text="Main GameBoard" />
+            <ChoiceBox layoutX="3.0" layoutY="113.0" prefHeight="26.0" prefWidth="91.0" />
+            <Label layoutX="8.0" layoutY="89.0" prefHeight="18.0" prefWidth="78.0" text="Other player" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="153.0" layoutY="330.0" prefHeight="113.0" prefWidth="613.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane layoutX="166.0" layoutY="287.0" prefHeight="113.0" prefWidth="613.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+               <children>
+                  <Separator layoutX="183.0" layoutY="-1.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                  <Pane layoutX="14.0" layoutY="14.0" prefHeight="43.0" prefWidth="172.0" AnchorPane.rightAnchor="427.0">
+                     <children>
+                        <Label layoutY="6.0" text="Nickname" />
+                        <VBox layoutX="53.0" layoutY="3.0" prefHeight="43.0" prefWidth="118.0" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="14.0" layoutY="65.0" prefHeight="58.0" prefWidth="184.0" AnchorPane.rightAnchor="427.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="6.0" text="Points" />
+                        <VBox layoutX="47.0" layoutY="12.0" prefHeight="34.0" prefWidth="118.0" />
+                     </children>
+                  </Pane>
+                  <Separator layoutX="200.0" layoutY="25.0" orientation="VERTICAL" prefHeight="78.0" prefWidth="13.0" />
+                  <AnchorPane layoutX="214.0" layoutY="13.0" prefHeight="102.0" prefWidth="202.0">
+                     <children>
+                        <Label layoutX="2.0" layoutY="5.0" text="Card" />
+                        <Separator layoutX="139.0" layoutY="10.0" orientation="VERTICAL" prefHeight="78.0" prefWidth="7.0" />
+                        <Separator layoutX="60.0" layoutY="10.0" orientation="VERTICAL" prefHeight="78.0" prefWidth="7.0" />
+                        <VBox layoutX="14.0" layoutY="34.0" prefHeight="34.0" prefWidth="46.0" />
+                        <VBox layoutX="78.0" layoutY="35.0" prefHeight="34.0" prefWidth="46.0" />
+                        <VBox layoutX="143.0" layoutY="34.0" prefHeight="34.0" prefWidth="46.0" />
+                        <Separator layoutX="199.0" layoutY="10.0" orientation="VERTICAL" prefHeight="78.0" prefWidth="7.0" />
+                     </children>
+                  </AnchorPane>
+                  <Pane layoutX="434.0" layoutY="13.0" prefHeight="102.0" prefWidth="172.0">
+                     <children>
+                        <Label layoutY="6.0" text="Objective Card" />
+                        <VBox layoutX="39.0" layoutY="30.0" prefHeight="43.0" prefWidth="78.0" />
+                     </children>
+                  </Pane>
+               </children>
+            </AnchorPane>
+            <Separator layoutX="488.0" orientation="VERTICAL" prefHeight="283.0" prefWidth="13.0" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="488.0" AnchorPane.rightAnchor="112.0" AnchorPane.topAnchor="0.0" />
+            <Button layoutX="528.0" layoutY="163.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="53.0" text="Chat" />
+            <Button layoutX="534.0" layoutY="215.0" mnemonicParsing="false" text="Help" />
+         </children></AnchorPane>
+   </children>
+</AnchorPane>

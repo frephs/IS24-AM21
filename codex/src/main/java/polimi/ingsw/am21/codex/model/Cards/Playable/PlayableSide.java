@@ -5,25 +5,24 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.model.Cards.Corner;
-import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
-import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
-// TODO investigate "Raw use of parameterized class 'Corner'" warning
-
-public abstract class PlayableSide {
+public abstract class PlayableSide implements CliCard {
 
   /**
    * The Map of the CornerPosition and the corner on the side of the card
    */
-  private final Map<CornerPosition, Corner> corners;
+  private final Map<CornerPosition, Corner<CornerContentType>> corners;
 
   public PlayableSide() {
     this.corners = new HashMap<>();
   }
 
-  public Map<CornerPosition, Corner> getCorners() {
+  public Map<CornerPosition, Corner<CornerContentType>> getCorners() {
     return corners;
   }
 
@@ -54,5 +53,36 @@ public abstract class PlayableSide {
    */
   public Function<PlayerBoard, Boolean> getPlaceabilityChecker() {
     return playerBoard -> true;
+  }
+
+  /*
+   * -----------------
+   * TUI METHODS
+   * -----------------
+   * */
+
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    // corners
+    corners.forEach(
+      (cornerPosition, corner) ->
+        corner
+          .getContent()
+          .ifPresentOrElse(
+            content ->
+              cardStringMap.put(
+                cornerPosition.getIndex(),
+                CliUtils.colorize(content, ColorStyle.BOLD, 1)
+              ),
+            () -> cardStringMap.put(cornerPosition.getIndex(), " ")
+          )
+    );
+
+    return CliCard.playableCardToAscii(cardStringMap);
+  }
+
+  @Override
+  public String cardToString() {
+    // TODO add cardToString implementation
+    return "";
   }
 }

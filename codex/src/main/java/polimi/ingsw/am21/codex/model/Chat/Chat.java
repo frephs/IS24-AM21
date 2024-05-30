@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.model.Chat;
 import java.util.LinkedList;
 
 public class Chat {
+
   private final LinkedList<Message> sentMessage;
 
   public Chat() {

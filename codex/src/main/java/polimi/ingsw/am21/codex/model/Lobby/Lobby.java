@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.Lobby;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -228,7 +229,7 @@ public class Lobby {
 
     playerBuilder.setStarterCardSide(cardSide);
     playerBuilder.setHand(hand);
-    Player player = playerBuilder.build();
+    Player player = playerBuilder.build(socketId);
     lobbyPlayers.remove(socketId);
     return player;
   }
@@ -283,6 +284,47 @@ public class Lobby {
       throw new PlayerNotFoundException(socketId);
     }
     return lobbyPlayers.get(socketId).getTokenColor();
+  }
+
+  /**
+   * Gets a list of all the available token colors in the lobby
+   */
+  public Set<TokenColor> getAvailableColors() {
+    return Arrays.stream(TokenColor.values())
+      .filter(
+        color ->
+          lobbyPlayers
+            .values()
+            .stream()
+            .noneMatch(
+              player ->
+                player
+                  .getTokenColor()
+                  .map(playerColor -> playerColor == color)
+                  .orElse(false)
+            )
+      )
+      .collect(Collectors.toSet());
+  }
+
+  /**
+   * Gets the information of all the players in the lobby.
+   *
+   * @return a map of the players' socket ID to their nickname and token color
+   */
+  public Map<UUID, Pair<String, TokenColor>> getPlayersInfo() {
+    Map<UUID, Pair<String, TokenColor>> playersInfo = new HashMap<>();
+    lobbyPlayers.forEach(
+      (socketId, playerBuilder) ->
+        playersInfo.put(
+          socketId,
+          new Pair<>(
+            playerBuilder.getNickname().orElse(null),
+            playerBuilder.getTokenColor().orElse(null)
+          )
+        )
+    );
+    return playersInfo;
   }
 
   /**

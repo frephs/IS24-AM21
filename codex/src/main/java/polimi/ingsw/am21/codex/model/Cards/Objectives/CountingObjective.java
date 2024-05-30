@@ -1,13 +1,19 @@
 package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
-public class CountingObjective extends Objective {
+public class CountingObjective extends Objective implements CliCard {
 
   /**
    * The map of which resources and how many to complete the objective
@@ -55,5 +61,56 @@ public class CountingObjective extends Objective {
             .reduce(Integer::min)
             .orElse(0) *
           points));
+  }
+
+  @Override
+  public String cardToString() {
+    return (
+      resources
+        .entrySet()
+        .stream()
+        .filter(
+          resourceTypeIntegerEntry -> resourceTypeIntegerEntry.getValue() != 0
+        )
+        .map(
+          resourceTypeIntegerEntry ->
+            resourceTypeIntegerEntry.getValue() +
+            " " +
+            CliUtils.colorize(
+              resourceTypeIntegerEntry.getKey(),
+              ColorStyle.UNDERLINED
+            ) +
+            " resource" +
+            (resourceTypeIntegerEntry.getValue() > 1 ? "s" : "")
+        )
+        .collect(Collectors.joining(" ")) +
+      objects
+        .entrySet()
+        .stream()
+        .filter(
+          objectTypeIntegerEntry -> objectTypeIntegerEntry.getValue() != 0
+        )
+        .map(
+          objectTypeIntegerEntry ->
+            objectTypeIntegerEntry.getValue() +
+            " " +
+            CliUtils.colorize(
+              objectTypeIntegerEntry.getKey(),
+              ColorStyle.UNDERLINED
+            ) +
+            " object" +
+            (objectTypeIntegerEntry.getValue() > 1 ? "s" : "")
+        )
+        .collect(
+          Collectors.collectingAndThen(Collectors.joining(", "), s -> s)
+        ) +
+      " collected"
+    );
+  }
+
+  @Override
+  public String cardToAscii(Map<Integer, String> cardStringMap) {
+    //TODO add cardToString implementation
+    return "";
   }
 }

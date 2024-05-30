@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -16,10 +17,12 @@ import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundExceptio
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 
 class GameTest {
 
@@ -53,7 +56,11 @@ class GameTest {
     assertEquals(1, lobby.getRemainingPlayerSlots());
     // we added a player, so player count should be 1
     assertEquals(1, lobby.getPlayersCount());
-    lobby.setNickname(firstPlayer, "FirstPlayer");
+    try {
+      lobby.setNickname(firstPlayer, "FirstPlayer");
+    } catch (NicknameAlreadyTakenException e) {
+      fail(e);
+    }
     lobby.setToken(firstPlayer, TokenColor.BLUE);
 
     UUID secondPlayer = UUID.randomUUID();
@@ -73,7 +80,11 @@ class GameTest {
     assertEquals(0, lobby.getRemainingPlayerSlots());
     // we added 2 players so the player count shall be 2
     assertEquals(2, lobby.getPlayersCount());
-    lobby.setNickname(secondPlayer, "SecondPlayer");
+    try {
+      lobby.setNickname(secondPlayer, "SecondPlayer");
+    } catch (NicknameAlreadyTakenException e) {
+      fail(e);
+    }
     // we pray you don't get a collision 🙏 ( joking a part the probability of a collision is one in a billion, source: https://en.wikipedia.org/wiki/Universally_unique_identifier#Collisions
     // )
     UUID randomId = UUID.randomUUID();
@@ -157,7 +168,11 @@ class GameTest {
         fail("Failed creating player in lobby");
       }
 
-      game.getLobby().setNickname(playerSocketID, "Player_" + i++);
+      try {
+        game.getLobby().setNickname(playerSocketID, "Player_" + i++);
+      } catch (NicknameAlreadyTakenException e) {
+        fail(e);
+      }
 
       game.getLobby().setToken(playerSocketID, TokenColor.GREEN);
       game.getLobby().setToken(playerSocketID, TokenColor.RED);
@@ -192,7 +207,18 @@ class GameTest {
     preparePlayers(this.game);
 
     assertEquals(GameState.GAME_INIT, this.game.getState());
-    game.start();
+    try {
+      game.start();
+    } catch (GameNotReadyException e) {
+      fail(
+        "Not enough players to start the game:\nneeded: " +
+        game.getMaxPlayers() +
+        "\nfound: " +
+        game.getPlayersCount()
+      );
+    } catch (GameAlreadyStartedException e) {
+      fail(e);
+    }
 
     assertEquals(GameState.PLAYING, this.game.getState());
 
@@ -207,7 +233,18 @@ class GameTest {
     for (int i = 0; i < 10000 && !isDifferent; ++i) {
       this.game = new Game(4);
       preparePlayers(game);
-      game.start();
+      try {
+        game.start();
+      } catch (GameNotReadyException e) {
+        fail(
+          "Not enough players to start the game:\nneeded: " +
+          game.getMaxPlayers() +
+          "\nfound: " +
+          game.getPlayersCount()
+        );
+      } catch (GameAlreadyStartedException e) {
+        fail(e);
+      }
       List<String> order = game.getPlayersOrder();
       if (
         order.get(0).compareTo("Player_0") != 0 ||

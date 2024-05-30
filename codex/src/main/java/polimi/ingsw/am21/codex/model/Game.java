@@ -1,7 +1,10 @@
 package polimi.ingsw.am21.codex.model;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import org.json.JSONArray;
+import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -13,6 +16,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundExceptio
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
+import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
@@ -25,22 +29,23 @@ public class Game {
   private GameState state;
   private Integer remainingRounds = null;
   Integer currentPlayer;
+  private final Integer maxPlayers;
 
   public Game(int players) {
-    this.lobby = new Lobby();
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
 
     this.gameBoard = new GameBoard(new CardsLoader());
     this.players = new ArrayList<>();
+    this.maxPlayers = players;
   }
 
   public Game(int players, JSONArray cards) {
-    this.lobby = new Lobby();
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
     this.gameBoard = GameBoard.fromJSON(cards);
     this.players = new ArrayList<>();
+    this.maxPlayers = players;
   }
 
   /**
@@ -55,7 +60,13 @@ public class Game {
   /**
    * Starts the game.
    */
-  public void start() {
+  public void start()
+    throws GameNotReadyException, GameAlreadyStartedException {
+    if (this.getPlayersSpotsLeft() != 0) throw new GameNotReadyException();
+    if (
+      this.state != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
   }
@@ -122,6 +133,32 @@ public class Game {
 
   public Player getCurrentPlayer() {
     return this.players.get(currentPlayer);
+  }
+
+  /**
+   * Gets a player from the nickname
+   *
+   * @param nickname The nickname of the player you're looking for
+   */
+  public Player getPlayer(String nickname) throws PlayerNotFoundException {
+    return this.players.stream()
+      .filter(player -> Objects.equals(player.getNickname(), nickname))
+      .findFirst()
+      .orElseThrow(() -> new PlayerNotFoundException(nickname));
+  }
+
+  /**
+   * Gets the players in the game.
+   */
+  public List<Player> getPlayers() {
+    return this.players;
+  }
+
+  /**
+   * Gets the nicknames of the players in the game.
+   */
+  public List<String> getPlayerIds() {
+    return this.players.stream().map(Player::getNickname).toList();
   }
 
   /**
@@ -199,14 +236,22 @@ public class Game {
   /**
    * Draws the player card and runs nextTurn();
    *
-   * @param drawingSource Where we are drawing the card rom
-   * @param deckType      The type of deck to draw from.
+   * @param drawingSource      Where we are drawing the card rom
+   * @param deckType           The type of deck to draw from.
+   * @param drawnCardsCallback Callback to be called after the cards are
+   *                           drawn: the first parameter is the id of the card drawn
+   *                           by the player, the second is from the one drawn for
+   *                           the card pair (if any, null otherwise).
    * @throws GameOverException If the game is over.
    */
   public void nextTurn(
     DrawingCardSource drawingSource,
-    DrawingDeckType deckType
+    DrawingDeckType deckType,
+    BiConsumer<Integer, Integer> drawnCardsCallback
   ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
+    int playerCardId;
+    AtomicReference<Integer> pairCardId = new AtomicReference<>();
+
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
@@ -214,14 +259,27 @@ public class Game {
       throw new InvalidNextTurnCallException();
     }
     try {
-      this.players.get(this.currentPlayer).drawCard(
-          this.gameBoard.drawCard(drawingSource, deckType)
-        );
+      PlayableCard playerCard =
+        this.gameBoard.drawCard(drawingSource, deckType, replacementCard -> {
+            pairCardId.set(replacementCard.getId());
+          });
+      playerCardId = playerCard.getId();
+
+      this.players.get(this.currentPlayer).drawCard(playerCard);
+
+      drawnCardsCallback.accept(playerCardId, pairCardId.get());
     } catch (EmptyDeckException e) {
       this.remainingRounds = 2;
       throw e;
     }
     this.nextTurn();
+  }
+
+  public void nextTurn(
+    DrawingCardSource drawingSource,
+    DrawingDeckType deckType
+  ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
+    this.nextTurn(drawingSource, deckType, (a, b) -> {});
   }
 
   /**
@@ -301,5 +359,23 @@ public class Game {
     hand.add(this.gameBoard.drawResourceCardFromDeck());
     hand.add(this.gameBoard.drawResourceCardFromDeck());
     return hand;
+  }
+
+  /**
+   * @return the number of connected players
+   */
+  public Integer getPlayersCount() {
+    return this.players.size();
+  }
+
+  /**
+   * @return the number of maximum players
+   */
+  public Integer getMaxPlayers() {
+    return this.maxPlayers;
+  }
+
+  public Integer getPlayersSpotsLeft() {
+    return this.getMaxPlayers() - this.getPlayersCount();
   }
 }

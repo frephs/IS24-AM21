@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.GameBoard;
 
 import java.util.*;
+import java.util.function.Consumer;
 import org.json.JSONArray;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -136,14 +137,17 @@ public class GameBoard {
   /**
    * Draws a card from a player's deck pair.
    *
-   * @param drawingSource Where we are drawing the card rom
-   * @param deckType      The type of deck to draw from.
+   * @param drawingSource        Where we are drawing the card rom
+   * @param deckType             The type of deck to draw from.
+   * @param replacedCardCallback A callback that accepts the card that was
+   *                             put in the card pair to replace the drawn card.
    * @return The drawn card.
    * @throws EmptyDeckException If the deck being drawn from is empty.
    */
   public PlayableCard drawCard(
     DrawingCardSource drawingSource,
-    DrawingDeckType deckType
+    DrawingDeckType deckType,
+    Consumer<PlayableCard> replacedCardCallback
   ) throws EmptyDeckException {
     if (drawingSource == DrawingCardSource.Deck) {
       if (deckType == DrawingDeckType.GOLD) {
@@ -161,12 +165,23 @@ public class GameBoard {
         drawingPair = this.resourceCards;
         drawingDeck = this.resourceDeck;
       }
+
+      PlayableCard replacement = drawingDeck.draw();
+      replacedCardCallback.accept(replacement);
+
       if (drawingSource == DrawingCardSource.CardPairFirstCard) {
-        return drawingPair.replaceFirst(drawingDeck.draw());
+        return drawingPair.replaceFirst(replacement);
       } else {
-        return drawingPair.replaceSecond(drawingDeck.draw());
+        return drawingPair.replaceSecond(replacement);
       }
     }
+  }
+
+  public PlayableCard drawCard(
+    DrawingCardSource drawingSource,
+    DrawingDeckType deckType
+  ) throws EmptyDeckException {
+    return drawCard(drawingSource, deckType, a -> {});
   }
 
   /**

@@ -1,7 +1,18 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-public enum DrawingCardSource {
+import java.io.Serializable;
+
+public enum DrawingCardSource implements Serializable {
   CardPairFirstCard,
   CardPairSecondCard,
-  Deck,
+  Deck;
+
+  @Override
+  public String toString() {
+    return switch (this) {
+      case CardPairFirstCard -> "the first card from the pair of";
+      case CardPairSecondCard -> "the second card from the pair of";
+      case Deck -> "from the deck of";
+    };
+  }
 }

@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model.Player;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -14,8 +15,9 @@ public class Player {
   private final PlayerBoard board;
   private final TokenColor token;
   private int points;
+  private final UUID socketId;
 
-  Player(PlayerBuilder builder)
+  Player(PlayerBuilder builder, UUID socketId)
     throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     this.nickname = builder.nickname;
     this.token = builder.token;
@@ -25,6 +27,11 @@ public class Player {
       builder.starterCard,
       builder.objectiveCard
     );
+    this.socketId = socketId;
+  }
+
+  public UUID getSocketId() {
+    return socketId;
   }
 
   public static class PlayerBuilder {
@@ -111,10 +118,10 @@ public class Player {
     /**
      * @return a functioning player
      */
-    public Player build()
+    public Player build(UUID socketId)
       throws IncompletePlayerBuilderException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
       IncompletePlayerBuilderException.checkPlayerBuilder(this);
-      return new Player(this);
+      return new Player(this, socketId);
     }
 
     /**
@@ -169,7 +176,11 @@ public class Player {
    * @throws IllegalCardSideChoiceException if the side chosen is not placeable because of the side placing condition
    * @throws IllegalPlacingPositionException if the position provided is either unreachable, occupied or forbidden
    */
-  public void placeCard(int cardIndex, CardSideType side, Position position)
+  public PlayableCard placeCard(
+    int cardIndex,
+    CardSideType side,
+    Position position
+  )
     throws IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
     PlayableCard playedCard;
     try {
@@ -181,9 +192,9 @@ public class Player {
     }
 
     board.placeCard(playedCard, side, position);
-
-    PlayableCard card = board.getHand().get(cardIndex);
-    this.points += card.getEvaluator().apply(board);
+    board.getHand().remove(cardIndex);
+    this.points += playedCard.getEvaluator().apply(board);
+    return playedCard;
   }
 
   /**

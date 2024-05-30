@@ -40,6 +40,13 @@ public class Position {
 
   @Override
   public int hashCode() {
-    return 0; // TODO actually return something
+    int result = Integer.hashCode(x);
+    result = 31 * result + Integer.hashCode(y);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return "Position{" + "x=" + x + ", y=" + y + '}';
   }
 }

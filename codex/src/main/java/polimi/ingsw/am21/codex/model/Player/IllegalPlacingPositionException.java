@@ -4,7 +4,7 @@ public class IllegalPlacingPositionException extends Exception {
 
   public IllegalPlacingPositionException() {
     super(
-      "Illegal placing position: you tried placing a card in a position which is either forbidden, occupied or not reachable"
+      "You tried placing a card in a position which is either forbidden, occupied or not reachable"
     );
   }
 

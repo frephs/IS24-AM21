@@ -26,11 +26,14 @@ public final class CardsLoader {
   private List<PlayableCard> goldCardsList = new ArrayList<>();
   private List<ObjectiveCard> objectiveCardsList = new ArrayList<>();
 
+  private List<Card> cardList = null;
+
   public CardsLoader() {
     this(
       "src/main/java/polimi/ingsw/am21/codex/model/Cards/Resources/cards" +
       ".json"
     );
+    this.loadCards();
   }
 
   /**
@@ -75,10 +78,10 @@ public final class CardsLoader {
     List<PlayableCard> goldCardsList,
     List<ObjectiveCard> objectiveCardsList
   ) {
-    starterCardsList.clear();
-    resourceCardsList.clear();
-    goldCardsList.clear();
-    objectiveCardsList.clear();
+    this.starterCardsList.clear();
+    this.resourceCardsList.clear();
+    this.goldCardsList.clear();
+    this.objectiveCardsList.clear();
     this.loadCards();
     starterCardsList.addAll(this.starterCardsList);
     resourceCardsList.addAll(this.resourceCardsList);
@@ -86,23 +89,39 @@ public final class CardsLoader {
     objectiveCardsList.addAll(this.objectiveCardsList);
   }
 
-  public List<PlayableCard> loadStarterCards() {
+  public List<Card> getCardsFromIds(List<Integer> ids) {
+    List<Card> cards = new ArrayList<>();
+    for (int id : ids) {
+      cards.add(getCardFromId(id));
+    }
+    return cards;
+  }
+
+  public Card getCardFromId(int id) {
     this.loadCards();
+    if (cardList == null) {
+      this.cardList = new ArrayList<Card>();
+      cardList.addAll(resourceCardsList);
+      cardList.addAll(goldCardsList);
+      cardList.addAll(starterCardsList);
+      cardList.addAll(objectiveCardsList);
+    }
+    return cardList.get(id);
+  }
+
+  public List<PlayableCard> loadStarterCards() {
     return new ArrayList<PlayableCard>(this.starterCardsList);
   }
 
   public List<PlayableCard> loadGoldCards() {
-    this.loadCards();
     return new ArrayList<PlayableCard>(this.goldCardsList);
   }
 
   public List<PlayableCard> loadResourceCards() {
-    this.loadCards();
     return new ArrayList<>(this.resourceCardsList);
   }
 
   public List<ObjectiveCard> loadObjectiveCards() {
-    this.loadCards();
     return new ArrayList<>(this.objectiveCardsList);
   }
 
@@ -131,7 +150,7 @@ public final class CardsLoader {
         >();
 
         for (int j = 0; j < geometryObjectivesArray.length(); j++) {
-          if (!geometryObjectivesArray.isNull(i)) {
+          if (!geometryObjectivesArray.isNull(j)) {
             AdjacentPosition position =
               CardsLoader.cardGeometryPositionFromJSONIndex(j);
             ResourceType resource = ResourceType.fromString(
