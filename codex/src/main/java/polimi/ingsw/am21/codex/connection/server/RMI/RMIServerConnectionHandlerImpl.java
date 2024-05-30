@@ -16,6 +16,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
@@ -89,6 +90,11 @@ public class RMIServerConnectionHandlerImpl
     RemoteGameEventListener listener
   ) throws RemoteException {
     this.controller.registerListener(connectionID, listener);
+  }
+
+  public void sendChatMessage(String gameId, ChatMessage message)
+    throws GameNotFoundException, RemoteException {
+    this.controller.sendChatMessage(gameId, message);
   }
 
   public void lobbySetTokenColor(

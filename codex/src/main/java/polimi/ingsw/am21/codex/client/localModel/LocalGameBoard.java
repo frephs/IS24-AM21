@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Chat.Chat;
 
 public class LocalGameBoard {
 
@@ -13,6 +14,7 @@ public class LocalGameBoard {
   private CardPair<Card> resourceCards;
 
   private Card secretObjective;
+  private Chat chat = new Chat();
 
   /**
    * Number of players the game contains
@@ -92,5 +94,9 @@ public class LocalGameBoard {
 
   public List<LocalPlayer> getPlayers() {
     return players;
+  }
+
+  public Chat getChat() {
+    return chat;
   }
 }

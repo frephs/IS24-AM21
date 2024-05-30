@@ -18,6 +18,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
@@ -373,6 +374,17 @@ public class RMIClientConnectionHandler
       this.localModel.playerNotActive();
     } catch (GameOverException e) {
       this.localModel.gameOver();
+    }
+  }
+
+  @Override
+  public void sendChatMessage(ChatMessage message) {
+    try {
+      rmiConnectionHandler.sendChatMessage(localModel.getGameId(), message);
+    } catch (GameNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (RemoteException e) {
+      this.messageNotSent();
     }
   }
 }

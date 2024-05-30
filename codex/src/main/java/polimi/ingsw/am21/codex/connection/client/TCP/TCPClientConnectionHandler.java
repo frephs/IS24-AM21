@@ -12,6 +12,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -38,6 +39,7 @@ import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -310,6 +312,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
   }
 
+  @Override
+  public void sendChatMessage(ChatMessage message) {
+    this.send(new SendChatMessage(localModel.getGameId(), message));
+  }
+
   public GameState getGameState() {
     //TODO
     return null;
@@ -394,6 +401,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
       case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
+      case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
       // Init
       case SOCKET_ID -> handleMessage((SocketIdMessage) message);
       default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
@@ -596,5 +604,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   public void handleMessage(SocketIdMessage message) {
     localModel.setSocketId(message.getSocketId());
+  }
+
+  public void handleMessage(SendChatMessage message) {
+    localModel.chatMessageSent(message.getGameId(), message.getMessage());
   }
 }

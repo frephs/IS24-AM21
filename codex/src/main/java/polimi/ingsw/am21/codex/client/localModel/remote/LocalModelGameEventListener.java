@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -170,5 +171,11 @@ public class LocalModelGameEventListener
   @Override
   public void winningPlayer(String nickname) throws RemoteException {
     listener.winningPlayer(nickname);
+  }
+
+  @Override
+  public void chatMessageSent(String gameId, ChatMessage message)
+    throws RemoteException {
+    listener.chatMessageSent(gameId, message);
   }
 }

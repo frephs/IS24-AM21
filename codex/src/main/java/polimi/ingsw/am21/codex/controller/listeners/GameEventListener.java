@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.controller.listeners;
 import java.util.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -73,4 +74,6 @@ public interface GameEventListener extends RemoteGameEventListener {
   void remainingTurns(int remainingTurns);
 
   void winningPlayer(String nickname);
+
+  void chatMessageSent(String gameId, ChatMessage chatMessage);
 }

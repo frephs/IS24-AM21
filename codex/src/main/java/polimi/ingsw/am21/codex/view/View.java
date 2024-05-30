@@ -11,6 +11,7 @@ import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
@@ -81,4 +82,6 @@ public interface View {
   void drawObjectiveCardChoice(CardPair<Card> cardPair);
   void drawStarterCardSides(Card cardId);
   void drawWinner(String nickname);
+
+  void drawChatMessage(ChatMessage message);
 }

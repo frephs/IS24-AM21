@@ -15,6 +15,7 @@ import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
@@ -248,6 +249,7 @@ public class TCPServerConnectionHandler implements Runnable {
       case GET_STARTER_CARD_SIDE -> handleMessage(
         (GetStarterCardSideMessage) message
       );
+      case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
       default -> throw new NotAClientMessageException();
     }
   }
@@ -455,6 +457,15 @@ public class TCPServerConnectionHandler implements Runnable {
       send(new StarterCardSidesMessage(starterCard.getId()));
     } catch (GameNotFoundException e) {
       send(new GameNotFoundMessage(message.getGameId()));
+    }
+  }
+
+  public void handleMessage(SendChatMessage message) {
+    try {
+      controller.sendChatMessage(message.getGameId(), message.getMessage());
+      broadcast(message, false);
+    } catch (GameNotFoundException e) {
+      throw new RuntimeException(e);
     }
   }
 

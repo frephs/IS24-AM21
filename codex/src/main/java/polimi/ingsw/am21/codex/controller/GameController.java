@@ -16,6 +16,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
@@ -529,6 +530,19 @@ public class GameController {
           throw new RuntimeException(e);
         }
       });
+  }
+
+  public void sendChatMessage(String gameId, ChatMessage message)
+    throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    game.getChat().postMessage(message);
+    listeners.forEach(listener -> {
+      try {
+        listener.chatMessageSent(gameId, message);
+      } catch (RemoteException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   public Set<TokenColor> getAvailableTokens(String gameId)

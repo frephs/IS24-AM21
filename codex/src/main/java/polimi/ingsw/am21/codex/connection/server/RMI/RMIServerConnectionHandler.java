@@ -12,6 +12,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
@@ -94,4 +95,7 @@ public interface RMIServerConnectionHandler extends Remote {
     UUID connectionID,
     RemoteGameEventListener listener
   ) throws RemoteException;
+
+  public void sendChatMessage(String gameId, ChatMessage message)
+    throws GameNotFoundException, RemoteException;
 }

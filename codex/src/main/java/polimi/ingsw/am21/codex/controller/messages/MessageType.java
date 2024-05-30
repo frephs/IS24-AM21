@@ -13,6 +13,7 @@ public enum MessageType implements Serializable {
   SELECT_CARD_SIDE(MessageTypeCategory.CLIENT_ACTION),
   SET_NICKNAME(MessageTypeCategory.CLIENT_ACTION),
   SET_TOKEN_COLOR(MessageTypeCategory.CLIENT_ACTION),
+  SEND_CHAT_MESSAGE(MessageTypeCategory.CLIENT_ACTION),
 
   GET_GAME_STATUS(MessageTypeCategory.CLIENT_REQUEST),
   GET_AVAILABLE_GAME_LOBBIES(MessageTypeCategory.CLIENT_REQUEST),

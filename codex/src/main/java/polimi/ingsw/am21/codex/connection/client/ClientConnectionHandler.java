@@ -5,6 +5,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -140,6 +141,8 @@ public abstract class ClientConnectionHandler {
    * Goes to next turn ( called only when the game is in the last round, since you cannot draw a card in that case)
    */
   public abstract void nextTurn();
+
+  public abstract void sendChatMessage(ChatMessage message);
 
   /*
    * -----------------

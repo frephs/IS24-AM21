@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -12,6 +13,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -72,6 +74,11 @@ public class TCPServerControllerListener implements GameEventListener {
   @Override
   public void winningPlayer(String nickname) {
     broadcast.accept(new WinningPlayerMessage(nickname));
+  }
+
+  @Override
+  public void chatMessageSent(String gameId, ChatMessage chatMessage) {
+    broadcast.accept(new SendChatMessage(gameId, chatMessage));
   }
 
   @Override

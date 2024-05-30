@@ -11,6 +11,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.model.Chat.Chat;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
@@ -30,6 +31,7 @@ public class Game {
   private Integer remainingRounds = null;
   Integer currentPlayer;
   private final Integer maxPlayers;
+  private final Chat chat = new Chat();
 
   public Game(int players) {
     this.state = GameState.GAME_INIT;
@@ -377,5 +379,9 @@ public class Game {
 
   public Integer getPlayersSpotsLeft() {
     return this.getMaxPlayers() - this.getPlayersCount();
+  }
+
+  public Chat getChat() {
+    return chat;
   }
 }

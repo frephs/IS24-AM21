@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -113,4 +114,20 @@ public class DummyView implements View {
 
   @Override
   public void drawWinner(String nickname) {}
+
+  @Override
+  public void drawChatMessage(ChatMessage message) {
+    System.out.println(
+      CliUtils.colorize(
+        "[" +
+        id +
+        "] received a message from: " +
+        message.getSender() +
+        ": " +
+        message.getContent(),
+        NotificationType.UPDATE.getColor(),
+        ColorStyle.NORMAL
+      )
+    );
+  }
 }

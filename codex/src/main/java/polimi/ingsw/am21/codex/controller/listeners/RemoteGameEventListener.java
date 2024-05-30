@@ -8,6 +8,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -84,4 +85,7 @@ public interface RemoteGameEventListener extends Remote {
   void remainingTurns(int remainingTurns) throws RemoteException;
 
   void winningPlayer(String nickname) throws RemoteException;
+
+  void chatMessageSent(String gameId, ChatMessage message)
+    throws RemoteException;
 }

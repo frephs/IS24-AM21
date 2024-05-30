@@ -16,6 +16,7 @@ import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.NotificationType;
@@ -426,6 +427,36 @@ public class CliClient {
             (context.get() != null)
               ? "You are now in the " + context.get().toString().toLowerCase()
               : "You have not joined any lobby or game yet"
+          );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler("chat <message>", "Broadcast a message") {
+        @Override
+        public void handle(String[] command) {
+          client.sendChatMessage(
+            new ChatMessage(localModel.getSocketID(), command[1])
+          );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "chat <player> <message>",
+        "Send a message to a player",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          client.sendChatMessage(
+            new ChatMessage(
+              localModel.getLocalGameBoard().getPlayerNickname(),
+              command[1],
+              command[2]
+            )
           );
         }
       }

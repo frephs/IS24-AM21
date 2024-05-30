@@ -12,6 +12,7 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -675,6 +676,16 @@ public class LocalModelContainer
     lobby = null;
     localGameBoard = null;
     listGames();
+  }
+
+  @Override
+  public void chatMessageSent(String gameId, ChatMessage chatMessage) {
+    if (Objects.equals(gameId, localGameBoard.getGameId())) {
+      if (!chatMessage.getSender().equals(localGameBoard.getPlayerNickname())) {
+        localGameBoard.getChat().postMessage(chatMessage);
+        view.drawChatMessage(chatMessage);
+      }
+    }
   }
 
   @Override
