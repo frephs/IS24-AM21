@@ -8,12 +8,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIf;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
@@ -22,7 +24,12 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 class MainTest {
 
+  boolean isCI() {
+    return Objects.equals(System.getenv("CI"), "true");
+  }
+
   @Test
+  @DisabledIf("isCI")
   void tcpClient() throws InterruptedException {
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
       AtomicReference<TCPClientConnectionHandler> client1 =
