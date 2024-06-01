@@ -207,7 +207,6 @@ public class Player {
     }
 
     board.placeCard(playedCard, side, position);
-    board.getHand().remove(cardIndex);
     this.points += playedCard.getEvaluator().apply(board);
     return playedCard;
   }
