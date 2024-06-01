@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -289,8 +290,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getSide(),
         message.getPosition()
       );
-    } catch (PlayerNotActive e) {
-      send(new ActionNotAllowedMessage());
+    } catch (PlayerNotActive | CardAlreadyPlacedException e) {
       send(new ActionNotAllowedMessage(e.getMessage()));
     } catch (
       IllegalPlacingPositionException | IllegalCardSideChoiceException e

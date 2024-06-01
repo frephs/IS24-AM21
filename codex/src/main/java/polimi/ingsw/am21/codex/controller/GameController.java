@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -499,15 +500,18 @@ public class GameController {
     CardSideType side,
     Position position
   )
-    throws GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+    throws GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException, CardAlreadyPlacedException {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, playerNickname);
+    this.checkIfCardWasPlaced(game, playerNickname);
     Player currentPlayer = game.getCurrentPlayer();
+    currentPlayer.toggleCardPlacedThisTurn();
     PlayableCard playedCard = currentPlayer.placeCard(
       playerHandCardNumber,
       side,
       position
     );
+
     this.getGameListeners(gameId).forEach(listener -> {
         try {
           listener
@@ -530,6 +534,14 @@ public class GameController {
           throw new RuntimeException(e);
         }
       });
+  }
+
+  private void checkIfCardWasPlaced(Game game, String playerNickname)
+    throws CardAlreadyPlacedException {
+    Player player = game.getCurrentPlayer();
+    if (player.hasPlacedCardThisTurn()) {
+      throw new CardAlreadyPlacedException();
+    }
   }
 
   public void sendChatMessage(String gameId, ChatMessage message)

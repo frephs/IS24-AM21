@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -140,7 +141,7 @@ public class RMIServerConnectionHandlerImpl
     CardSideType side,
     Position position
   )
-    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException, CardAlreadyPlacedException {
     this.controller.placeCard(
         gameId,
         playerNickname,

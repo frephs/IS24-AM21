@@ -16,6 +16,7 @@ public class Player {
   private final TokenColor token;
   private int points;
   private final UUID socketId;
+  private Boolean cardPlacedThisTurn = false;
 
   Player(PlayerBuilder builder, UUID socketId)
     throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
@@ -158,6 +159,20 @@ public class Player {
    */
   public int getPoints() {
     return points;
+  }
+
+  /**
+   * @return if a player has already played a card this turn
+   * */
+  public Boolean hasPlacedCardThisTurn() {
+    return cardPlacedThisTurn;
+  }
+
+  /**
+   * Toggle the cardPlayedThisTurn boolean
+   * */
+  public void toggleCardPlacedThisTurn() {
+    this.cardPlacedThisTurn = !cardPlacedThisTurn;
   }
 
   /**

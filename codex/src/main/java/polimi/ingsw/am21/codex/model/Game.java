@@ -307,6 +307,7 @@ public class Game {
       throw new GameOverException();
     }
     if (this.remainingRounds == null) throw new InvalidNextTurnCallException();
+    players.get(currentPlayer).toggleCardPlacedThisTurn();
     currentPlayer = (currentPlayer + 1) % players.size();
     if (this.currentPlayer == 0) {
       this.remainingRounds--;

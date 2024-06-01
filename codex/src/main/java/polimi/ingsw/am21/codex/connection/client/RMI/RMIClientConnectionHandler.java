@@ -11,6 +11,7 @@ import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
+import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -309,6 +310,8 @@ public class RMIClientConnectionHandler
       throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (CardAlreadyPlacedException e) {
+      localModel.actionNotAllowed(e.getMessage());
     }
   }
 

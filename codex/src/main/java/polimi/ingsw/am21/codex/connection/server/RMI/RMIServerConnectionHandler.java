@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
@@ -83,7 +84,7 @@ public interface RMIServerConnectionHandler extends Remote {
     CardSideType side,
     Position position
   )
-    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException;
+    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException, CardAlreadyPlacedException;
 
   void leaveLobby(String gameId, UUID connectionID)
     throws RemoteException, GameNotFoundException;

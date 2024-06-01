@@ -86,9 +86,12 @@ public class LocalModelContainer
   }
 
   @Override
-  public void actionNotAllowed() {
+  public void actionNotAllowed(String cause) {
     // TODO use this in RMI
-    view.postNotification(NotificationType.WARNING, "Action not allowed");
+    view.postNotification(
+      NotificationType.WARNING,
+      "Action not allowed: " + cause
+    );
   }
 
   @Override
