@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Chat.Chat;
@@ -26,8 +27,7 @@ public class LocalGameBoard {
   /**
    * Index of the player associated with the client
    */
-  private int myPlayerIndex;
-  private int playerIndex;
+  private String playerNickname;
 
   public LocalGameBoard(String gameId, int players) {
     this.gameId = gameId;
@@ -57,15 +57,25 @@ public class LocalGameBoard {
    * Gets the local player associated with the client
    */
   public LocalPlayer getPlayer() {
-    return players.get(playerIndex);
+    return players
+      .stream()
+      .filter(player -> player.getNickname().equals(playerNickname))
+      .collect(Collectors.toList())
+      .getFirst();
+  }
+
+  public LocalPlayer getNextPlayer() {
+    return players.get(
+      (players.indexOf(getCurrentPlayer()) + 1) % playerNumber
+    );
   }
 
   public String getPlayerNickname() {
-    return getPlayer().getNickname();
+    return playerNickname;
   }
 
-  public void setPlayerIndex(int playerIndex) {
-    this.playerIndex = playerIndex;
+  public void setPlayerNickname(String playerNickname) {
+    this.playerNickname = playerNickname;
   }
 
   public Card getSecretObjective() {

@@ -365,6 +365,7 @@ public class LocalModelContainer
     setPlayerNickname(socketId, nickname);
 
     if (this.socketId.equals(socketId)) {
+      localGameBoard.setPlayerNickname(nickname);
       view.postNotification(
         NotificationType.UPDATE,
         "You chose the nickname \"" + nickname + "\""
@@ -475,10 +476,14 @@ public class LocalModelContainer
           )
         );
     }
+
+    localGameBoard.setCurrentPlayer(players.getFirst());
+
     view.postNotification(
       NotificationType.UPDATE,
       "Game " + gameId + " started."
     );
+    view.drawLeaderBoard(localGameBoard.getPlayers());
   }
 
   @Override
@@ -498,7 +503,10 @@ public class LocalModelContainer
     Card card = cardsLoader.getCardFromId(cardId);
     localGameBoard.getCurrentPlayer().addPlayedCards(card, side, position);
 
-    view.postNotification(NotificationType.UPDATE, "Card" + cardId + " placed");
+    view.postNotification(
+      NotificationType.UPDATE,
+      playerId + " placed card " + cardId
+    );
     view.drawCardPlacement(card, side, position);
 
     diffMessage(
