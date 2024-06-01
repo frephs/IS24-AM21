@@ -108,6 +108,13 @@ public class Player {
     }
 
     /**
+     * @return the player objective card
+     */
+    public Optional<ObjectiveCard> getObjectiveCard() {
+      return Optional.ofNullable(this.objectiveCard);
+    }
+
+    /**
      * @param objectiveCard chosen by the client controller (physical player)
      */
     public PlayerBuilder setObjectiveCard(ObjectiveCard objectiveCard) {

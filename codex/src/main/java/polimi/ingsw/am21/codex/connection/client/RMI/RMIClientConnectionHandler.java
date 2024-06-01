@@ -60,6 +60,7 @@ public class RMIClientConnectionHandler
           this.localModel.getRemoteListener()
         );
       this.connectionEstablished();
+      this.listGames();
     } catch (RemoteException | NotBoundException e) {
       this.connectionFailed(e);
     }

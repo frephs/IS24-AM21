@@ -1,14 +1,14 @@
 package polimi.ingsw.am21.codex.controller;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.connection.client.RMI.common.GamePlayerInfo;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -43,14 +43,26 @@ public class GameController {
 
   public class UserGameContext {
 
+    public enum ConnectionStatus {
+      CONNECTED,
+      LOSING,
+      DISCONNECTED,
+    }
+
+    private Date lastHeartBeat;
+
     private String gameId;
     private UserGameContextStatus status;
 
     private RemoteGameEventListener listener;
+    private String username;
+
+    private ConnectionStatus connectionStatus;
 
     public UserGameContext() {
       this.gameId = null;
       this.status = UserGameContextStatus.MENU;
+      this.connectionStatus = ConnectionStatus.CONNECTED;
     }
 
     public UserGameContext(RemoteGameEventListener listener) {
@@ -58,18 +70,40 @@ public class GameController {
       this.listener = listener;
     }
 
-    public UserGameContext(String gameId, UserGameContextStatus status) {
-      this.gameId = null;
-      this.status = UserGameContextStatus.MENU;
-    }
-
-    public UserGameContext(
+    private UserGameContext(
       String gameId,
       UserGameContextStatus status,
+      String username,
       RemoteGameEventListener listener
     ) {
-      this();
-      this.listener = listener;
+      this.gameId = null;
+      this.status = status;
+      this.username = username;
+      this.connectionStatus = ConnectionStatus.CONNECTED;
+    }
+
+    /* in game constructor */
+    public UserGameContext(String gameId, String username) {
+      this(gameId, UserGameContextStatus.IN_GAME, username, null);
+    }
+
+    /* in game constructor */
+    public UserGameContext(
+      String gameId,
+      String username,
+      RemoteGameEventListener listener
+    ) {
+      this(gameId, UserGameContextStatus.IN_GAME, username, listener);
+    }
+
+    /* in lobby constructor */
+    public UserGameContext(String gameId) {
+      this(gameId, UserGameContextStatus.IN_LOBBY, null, null);
+    }
+
+    /* in lobby constructor */
+    public UserGameContext(String gameId, RemoteGameEventListener listener) {
+      this(gameId, UserGameContextStatus.IN_LOBBY, null, listener);
     }
 
     public RemoteGameEventListener getListener() {
@@ -80,22 +114,75 @@ public class GameController {
       this.listener = listener;
     }
 
-    public void setGameId(String gameId, UserGameContextStatus status) {
+    public void setLobbyGameId(String gameId) {
       this.gameId = gameId;
-      this.status = status;
+      this.status = UserGameContextStatus.IN_LOBBY;
+      this.username = null;
+    }
+
+    public void setGameId(String gameId, String username) {
+      this.gameId = gameId;
+      this.status = UserGameContextStatus.IN_GAME;
+      this.username = username;
     }
 
     public void removeGameId() {
       this.gameId = null;
       this.status = UserGameContextStatus.MENU;
+      this.username = null;
+    }
+
+    /**
+     * @return true if the connection has been restored
+     */
+    public Boolean heartBeat() {
+      lastHeartBeat = new Date();
+      if (this.connectionStatus == ConnectionStatus.CONNECTED) return false;
+      this.connectionStatus = ConnectionStatus.CONNECTED;
+      return true;
+    }
+
+    public Boolean disconnected() {
+      if (this.connectionStatus == ConnectionStatus.DISCONNECTED) return false;
+      this.connectionStatus = ConnectionStatus.DISCONNECTED;
+      return true;
+    }
+
+    /**
+     * @return the ConnectionStatus has changed or empty if it hasn't
+     */
+    public Optional<ConnectionStatus> checkConnection() {
+      if (lastHeartBeat != null) {
+        long elapsedTime = new Date().getTime() - lastHeartBeat.getTime();
+        if (elapsedTime > 10000) {
+          if (this.connectionStatus != ConnectionStatus.DISCONNECTED) {
+            this.connectionStatus = ConnectionStatus.DISCONNECTED;
+            return Optional.of(ConnectionStatus.DISCONNECTED);
+          }
+        } else if (elapsedTime > 2000) {
+          if (this.connectionStatus != ConnectionStatus.LOSING) {
+            this.connectionStatus = ConnectionStatus.LOSING;
+            return Optional.of(ConnectionStatus.LOSING);
+          }
+        }
+      }
+      return Optional.empty();
     }
 
     public Optional<String> getGameId() {
       return Optional.ofNullable(gameId);
     }
 
+    public Optional<String> getUsername() {
+      return Optional.ofNullable(username);
+    }
+
     public UserGameContextStatus getStatus() {
       return status;
+    }
+
+    public ConnectionStatus getConnectionStatus() {
+      return connectionStatus;
     }
   }
 
@@ -161,14 +248,9 @@ public class GameController {
         game.drawStarterCard()
       );
       if (userContexts.containsKey(socketID)) {
-        userContexts
-          .get(socketID)
-          .setGameId(gameId, UserGameContextStatus.IN_LOBBY);
+        userContexts.get(socketID).setLobbyGameId(gameId);
       } else {
-        userContexts.put(
-          socketID,
-          new UserGameContext(gameId, UserGameContextStatus.IN_LOBBY)
-        );
+        userContexts.put(socketID, new UserGameContext(gameId));
       }
       this.getLobbyListeners(gameId).forEach(listener -> {
           try {
@@ -186,36 +268,78 @@ public class GameController {
   private List<Pair<UUID, RemoteGameEventListener>> getLobbyListeners(
     String gameId
   ) {
-    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
-      .keySet()
-      .stream()
-      .filter(
-        sID ->
-          userContexts.get(sID).getStatus() == UserGameContextStatus.IN_LOBBY &&
-          userContexts.get(sID).getGameId().map(gameId::equals).orElse(false)
-      )
-      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
-      .collect(Collectors.toList());
-
-    listeners
-      .stream()
-      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
-      .forEach(pairs::add);
-    return pairs;
+    // TODO: uncomment when we first join messages
+    return this.getAllListeners();
+    //    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
+    //      .keySet()
+    //      .stream()
+    //      .filter(
+    //        sID ->
+    //          userContexts.get(sID).getStatus() == UserGameContextStatus
+    //          .IN_LOBBY &&
+    //          userContexts.get(sID).getGameId().map(gameId::equals).orElse
+    //          (false)
+    //      )
+    //      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
+    //      .collect(Collectors.toList());
+    //
+    //    listeners
+    //      .stream()
+    //      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
+    //      .forEach(pairs::add);
+    //    return pairs;
   }
 
   private List<Pair<UUID, RemoteGameEventListener>> getGameListeners(
     String gameID
   ) {
+    return this.getAllListeners();
+    // TODO: uncomment when we first join messages
+    //    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
+    //      .keySet()
+    //      .stream()
+    //      .filter(
+    //        sID ->
+    //          userContexts.get(sID).getStatus() == UserGameContextStatus
+    //          .IN_GAME &&
+    //          userContexts.get(sID).getGameId().map(gameID::equals).orElse
+    //          (false)
+    //      )
+    //      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
+    //      .collect(Collectors.toList());
+    //
+    //    listeners
+    //      .stream()
+    //      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
+    //      .forEach(pairs::add);
+    //    return pairs;
+  }
+
+  private List<Pair<UUID, RemoteGameEventListener>> getMenuListeners() {
+    return this.getAllListeners();
+    //    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
+    //      .keySet()
+    //      .stream()
+    //      .filter(
+    //        sID -> userContexts.get(sID).getStatus() ==
+    //        UserGameContextStatus.MENU
+    //      )
+    //      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
+    //      .collect(Collectors.toList());
+    //
+    //    listeners
+    //      .stream()
+    //      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
+    //      .forEach(pairs::add);
+    //    return pairs;
+  }
+
+  private List<Pair<UUID, RemoteGameEventListener>> getAllListeners() {
     List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
       .keySet()
       .stream()
-      .filter(
-        sID ->
-          userContexts.get(sID).getStatus() == UserGameContextStatus.IN_GAME &&
-          userContexts.get(sID).getGameId().map(gameID::equals).orElse(false)
-      )
       .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
+      .filter(pair -> pair.getValue() != null)
       .collect(Collectors.toList());
 
     listeners
@@ -225,24 +349,165 @@ public class GameController {
     return pairs;
   }
 
-  private List<Pair<UUID, RemoteGameEventListener>> getMenuListeners(
-    String gameId
+  private List<Pair<UUID, UserGameContext>> getSameContextListeners(
+    List<UUID> socketIDs,
+    Boolean includeSelf
   ) {
-    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
+    List<UserGameContext> targetContexts = new ArrayList<>();
+    for (UUID sID : socketIDs) {
+      if (userContexts.containsKey(sID)) {
+        targetContexts.add(userContexts.get(sID));
+      }
+    }
+    return userContexts
       .keySet()
       .stream()
       .filter(
         sID ->
-          userContexts.get(sID).getGameId().map(gameId::equals).orElse(false)
+          targetContexts
+            .stream()
+            .anyMatch(
+              targetContext ->
+                (includeSelf || socketIDs.contains(sID)) &&
+                userContexts.get(sID).getStatus() ==
+                  targetContext.getStatus() &&
+                ((targetContext.getGameId().isEmpty() &&
+                    userContexts.get(sID).getGameId().isEmpty()) ||
+                  targetContext
+                    .getGameId()
+                    .equals(userContexts.get(sID).getGameId())) &&
+                targetContext.getConnectionStatus() ==
+                  UserGameContext.ConnectionStatus.CONNECTED
+            )
       )
-      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
+      .map(sID -> new Pair<>(sID, userContexts.get(sID)))
       .collect(Collectors.toList());
+  }
 
-    listeners
-      .stream()
-      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
-      .forEach(pairs::add);
-    return pairs;
+  private List<Pair<UUID, UserGameContext>> getSameContextListeners(
+    UUID socketID,
+    Boolean includeSelf
+  ) {
+    return this.getSameContextListeners(
+        Collections.singletonList(socketID),
+        includeSelf
+      );
+  }
+
+  public void clientDisconnected(UUID socketID) {
+    if (userContexts.containsKey(socketID)) {
+      UserGameContext context = userContexts.get(socketID);
+      if (context.disconnected()) {}
+    }
+  }
+
+  /**
+   * @param disconnectedClients list of clients that have disconnected
+   */
+  public void notifyDisconnections(List<UUID> disconnectedClients) {
+    List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
+
+    for (UUID disconnectedClient : disconnectedClients) {
+      this.getSameContextListeners(disconnectedClient, false).forEach(
+          listener -> {
+            listenersToNotify.add(
+              new Pair<>(listener.getKey(), disconnectedClient)
+            );
+          }
+        );
+    }
+
+    while (!listenersToNotify.isEmpty()) {
+      Pair<UUID, UUID> toNotify = listenersToNotify.remove(0);
+      UserGameContext clientToNotifyContext = userContexts.get(
+        toNotify.getKey()
+      );
+      UserGameContext clientToCheckContext = userContexts.get(
+        toNotify.getValue()
+      );
+      if (
+        clientToNotifyContext == null || clientToCheckContext == null
+      ) continue;
+
+      try {
+        clientToNotifyContext
+          .getListener()
+          .playerConnectionChanged(
+            toNotify.getValue(),
+            clientToNotifyContext.getConnectionStatus()
+          );
+      } catch (RemoteException e) {
+        if (userContexts.containsKey(toNotify.getKey())) {
+          if (userContexts.get(toNotify.getKey()).disconnected()) {
+            listenersToNotify.removeIf(
+              listener -> listener.getKey().equals(toNotify.getKey())
+            );
+            this.getSameContextListeners(toNotify.getKey(), false).forEach(
+                listener ->
+                  listenersToNotify.add(
+                    new Pair<>(listener.getKey(), toNotify.getKey())
+                  )
+              );
+          }
+        }
+      }
+    }
+  }
+
+  private void notifySameContextClients(
+    UUID socketID,
+    Function<RemoteGameEventListener, Void> function
+  ) {
+    List<UUID> failedListeners = new ArrayList<>();
+    this.getSameContextListeners(socketID, true).forEach(listener -> {
+        try {
+          function.apply(listener.getValue().getListener());
+        } catch (RemoteException e) {
+          failedListeners.add(listener.getKey());
+        }
+      });
+    this.notifyDisconnections(failedListeners);
+  }
+
+  public void checkClientConnection(UUID clientToCheckID) {
+    // First UUID is the socket ID of the client to notify
+    // the second socket ID is the id of the client that has disconnected
+    List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
+    userContexts
+      .get(clientToCheckID)
+      .checkConnection()
+      .ifPresent(connectionStatus -> {
+        this.getSameContextListeners(clientToCheckID, false).forEach(
+            listener ->
+              listenersToNotify.add(
+                new Pair<>(listener.getKey(), clientToCheckID)
+              )
+          );
+      });
+  }
+
+  public void heartBeat(UUID socketID) {
+    // TODO: for now we are checking the heartbeat of the players only when a
+    //  player
+    // sends a message as we don't care about the connection status of players
+    // that are not in the same context of other players
+    // should we change this to check the heartbeat of all players every x
+    // seconds? 🤷‍♂️
+
+    if (
+      userContexts.containsKey(socketID) &&
+      userContexts.get(socketID).heartBeat()
+    ) {
+      this.getSameContextListeners(socketID, false).forEach(listener -> {
+          try {
+            checkClientConnection(socketID);
+            listener.playerConnectionChanged(
+              socketID,
+              userContexts.get(socketID).getConnectionStatus()
+            );
+          } catch (RemoteException ignored) {}
+        });
+    }
   }
 
   public void lobbySetTokenColor(
@@ -312,7 +577,10 @@ public class GameController {
           }
         } catch (RemoteException e) {
           // TODO: handle in a better way
-          throw new RuntimeException(e);
+          System.out.print(
+            "Error dispatching playerChoseObjectiveCard event for socket: " +
+            listener.getKey()
+          );
         }
       });
   }
@@ -322,18 +590,28 @@ public class GameController {
     game.start();
     this.getGameListeners(gameId).forEach(listener -> {
         try {
+          Lobby lobby = game.getLobby();
+          userContexts
+            .get(listener.getKey())
+            .setGameId(
+              gameId,
+              // TODO: add exception instead of null ??
+              lobby.getPlayerNickname(listener.getKey()).orElse(null)
+            );
           listener.getValue().gameStarted(gameId, game.getPlayerIds());
         } catch (RemoteException e) {
           // TODO: handle in a better way
-          throw new RuntimeException(e);
+          System.out.print(
+            "Error dispatching gameStarted event for socket: " +
+            listener.getKey()
+          );
         }
       });
   }
 
   public void startGame(String gameId)
     throws GameNotFoundException, GameNotReadyException, GameAlreadyStartedException {
-    Game game = getGame(gameId);
-    this.startGame(gameId, game);
+    this.startGame(gameId, getGame(gameId));
   }
 
   public void joinGame(String gameId, UUID socketID, CardSideType sideType)
@@ -368,7 +646,10 @@ public class GameController {
             );
         } catch (RemoteException e) {
           // TODO: handle in a better way
-          throw new RuntimeException(e);
+          System.out.print(
+            "Error dispatching playerJoinedGame event for socket: " +
+            listener.getKey()
+          );
         }
       });
     if (game.getPlayersSpotsLeft() == 0) {
@@ -380,12 +661,16 @@ public class GameController {
     throws EmptyDeckException {
     manager.createGame(gameId, players);
 
-    this.getGameListeners(gameId).forEach(listener -> {
+    this.getAllListeners()
+      .forEach(listener -> {
         try {
           listener.getValue().gameCreated(gameId, 0, players);
         } catch (RemoteException e) {
           // TODO: handle in a better way
-          throw new RuntimeException(e);
+          System.out.print(
+            "Error dispatching gameCreated event for socket: " +
+            listener.getKey()
+          );
         }
       });
   }
@@ -396,14 +681,23 @@ public class GameController {
 
   public void deleteGame(String gameId) {
     manager.deleteGame(gameId);
-    this.getGameListeners(gameId).forEach(listener -> {
-        try {
-          listener.getValue().gameDeleted(gameId);
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          throw new RuntimeException(e);
-        }
-      });
+
+    List<Pair<UUID, RemoteGameEventListener>> listeners = new ArrayList<>(
+      this.getMenuListeners()
+    );
+    listeners.addAll(this.getGameListeners(gameId));
+    listeners.addAll(this.getLobbyListeners(gameId));
+
+    listeners.forEach(listener -> {
+      try {
+        listener.getValue().gameDeleted(gameId);
+      } catch (RemoteException e) {
+        // TODO: handle in a better way
+        System.out.print(
+          "Error dispatching gameDeleted event for socket: " + listener.getKey()
+        );
+      }
+    });
   }
 
   private void checkIfCurrentPlayer(Game game, String playerNickname)
@@ -430,7 +724,10 @@ public class GameController {
             );
         } catch (RemoteException e) {
           // TODO: handle in a better way
-          throw new RuntimeException(e);
+          System.out.print(
+            "Error dispatching changeTurn event for socket: " +
+            listener.getKey()
+          );
         }
       });
   }
@@ -463,7 +760,10 @@ public class GameController {
                 );
             } catch (RemoteException e) {
               // TODO: handle in a better way
-              throw new RuntimeException(e);
+              System.out.print(
+                "Error dispatching changeTurn event for socket: " +
+                listener.getKey()
+              );
             }
           })
     );
@@ -523,7 +823,10 @@ public class GameController {
             );
         } catch (RemoteException e) {
           // TODO: handle in a better way
-          throw new RuntimeException(e);
+          System.out.print(
+            "Error dispatching cardPlaced event for socket: " +
+            listener.getKey()
+          );
         }
       });
   }

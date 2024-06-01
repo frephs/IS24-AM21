@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import org.json.JSONArray;
+import polimi.ingsw.am21.codex.connection.client.RMI.common.GamePlayerInfo;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
@@ -166,7 +167,6 @@ public class Game {
    *
    * @return The index of current player.
    */
-
   public Integer getCurrentPlayerIndex() {
     return this.currentPlayer;
   }

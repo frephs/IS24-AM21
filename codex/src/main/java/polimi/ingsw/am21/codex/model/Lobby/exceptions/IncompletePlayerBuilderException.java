@@ -33,6 +33,10 @@ public class IncompletePlayerBuilderException extends RuntimeException {
       );
     }
 
+    if (playerBuilder.getObjectiveCard().isEmpty()) {
+      missingParams.add("objectiveCard");
+    }
+
     if (!missingParams.isEmpty() || !invalidParams.isEmpty()) {
       String missingPramsStr = !missingParams.isEmpty()
         ? "\nmissing: " + String.join(",", missingParams)

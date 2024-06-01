@@ -237,11 +237,12 @@ public class LocalModelContainer
       addToLobby(socketId);
       view.postNotification(
         NotificationType.UPDATE,
-        "Player" + socketId + " joined your game " + gameId
+        "Player " + socketId + " joined your game " + gameId
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
     } else if (socketId.equals(this.socketId)) {
       lobby = new LocalLobby(gameId);
+      if (!menu.getGames().containsKey(gameId)) this.listGames();
       localGameBoard = new LocalGameBoard(
         gameId,
         menu.getGames().get(gameId).getMaxPlayers()

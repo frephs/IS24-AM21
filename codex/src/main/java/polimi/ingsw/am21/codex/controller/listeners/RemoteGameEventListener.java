@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.controller.listeners;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -84,4 +85,9 @@ public interface RemoteGameEventListener extends Remote {
   void remainingTurns(int remainingTurns) throws RemoteException;
 
   void winningPlayer(String nickname) throws RemoteException;
+
+  void playerConnectionChanged(
+    UUID socketID,
+    GameController.UserGameContext.ConnectionStatus status
+  ) throws RemoteException;
 }
