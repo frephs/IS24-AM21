@@ -5,12 +5,19 @@ import polimi.ingsw.am21.codex.controller.messages.MessageType;
 
 public class ActionNotAllowedMessage extends ErrorMessage {
 
-  public ActionNotAllowedMessage() {
+  private String reason;
+
+  public ActionNotAllowedMessage(String reason) {
     super(MessageType.ACTION_NOT_ALLOWED);
+    this.reason = reason;
+  }
+
+  public String getReason() {
+    return reason;
   }
 
   @Override
   public String toString() {
-    return getType().toString();
+    return "ActionNotAllowedMessage{" + "cause='" + cause + '\'' + '}';
   }
 }

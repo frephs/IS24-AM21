@@ -3,7 +3,7 @@ package polimi.ingsw.am21.codex.controller.listeners;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface GameErrorListener {
-  void actionNotAllowed();
+  void actionNotAllowed(String cause);
   void unknownResponse();
 
   void gameNotFound(String gameId);

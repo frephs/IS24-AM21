@@ -276,7 +276,7 @@ public class TCPServerConnectionHandler implements Runnable {
       | InvalidNextTurnCallException
       | PlayerNotFoundException e
     ) {
-      send(new ActionNotAllowedMessage());
+      send(new ActionNotAllowedMessage(e.getMessage()));
     }
   }
 
@@ -291,6 +291,7 @@ public class TCPServerConnectionHandler implements Runnable {
       );
     } catch (PlayerNotActive e) {
       send(new ActionNotAllowedMessage());
+      send(new ActionNotAllowedMessage(e.getMessage()));
     } catch (
       IllegalPlacingPositionException | IllegalCardSideChoiceException e
     ) {
@@ -350,7 +351,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getCardSideType()
       );
     } catch (GameNotReadyException | EmptyDeckException e) {
-      send(new ActionNotAllowedMessage());
+      send(new ActionNotAllowedMessage(e.getMessage()));
     } catch (
       IllegalCardSideChoiceException | IllegalPlacingPositionException e
     ) {

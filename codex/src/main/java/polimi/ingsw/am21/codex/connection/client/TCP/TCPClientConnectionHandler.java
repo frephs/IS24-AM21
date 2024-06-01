@@ -472,8 +472,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.tokenTaken(message.getToken());
   }
 
-  public void handleMessage(ActionNotAllowedMessage ignored) {
-    localModel.actionNotAllowed();
+  public void handleMessage(ActionNotAllowedMessage message) {
+    localModel.actionNotAllowed(message.getReason());
   }
 
   public void handleMessage(UnknownMessageTypeMessage ignored) {
