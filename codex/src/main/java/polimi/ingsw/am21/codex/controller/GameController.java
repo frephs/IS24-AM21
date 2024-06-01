@@ -415,7 +415,7 @@ public class GameController {
     throws PlayerNotActive {
     Player player = game.getCurrentPlayer();
     if (
-      player.getNickname().equals(playerNickname)
+      !player.getNickname().equals(playerNickname)
     ) throw new PlayerNotActive();
   }
 

@@ -71,6 +71,7 @@ public class Game {
 
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
+    currentPlayer = 0;
   }
 
   /**
