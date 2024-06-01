@@ -1,6 +1,8 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
 
   private final Integer x, y;
 
@@ -35,7 +37,7 @@ public class Position {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Position position = (Position) o;
-    return x == position.x && y == position.y;
+    return x.equals(position.x) && y.equals(position.y);
   }
 
   @Override
