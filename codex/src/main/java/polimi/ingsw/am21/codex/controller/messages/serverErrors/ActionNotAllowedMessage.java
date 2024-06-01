@@ -18,6 +18,6 @@ public class ActionNotAllowedMessage extends ErrorMessage {
 
   @Override
   public String toString() {
-    return "ActionNotAllowedMessage{" + "cause='" + cause + '\'' + '}';
+    return "ActionNotAllowedMessage{" + "cause='" + reason + '\'' + '}';
   }
 }
