@@ -183,6 +183,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         connected = true;
         connectionEstablished();
       } catch (IOException e) {
+        getView().displayException(e);
         connectionFailed(e);
       }
     }
