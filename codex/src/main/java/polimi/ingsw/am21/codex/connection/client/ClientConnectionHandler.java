@@ -177,4 +177,11 @@ public abstract class ClientConnectionHandler {
     this.connected = true;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
   }
+
+  /**
+   * @return local model for testing purposes
+   * */
+  LocalModelContainer getLocalModel() {
+    return localModel;
+  }
 }

@@ -55,7 +55,15 @@ public class DummyView implements View {
   ) {}
 
   @Override
-  public void displayException(Exception e) {}
+  public void displayException(Exception e) {
+    CliUtils.colorize(
+      "[" + id + "] " + e.getMessage(),
+      NotificationType.ERROR.getColor(),
+      ColorStyle.NORMAL
+    );
+
+    e.printStackTrace();
+  }
 
   @Override
   public void drawAvailableGames(List<GameEntry> games) {}

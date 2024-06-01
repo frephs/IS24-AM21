@@ -2,24 +2,34 @@ package polimi.ingsw.am21.codex;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
+import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
+import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
+import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 class MainTest {
@@ -84,7 +94,7 @@ class MainTest {
       actions.forEach(action -> {
         action.run();
         try {
-          Thread.sleep(300);
+          Thread.sleep(1000);
         } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
@@ -101,14 +111,108 @@ class MainTest {
     List<Runnable> actions = new ArrayList<>();
     actions.add(() -> client1.get().createAndConnectToGame("test", 2));
     actions.add(() -> client1.get().lobbySetNickname("Player 1"));
+
     actions.add(() -> client1.get().lobbySetToken(TokenColor.RED));
     actions.add(() -> client2.get().connectToGame("test"));
+
     actions.add(() -> client2.get().lobbySetNickname("Player 2"));
     actions.add(() -> client2.get().lobbySetToken(TokenColor.BLUE));
+
+    actions.add(() -> client1.get().lobbyChooseObjectiveCard(true));
+    actions.add(() -> client2.get().lobbyChooseObjectiveCard(false));
+
+    //todo remove duplicate messages
+    actions.add(() -> client1.get().lobbyJoinGame(CardSideType.BACK));
+    actions.add(() -> client2.get().lobbyJoinGame(CardSideType.BACK));
+
+    //TODO remove duplicate messages
+    actions.add(
+      () -> client1.get().sendChatMessage(new ChatMessage("Player 1", "Hello"))
+    );
+
+    //making a private getter available to see whose turn is it
+
+    Method localModelGetter = null;
+    try {
+      localModelGetter = ClientConnectionHandler.class.getDeclaredMethod(
+          "getLocalModel"
+        );
+      assertNotNull(localModelGetter);
+      localModelGetter.setAccessible(true);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    }
+
+    LocalModelContainer localModel;
+    try {
+      localModel = ((LocalModelContainer) localModelGetter.invoke(
+          (ClientConnectionHandler) client1.get()
+        ));
+      assertNotNull(localModel);
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      DummyView view = new DummyView("getActions");
+      view.displayException(e);
+      throw new RuntimeException(e);
+    }
+
+    // TODO move this into the action stuff
+
+    actions.add(() -> {
+      AtomicReference<
+        TCPClientConnectionHandler
+      > playingClient, notPlayingClient;
+
+      if (
+        localModel
+          .getLocalGameBoard()
+          .getCurrentPlayer()
+          .getNickname()
+          .equals("Player 1")
+      ) {
+        playingClient = client1;
+        notPlayingClient = client2;
+      } else {
+        playingClient = client2;
+        notPlayingClient = client1;
+      }
+      playingClient.get().placeCard(0, CardSideType.BACK, new Position(0, 1));
+      playingClient.get().placeCard(1, CardSideType.FRONT, new Position(0, 2));
+
+      notPlayingClient
+        .get()
+        .placeCard(2, CardSideType.FRONT, new Position(0, 1));
+
+      assertTrue(
+        (client1 == playingClient &&
+          localModel
+            .getLocalGameBoard()
+            .getPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1)) &&
+          !localModel
+            .getLocalGameBoard()
+            .getNextPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1))) ||
+        (client2 == playingClient &&
+          localModel
+            .getLocalGameBoard()
+            .getCurrentPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1)) &&
+          !localModel
+            .getLocalGameBoard()
+            .getPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1)))
+      );
+    });
+
     actions.add(
       () ->
         assertTrue(client1.get().isConnected() && client2.get().isConnected())
     );
+
     actions.add(() -> client1.get().disconnect());
     actions.add(() -> client2.get().disconnect());
     actions.add(() -> server.get().stop());
