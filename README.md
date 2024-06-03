@@ -24,12 +24,12 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 | Complete Rules | Model| 🟢 |
 | TUI | View| 🟡🟡|
 | GUI | View |🟡 |
-| Rmi | Connection | 🟡|
+| Rmi  | Connection | 🟡|
 | Socket | Connection| 🟡🟡 | 
 | Chat | Advanced functionality 1 | 🟢|
-| Partite multiple  | Advanced functionality 2| 🟢
-| Persistenza lato server | Advanced functionality 3 | 🔴 |
-| Resilienza alle disconnessioni |Advanced functionality 4 | ❌|
+| Multiple games  | Advanced functionality 2| 🟢
+| Game saving on disk | Advanced functionality 3 | 🔴 |
+| Client disconnection resilience |Advanced functionality 4 | ❌|
 
 ## License
 All rights to Codex Naturalis © are owned by Cranio Creations ®, which provided the graphical resources to be used for educational purposes only.
