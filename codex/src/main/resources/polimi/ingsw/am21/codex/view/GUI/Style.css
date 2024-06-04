@@ -36,7 +36,7 @@
 .window {
   -fx-background-color: #ede4bc;
   -fx-background-radius: 8px;
-  -fx-background-image: url("../../pictures/background.png");
+  -fx-background-image: url("pictures/background.png");
   -fx-background-size: 25px;
   -fx-background-repeat: repeat;
 }
