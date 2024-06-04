@@ -22,24 +22,25 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.ViewClient;
 
-public class CliClient {
+public class CliClient extends ViewClient {
 
+  //TODO move context out of here into viewClient. It's not a concern of the cli
   private final ContextContainer context = new ContextContainer();
 
-  Scanner scanner = new Scanner(System.in);
-  Cli cli = Cli.getInstance();
-  ClientConnectionHandler client;
+  Scanner scanner;
+  Cli cli;
 
-  private final LocalModelContainer localModel = new LocalModelContainer(cli);
+  public CliClient() {
+    cli = Cli.getInstance();
+    localModel = new LocalModelContainer(cli);
+    scanner = new Scanner(System.in);
+  }
 
+  @Override
   public void start(ConnectionType connectionType, String address, int port) {
-    if (connectionType == ConnectionType.TCP) {
-      client = new TCPClientConnectionHandler(address, port, localModel);
-    } else {
-      client = new RMIClientConnectionHandler(address, port, localModel);
-    }
-    client.connect();
+    super.start(connectionType, address, port);
 
     cli.postNotification(
       NotificationType.CONFIRM,
