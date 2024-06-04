@@ -24,6 +24,9 @@ public class Main {
     System.out.println("Client Parameters: ");
     System.out.println("--rmi: use RMI connection (by default it uses TCP)");
     System.out.println(
+      "--ip=<ip>: specify the address of the server to connect to, if starting a client (default: 127.0.0.1)"
+    );
+    System.out.println(
       "--port=<port>: specify the port to connect to " +
       "(default: " +
       ConnectionType.TCP.getDefaultPort() +
@@ -63,25 +66,28 @@ public class Main {
   private static void startClient(
     ClientType clientType,
     ConnectionType connectionType,
+    String serverAddress,
     Integer port
   ) throws MalformedURLException, NotBoundException, RemoteException {
-    //    throw new UnsupportedOperationException("Not implemented yet");
+    System.out.println(
+      "Starting client " +
+      clientType +
+      " on " +
+      connectionType +
+      " to " +
+      serverAddress +
+      ":" +
+      port
+    );
     View view;
-    // TODO: implement
-    //
+
     if (clientType == ClientType.CLI) {
       CliClient client = new CliClient();
-      client.start(
-        connectionType,
-        "127.0.0.1",
-        connectionType.getDefaultPort()
-      );
+      client.start(connectionType, serverAddress, port);
     } else {
       //      // TODO: add gui
       //      // VIEW = new GUIClient();
     }
-    //
-
   }
 
   public static void main(String[] args)
@@ -99,6 +105,9 @@ public class Main {
       AtomicReference<Integer> tcpPort = new AtomicReference<>(
         ConnectionType.TCP.getDefaultPort()
       );
+      AtomicReference<Integer> rmiPort = new AtomicReference<>(
+        ConnectionType.RMI.getDefaultPort()
+      );
 
       Arrays.stream(args)
         .filter(arg -> arg.startsWith("--tcp-port"))
@@ -106,9 +115,6 @@ public class Main {
         .ifPresent(arg -> {
           tcpPort.set(Integer.parseInt(arg.split("=")[1]));
         });
-      AtomicReference<Integer> rmiPort = new AtomicReference<>(
-        ConnectionType.RMI.getDefaultPort()
-      );
 
       Arrays.stream(args)
         .filter(arg -> arg.startsWith("--rmi-port"))
@@ -120,6 +126,12 @@ public class Main {
     } else {
       ConnectionType connectionType = ConnectionType.TCP;
       ClientType clientType = ClientType.GUI;
+      AtomicReference<String> serverAddress = new AtomicReference<>(
+        "127.0.0.1"
+      );
+      AtomicReference<Integer> port = new AtomicReference<>(
+        connectionType.getDefaultPort()
+      );
 
       if (Arrays.asList(args).contains("--cli")) {
         clientType = ClientType.CLI;
@@ -129,9 +141,12 @@ public class Main {
         connectionType = ConnectionType.RMI;
       }
 
-      AtomicReference<Integer> port = new AtomicReference<>(
-        connectionType.getDefaultPort()
-      );
+      Arrays.stream(args)
+        .filter(arg -> arg.startsWith("--ip"))
+        .findFirst()
+        .ifPresent(arg -> {
+          serverAddress.set(arg.split("=")[1]);
+        });
 
       Arrays.stream(args)
         .filter(arg -> arg.startsWith("--port"))
@@ -140,7 +155,7 @@ public class Main {
           port.set(Integer.parseInt(arg.split("=")[1]));
         });
 
-      startClient(clientType, connectionType, port.get());
+      startClient(clientType, connectionType, serverAddress.get(), port.get());
     }
   }
 
