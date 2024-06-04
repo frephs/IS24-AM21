@@ -62,6 +62,7 @@
   -fx-font-size: 16px;
   -fx-font-weight: bold;
   -fx-padding: 10px;
+  -fx-cursor: hand;
 }
 
 .input {
@@ -174,7 +175,6 @@
   -fx-background-color: #157f33;
   -fx-border-color: #003d20;
   -fx-font-family: "Noyh R Light";
-  -fx-font-size: 1.4em;
 }
 
 .confirm .progress-bar {
@@ -199,8 +199,10 @@
   -fx-accent: #008860;
 }
 
-.notification .label {
-  -fx-text-fill: white;
+.notification-text {
+  -fx-fill: white;
+  -fx-font-size: 1.8em;
+  -fx-font-family: "Noyh R Light";
 }
 
 .progress-bar {
