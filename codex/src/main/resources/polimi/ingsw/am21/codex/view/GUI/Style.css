@@ -11,17 +11,17 @@
 .outer-border {
   -fx-border-color: #422917;
   -fx-border-width: 2px;
-  -fx-border-radius: 14px;
+  /*-fx-border-radius: 14px;*/
   /*-fx-background-radius: 8px;*/
   -fx-background-color: rgba(0, 0, 0, 0);
 }
 
 .window-border {
   -fx-border-width: 6px;
-  -fx-border-radius: 12px;
+  /*-fx-border-radius: 12px;*/
   -fx-border-color: #b4a31f;
   /*-fx-background-color: rgba(0, 0, 0, 0);*/
-  -fx-background-radius: 12;
+  /*-fx-background-radius: 12;*/
   -fx-background-color: #b4a31f;
 }
 
