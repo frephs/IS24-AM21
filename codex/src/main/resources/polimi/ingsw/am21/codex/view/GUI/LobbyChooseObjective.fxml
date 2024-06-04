@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="376.0" prefWidth="643.0" styleClass="window" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.MainGameBoard">
+<VBox prefHeight="376.0" prefWidth="643.0" styleClass="window" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.MainGameBoard">
    <children>
       <VBox alignment="TOP_CENTER" prefHeight="333.0" prefWidth="603.0" styleClass="container">
          <children>
