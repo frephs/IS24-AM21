@@ -10,6 +10,7 @@ module polimi.ingsw.am21.codex {
   requires org.apache.commons.lang3;
 
   opens polimi.ingsw.am21.codex to javafx.fxml, javafx.graphics;
+  opens polimi.ingsw.am21.codex.view.GUI to javafx.fxml;
   opens polimi.ingsw.am21.codex.model to com.google.gson;
   exports polimi.ingsw.am21.codex;
   exports polimi.ingsw.am21.codex.view.GUI;
