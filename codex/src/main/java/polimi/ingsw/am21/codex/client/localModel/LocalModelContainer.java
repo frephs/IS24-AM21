@@ -467,7 +467,10 @@ public class LocalModelContainer
   public void gameStarted(String gameId, List<String> players) {
     Map<String, Integer> nicknameToIndex = new HashMap<>();
 
-    if (this.localGameBoard.getGameId().equals(gameId)) {
+    if (
+      this.localGameBoard != null &&
+      this.localGameBoard.getGameId().equals(gameId)
+    ) {
       localGameBoard
         .getPlayers()
         .sort(
@@ -475,15 +478,14 @@ public class LocalModelContainer
             player -> players.indexOf(player.getNickname())
           )
         );
+      localGameBoard.setCurrentPlayer(players.getFirst());
     }
-
-    localGameBoard.setCurrentPlayer(players.getFirst());
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Game " + gameId + " started."
-    );
-    view.drawLeaderBoard(localGameBoard.getPlayers());
+    // TODO not needed?
+    //    view.postNotification(
+    //      NotificationType.UPDATE,
+    //      "Game " + gameId + " started."
+    //    );
+    //    view.drawLeaderBoard(localGameBoard.getPlayers());
   }
 
   @Override
