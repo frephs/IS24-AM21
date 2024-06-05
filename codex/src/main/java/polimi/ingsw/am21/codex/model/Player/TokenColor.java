@@ -1,10 +1,11 @@
 package polimi.ingsw.am21.codex.model.Player;
 
 import java.io.Serializable;
+import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
-public enum TokenColor implements Colorable, Serializable {
+public enum TokenColor implements Colorable, Serializable, GuiElement {
   RED,
   BLUE,
   GREEN,
@@ -33,5 +34,19 @@ public enum TokenColor implements Colorable, Serializable {
     } catch (IllegalArgumentException e) {
       return null;
     }
+  }
+
+  @Override
+  public String getImagePath() {
+    return (
+      "tokens/" +
+      switch (this) {
+        case RED -> "CODEX_pion_rouge.png";
+        case BLUE -> "CODEX_pion_bleu.png";
+        case GREEN -> "CODEX_pion_vert.png";
+        case YELLOW -> "CODEX_pion_jaune.png";
+        // case BLACK -> "CODEX_pion_noir.png";
+      }
+    );
   }
 }
