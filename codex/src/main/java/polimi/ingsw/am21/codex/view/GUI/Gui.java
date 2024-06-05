@@ -94,6 +94,7 @@ public class Gui extends Application implements View {
       notificationLoader = new NotificationLoader(new Stage());
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
+      primaryStage.setMaximized(true);
       primaryStage.show();
       testLobby();
     } catch (IOException e) {
