@@ -257,22 +257,34 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {}
+  public void drawLobby(Map<UUID, LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawLeaderBoard(List<LocalPlayer> players) {}
+  public void drawLeaderBoard(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawPlayerBoards(List<LocalPlayer> players) {}
+  public void drawPlayerBoards(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawPlayerBoard(LocalPlayer player) {}
+  public void drawPlayerBoard(LocalPlayer player) {
+    // TODO
+  }
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck, Card card) {}
+  public void drawCardDrawn(DrawingDeckType deck, Card card) {
+    // TODO
+  }
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck) {}
+  public void drawCardDrawn(DrawingDeckType deck) {
+    // TODO
+  }
 
   @Override
   public void drawCardPlacement(
@@ -282,16 +294,24 @@ public class Gui extends Application implements View {
   ) {}
 
   @Override
-  public void drawGame(List<LocalPlayer> players) {}
+  public void drawGame(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawGameOver(List<LocalPlayer> players) {}
+  public void drawGameOver(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawCard(Card card) {}
+  public void drawCard(Card card) {
+    // TODO
+  }
 
   @Override
-  public void drawHand(List<Card> hand) {}
+  public void drawHand(List<Card> hand) {
+    // TODO
+  }
 
   @Override
   public void drawPairs(
@@ -346,8 +366,12 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawWinner(String nickname) {}
+  public void drawWinner(String nickname) {
+    // TODO
+  }
 
   @Override
-  public void drawChatMessage(ChatMessage message) {}
+  public void drawChatMessage(ChatMessage message) {
+    // TODO
+  }
 }
