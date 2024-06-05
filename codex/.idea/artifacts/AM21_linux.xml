@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="AM21:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/AM21_jar</output-path>
-    <root id="archive" name="AM21.jar">
+  <artifact type="jar" build-on-make="true" name="AM21_linux">
+    <output-path>$PROJECT_DIR$/out/artifacts/AM21_linux</output-path>
+    <root id="archive" name="AM21_linux.jar">
       <element id="module-output" name="AM21" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.14.2/jackson-databind-2.14.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/almasb/fxgl-io/17.3/fxgl-io-17.3.jar" path-in-jar="/" />
