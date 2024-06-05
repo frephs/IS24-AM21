@@ -11,6 +11,8 @@ module polimi.ingsw.am21.codex {
 
   opens polimi.ingsw.am21.codex to javafx.fxml, javafx.graphics;
   opens polimi.ingsw.am21.codex.view.GUI to javafx.fxml;
+  opens polimi.ingsw.am21.codex.view.GUI.utils to javafx.fxml;
+
   opens polimi.ingsw.am21.codex.model to com.google.gson;
   exports polimi.ingsw.am21.codex;
   exports polimi.ingsw.am21.codex.view.GUI;
