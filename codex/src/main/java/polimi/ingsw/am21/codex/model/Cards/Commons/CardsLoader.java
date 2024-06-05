@@ -83,6 +83,7 @@ public final class CardsLoader {
     this.goldCardsList.clear();
     this.objectiveCardsList.clear();
     this.loadCards();
+    loaded = true;
     starterCardsList.addAll(this.starterCardsList);
     resourceCardsList.addAll(this.resourceCardsList);
     goldCardsList.addAll(this.goldCardsList);
@@ -98,7 +99,6 @@ public final class CardsLoader {
   }
 
   public Card getCardFromId(int id) {
-    this.loadCards();
     if (cardList == null) {
       this.cardList = new ArrayList<Card>();
       cardList.addAll(resourceCardsList);
@@ -106,7 +106,7 @@ public final class CardsLoader {
       cardList.addAll(starterCardsList);
       cardList.addAll(objectiveCardsList);
     }
-    return cardList.get(id);
+    return cardList.get(id - 1);
   }
 
   public List<PlayableCard> loadStarterCards() {
