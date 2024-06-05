@@ -94,7 +94,7 @@ class MainTest {
       actions.forEach(action -> {
         action.run();
         try {
-          Thread.sleep(1000);
+          Thread.sleep(300);
         } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
@@ -108,6 +108,9 @@ class MainTest {
     AtomicReference<TCPClientConnectionHandler> client2,
     AtomicReference<Server> server
   ) {
+    final AtomicReference<TCPClientConnectionHandler> playingClient =
+      new AtomicReference<>(), notPlayingClient = new AtomicReference<>();
+
     List<Runnable> actions = new ArrayList<>();
     actions.add(() -> client1.get().createAndConnectToGame("test", 2));
     actions.add(() -> client1.get().lobbySetNickname("Player 1"));
@@ -155,13 +158,7 @@ class MainTest {
       throw new RuntimeException(e);
     }
 
-    // TODO move this into the action stuff
-
     actions.add(() -> {
-      AtomicReference<
-        TCPClientConnectionHandler
-      > playingClient, notPlayingClient;
-
       if (
         localModel
           .getLocalGameBoard()
@@ -169,44 +166,54 @@ class MainTest {
           .getNickname()
           .equals("Player 1")
       ) {
-        playingClient = client1;
-        notPlayingClient = client2;
+        playingClient.set(client1.get());
+        notPlayingClient.set(client2.get());
       } else {
-        playingClient = client2;
-        notPlayingClient = client1;
+        playingClient.set(client2.get());
+        notPlayingClient.set(client1.get());
       }
       playingClient.get().placeCard(0, CardSideType.BACK, new Position(0, 1));
-      playingClient.get().placeCard(1, CardSideType.FRONT, new Position(0, 2));
-
-      notPlayingClient
-        .get()
-        .placeCard(2, CardSideType.FRONT, new Position(0, 1));
-
-      assertTrue(
-        (client1 == playingClient &&
-          localModel
-            .getLocalGameBoard()
-            .getPlayer()
-            .getPlayedCards()
-            .containsKey(new Position(0, 1)) &&
-          !localModel
-            .getLocalGameBoard()
-            .getNextPlayer()
-            .getPlayedCards()
-            .containsKey(new Position(0, 1))) ||
-        (client2 == playingClient &&
-          localModel
-            .getLocalGameBoard()
-            .getCurrentPlayer()
-            .getPlayedCards()
-            .containsKey(new Position(0, 1)) &&
-          !localModel
-            .getLocalGameBoard()
-            .getPlayer()
-            .getPlayedCards()
-            .containsKey(new Position(0, 1)))
-      );
     });
+
+    actions.add(
+      () ->
+        playingClient.get().placeCard(1, CardSideType.FRONT, new Position(0, 2))
+    );
+
+    actions.add(
+      () ->
+        notPlayingClient
+          .get()
+          .placeCard(2, CardSideType.FRONT, new Position(0, 1))
+    );
+
+    actions.add(
+      () ->
+        assertTrue(
+          (client1.get() == playingClient.get() &&
+            localModel
+              .getLocalGameBoard()
+              .getPlayer()
+              .getPlayedCards()
+              .containsKey(new Position(0, 1)) &&
+            !localModel
+              .getLocalGameBoard()
+              .getNextPlayer()
+              .getPlayedCards()
+              .containsKey(new Position(0, 1))) ||
+          (client2.get() == playingClient.get() &&
+            localModel
+              .getLocalGameBoard()
+              .getCurrentPlayer()
+              .getPlayedCards()
+              .containsKey(new Position(0, 1)) &&
+            !localModel
+              .getLocalGameBoard()
+              .getPlayer()
+              .getPlayedCards()
+              .containsKey(new Position(0, 1)))
+        )
+    );
 
     actions.add(
       () ->
