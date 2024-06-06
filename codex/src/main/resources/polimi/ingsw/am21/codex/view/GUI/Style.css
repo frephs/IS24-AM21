@@ -1,11 +1,11 @@
 @font-face {
   -fx-font-family: "noyhr-regular";
-  src: url("../../../../../../font/NoyhR-Regular.ttf");
+  src: url("font/NoyhR-Regular.ttf");
 }
 
 @font-face {
   -fx-font-family: "plain-germanica";
-  src: url("../../../../../../font/Plain-Germanica.ttf");
+  src: url("font/Plain-Germanica.ttf");
 }
 
 .outer-border {
@@ -150,8 +150,17 @@
 
 .notification {
   -fx-border-radius: 12px;
-  -fx-background-radius: 16px;
   -fx-border-width: 2px;
+  -fx-background-radius: 16px;
+  -fx-background-image: url(pictures/scripted_background.png);
+  -fx-background-size: 100%;
+  -fx-background-repeat: no-repeat;
+}
+
+.notification-text {
+  -fx-fill: white;
+  -fx-font-size: 1.8em;
+  -fx-font-family: "Noyh R Light";
 }
 
 .error {
