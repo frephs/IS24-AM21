@@ -1,17 +1,16 @@
 package polimi.ingsw.am21.codex.model.GameBoard.exceptions;
 
+import java.util.List;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public class TokenAlreadyTakenException extends RuntimeException {
-
-  TokenColor tokenColor;
+public class TokenAlreadyTakenException extends InvalidActionException {
 
   public TokenAlreadyTakenException(TokenColor color) {
-    super("The " + color.name() + " token is already taken");
-    this.tokenColor = color;
+    super(InvalidActionCode.TOKEN_ALREADY_TAKEN, List.of(color.name()));
   }
 
-  public TokenColor getTokenColor() {
-    return this.tokenColor;
+  public String getTokenColor() {
+    return this.getNotes().get(0);
   }
 }

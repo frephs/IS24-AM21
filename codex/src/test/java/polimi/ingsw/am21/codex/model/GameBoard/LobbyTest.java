@@ -15,6 +15,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundExceptio
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException.LobbyFullInternalException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -51,7 +52,7 @@ class LobbyTest {
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           );
-      } catch (LobbyFullException e) {
+      } catch (LobbyFullException.LobbyFullInternalException e) {
         fail(
           "Failed adding a new player in the lobby while testing " +
           "getRemainingPlayerSlots, player number: " +
@@ -78,7 +79,7 @@ class LobbyTest {
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           );
-      } catch (LobbyFullException e) {
+      } catch (LobbyFullException.LobbyFullInternalException e) {
         fail(
           "Failed adding a new player in the lobby while testing " +
           "getRemainingPlayerSlots"
@@ -102,7 +103,7 @@ class LobbyTest {
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           );
-      } catch (LobbyFullException e) {
+      } catch (LobbyFullException.LobbyFullInternalException e) {
         fail("Lobby full");
       } catch (EmptyDeckException e) {
         fail("Invalid mock GameBoard, the decks are empty");
@@ -111,7 +112,7 @@ class LobbyTest {
       socketID = generateNewSocketID();
     }
     assertThrows(
-      LobbyFullException.class,
+      LobbyFullException.LobbyFullInternalException.class,
       () ->
         this.lobby.addPlayer(
             generateNewSocketID(),
@@ -141,7 +142,7 @@ class LobbyTest {
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
@@ -168,7 +169,7 @@ class LobbyTest {
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
@@ -192,7 +193,7 @@ class LobbyTest {
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
@@ -219,13 +220,17 @@ class LobbyTest {
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    this.lobby.setToken(socketID, TokenColor.GREEN);
+    try {
+      this.lobby.setToken(socketID, TokenColor.GREEN);
+    } catch (TokenAlreadyTakenException e) {
+      fail("wrongfully thrown TokenAlreadyTakenException");
+    }
     Optional<TokenColor> playerTokenColor =
       this.lobby.getPlayerTokenColor(socketID);
     if (playerTokenColor.isEmpty()) fail(
@@ -240,7 +245,7 @@ class LobbyTest {
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
@@ -266,7 +271,7 @@ class LobbyTest {
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
@@ -304,7 +309,7 @@ class LobbyTest {
         objectiveCards
       );
       else fail("Could not find player with socket id" + playerId);
-    } catch (LobbyFullException e) {
+    } catch (LobbyFullException.LobbyFullInternalException e) {
       fail("Lobby full");
     } catch (EmptyDeckException e) {
       fail("Invalid mock GameBoard, the decks are empty");
@@ -379,7 +384,11 @@ class LobbyTest {
     );
     assertEquals(Optional.empty(), playerTokenColor);
 
-    lobby.setToken(firstPlayerID, TokenColor.RED);
+    try {
+      lobby.setToken(firstPlayerID, TokenColor.RED);
+    } catch (TokenAlreadyTakenException e) {
+      fail("wrongfully thrown TokenAlreadyTakenException");
+    }
     playerTokenColor = lobby.getPlayerTokenColor(firstPlayerID);
     if (playerTokenColor.isEmpty()) {
       fail("Empty player token");

@@ -3,8 +3,11 @@ package polimi.ingsw.am21.codex.connection.server.TCP;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Consumer;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -75,6 +78,22 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    broadcast.accept(
+      new PlayerConnectionChangedMessage(socketID, nickname, status)
+    );
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    broadcast.accept(new LobbyInfoMessage(usersInfo));
+  }
+
+  @Override
   public void changeTurn(
     String gameId,
     String playerId,
@@ -129,8 +148,15 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerSetToken(String gameId, UUID socketID, TokenColor token) {
-    broadcast.accept(new PlayerSetTokenColorMessage(gameId, socketID, token));
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) {
+    broadcast.accept(
+      new PlayerSetTokenColorMessage(gameId, socketID, nickname, token)
+    );
   }
 
   @Override
@@ -143,7 +169,11 @@ public class TCPServerControllerListener implements GameEventListener {
     String gameId,
     UUID socketID,
     String nickname
-  ) {}
+  ) {
+    broadcast.accept(
+      new PlayerChoseObjectiveCardMessage(gameId, socketID, nickname)
+    );
+  }
 
   @Override
   public void playerJoinedGame(

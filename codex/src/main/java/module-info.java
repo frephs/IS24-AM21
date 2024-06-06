@@ -18,4 +18,6 @@ module polimi.ingsw.am21.codex {
   opens polimi.ingsw.am21.codex.connection to javafx.fxml;
   exports polimi.ingsw.am21.codex.client.localModel.remote;
   exports polimi.ingsw.am21.codex.controller.listeners;
+  exports polimi.ingsw.am21.codex.controller.messages;
+  exports polimi.ingsw.am21.codex.controller.messages.viewUpdate.game;
 }

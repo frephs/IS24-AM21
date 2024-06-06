@@ -22,8 +22,12 @@ public interface RemoteGameEventListener extends Remote {
 
   void playerLeftLobby(String gameId, UUID socketID) throws RemoteException;
 
-  void playerSetToken(String gameId, UUID socketID, TokenColor token)
-    throws RemoteException;
+  void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) throws RemoteException;
 
   void playerSetNickname(String gameId, UUID socketID, String nickname)
     throws RemoteException;
@@ -88,6 +92,8 @@ public interface RemoteGameEventListener extends Remote {
 
   void playerConnectionChanged(
     UUID socketID,
+    String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) throws RemoteException;
+  void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException;
 }

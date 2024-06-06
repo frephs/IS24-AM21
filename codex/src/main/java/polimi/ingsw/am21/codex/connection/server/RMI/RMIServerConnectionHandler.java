@@ -6,6 +6,7 @@ import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -32,63 +33,57 @@ public interface RMIServerConnectionHandler extends Remote {
 
   Map<String, Integer> getGamesMaxPlayers() throws RemoteException;
 
-  Pair<Integer, Integer> getLobbyObjectiveCards(String gameId, UUID socketID)
-    throws RemoteException, GameNotFoundException;
+  Pair<Integer, Integer> getLobbyObjectiveCards(UUID connectionID)
+    throws RemoteException, InvalidActionException;
 
-  Integer getLobbyStarterCard(String gameId, UUID socketID)
-    throws RemoteException, GameNotFoundException, PlayerNotFoundException;
+  Integer getLobbyStarterCard(UUID connectionID)
+    throws RemoteException, InvalidActionException;
 
-  void removePlayerFromLobby(String gameId, UUID socketID)
-    throws RemoteException, GameNotFoundException;
+  void joinLobby(UUID connectionID, String gameID)
+    throws RemoteException, InvalidActionException;
 
-  void joinLobby(String gameId, UUID socketID)
-    throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException;
+  void lobbySetTokenColor(UUID connectionID, TokenColor color)
+    throws RemoteException, InvalidActionException;
 
-  void lobbySetTokenColor(String gameId, UUID socketID, TokenColor color)
-    throws RemoteException, GameNotFoundException, TokenAlreadyTakenException, GameAlreadyStartedException;
+  void lobbySetNickname(UUID connectionID, String nickname)
+    throws RemoteException, InvalidActionException;
 
-  void lobbySetNickname(String gameId, UUID socketID, String nickname)
-    throws RemoteException, GameNotFoundException, NicknameAlreadyTakenException, GameAlreadyStartedException;
+  void lobbyChooseObjective(UUID connectionID, Boolean first)
+    throws RemoteException, InvalidActionException;
 
-  void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
-    throws RemoteException, GameNotFoundException, GameAlreadyStartedException;
+  void startGame(UUID connectionID)
+    throws RemoteException, InvalidActionException;
 
-  void startGame(String gameId)
-    throws RemoteException, GameNotFoundException, GameNotReadyException, GameAlreadyStartedException;
+  void joinGame(UUID connectionID, String gameID, CardSideType sideType)
+    throws RemoteException, InvalidActionException;
 
-  void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws RemoteException, GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameAlreadyStartedException;
+  void createGame(UUID connectionID, String gameId, Integer players)
+    throws RemoteException, InvalidActionException;
 
-  void createGame(String gameId, UUID socketID, Integer players)
-    throws RemoteException, EmptyDeckException;
+  void deleteGame(UUID connectionID, String gameId)
+    throws RemoteException, InvalidActionException;
 
-  void deleteGame(String gameId) throws RemoteException;
-
-  void nextTurn(String gameId, String playerNickname)
-    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException;
+  void nextTurn(UUID connectionID)
+    throws RemoteException, InvalidActionException;
 
   void nextTurn(
-    String gameId,
-    String playerNickname,
+    UUID connectionID,
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
-  )
-    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException;
+  ) throws RemoteException, InvalidActionException;
 
   void placeCard(
-    String gameId,
-    String playerNickname,
+    UUID connectionID,
     Integer playerHandCardNumber,
     CardSideType side,
     Position position
-  )
-    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException;
+  ) throws RemoteException, InvalidActionException;
 
-  void leaveLobby(String gameId, UUID connectionID)
-    throws RemoteException, GameNotFoundException;
+  void leaveLobby(UUID connectionID)
+    throws RemoteException, InvalidActionException;
 
   Set<TokenColor> getAvailableTokens(String gameId)
-    throws RemoteException, GameNotFoundException;
+    throws RemoteException, InvalidActionException;
 
   public void registerListener(
     UUID connectionID,

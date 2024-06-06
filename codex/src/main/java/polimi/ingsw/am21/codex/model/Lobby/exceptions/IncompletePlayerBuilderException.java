@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import polimi.ingsw.am21.codex.model.Player.Player;
 
-public class IncompletePlayerBuilderException extends RuntimeException {
+public class IncompletePlayerBuilderException extends Exception {
 
   public IncompletePlayerBuilderException(String message) {
     super(message);
@@ -13,7 +13,8 @@ public class IncompletePlayerBuilderException extends RuntimeException {
   /**
    * @param playerBuilder the current player builder
    */
-  public static void checkPlayerBuilder(Player.PlayerBuilder playerBuilder) {
+  public static void checkPlayerBuilder(Player.PlayerBuilder playerBuilder)
+    throws IncompletePlayerBuilderException {
     List<String> missingParams = new ArrayList<>();
     List<String> invalidParams = new ArrayList<>();
     if (playerBuilder.getNickname().isEmpty()) missingParams.add("nickname");

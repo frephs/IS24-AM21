@@ -1,8 +1,14 @@
 package polimi.ingsw.am21.codex.controller.exceptions;
 
-public class GameNotFoundException extends Exception {
+import java.util.List;
 
-  public GameNotFoundException() {
-    super("Game not found");
+public class GameNotFoundException extends InvalidActionException {
+
+  public GameNotFoundException(String gameID) {
+    super(InvalidActionCode.GAME_NOT_FOUND, List.of(gameID));
+  }
+
+  public String getGameID() {
+    return this.getNotes().get(0);
   }
 }

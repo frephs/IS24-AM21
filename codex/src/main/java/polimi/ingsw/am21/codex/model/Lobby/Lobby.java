@@ -26,10 +26,6 @@ public class Lobby {
    * PlayerBuilder as the value used to progressively create the player;
    */
   private final Map<UUID, Player.PlayerBuilder> lobbyPlayers;
-  /**
-   * The map of extracted cards associated with each player's socket ID.
-   */
-  private final Map<UUID, CardPair<ObjectiveCard>> extractedCards;
 
   /**
    * The remaining slots for players in the lobby. ( how many player can
@@ -45,7 +41,6 @@ public class Lobby {
   public Lobby(int maxPlayers) {
     this.remainingPlayerSlots = maxPlayers;
     this.lobbyPlayers = new HashMap<>();
-    this.extractedCards = new HashMap<>();
   }
 
   /**
@@ -84,13 +79,15 @@ public class Lobby {
     UUID socketId,
     CardPair<ObjectiveCard> objectiveCards,
     PlayableCard starterCard
-  ) throws LobbyFullException {
+  ) throws LobbyFullException.LobbyFullInternalException {
     if (remainingPlayerSlots <= 0) {
-      throw new LobbyFullException();
+      throw new LobbyFullException.LobbyFullInternalException();
     }
-    Player.PlayerBuilder playerBuilder = new Player.PlayerBuilder(starterCard);
+    Player.PlayerBuilder playerBuilder = new Player.PlayerBuilder(
+      starterCard,
+      objectiveCards
+    );
     lobbyPlayers.put(socketId, playerBuilder);
-    extractedCards.put(socketId, objectiveCards);
 
     remainingPlayerSlots--;
   }
@@ -110,9 +107,11 @@ public class Lobby {
       throw new PlayerNotFoundException(socketId);
     }
     PlayableCard starterCard = lobbyPlayers.get(socketId).getStarterCard();
+    CardPair<ObjectiveCard> objectiveCards =
+      this.lobbyPlayers.get(socketId).getObjectiveCards();
     lobbyPlayers.remove(socketId);
     remainingPlayerSlots++;
-    return new Pair<>(this.extractedCards.get(socketId), starterCard);
+    return new Pair<>(objectiveCards, starterCard);
   }
 
   /**
@@ -196,15 +195,22 @@ public class Lobby {
     if (!lobbyPlayers.containsKey(socketId)) {
       throw new PlayerNotFoundException(socketId);
     }
-    CardPair<ObjectiveCard> playerExtractedCards = extractedCards.get(socketId);
+    lobbyPlayers.get(socketId).setObjectiveCard(firstObjectiveCard);
+  }
 
-    ObjectiveCard selectedObjectiveCard;
-    if (firstObjectiveCard) {
-      selectedObjectiveCard = playerExtractedCards.getFirst();
-    } else {
-      selectedObjectiveCard = playerExtractedCards.getSecond();
+  /**
+   * Gets the objective card associated with the player in the lobby.
+   *
+   * @param socketId the socket ID of the player
+   * @return the objective card associated with the player
+   * @throws PlayerNotFoundException if the player is not found in the lobby
+   */
+  public Boolean hasSelectedFirstObjectiveCard(UUID socketId)
+    throws PlayerNotFoundException {
+    if (!lobbyPlayers.containsKey(socketId)) {
+      throw new PlayerNotFoundException(socketId);
     }
-    lobbyPlayers.get(socketId).setObjectiveCard(selectedObjectiveCard);
+    return lobbyPlayers.get(socketId).hasSelectedObjectiveCard();
   }
 
   /**
@@ -243,7 +249,10 @@ public class Lobby {
   public Optional<CardPair<ObjectiveCard>> getPlayerObjectiveCards(
     UUID socketId
   ) {
-    return Optional.ofNullable(this.extractedCards.get(socketId));
+    if (!lobbyPlayers.containsKey(socketId)) {
+      return Optional.empty();
+    }
+    return Optional.of(lobbyPlayers.get(socketId).getObjectiveCards());
   }
 
   /**

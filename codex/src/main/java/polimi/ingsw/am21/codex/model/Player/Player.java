@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
@@ -25,7 +26,7 @@ public class Player {
     this.board = new PlayerBoard(
       builder.cards,
       builder.starterCard,
-      builder.objectiveCard
+      builder.getObjectiveCard().orElse(null)
     );
     this.socketId = socketId;
   }
@@ -40,10 +41,15 @@ public class Player {
     private TokenColor token;
     private List<PlayableCard> cards;
     private PlayableCard starterCard;
-    private ObjectiveCard objectiveCard;
+    private Boolean selectedFirstObjectiveCard;
+    private final CardPair<ObjectiveCard> secretObjectives;
 
-    public PlayerBuilder(PlayableCard card) {
+    public PlayerBuilder(
+      PlayableCard card,
+      CardPair<ObjectiveCard> secretObjectives
+    ) {
       this.starterCard = card;
+      this.secretObjectives = secretObjectives;
     }
 
     /**
@@ -107,18 +113,32 @@ public class Player {
       this.starterCard.setPlayedSideType(side);
     }
 
+    public CardPair<ObjectiveCard> getObjectiveCards() {
+      return secretObjectives;
+    }
+
+    public Boolean hasSelectedObjectiveCard() {
+      return selectedFirstObjectiveCard != null;
+    }
+
     /**
      * @return the player objective card
      */
     public Optional<ObjectiveCard> getObjectiveCard() {
-      return Optional.ofNullable(this.objectiveCard);
+      return Optional.ofNullable(this.selectedFirstObjectiveCard).map(
+        selectedFirstObjectiveCard ->
+          selectedFirstObjectiveCard
+            ? secretObjectives.getFirst()
+            : secretObjectives.getSecond()
+      );
     }
 
     /**
-     * @param objectiveCard chosen by the client controller (physical player)
+     * @param first true if the player selects the first card in the pair
      */
-    public PlayerBuilder setObjectiveCard(ObjectiveCard objectiveCard) {
-      this.objectiveCard = objectiveCard;
+    public PlayerBuilder setObjectiveCard(Boolean first) {
+      ObjectiveCard selectedObjectiveCard;
+      this.selectedFirstObjectiveCard = first;
       return this;
     }
 

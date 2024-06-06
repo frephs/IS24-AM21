@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.connection.client;
 
 import java.util.UUID;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -9,6 +10,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
+import polimi.ingsw.am21.codex.view.TUI.CliClient;
 import polimi.ingsw.am21.codex.view.View;
 
 public abstract class ClientConnectionHandler {
@@ -173,5 +175,11 @@ public abstract class ClientConnectionHandler {
   public void connectionEstablished() {
     this.connected = true;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
+  }
+
+  public void getObjectivesIfNull() {
+    if (localModel.getAvailableObjectives() == null) {
+      getObjectiveCards();
+    }
   }
 }

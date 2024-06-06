@@ -2,36 +2,28 @@ package polimi.ingsw.am21.codex.controller;
 
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.connection.client.RMI.common.GamePlayerInfo;
-import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
-import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
+import polimi.ingsw.am21.codex.controller.exceptions.*;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
+import polimi.ingsw.am21.codex.controller.utils.RemoteListenerFunction;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameManager;
 import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
-import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 public class GameController {
 
@@ -55,7 +47,7 @@ public class GameController {
     private UserGameContextStatus status;
 
     private RemoteGameEventListener listener;
-    private String username;
+    private String nickname;
 
     private ConnectionStatus connectionStatus;
 
@@ -73,27 +65,27 @@ public class GameController {
     private UserGameContext(
       String gameId,
       UserGameContextStatus status,
-      String username,
+      String nickname,
       RemoteGameEventListener listener
     ) {
       this.gameId = null;
       this.status = status;
-      this.username = username;
+      this.nickname = nickname;
       this.connectionStatus = ConnectionStatus.CONNECTED;
     }
 
     /* in game constructor */
-    public UserGameContext(String gameId, String username) {
-      this(gameId, UserGameContextStatus.IN_GAME, username, null);
+    public UserGameContext(String gameId, String nickname) {
+      this(gameId, UserGameContextStatus.IN_GAME, nickname, null);
     }
 
     /* in game constructor */
     public UserGameContext(
       String gameId,
-      String username,
+      String nickname,
       RemoteGameEventListener listener
     ) {
-      this(gameId, UserGameContextStatus.IN_GAME, username, listener);
+      this(gameId, UserGameContextStatus.IN_GAME, nickname, listener);
     }
 
     /* in lobby constructor */
@@ -117,19 +109,23 @@ public class GameController {
     public void setLobbyGameId(String gameId) {
       this.gameId = gameId;
       this.status = UserGameContextStatus.IN_LOBBY;
-      this.username = null;
+      this.nickname = null;
     }
 
-    public void setGameId(String gameId, String username) {
+    public void setGameId(String gameId, String nickname) {
       this.gameId = gameId;
       this.status = UserGameContextStatus.IN_GAME;
-      this.username = username;
+      this.nickname = nickname;
     }
 
     public void removeGameId() {
       this.gameId = null;
       this.status = UserGameContextStatus.MENU;
-      this.username = null;
+      this.nickname = null;
+    }
+
+    public void setNickname(String nickname) {
+      this.nickname = nickname;
     }
 
     /**
@@ -173,8 +169,8 @@ public class GameController {
       return Optional.ofNullable(gameId);
     }
 
-    public Optional<String> getUsername() {
-      return Optional.ofNullable(username);
+    public Optional<String> getNickname() {
+      return Optional.ofNullable(nickname);
     }
 
     public UserGameContextStatus getStatus() {
@@ -183,6 +179,124 @@ public class GameController {
 
     public ConnectionStatus getConnectionStatus() {
       return connectionStatus;
+    }
+  }
+
+  public enum EventDispatchMode {
+    // EventDispatchMode is an enum used to describe how the events should be dispatched
+    // under different circumstances. for each mode we provide a description of the logic structured this way:
+    // EVENT_NAME
+    // context of the client that caused the event:
+    // - listeners that will receive the event
+    TOP_DOWN,
+    // menu:
+    // - menu listeners
+    // lobby:
+    // - lobby listeners
+    // game:
+    // - game listeners
+    // - lobby listeners
+    BOTTOM_UP,
+    // menu:
+    // - menu listeners
+    // lobby:
+    // - lobby listeners
+    // - game listeners
+    // game:
+    // - game listeners
+    TOP_DOWN_FULL,
+    // menu:
+    // - menu listeners
+    // lobby:
+    // - lobby listeners
+    // - menu listeners
+    // game:
+    // - game listeners
+    // - menu listeners
+    // - lobby listeners
+    BOTTOM_UP_FULL,
+    // menu:
+    // - menu listeners
+    // - lobby listeners
+    // - game listeners
+    // lobby:
+    // - lobby listeners
+    // - game listeners
+    // game:
+    // - game listeners
+    BOTH_WAYS,
+    // menu:
+    // - menu listeners
+    // lobby:
+    // - lobby listeners
+    // - game listeners
+    // game:
+    // - game listeners
+    // - lobby listeners
+    BOTH_WAYS_FULL,
+
+    // menu:
+    // - menu listeners
+    // - game listeners
+    // - lobby listeners
+    // lobby:
+    // - lobby listeners
+    // - game listeners
+    // - menu listeners
+    // game:
+    // - game listeners
+    // - lobby listeners
+    // - menu listeners
+    SAME_CONTEXT;
+
+    // menu:
+    // - menu listeners
+    // lobby:
+    // - lobby listeners
+    // game:
+    // - game listeners
+
+    private Integer getContextRanking(UserGameContextStatus contextStatus) {
+      return switch (contextStatus) {
+        case MENU -> -1;
+        case IN_LOBBY -> 0;
+        case IN_GAME -> 1;
+      };
+    }
+
+    private Boolean isMenu(UserGameContextStatus status) {
+      return status == UserGameContextStatus.MENU;
+    }
+
+    private Boolean isBothMenu(
+      UserGameContextStatus dispatcher,
+      UserGameContextStatus listener
+    ) {
+      return this.isMenu(dispatcher) && this.isMenu(listener);
+    }
+
+    public Boolean checkDispatchable(
+      UserGameContextStatus dispatcher,
+      UserGameContextStatus listener
+    ) {
+      return switch (this) {
+        case BOTH_WAYS -> this.isBothMenu(dispatcher, listener) ||
+        !this.isMenu(listener);
+        case BOTH_WAYS_FULL -> true;
+        case BOTTOM_UP -> this.isBothMenu(dispatcher, listener) ||
+        (!this.isMenu(listener) &&
+          this.getContextRanking(dispatcher) <=
+            this.getContextRanking(listener));
+        case BOTTOM_UP_FULL -> !this.isMenu(listener) &&
+        this.getContextRanking(dispatcher) <= this.getContextRanking(listener);
+        case TOP_DOWN -> this.isBothMenu(dispatcher, listener) ||
+        (!this.isMenu(listener) &&
+          this.getContextRanking(dispatcher) >=
+            this.getContextRanking(listener));
+        case TOP_DOWN_FULL -> !this.isMenu(listener) &&
+        this.getContextRanking(dispatcher) >= this.getContextRanking(listener);
+        case SAME_CONTEXT -> dispatcher == listener;
+      };
     }
   }
 
@@ -208,197 +322,9 @@ public class GameController {
   }
 
   public Game getGame(String gameId) throws GameNotFoundException {
-    return manager.getGame(gameId).orElseThrow(GameNotFoundException::new);
-  }
-
-  public void removePlayerFromLobby(Game game, UUID socketID) {
-    Lobby lobby = game.getLobby();
-    Pair<CardPair<ObjectiveCard>, PlayableCard> oldPlayerCards =
-      lobby.removePlayer(socketID);
-    game.insertObjectiveCard(oldPlayerCards.getKey().getFirst());
-    game.insertObjectiveCard(oldPlayerCards.getKey().getSecond());
-    PlayableCard starterCard = oldPlayerCards.getValue();
-    starterCard.clearPlayedSide();
-    game.insertStarterCard(starterCard);
-    userContexts.get(socketID).removeGameId();
-  }
-
-  public void removePlayerFromLobby(String gameId, UUID socketID)
-    throws GameNotFoundException {
-    Game game = this.getGame(gameId);
-    this.removePlayerFromLobby(game, socketID);
-  }
-
-  public void joinLobby(String gameId, UUID socketID)
-    throws GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
-    Game game = this.getGame(gameId);
-
-    if (
-      game.getState() != GameState.GAME_INIT
-    ) throw new GameAlreadyStartedException();
-
-    Lobby lobby = game.getLobby();
-    try {
-      if (lobby.containsSocketID(socketID)) {
-        this.removePlayerFromLobby(game, socketID);
-      }
-      lobby.addPlayer(
-        socketID,
-        game.drawObjectiveCardPair(),
-        game.drawStarterCard()
-      );
-      if (userContexts.containsKey(socketID)) {
-        userContexts.get(socketID).setLobbyGameId(gameId);
-      } else {
-        userContexts.put(socketID, new UserGameContext(gameId));
-      }
-      this.getLobbyListeners(gameId).forEach(listener -> {
-          try {
-            listener.getValue().playerJoinedLobby(gameId, socketID);
-          } catch (RemoteException e) {
-            // TODO: Handle in a better way
-            throw new RuntimeException(e);
-          }
-        });
-    } catch (EmptyDeckException e) {
-      throw new RuntimeException("EmptyDeckException");
-    }
-  }
-
-  private List<Pair<UUID, RemoteGameEventListener>> getLobbyListeners(
-    String gameId
-  ) {
-    // TODO: uncomment when we first join messages
-    return this.getAllListeners();
-    //    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
-    //      .keySet()
-    //      .stream()
-    //      .filter(
-    //        sID ->
-    //          userContexts.get(sID).getStatus() == UserGameContextStatus
-    //          .IN_LOBBY &&
-    //          userContexts.get(sID).getGameId().map(gameId::equals).orElse
-    //          (false)
-    //      )
-    //      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
-    //      .collect(Collectors.toList());
-    //
-    //    listeners
-    //      .stream()
-    //      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
-    //      .forEach(pairs::add);
-    //    return pairs;
-  }
-
-  private List<Pair<UUID, RemoteGameEventListener>> getGameListeners(
-    String gameID
-  ) {
-    return this.getAllListeners();
-    // TODO: uncomment when we first join messages
-    //    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
-    //      .keySet()
-    //      .stream()
-    //      .filter(
-    //        sID ->
-    //          userContexts.get(sID).getStatus() == UserGameContextStatus
-    //          .IN_GAME &&
-    //          userContexts.get(sID).getGameId().map(gameID::equals).orElse
-    //          (false)
-    //      )
-    //      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
-    //      .collect(Collectors.toList());
-    //
-    //    listeners
-    //      .stream()
-    //      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
-    //      .forEach(pairs::add);
-    //    return pairs;
-  }
-
-  private List<Pair<UUID, RemoteGameEventListener>> getMenuListeners() {
-    return this.getAllListeners();
-    //    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
-    //      .keySet()
-    //      .stream()
-    //      .filter(
-    //        sID -> userContexts.get(sID).getStatus() ==
-    //        UserGameContextStatus.MENU
-    //      )
-    //      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
-    //      .collect(Collectors.toList());
-    //
-    //    listeners
-    //      .stream()
-    //      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
-    //      .forEach(pairs::add);
-    //    return pairs;
-  }
-
-  private List<Pair<UUID, RemoteGameEventListener>> getAllListeners() {
-    List<Pair<UUID, RemoteGameEventListener>> pairs = userContexts
-      .keySet()
-      .stream()
-      .map(sID -> new Pair<>(sID, userContexts.get(sID).getListener()))
-      .filter(pair -> pair.getValue() != null)
-      .collect(Collectors.toList());
-
-    listeners
-      .stream()
-      .map(listener -> new Pair<>(UUID.randomUUID(), listener))
-      .forEach(pairs::add);
-    return pairs;
-  }
-
-  private List<Pair<UUID, UserGameContext>> getSameContextListeners(
-    List<UUID> socketIDs,
-    Boolean includeSelf
-  ) {
-    List<UserGameContext> targetContexts = new ArrayList<>();
-    for (UUID sID : socketIDs) {
-      if (userContexts.containsKey(sID)) {
-        targetContexts.add(userContexts.get(sID));
-      }
-    }
-    return userContexts
-      .keySet()
-      .stream()
-      .filter(
-        sID ->
-          targetContexts
-            .stream()
-            .anyMatch(
-              targetContext ->
-                (includeSelf || socketIDs.contains(sID)) &&
-                userContexts.get(sID).getStatus() ==
-                  targetContext.getStatus() &&
-                ((targetContext.getGameId().isEmpty() &&
-                    userContexts.get(sID).getGameId().isEmpty()) ||
-                  targetContext
-                    .getGameId()
-                    .equals(userContexts.get(sID).getGameId())) &&
-                targetContext.getConnectionStatus() ==
-                  UserGameContext.ConnectionStatus.CONNECTED
-            )
-      )
-      .map(sID -> new Pair<>(sID, userContexts.get(sID)))
-      .collect(Collectors.toList());
-  }
-
-  private List<Pair<UUID, UserGameContext>> getSameContextListeners(
-    UUID socketID,
-    Boolean includeSelf
-  ) {
-    return this.getSameContextListeners(
-        Collections.singletonList(socketID),
-        includeSelf
-      );
-  }
-
-  public void clientDisconnected(UUID socketID) {
-    if (userContexts.containsKey(socketID)) {
-      UserGameContext context = userContexts.get(socketID);
-      if (context.disconnected()) {}
-    }
+    return manager
+      .getGame(gameId)
+      .orElseThrow(() -> new GameNotFoundException(gameId));
   }
 
   /**
@@ -408,13 +334,15 @@ public class GameController {
     List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
 
     for (UUID disconnectedClient : disconnectedClients) {
-      this.getSameContextListeners(disconnectedClient, false).forEach(
-          listener -> {
-            listenersToNotify.add(
-              new Pair<>(listener.getKey(), disconnectedClient)
-            );
-          }
-        );
+      this.getSameContextListeners(
+          disconnectedClient,
+          false,
+          EventDispatchMode.TOP_DOWN
+        ).forEach(listener -> {
+          listenersToNotify.add(
+            new Pair<>(listener.getKey(), disconnectedClient)
+          );
+        });
     }
 
     while (!listenersToNotify.isEmpty()) {
@@ -434,6 +362,7 @@ public class GameController {
           .getListener()
           .playerConnectionChanged(
             toNotify.getValue(),
+            clientToNotifyContext.getNickname().orElse(null),
             clientToNotifyContext.getConnectionStatus()
           );
       } catch (RemoteException e) {
@@ -442,7 +371,11 @@ public class GameController {
             listenersToNotify.removeIf(
               listener -> listener.getKey().equals(toNotify.getKey())
             );
-            this.getSameContextListeners(toNotify.getKey(), false).forEach(
+            this.getSameContextListeners(
+                toNotify.getKey(),
+                false,
+                EventDispatchMode.TOP_DOWN
+              ).forEach(
                 listener ->
                   listenersToNotify.add(
                     new Pair<>(listener.getKey(), toNotify.getKey())
@@ -454,36 +387,159 @@ public class GameController {
     }
   }
 
-  private void notifySameContextClients(
-    UUID socketID,
-    Function<RemoteGameEventListener, Void> function
-  ) {
-    List<UUID> failedListeners = new ArrayList<>();
-    this.getSameContextListeners(socketID, true).forEach(listener -> {
-        try {
-          function.apply(listener.getValue().getListener());
-        } catch (RemoteException e) {
-          failedListeners.add(listener.getKey());
-        }
-      });
-    this.notifyDisconnections(failedListeners);
+  private UserGameContext getUserContext(UUID connectionID) {
+    if (
+      !userContexts.containsKey(connectionID)
+    ) throw new PlayerNotFoundException(connectionID);
+    return userContexts.get(connectionID);
   }
 
-  public void checkClientConnection(UUID clientToCheckID) {
-    // First UUID is the socket ID of the client to notify
-    // the second socket ID is the id of the client that has disconnected
+  public void notifyDisconnectionsSameContext(
+    List<UUID> disconnectedClients,
+    List<Pair<UUID, UserGameContext>> sameContextClients
+  ) {
     List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
-    userContexts
-      .get(clientToCheckID)
-      .checkConnection()
-      .ifPresent(connectionStatus -> {
-        this.getSameContextListeners(clientToCheckID, false).forEach(
-            listener ->
-              listenersToNotify.add(
-                new Pair<>(listener.getKey(), clientToCheckID)
-              )
+
+    for (UUID disconnectedClient : disconnectedClients) {
+      sameContextClients
+        .stream()
+        .filter(client -> disconnectedClients.contains(client.getKey()))
+        .forEach(client -> {
+          listenersToNotify.add(
+            new Pair<>(client.getKey(), disconnectedClient)
           );
-      });
+        });
+    }
+
+    while (!listenersToNotify.isEmpty()) {
+      Pair<UUID, UUID> toNotify = listenersToNotify.remove(0);
+      UserGameContext clientToNotifyContext = userContexts.get(
+        toNotify.getKey()
+      );
+      UserGameContext clientToCheckContext = userContexts.get(
+        toNotify.getValue()
+      );
+      if (
+        clientToNotifyContext == null || clientToCheckContext == null
+      ) continue;
+
+      try {
+        clientToNotifyContext
+          .getListener()
+          .playerConnectionChanged(
+            toNotify.getValue(),
+            clientToNotifyContext.getNickname().orElse(null),
+            clientToNotifyContext.getConnectionStatus()
+          );
+      } catch (RemoteException e) {
+        if (userContexts.containsKey(toNotify.getKey())) {
+          if (userContexts.get(toNotify.getKey()).disconnected()) {
+            listenersToNotify.removeIf(
+              listener -> listener.getKey().equals(toNotify.getKey())
+            );
+            sameContextClients.forEach(
+              listener ->
+                listenersToNotify.add(
+                  new Pair<>(listener.getKey(), toNotify.getKey())
+                )
+            );
+          }
+        }
+      }
+    }
+  }
+
+  private void notifyClients(
+    List<Pair<UUID, UserGameContext>> listeners,
+    RemoteListenerFunction<RemoteGameEventListener> function,
+    Boolean sameContext
+  ) {
+    List<UUID> failedListeners = new ArrayList<>();
+    listeners.forEach(listener -> {
+      try {
+        function.apply(listener.getValue().getListener());
+      } catch (RemoteException e) {
+        failedListeners.add(listener.getKey());
+      }
+    });
+    if (sameContext) {
+      this.notifyDisconnectionsSameContext(failedListeners, listeners);
+    } else {
+      this.notifyDisconnections(failedListeners);
+    }
+  }
+
+  private void notifyClients(
+    List<Pair<UUID, UserGameContext>> listeners,
+    RemoteListenerFunction<RemoteGameEventListener> function
+  ) {
+    this.notifyClients(listeners, function, false);
+  }
+
+  private void notifySameContextClients(
+    UUID socketID,
+    RemoteListenerFunction<RemoteGameEventListener> function,
+    EventDispatchMode mode
+  ) {
+    this.notifyClients(
+        this.getSameContextListeners(socketID, true, mode),
+        function,
+        true
+      );
+  }
+
+  private void notifySameContextClients(
+    UUID socketID,
+    RemoteListenerFunction<RemoteGameEventListener> function
+  ) {
+    this.notifySameContextClients(
+        socketID,
+        function,
+        EventDispatchMode.BOTH_WAYS
+      );
+  }
+
+  public void checkClientConnections() {
+    List<UUID> disconnectedClients = new ArrayList<>();
+    // these are all the contexts that we need to check and potentially notify
+
+    this.userContexts.entrySet()
+      .stream()
+      .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+      .forEach(
+        context ->
+          context
+            .getValue()
+            .checkConnection()
+            .ifPresent(
+              connectionStatus -> disconnectedClients.add(context.getKey())
+            )
+      );
+
+    this.notifyDisconnections(disconnectedClients);
+  }
+
+  public void checkClientConnections(UUID heartBeatClient) {
+    List<UUID> disconnectedClients = new ArrayList<>();
+    // these are all the contexts that we need to check and potentially notify
+    List<Pair<UUID, UserGameContext>> contexts =
+      this.getSameContextListeners(
+          heartBeatClient,
+          false,
+          EventDispatchMode.BOTH_WAYS
+        );
+
+    contexts.forEach(
+      context ->
+        context
+          .getValue()
+          .checkConnection()
+          .ifPresent(
+            connectionStatus -> disconnectedClients.add(context.getKey())
+          )
+    );
+
+    this.notifyDisconnectionsSameContext(disconnectedClients, contexts);
   }
 
   public void heartBeat(UUID socketID) {
@@ -492,30 +548,89 @@ public class GameController {
     // sends a message as we don't care about the connection status of players
     // that are not in the same context of other players
     // should we change this to check the heartbeat of all players every x
-    // seconds? 🤷‍♂️
+    // seconds? 🤷‍♂️ ( the actual check is done by `this.checkClientConnections(socketID);` )
+    // there is another method that check all the clients `this.checkAllConnections();`
 
+    // the heartBeat function returns true if the connection has been restored
+    // it also updates the last heartbeat value
     if (
       userContexts.containsKey(socketID) &&
       userContexts.get(socketID).heartBeat()
     ) {
-      this.getSameContextListeners(socketID, false).forEach(listener -> {
-          try {
-            checkClientConnection(socketID);
+      this.notifySameContextClients(
+          socketID,
+          listener ->
             listener.playerConnectionChanged(
               socketID,
-              userContexts.get(socketID).getConnectionStatus()
-            );
-          } catch (RemoteException ignored) {}
-        });
+              userContexts.get(socketID).getNickname().orElse(null),
+              UserGameContext.ConnectionStatus.CONNECTED
+            )
+        );
     }
+    this.checkClientConnections(socketID);
   }
 
-  public void lobbySetTokenColor(
-    String gameId,
+  private List<Pair<UUID, UserGameContext>> getSameContextListeners(
     UUID socketID,
-    TokenColor color
-  )
-    throws GameNotFoundException, TokenAlreadyTakenException, GameAlreadyStartedException {
+    Boolean includeSelf,
+    EventDispatchMode mode
+  ) {
+    // the socket Ids that dispatched the event
+    if (!userContexts.containsKey(socketID)) return new ArrayList<>();
+    UserGameContext targetContext = userContexts.get(socketID);
+    return userContexts
+      .keySet()
+      .stream()
+      .filter(sID ->
+        // if includeSelf we also include the client that caused the event
+        // otherwise we don't
+        (includeSelf || socketID != sID) &&
+        // if lobbyGameSharing is true we send the events to both the lobby & the game listeners
+        // otherwise we will only send the events to the listeners in the same context
+        // ( e.g. lobbyGameSharing is true and the client that caused the event is in the lobby
+        // we will send the event to the listeners in the lobby and the game listeners )
+        mode.checkDispatchable(
+          targetContext.getStatus(),
+          userContexts.get(sID).getStatus()
+        ) &&
+        // here we check that the clients are in the same game or in the same lobby or both in the menu
+        ((targetContext.getGameId().isEmpty() &&
+            userContexts.get(sID).getGameId().isEmpty()) ||
+          targetContext
+            .getGameId()
+            .equals(userContexts.get(sID).getGameId())) &&
+        // we filter out the clients that have disconnected or are having connection problems
+          // as those events will fail to be dispatched
+          targetContext.getConnectionStatus() ==
+          UserGameContext.ConnectionStatus.CONNECTED)
+      .map(sID -> new Pair<>(sID, userContexts.get(sID)))
+      .collect(Collectors.toList());
+  }
+
+  public void removePlayerFromLobby(Game game, UUID socketID) {
+    Lobby lobby = game.getLobby();
+    Pair<CardPair<ObjectiveCard>, PlayableCard> oldPlayerCards =
+      lobby.removePlayer(socketID);
+    game.insertObjectiveCard(oldPlayerCards.getKey().getFirst());
+    game.insertObjectiveCard(oldPlayerCards.getKey().getSecond());
+    PlayableCard starterCard = oldPlayerCards.getValue();
+    starterCard.clearPlayedSide();
+    game.insertStarterCard(starterCard);
+    userContexts.get(socketID).removeGameId();
+  }
+
+  public void quitFromLobby(UUID socketID) throws InvalidActionException {
+    String gameId = userContexts
+      .get(socketID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+
+    Game game = this.getGame(gameId);
+    this.removePlayerFromLobby(game, socketID);
+  }
+
+  public void joinLobby(UUID socketID, String gameId)
+    throws InvalidActionException {
     Game game = this.getGame(gameId);
 
     if (
@@ -523,39 +638,99 @@ public class GameController {
     ) throw new GameAlreadyStartedException();
 
     Lobby lobby = game.getLobby();
-    lobby.setToken(socketID, color);
-    this.getLobbyListeners(gameId).forEach(listener -> {
-        try {
-          listener.getValue().playerSetToken(gameId, socketID, color);
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          throw new RuntimeException(e);
-        }
-      });
+    if (lobby.containsSocketID(socketID)) {
+      this.removePlayerFromLobby(game, socketID);
+    }
+    try {
+      lobby.addPlayer(
+        socketID,
+        game.drawObjectiveCardPair(),
+        game.drawStarterCard()
+      );
+    } catch (LobbyFullException.LobbyFullInternalException e) {
+      throw new LobbyFullException(gameId);
+    }
+    if (userContexts.containsKey(socketID)) {
+      userContexts.get(socketID).setLobbyGameId(gameId);
+    } else {
+      userContexts.put(socketID, new UserGameContext(gameId));
+    }
+
+    this.notifySameContextClients(
+        socketID,
+        listener -> listener.playerJoinedLobby(gameId, socketID)
+      );
+
+    //    if (userContexts.get(socketID).getListener() != null) {
+    this.notifySameContextClients(
+        socketID,
+        listener ->
+          listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game))
+      );
+    //      try {
+    //        userContexts
+    //          .get(socketID)
+    //          .getListener()
+    //          .lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game));
+    //      } catch (RemoteException e) {
+    //        this.notifyDisconnections(List.of(socketID));
+    //      }
+    //    }
   }
 
-  public void lobbySetNickname(String gameId, UUID socketID, String nickname)
-    throws GameNotFoundException, NicknameAlreadyTakenException, GameAlreadyStartedException {
-    Game game = this.getGame(gameId);
+  public void lobbySetTokenColor(UUID connectionID, TokenColor color)
+    throws InvalidActionException {
+    UserGameContext userGameContext = this.getUserContext(connectionID);
 
+    String gameID = userGameContext
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+
+    Game game = this.getGame(gameID);
+    if (
+      game.getState() != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
+    Lobby lobby = game.getLobby();
+    lobby.setToken(connectionID, color);
+    this.notifySameContextClients(
+        connectionID,
+        listener ->
+          listener.playerSetToken(
+            gameID,
+            connectionID,
+            userGameContext.getNickname().orElse(null),
+            color
+          )
+      );
+  }
+
+  public void lobbySetNickname(UUID socketID, String nickname)
+    throws InvalidActionException {
+    UserGameContext userGameContext = this.getUserContext(socketID);
+    String gameId = userGameContext
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+    Game game = this.getGame(gameId);
     if (
       game.getState() != GameState.GAME_INIT
     ) throw new GameAlreadyStartedException();
 
     Lobby lobby = game.getLobby();
     lobby.setNickname(socketID, nickname);
-    this.getLobbyListeners(gameId).forEach(listener -> {
-        try {
-          listener.getValue().playerSetNickname(gameId, socketID, nickname);
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          throw new RuntimeException(e);
-        }
-      });
+    userGameContext.setNickname(nickname);
+    this.notifySameContextClients(
+        socketID,
+        listener -> listener.playerSetNickname(gameId, socketID, nickname)
+      );
   }
 
-  public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
-    throws GameNotFoundException, GameAlreadyStartedException {
+  public void lobbyChooseObjective(UUID socketID, Boolean first)
+    throws InvalidActionException {
+    String gameId = userContexts
+      .get(socketID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
     Game game = this.getGame(gameId);
 
     if (
@@ -563,69 +738,47 @@ public class GameController {
     ) throw new GameAlreadyStartedException();
 
     Lobby lobby = game.getLobby();
+
     lobby.setObjectiveCard(socketID, first);
-    this.getLobbyListeners(gameId).forEach(listener -> {
-        try {
-          if (listener.getKey() != socketID) {
-            listener
-              .getValue()
-              .playerChoseObjectiveCard(
-                gameId,
-                socketID,
-                lobby.getPlayerNickname(socketID).orElse(null)
-              );
-          }
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          System.out.print(
-            "Error dispatching playerChoseObjectiveCard event for socket: " +
-            listener.getKey()
-          );
-        }
-      });
+
+    this.notifySameContextClients(
+        socketID,
+        listener ->
+          listener.playerChoseObjectiveCard(
+            gameId,
+            socketID,
+            lobby.getPlayerNickname(socketID).orElse(null)
+          )
+      );
   }
 
-  private void startGame(String gameId, Game game)
-    throws GameNotReadyException, GameAlreadyStartedException {
-    game.start();
-    this.getGameListeners(gameId).forEach(listener -> {
-        try {
-          Lobby lobby = game.getLobby();
-          userContexts
-            .get(listener.getKey())
-            .setGameId(
-              gameId,
-              // TODO: add exception instead of null ??
-              lobby.getPlayerNickname(listener.getKey()).orElse(null)
-            );
-          listener.getValue().gameStarted(gameId, game.getPlayerIds());
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          System.out.print(
-            "Error dispatching gameStarted event for socket: " +
-            listener.getKey()
-          );
-        }
-      });
-  }
+  public void startGame(UUID socketID) throws InvalidActionException {
+    String gameId = userContexts
+      .get(socketID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
 
-  public void startGame(String gameId)
-    throws GameNotFoundException, GameNotReadyException, GameAlreadyStartedException {
-    this.startGame(gameId, getGame(gameId));
-  }
-
-  public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameAlreadyStartedException {
     Game game = this.getGame(gameId);
-    Player newPlayer = game
-      .getLobby()
-      .finalizePlayer(socketID, sideType, game.drawHand());
-    game.addPlayer(newPlayer);
-    this.getGameListeners(gameId).forEach(listener -> {
-        try {
-          listener
-            .getValue()
-            .playerJoinedGame(
+    if (
+      game.getState() != GameState.GAME_INIT
+    ) throw new GameAlreadyStartedException();
+
+    game.start();
+  }
+
+  public void joinGame(UUID socketID, String gameId, CardSideType sideType)
+    throws InvalidActionException {
+    Game game = this.getGame(gameId);
+    try {
+      final Player newPlayer = game
+        .getLobby()
+        .finalizePlayer(socketID, sideType, game.drawHand());
+      game.addPlayer(newPlayer);
+      userContexts.get(socketID).setGameId(gameId, newPlayer.getNickname());
+      this.notifySameContextClients(
+          socketID,
+          listener ->
+            listener.playerJoinedGame(
               gameId,
               socketID,
               newPlayer.getNickname(),
@@ -643,129 +796,138 @@ public class GameController {
                 .get(new Position())
                 .getPlayedSideType()
                 .orElse(CardSideType.FRONT)
-            );
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          System.out.print(
-            "Error dispatching playerJoinedGame event for socket: " +
-            listener.getKey()
-          );
-        }
-      });
-    if (game.getPlayersSpotsLeft() == 0) {
-      this.startGame(gameId, game);
+            ),
+          EventDispatchMode.BOTH_WAYS
+        );
+      try {
+        game.start();
+      } catch (GameAlreadyStartedException ignored) {
+        // the game has already started
+        // we don't need to do anything
+      } catch (GameNotReadyException ignored) {
+        // the game is not ready to start
+        // we don't need to do anything
+      }
+    } catch (IncompletePlayerBuilderException e) {
+      throw new InvalidActionException(
+        InvalidActionException.InvalidActionCode.INCOMPLETE_LOBBY_PLAYER,
+        List.of(e.getMessage())
+      );
     }
   }
 
-  public void createGame(String gameId, Integer players)
-    throws EmptyDeckException {
+  public void createGame(UUID connectionID, String gameId, Integer players)
+    throws InvalidActionException {
     manager.createGame(gameId, players);
 
-    this.getAllListeners()
-      .forEach(listener -> {
-        try {
-          listener.getValue().gameCreated(gameId, 0, players);
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          System.out.print(
-            "Error dispatching gameCreated event for socket: " +
-            listener.getKey()
-          );
-        }
-      });
+    this.notifySameContextClients(
+        connectionID,
+        listener -> listener.gameCreated(gameId, 0, players)
+      );
   }
 
   public Boolean isLastRound(String gameId) throws GameNotFoundException {
     return this.getGame(gameId).isLastRound();
   }
 
-  public void deleteGame(String gameId) {
+  public void deleteGame(UUID connectionID, String gameId)
+    throws InvalidActionException {
+    if (
+      userContexts
+        .values()
+        .stream()
+        .anyMatch(
+          uc ->
+            uc.getGameId().map(gid -> gid.equals(gameId)).orElse(false) &&
+            uc.getConnectionStatus() ==
+              UserGameContext.ConnectionStatus.CONNECTED
+        )
+    ) {
+      if (
+        !userContexts.containsKey(connectionID) ||
+        !userContexts
+          .get(connectionID)
+          .getGameId()
+          .map(gid -> gid.equals(gameId))
+          .orElse(false)
+      ) {
+        throw new NotInGameException();
+      }
+    }
     manager.deleteGame(gameId);
 
-    List<Pair<UUID, RemoteGameEventListener>> listeners = new ArrayList<>(
-      this.getMenuListeners()
-    );
-    listeners.addAll(this.getGameListeners(gameId));
-    listeners.addAll(this.getLobbyListeners(gameId));
-
-    listeners.forEach(listener -> {
-      try {
-        listener.getValue().gameDeleted(gameId);
-      } catch (RemoteException e) {
-        // TODO: handle in a better way
-        System.out.print(
-          "Error dispatching gameDeleted event for socket: " + listener.getKey()
-        );
-      }
-    });
+    this.notifySameContextClients(
+        connectionID,
+        listener -> listener.gameDeleted(gameId)
+      );
   }
 
-  private void checkIfCurrentPlayer(Game game, String playerNickname)
-    throws PlayerNotActive {
+  private void checkIfCurrentPlayer(Game game, UUID connectionID)
+    throws InvalidActionException {
     Player player = game.getCurrentPlayer();
     if (
-      player.getNickname().equals(playerNickname)
-    ) throw new PlayerNotActive();
+      userContexts.containsKey(connectionID) &&
+      player
+        .getNickname()
+        .equals(
+          userContexts
+            .get(connectionID)
+            .getNickname()
+            .orElseThrow(PlayerNotActive::new)
+        )
+    ) return;
+    throw new PlayerNotActive();
   }
 
-  public void nextTurn(String gameId, String playerNickname)
-    throws GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException {
+  public void nextTurn(UUID connectionID) throws InvalidActionException {
+    String gameId = userContexts
+      .get(connectionID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+
     Game game = this.getGame(gameId);
-    this.checkIfCurrentPlayer(game, playerNickname);
+    this.checkIfCurrentPlayer(game, connectionID);
     game.nextTurn();
-    this.getGameListeners(gameId).forEach(listener -> {
-        try {
-          listener
-            .getValue()
-            .changeTurn(
-              gameId,
-              game.getCurrentPlayer().getNickname(),
-              game.isLastRound()
-            );
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          System.out.print(
-            "Error dispatching changeTurn event for socket: " +
-            listener.getKey()
-          );
-        }
-      });
+    this.notifySameContextClients(
+        connectionID,
+        listener ->
+          listener.changeTurn(
+            gameId,
+            game.getCurrentPlayer().getNickname(),
+            game.isLastRound()
+          )
+      );
   }
 
   public void nextTurn(
-    String gameId,
-    String playerNickname,
+    UUID connectionID,
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
-  )
-    throws GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException {
+  ) throws InvalidActionException {
+    String gameId = userContexts
+      .get(connectionID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+
     Game game = this.getGame(gameId);
-    this.checkIfCurrentPlayer(game, playerNickname);
+    this.checkIfCurrentPlayer(game, connectionID);
     game.nextTurn(
       drawingSource,
       deckType,
       (playerCardId, pairCardId) ->
-        this.getGameListeners(gameId).forEach(listener -> {
-            try {
-              listener
-                .getValue()
-                .changeTurn(
-                  gameId,
-                  playerNickname,
-                  game.isLastRound(),
-                  drawingSource,
-                  deckType,
-                  playerCardId,
-                  pairCardId
-                );
-            } catch (RemoteException e) {
-              // TODO: handle in a better way
-              System.out.print(
-                "Error dispatching changeTurn event for socket: " +
-                listener.getKey()
-              );
-            }
-          })
+        this.notifySameContextClients(
+            connectionID,
+            listener ->
+              listener.changeTurn(
+                gameId,
+                game.getCurrentPlayer().getNickname(),
+                game.isLastRound(),
+                drawingSource,
+                deckType,
+                playerCardId,
+                pairCardId
+              )
+          )
     );
   }
 
@@ -789,51 +951,100 @@ public class GameController {
   }
 
   public void placeCard(
-    String gameId,
-    String playerNickname,
+    UUID connectionID,
     Integer playerHandCardNumber,
     CardSideType side,
     Position position
-  )
-    throws GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+  ) throws InvalidActionException {
+    String gameId = userContexts
+      .get(connectionID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+
     Game game = this.getGame(gameId);
-    this.checkIfCurrentPlayer(game, playerNickname);
+    this.checkIfCurrentPlayer(game, connectionID);
     Player currentPlayer = game.getCurrentPlayer();
     PlayableCard playedCard = currentPlayer.placeCard(
       playerHandCardNumber,
       side,
       position
     );
-    this.getGameListeners(gameId).forEach(listener -> {
-        try {
-          listener
-            .getValue()
-            .cardPlaced(
-              gameId,
-              playerNickname,
-              playerHandCardNumber,
-              playedCard.getId(),
-              side,
-              position,
-              currentPlayer.getPoints(),
-              currentPlayer.getBoard().getResources(),
-              currentPlayer.getBoard().getObjects(),
-              currentPlayer.getBoard().getAvailableSpots(),
-              currentPlayer.getBoard().getForbiddenSpots()
-            );
-        } catch (RemoteException e) {
-          // TODO: handle in a better way
-          System.out.print(
-            "Error dispatching cardPlaced event for socket: " +
-            listener.getKey()
-          );
-        }
-      });
+    this.notifySameContextClients(
+        connectionID,
+        listener ->
+          listener.cardPlaced(
+            gameId,
+            game.getCurrentPlayer().getNickname(),
+            playerHandCardNumber,
+            playedCard.getId(),
+            side,
+            position,
+            currentPlayer.getPoints(),
+            currentPlayer.getBoard().getResources(),
+            currentPlayer.getBoard().getObjects(),
+            currentPlayer.getBoard().getAvailableSpots(),
+            currentPlayer.getBoard().getForbiddenSpots()
+          )
+      );
   }
 
   public Set<TokenColor> getAvailableTokens(String gameId)
-    throws GameNotFoundException {
+    throws InvalidActionException {
     Game game = this.getGame(gameId);
     return game.getLobby().getAvailableColors();
+  }
+
+  public Map<String, Integer> getGamesCurrentPlayers() {
+    Map<String, Integer> playerCounts = new HashMap<>();
+    for (String gameId : this.getGames()) {
+      try {
+        playerCounts.put(gameId, this.getGame(gameId).getPlayers().size());
+      } catch (GameNotFoundException e) {
+        playerCounts.put(gameId, 0);
+      }
+    }
+    return playerCounts;
+  }
+
+  public Map<String, Integer> getGamesMaxPlayers() {
+    Map<String, Integer> maxPlayers = new HashMap<>();
+    for (String gameId : this.getGames()) {
+      try {
+        maxPlayers.put(gameId, this.getGame(gameId).getMaxPlayers());
+      } catch (GameNotFoundException e) {
+        maxPlayers.put(gameId, 0);
+      }
+    }
+    return maxPlayers;
+  }
+
+  public Pair<Integer, Integer> getLobbyObjectiveCards(UUID socketID)
+    throws InvalidActionException {
+    String gameId = userContexts
+      .get(socketID)
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+    this.getGame(gameId);
+    Game game = manager
+      .getGame(gameId)
+      .orElseThrow(() -> new GameNotFoundException(gameId));
+    return game
+      .getLobby()
+      .getPlayerObjectiveCards(socketID)
+      .map(p -> new Pair<>(p.getFirst().getId(), p.getSecond().getId()))
+      .orElseThrow(InvalidGetObjectiveCardsCallException::new);
+  }
+
+  public Integer getLobbyStarterCard(UUID connectionID)
+    throws InvalidActionException {
+    return this.getGame(
+        userContexts
+          .get(connectionID)
+          .getGameId()
+          .orElseThrow(NotInGameException::new)
+      )
+      .getLobby()
+      .getStarterCard(connectionID)
+      .getId();
   }
 }

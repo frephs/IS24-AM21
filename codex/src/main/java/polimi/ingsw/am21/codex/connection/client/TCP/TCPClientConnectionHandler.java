@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,18 +22,11 @@ import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetObject
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetStarterCardSideMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.InvalidActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
@@ -336,7 +331,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case AVAILABLE_GAME_LOBBIES -> handleMessage(
         (AvailableGameLobbiesMessage) message
       );
-      case LOBBY_STATUS -> handleMessage((LobbyStatusMessage) message);
       case OBJECTIVE_CARDS -> handleMessage((ObjectiveCardsMessage) message);
       case STARTER_CARD_SIDES -> handleMessage(
         (StarterCardSidesMessage) message
@@ -344,31 +338,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       // Game
       case GAME_STATUS -> handleMessage((GameStatusMessage) message);
       // Server Errors
-      case GAME_ALREADY_STARTED -> handleMessage(
-        (GameAlreadyStartedMessage) message
-      );
-      case ACTION_NOT_ALLOWED -> handleMessage(
-        (ActionNotAllowedMessage) message
-      );
+
       case UNKNOWN_MESSAGE_TYPE -> handleMessage(
         (UnknownMessageTypeMessage) message
       );
       case NOT_A_CLIENT_MESSAGE -> handleMessage(
         (NotAClientMessageMessage) message
       );
-      // lobby
-      case GAME_FULL -> handleMessage((GameFullMessage) message);
-      case GAME_NOT_FOUND -> handleMessage((GameNotFoundMessage) message);
-      case NICKNAME_ALREADY_TAKEN -> handleMessage(
-        (NicknameAlreadyTakenMessage) message
-      );
-      case TOKEN_COLOR_ALREADY_TAKEN -> handleMessage(
-        (TokenColorAlreadyTakenMessage) message
-      );
-      // game
-      case INVALID_CARD_PLACEMENT -> handleMessage(
-        (InvalidCardPlacementMessage) message
-      );
+      case INVALID_ACTION -> handleMessage((InvalidActionMessage) message);
       // View Updating Messages
       // Lobby
       case GAME_CREATED -> handleMessage((GameCreatedMessage) message);
@@ -412,10 +389,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.gameStatusUpdate(message.getState());
   }
 
-  public void handleMessage(LobbyStatusMessage message) {
-    localModel.loadGameLobby(message.getPlayers());
-  }
-
   public void handleMessage(AvailableGameLobbiesMessage message) {
     localModel.createGames(
       message.getLobbyIds(),
@@ -440,34 +413,80 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   //game
 
-  public void handleMessage(InvalidCardPlacementMessage message) {
-    localModel.invalidCardPlacement(message.getReason());
-  }
-
-  public void handleMessage(GameAlreadyStartedMessage ignored) {
-    localModel.gameAlreadyStarted();
-  }
-
-  //lobby
-
-  public void handleMessage(GameFullMessage message) {
-    localModel.lobbyFull(message.getGameId());
-  }
-
-  public void handleMessage(GameNotFoundMessage message) {
-    localModel.gameNotFound(message.getGameId());
-  }
-
-  public void handleMessage(NicknameAlreadyTakenMessage message) {
-    localModel.nicknameTaken(message.getNickname());
-  }
-
-  public void handleMessage(TokenColorAlreadyTakenMessage message) {
-    localModel.tokenTaken(message.getToken());
-  }
-
-  public void handleMessage(ActionNotAllowedMessage ignored) {
-    localModel.actionNotAllowed();
+  public void handleMessage(InvalidActionMessage message) {
+    switch (message.getCode()) {
+      case PLAYER_NOT_ACTIVE -> {
+        this.localModel.playerNotActive();
+      }
+      case NOT_IN_GAME -> {
+        this.localModel.notInGame();
+      }
+      case GAME_ALREADY_STARTED -> {
+        this.localModel.gameAlreadyStarted();
+      }
+      case INVALID_NEXT_TURN_CALL -> {
+        this.localModel.invalidNextTurnCall();
+      }
+      case GAME_NOT_READY -> {
+        this.localModel.gameNotReady();
+      }
+      case INVALID_GET_OBJECTIVE_CARDS_CALL -> {
+        this.localModel.invalidGetObjectiveCardsCall();
+      }
+      case GAME_NOT_FOUND -> {
+        this.localModel.gameNotFound(
+            message.getNotes().orElse(List.of("")).get(0)
+          );
+      }
+      case PLAYER_NOT_FOUND -> {
+        this.localModel.playerNotFound();
+      }
+      case INCOMPLETE_LOBBY_PLAYER -> {
+        this.localModel.incompleteLobbyPlayer(
+            message
+              .getNotes()
+              .orElse(
+                List.of(
+                  "Incomplete player, finish setting up your player first"
+                )
+              )
+              .get(0)
+          );
+      }
+      case EMPTY_DECK -> {
+        this.localModel.emptyDeck();
+      }
+      case ILLEGAL_PLACING_POSITION -> {
+        this.localModel.invalidCardPlacement(
+            Optional.ofNullable(
+              message.getNotes().orElse(List.of(null)).get(0)
+            ).orElse(message.getCode().getErrorMessage())
+          );
+      }
+      case ILLEGAL_CARD_SIDE_CHOICE -> {
+        this.localModel.illegalCardSideChoice();
+      }
+      case LOBBY_FULL -> {
+        this.localModel.lobbyFull(
+            message.getNotes().orElse(List.of("N/A")).get(0)
+          );
+      }
+      case NICKNAME_ALREADY_TAKEN -> {
+        this.localModel.nicknameTaken(
+            message.getNotes().orElse(List.of("N/A")).get(0)
+          );
+      }
+      case TOKEN_ALREADY_TAKEN -> {
+        this.localModel.tokenTaken(
+            TokenColor.fromString(
+              message.getNotes().orElse(List.of("N/A")).get(0)
+            )
+          );
+      }
+      case GAME_OVER -> {
+        this.localModel.gameOver();
+      }
+    }
   }
 
   public void handleMessage(UnknownMessageTypeMessage ignored) {
@@ -534,6 +553,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.playerSetToken(
       message.getGameId(),
       message.getSocketId(),
+      message.getNickname(),
       message.getColor()
     );
   }

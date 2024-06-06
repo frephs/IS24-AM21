@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
@@ -41,45 +42,119 @@ public class RMIServerConnectionHandlerImpl
     this.controller = controller;
   }
 
-  public void joinLobby(String gameId, UUID connectionID)
-    throws RemoteException, GameNotFoundException, LobbyFullException, GameAlreadyStartedException {
-    this.controller.joinLobby(gameId, connectionID);
+  @Override
+  public Set<String> getGames() throws RemoteException {
+    return this.controller.getGames();
   }
 
-  public void lobbySetNickname(
-    String gameId,
+  @Override
+  public Map<String, Integer> getGamesCurrentPlayers() throws RemoteException {
+    return this.controller.getGamesCurrentPlayers();
+  }
+
+  @Override
+  public Map<String, Integer> getGamesMaxPlayers() throws RemoteException {
+    return this.controller.getGamesMaxPlayers();
+  }
+
+  @Override
+  public Pair<Integer, Integer> getLobbyObjectiveCards(UUID connectionID)
+    throws RemoteException, InvalidActionException {
+    return this.controller.getLobbyObjectiveCards(connectionID);
+  }
+
+  @Override
+  public Integer getLobbyStarterCard(UUID connectionID)
+    throws RemoteException, InvalidActionException {
+    return this.controller.getLobbyStarterCard(connectionID);
+  }
+
+  @Override
+  public void joinLobby(UUID connectionID, String gameID)
+    throws RemoteException, InvalidActionException {
+    this.controller.joinLobby(connectionID, gameID);
+  }
+
+  @Override
+  public void lobbySetTokenColor(UUID connectionID, TokenColor color)
+    throws RemoteException, InvalidActionException {
+    this.controller.lobbySetTokenColor(connectionID, color);
+  }
+
+  @Override
+  public void lobbySetNickname(UUID connectionID, String nickname)
+    throws RemoteException, InvalidActionException {
+    this.controller.lobbySetNickname(connectionID, nickname);
+  }
+
+  @Override
+  public void lobbyChooseObjective(UUID connectionID, Boolean first)
+    throws RemoteException, InvalidActionException {
+    this.controller.lobbyChooseObjective(connectionID, first);
+  }
+
+  @Override
+  public void startGame(UUID connectionID)
+    throws RemoteException, InvalidActionException {
+    this.controller.startGame(connectionID);
+  }
+
+  @Override
+  public void joinGame(UUID connectionID, String gameID, CardSideType sideType)
+    throws RemoteException, InvalidActionException {
+    this.controller.joinGame(connectionID, gameID, sideType);
+  }
+
+  @Override
+  public void createGame(UUID connectionID, String gameId, Integer players)
+    throws RemoteException, InvalidActionException {
+    this.controller.createGame(connectionID, gameId, players);
+  }
+
+  @Override
+  public void deleteGame(UUID connectionID, String gameId)
+    throws RemoteException, InvalidActionException {
+    this.controller.deleteGame(connectionID, gameId);
+  }
+
+  @Override
+  public void nextTurn(UUID connectionID)
+    throws RemoteException, InvalidActionException {
+    this.controller.nextTurn(connectionID);
+  }
+
+  @Override
+  public void nextTurn(
     UUID connectionID,
-    String username
-  )
-    throws RemoteException, NicknameAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException {
-    this.controller.lobbySetNickname(gameId, connectionID, username);
+    DrawingCardSource drawingSource,
+    DrawingDeckType deckType
+  ) throws RemoteException, InvalidActionException {
+    this.controller.nextTurn(connectionID, drawingSource, deckType);
   }
 
   @Override
-  public void lobbyChooseObjective(String gameId, UUID socketID, Boolean first)
-    throws RemoteException, GameNotFoundException, GameAlreadyStartedException {
-    this.controller.lobbyChooseObjective(gameId, socketID, first);
+  public void placeCard(
+    UUID connectionID,
+    Integer playerHandCardNumber,
+    CardSideType side,
+    Position position
+  ) throws RemoteException, InvalidActionException {
+    this.controller.placeCard(
+        connectionID,
+        playerHandCardNumber,
+        side,
+        position
+      );
   }
 
   @Override
-  public void startGame(String gameId)
-    throws RemoteException, GameNotFoundException, GameNotReadyException, GameAlreadyStartedException {
-    this.controller.startGame(gameId);
-  }
-
-  @Override
-  public void joinGame(String gameId, UUID socketID, CardSideType sideType)
-    throws RemoteException, GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameAlreadyStartedException {}
-
-  @Override
-  public void leaveLobby(String gameId, UUID connectionID)
-    throws RemoteException, GameNotFoundException {
-    this.controller.removePlayerFromLobby(gameId, connectionID);
+  public void leaveLobby(UUID connectionID) throws RemoteException {
+    this.leaveLobby(connectionID);
   }
 
   @Override
   public Set<TokenColor> getAvailableTokens(String gameId)
-    throws RemoteException, GameNotFoundException {
+    throws RemoteException, InvalidActionException {
     return this.controller.getAvailableTokens(gameId);
   }
 
@@ -89,118 +164,5 @@ public class RMIServerConnectionHandlerImpl
     RemoteGameEventListener listener
   ) throws RemoteException {
     this.controller.registerListener(connectionID, listener);
-  }
-
-  public void lobbySetTokenColor(
-    String gameId,
-    UUID connectionID,
-    TokenColor tokenColor
-  )
-    throws RemoteException, TokenAlreadyTakenException, GameNotFoundException, GameAlreadyStartedException {
-    this.controller.lobbySetTokenColor(gameId, connectionID, tokenColor);
-  }
-
-  public void lobbySetObjectiveCard(
-    String gameId,
-    UUID connectionID,
-    Boolean isFirst
-  ) throws RemoteException, GameNotFoundException, GameAlreadyStartedException {
-    this.controller.lobbyChooseObjective(gameId, connectionID, isFirst);
-  }
-
-  public void lobbyJoinGame(
-    String gameId,
-    UUID connectionID,
-    CardSideType starterCardSize
-  )
-    throws RemoteException, GameNotReadyException, EmptyDeckException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameNotFoundException, GameAlreadyStartedException {
-    this.controller.joinGame(gameId, connectionID, starterCardSize);
-  }
-
-  public void createGame(String gameId, UUID socketID, Integer players)
-    throws RemoteException, EmptyDeckException {
-    this.controller.createGame(gameId, players);
-  }
-
-  @Override
-  public void deleteGame(String gameId) throws RemoteException {
-    this.controller.deleteGame(gameId);
-  }
-
-  public void placeCard(
-    String gameId,
-    String playerNickname,
-    Integer playerHandCardNumber,
-    CardSideType side,
-    Position position
-  )
-    throws RemoteException, GameNotFoundException, PlayerNotActive, IllegalCardSideChoiceException, IllegalPlacingPositionException {
-    this.controller.placeCard(
-        gameId,
-        playerNickname,
-        playerHandCardNumber,
-        side,
-        position
-      );
-  }
-
-  public void nextTurn(String gameId, String playerNickname)
-    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException {
-    this.controller.nextTurn(gameId, playerNickname);
-  }
-
-  public void nextTurn(
-    String gameId,
-    String playerNickname,
-    DrawingCardSource drawingSource,
-    DrawingDeckType deckType
-  )
-    throws RemoteException, GameNotFoundException, InvalidNextTurnCallException, PlayerNotActive, GameOverException, EmptyDeckException {
-    this.controller.nextTurn(gameId, playerNickname, drawingSource, deckType);
-  }
-
-  public Set<String> getGames() throws RemoteException {
-    return this.controller.getGames();
-  }
-
-  @Override
-  public Map<String, Integer> getGamesCurrentPlayers() throws RemoteException {
-    return this.controller.getCurrentSlots();
-  }
-
-  @Override
-  public Map<String, Integer> getGamesMaxPlayers() throws RemoteException {
-    return this.controller.getMaxSlots();
-  }
-
-  @Override
-  public Pair<Integer, Integer> getLobbyObjectiveCards(
-    String gameId,
-    UUID socketID
-  ) throws RemoteException, GameNotFoundException {
-    return controller
-      .getGame(gameId)
-      .getLobby()
-      .getPlayerObjectiveCards(socketID)
-      .map(p -> new Pair<>(p.getFirst().getId(), p.getSecond().getId()))
-      .orElseThrow(
-        () -> new RuntimeException("No player objective cards found.")
-      );
-  }
-
-  @Override
-  public Integer getLobbyStarterCard(String gameId, UUID socketID)
-    throws RemoteException, GameNotFoundException, PlayerNotFoundException {
-    return controller
-      .getGame(gameId)
-      .getLobby()
-      .getStarterCard(socketID)
-      .getId();
-  }
-
-  @Override
-  public void removePlayerFromLobby(String gameId, UUID socketID)
-    throws RemoteException, GameNotFoundException {
-    this.controller.removePlayerFromLobby(gameId, socketID);
   }
 }

@@ -24,13 +24,15 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class CliClient {
 
-  private final ContextContainer context = new ContextContainer();
-
   Scanner scanner = new Scanner(System.in);
   Cli cli = Cli.getInstance();
   ClientConnectionHandler client;
 
   private final LocalModelContainer localModel = new LocalModelContainer(cli);
+
+  private LocalModelContainer.ClientContextContainer getClientContextContainer() {
+    return localModel.getClientContextContainer();
+  }
 
   public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
@@ -56,12 +58,11 @@ public class CliClient {
           .stream()
           .filter(
             commandHandler ->
-              commandHandler.getContext() == null ||
-              commandHandler.getContext() == ClientContext.ALL ||
-              commandHandler.getContext() == context.get()
-          )
-          .filter(
-            commandHandler ->
+              (commandHandler.getContext().isEmpty() ||
+                this.getClientContextContainer().get().isEmpty() ||
+                commandHandler.getContext().get() == ClientContext.ALL ||
+                commandHandler.getContext().get() ==
+                  this.getClientContextContainer().get().get()) &&
               commandHandler.getUsage().split(" ")[0].equals(command[0])
           )
           .collect(Collectors.toSet());
@@ -126,9 +127,7 @@ public class CliClient {
     }
 
     public CommandHandler(String usage, String description) {
-      this.usage = usage;
-      this.description = description;
-      context = null;
+      this(usage, description, null);
     }
 
     public boolean matchUsageString(String input) {
@@ -154,38 +153,18 @@ public class CliClient {
       return description;
     }
 
-    public ClientContext getContext() {
-      return context;
+    public Optional<ClientContext> getContext() {
+      return Optional.ofNullable(context);
     }
   }
 
   private final List<CommandHandler> commandHandlers = new LinkedList<>();
 
-  private class ContextContainer {
-
-    private ClientContext context;
-
-    ContextContainer() {
-      context = null;
-    }
-
-    public ClientContext get() {
-      return context;
-    }
-
-    private void set(ClientContext context) {
-      this.context = context;
-      if (context != null) {
-        cli.postNotification(
-          NotificationType.RESPONSE,
-          "You are now in the " + context.toString().toLowerCase()
-        );
-      }
-    }
-  }
-
   private void initializeCommandHandlers() {
     // TODO add optional arguments to usages
+
+    final LocalModelContainer.ClientContextContainer currentContext =
+      this.getClientContextContainer();
 
     commandHandlers.add(
       new CommandHandler("exit", "Exit the program") {
@@ -203,7 +182,7 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.connect();
-          context.set(null);
+          currentContext.set(null);
         }
       }
     );
@@ -218,9 +197,20 @@ public class CliClient {
             .stream()
             .filter(
               commandHandler ->
-                commandHandler.getContext() == null ||
-                commandHandler.getContext() == ClientContext.ALL ||
-                commandHandler.getContext().equals(context.get())
+                currentContext
+                  .get()
+                  .map(
+                    currentContextVal ->
+                      commandHandler
+                        .getContext()
+                        .map(
+                          context ->
+                            context == ClientContext.ALL ||
+                            context.equals(currentContextVal)
+                        )
+                        .orElse(true)
+                  )
+                  .orElse(true)
             )
             .forEach(commandHandler -> {
               usages.add(commandHandler.getUsage());
@@ -252,8 +242,6 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
-          context.set(ClientContext.LOBBY);
-          // TODO printed lobby is outdated
         }
       }
     );
@@ -291,7 +279,14 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.createGame(command[1], Integer.parseInt(command[2]));
+          try {
+            client.createGame(command[1], Integer.parseInt(command[2]));
+          } catch (NumberFormatException e) {
+            cli.postNotification(
+              NotificationType.ERROR,
+              "Invalid number of players"
+            );
+          }
         }
       }
     );
@@ -303,11 +298,17 @@ public class CliClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.createAndConnectToGame(
-            command[1],
-            Integer.parseInt(command[2])
-          );
-          context.set(ClientContext.LOBBY);
+          try {
+            client.createAndConnectToGame(
+              command[1],
+              Integer.parseInt(command[2])
+            );
+          } catch (NumberFormatException e) {
+            cli.postNotification(
+              NotificationType.ERROR,
+              "Invalid number of players"
+            );
+          }
         }
       }
     );
@@ -373,10 +374,9 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           if (!List.of("1", "2").contains(command[1])) {
-            // TODO Handle invalid command
             return;
           }
-
+          client.getObjectivesIfNull();
           client.lobbyChooseObjectiveCard(command[1].equals("1"));
         }
       }
@@ -404,14 +404,15 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           if (!List.of("front", "back").contains(command[1])) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(NotificationType.ERROR, "Invalid side");
             return;
           }
 
           client.lobbyJoinGame(
             command[1].equals("front") ? CardSideType.FRONT : CardSideType.BACK
           );
-          context.set(ClientContext.GAME);
         }
       }
     );
@@ -422,9 +423,13 @@ public class CliClient {
         public void handle(String[] command) {
           cli.postNotification(
             NotificationType.RESPONSE,
-            (context.get() != null)
-              ? "You are now in the " + context.get().toString().toLowerCase()
-              : "You have not joined any lobby or game yet"
+            currentContext
+              .get()
+              .map(
+                context ->
+                  "You are now in the " + context.toString().toLowerCase()
+              )
+              .orElse("You have not joined any lobby or game yet")
           );
         }
       }
@@ -462,7 +467,10 @@ public class CliClient {
               try {
                 cardId = Integer.parseInt(command[2]);
               } catch (NumberFormatException e) {
-                // TODO Handle invalid command
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Invalid card id"
+                );
                 return;
               }
 
@@ -539,7 +547,12 @@ public class CliClient {
               Integer.parseInt(command[3])
             );
           } catch (NumberFormatException e) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(
+                NotificationType.WARNING,
+                "Invalid number format"
+              );
             return;
           }
           client.placeCard(
@@ -569,7 +582,9 @@ public class CliClient {
               "gold2"
             ).contains(command[1])
           ) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(NotificationType.WARNING, "Invalid command");
             return;
           }
 
@@ -608,12 +623,19 @@ public class CliClient {
     CliClient cliClient = new CliClient();
 
     // TODO add defaults from config file
-    cliClient.start(
-      Objects.equals(args[0], "--TCP")
+    try {
+      ConnectionType connectionType = Objects.equals(args[0], "--TCP")
         ? ConnectionType.TCP
-        : ConnectionType.RMI,
-      args[1] != null ? args[1] : "localhost",
-      args[2] != null ? Integer.parseInt(args[2]) : 12345
-    );
+        : ConnectionType.RMI;
+      cliClient.start(
+        connectionType,
+        args[1] != null ? args[1] : "localhost",
+        args[2] != null
+          ? Integer.parseInt(args[2])
+          : connectionType.getDefaultPort()
+      );
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid port number");
+    }
   }
 }

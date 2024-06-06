@@ -3,7 +3,6 @@ package polimi.ingsw.am21.codex.controller.listeners;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public interface GameErrorListener {
-  void actionNotAllowed();
   void unknownResponse();
 
   void gameNotFound(String gameId);
@@ -19,6 +18,11 @@ public interface GameErrorListener {
   void playerNotActive();
   void invalidCardPlacement(String reason);
   void invalidNextTurnCall();
+  void invalidGetObjectiveCardsCall();
+  void gameNotReady();
   void gameOver();
   void emptyDeck();
+  void playerNotFound();
+  void incompleteLobbyPlayer(String msg);
+  void illegalCardSideChoice();
 }

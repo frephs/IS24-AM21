@@ -3,7 +3,9 @@ package polimi.ingsw.am21.codex.client.localModel.remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
@@ -48,9 +50,13 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void playerSetToken(String gameId, UUID socketID, TokenColor token)
-    throws RemoteException {
-    listener.playerSetToken(gameId, socketID, token);
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) throws RemoteException {
+    listener.playerSetToken(gameId, socketID, nickname, token);
   }
 
   @Override
@@ -170,5 +176,19 @@ public class LocalModelGameEventListener
   @Override
   public void winningPlayer(String nickname) throws RemoteException {
     listener.winningPlayer(nickname);
+  }
+
+  @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) throws RemoteException {
+    listener.playerConnectionChanged(socketID, nickname, status);
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException {
+    listener.lobbyInfo(usersInfo);
   }
 }

@@ -4,13 +4,17 @@ import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
@@ -47,6 +51,30 @@ public class LocalModelContainer
   private UUID socketId;
 
   private final RemoteGameEventListener listener;
+
+  public class ClientContextContainer {
+
+    private ClientContext context;
+
+    ClientContextContainer() {
+      context = null;
+    }
+
+    public Optional<ClientContext> get() {
+      return Optional.ofNullable(context);
+    }
+
+    public void set(ClientContext context) {
+      this.context = context;
+    }
+  }
+
+  private final ClientContextContainer clientContextContainer =
+    new ClientContextContainer();
+
+  public ClientContextContainer getClientContextContainer() {
+    return clientContextContainer;
+  }
 
   public LocalModelContainer(View view) {
     this.view = view;
@@ -85,19 +113,12 @@ public class LocalModelContainer
   }
 
   @Override
-  public void actionNotAllowed() {
-    // TODO use this in RMI
-    view.postNotification(NotificationType.WARNING, "Action not allowed");
-  }
-
-  @Override
   public void gameAlreadyStarted() {
     view.postNotification(NotificationType.ERROR, "Game has already started");
   }
 
   @Override
   public void gameNotStarted() {
-    // TODO use this
     view.postNotification(NotificationType.ERROR, "Game not started");
   }
 
@@ -190,24 +211,6 @@ public class LocalModelContainer
       );
   }
 
-  public void loadGameLobby(Map<UUID, Pair<String, TokenColor>> players) {
-    //TODO use this in RMI
-
-    players.forEach((uuid, nicknameTokenPair) -> {
-      addToLobby(uuid);
-      String nickname = nicknameTokenPair.getKey();
-      if (nickname != null) {
-        setPlayerNickname(uuid, nickname);
-      }
-      TokenColor tokenColor = nicknameTokenPair.getValue();
-      if (tokenColor != null) {
-        setPlayerToken(uuid, tokenColor);
-      }
-    });
-
-    listLobbyPlayers();
-  }
-
   public void listLobbyPlayers() {
     view.drawLobby(lobby.getPlayers());
   }
@@ -221,8 +224,6 @@ public class LocalModelContainer
    * */
   @Override
   public void playerJoinedLobby(String gameId, UUID socketId) {
-    //TODO check player joins are not filtered by the server to my lobby.
-    //TODO check if tcp and rmi servers send a message / call the methods when a "late" player joins (lobbystatusmessage)
     menu
       .getGames()
       .computeIfPresent(gameId, (gameID, gameEntry) -> {
@@ -230,7 +231,7 @@ public class LocalModelContainer
         return gameEntry;
       });
 
-    // Do not draw the lobby in this method, let it be drawn by lobbyStatus
+    // Do not draw the lobby in this method, let it be drawn by lobbyInfo
     // This way we prevent an outdated lobby from being drawn
 
     if (lobby != null && lobby.getGameId().equals(gameId)) {
@@ -248,7 +249,7 @@ public class LocalModelContainer
         menu.getGames().get(gameId).getMaxPlayers()
       );
       addToLobby(socketId);
-
+      this.getClientContextContainer().set(ClientContext.GAME);
       view.postNotification(
         NotificationType.RESPONSE,
         "You joined the lobby of the game: " + gameId
@@ -312,7 +313,12 @@ public class LocalModelContainer
   }
 
   @Override
-  public void playerSetToken(String gameId, UUID socketId, TokenColor token) {
+  public void playerSetToken(
+    String gameId,
+    UUID socketId,
+    String nickname,
+    TokenColor token
+  ) {
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
 
     setPlayerToken(socketId, token);
@@ -329,7 +335,11 @@ public class LocalModelContainer
       getView()
         .postNotification(
           NotificationType.UPDATE,
-          new String[] { socketId.toString(), " chose the ", " token. " },
+          new String[] {
+            Optional.ofNullable(nickname).orElse(socketId.toString()),
+            " chose the ",
+            " token. ",
+          },
           token,
           2
         );
@@ -389,6 +399,10 @@ public class LocalModelContainer
     );
   }
 
+  public CardPair<Card> getAvailableObjectives() {
+    return lobby.getAvailableObjectives();
+  }
+
   public void playerChoseObjectiveCard(Boolean isFirst) {
     this.localGameBoard.setSecretObjective(
         isFirst
@@ -437,12 +451,19 @@ public class LocalModelContainer
     CardSideType starterSide
   ) {
     List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
-    lobby.getPlayers().get(socketID).setHand(hand);
 
     Card starterCard = cardsLoader.getCardFromId(starterCardID);
-    lobby
+
+    if (lobby.getPlayers().get(socketId) == null) lobby
       .getPlayers()
-      .get(socketID)
+      .put(socketId, new LocalPlayer(socketId));
+
+    LocalPlayer player = lobby.getPlayers().get(socketID);
+
+    player.setHand(hand);
+    player.setNickname(nickname);
+    player.setToken(color);
+    player
       .getPlayedCards()
       .put(new Position(), new Pair<>(starterCard, starterSide));
 
@@ -678,6 +699,38 @@ public class LocalModelContainer
   }
 
   @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    view.postNotification(
+      NotificationType.UPDATE,
+      "Player " +
+      Optional.ofNullable(nickname).orElse(socketID.toString()) +
+      " is now " +
+      status
+    );
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    this.lobby.getPlayers().clear();
+    usersInfo
+      .getUsers()
+      .forEach((uuid, lobbyInfoUser) -> {
+        addToLobby(uuid);
+        lobbyInfoUser
+          .getNickname()
+          .ifPresent(nickname -> setPlayerNickname(uuid, nickname));
+        lobbyInfoUser
+          .getTokenColor()
+          .ifPresent(token -> setPlayerToken(uuid, token));
+      });
+    this.clientContextContainer.set(ClientContext.LOBBY);
+  }
+
+  @Override
   public void playerNotActive() {
     view.postNotification(NotificationType.ERROR, "It's not your turn. ");
   }
@@ -688,8 +741,36 @@ public class LocalModelContainer
   }
 
   @Override
+  public void invalidGetObjectiveCardsCall() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Invalid get objective cards call. "
+    );
+  }
+
+  @Override
+  public void gameNotReady() {
+    view.postNotification(NotificationType.ERROR, "Game not ready. ");
+  }
+
+  @Override
   public void emptyDeck() {
     view.postNotification(NotificationType.ERROR, "Deck is empty. ");
+  }
+
+  @Override
+  public void playerNotFound() {
+    view.postNotification(NotificationType.ERROR, "Player not found. ");
+  }
+
+  @Override
+  public void incompleteLobbyPlayer(String msg) {
+    view.postNotification(NotificationType.ERROR, msg);
+  }
+
+  @Override
+  public void illegalCardSideChoice() {
+    view.postNotification(NotificationType.ERROR, "Illegal card side choice. ");
   }
 
   public View getView() {
