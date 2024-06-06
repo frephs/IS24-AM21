@@ -12,7 +12,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -24,12 +23,12 @@ import polimi.ingsw.am21.codex.view.NotificationType;
 
 public class NotificationLoader {
 
-  private final Stage notificationStage;
+  private static Stage notificationStage;
 
   private Queue<NotificationLayout> notifications = new LinkedList<>();
 
   public NotificationLoader(Stage notificationStage) {
-    this.notificationStage = notificationStage;
+    NotificationLoader.notificationStage = notificationStage;
 
     notificationStage.setAlwaysOnTop(true);
     notificationStage.initStyle(StageStyle.TRANSPARENT);
@@ -40,7 +39,15 @@ public class NotificationLoader {
     NotificationType notificationType,
     String message
   ) throws IOException {
-    notifications.add(new NotificationLayout(notificationType, message));
+    NotificationLayout notification = new NotificationLayout();
+
+    notification.loadNotification();
+    notification.setNotificationText(message);
+    notification.setNotificationType(notificationType);
+    notification.setDraggable(notificationStage);
+
+    notifications.add(notification);
+
     if (!notificationStage.isShowing()) {
       processNotifications();
     }
@@ -49,13 +56,10 @@ public class NotificationLoader {
   public void processNotifications() throws IOException {
     if (!notifications.isEmpty()) {
       NotificationLayout notification = notifications.poll();
-      notification.loadNotification();
 
-      Scene notificationScene = new Scene(
-        (Parent) notification.getNotificationLayout()
-      );
+      Scene notificationScene = new Scene((Parent) notification.getParent());
 
-      notificationScene.setFill(Color.TRANSPARENT); // Make the scene background transparent
+      notificationScene.setFill(Color.TRANSPARENT);
       notificationStage.setScene(notificationScene);
       notificationStage.show();
 
@@ -66,74 +70,59 @@ public class NotificationLoader {
         try {
           Thread.sleep(2000); // Duration in milliseconds
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          Gui.getInstance().displayException(e);
         }
         Platform.runLater(() -> {
           notificationStage.close();
           try {
             processNotifications();
           } catch (IOException e) {
-            e.printStackTrace();
+            Gui.getInstance().displayException(e);
           }
         });
       }).start();
     }
   }
 
-  private class NotificationLayout {
+  public static class NotificationLayout extends DraggableLayout {
+
+    Parent notificationLayout;
 
     @FXML
     ProgressBar progressBar;
 
     @FXML
-    Node notificationLayout;
+    Node notificationContainer;
 
     @FXML
     Text notificationText;
 
-    private NotificationType notificationType;
-    private String message;
+    public NotificationLayout() {}
 
-    public NotificationLayout(
-      NotificationType notificationType,
-      String message
-    ) {
-      this.notificationType = notificationType;
-      this.message = message;
-    }
-
-    public Node getNotificationLayout() {
+    public Node getParent() {
       return notificationLayout;
     }
 
-    public void loadNotification() throws IOException {
+    private void loadNotification() throws IOException {
       FXMLLoader loader = new FXMLLoader(
         Gui.class.getResource("Notification.fxml")
       );
 
       loader.setController(this);
       notificationLayout = loader.load();
-
-      notificationText = (Text) notificationLayout.lookup("#notification-text");
-      progressBar = (ProgressBar) notificationLayout.lookup("#progress-bar");
-
-      setNotificationText();
-      setNotificationType();
     }
 
-    private void setNotificationText() {
-      notificationText = (Text) notificationLayout.lookup("#notification-text");
+    private void setNotificationText(String message) {
       notificationText.setText(message);
     }
 
-    private void setNotificationType() {
-      VBox notificationBox = (VBox) notificationLayout.lookup(".notification");
-      notificationBox.getStyleClass().add(notificationType.getStyleClass());
+    private void setNotificationType(NotificationType notificationType) {
+      notificationContainer
+        .getStyleClass()
+        .add(notificationType.getStyleClass());
     }
 
     public void startProgressBar(int duration, boolean reverse) {
-      progressBar = (ProgressBar) notificationLayout.lookup("#progress-bar");
-
       Timeline timeline = new Timeline();
 
       for (int i = 0; i <= duration; i += 25) {
@@ -150,6 +139,11 @@ public class NotificationLoader {
       }
 
       timeline.play();
+    }
+
+    @Override
+    public void setDraggable(Stage notificationStage) {
+      setDraggable(notificationStage, notificationContainer);
     }
   }
 }
