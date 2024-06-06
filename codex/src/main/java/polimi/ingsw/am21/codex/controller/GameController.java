@@ -752,6 +752,35 @@ public class GameController {
       );
   }
 
+  private void sendGameStartedNotification(String gameId, Game game) {
+    this.notifyClients(
+        userContexts
+          .entrySet()
+          .stream()
+          .filter(
+            entry ->
+              entry.getValue().getConnectionStatus() ==
+                UserGameContext.ConnectionStatus.CONNECTED &&
+              entry
+                .getValue()
+                .getGameId()
+                .map(gid -> gid.equals(gameId))
+                .orElse(false)
+          )
+          .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+          .collect(Collectors.toList()),
+        listener ->
+          listener.gameStarted(
+            gameId,
+            game
+              .getPlayers()
+              .stream()
+              .map(Player::getNickname)
+              .collect(Collectors.toList())
+          )
+      );
+  }
+
   public void startGame(UUID socketID) throws InvalidActionException {
     String gameId = userContexts
       .get(socketID)
@@ -764,6 +793,8 @@ public class GameController {
     ) throw new GameAlreadyStartedException();
 
     game.start();
+
+    this.sendGameStartedNotification(gameId, game);
   }
 
   public void joinGame(UUID socketID, String gameId, CardSideType sideType)
@@ -801,6 +832,7 @@ public class GameController {
         );
       try {
         game.start();
+        this.sendGameStartedNotification(gameId, game);
       } catch (GameAlreadyStartedException ignored) {
         // the game has already started
         // we don't need to do anything
