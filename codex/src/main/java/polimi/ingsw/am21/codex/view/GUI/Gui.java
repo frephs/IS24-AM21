@@ -11,6 +11,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -25,10 +26,12 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
+import polimi.ingsw.am21.codex.view.GUI.utils.GuiUtils;
 import polimi.ingsw.am21.codex.view.GUI.utils.NotificationLoader;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
@@ -72,7 +75,36 @@ public class Gui extends Application implements View {
         new CardPair<>(cardFromId, cards.getCardFromId(101))
       );
     this.drawStarterCardSides(cards.getCardFromId(32));
-    // Add assertions here
+  }
+
+  public void testGame() {
+    LocalPlayer p1 = new LocalPlayer(UUID.randomUUID());
+    LocalPlayer p2 = new LocalPlayer(UUID.randomUUID());
+    LocalPlayer p3 = new LocalPlayer(UUID.randomUUID());
+    LocalPlayer p4 = new LocalPlayer(UUID.randomUUID());
+
+    p1.setNickname("Player 1");
+    p2.setNickname("Player 2");
+    p3.setNickname("Player 3");
+    p4.setNickname("Player 4");
+
+    p1.setToken(TokenColor.RED);
+    p2.setToken(TokenColor.BLUE);
+    p3.setToken(TokenColor.GREEN);
+    p4.setToken(TokenColor.YELLOW);
+
+    p1.setPoints(10);
+    p2.setPoints(40);
+    p3.setPoints(30);
+    p4.setPoints(20);
+
+    p1.addResource(ResourceType.ANIMAL, 2);
+    p2.addResource(ResourceType.INSECT, 2);
+    p3.addResource(ResourceType.PLANT, 2);
+    p4.addResource(ResourceType.FUNGI, 2);
+
+    this.drawGame(List.of(p1, p2, p3, p4));
+    this.drawLeaderBoard(List.of(p1, p2, p3, p4));
   }
 
   public Gui() {}
@@ -96,7 +128,9 @@ public class Gui extends Application implements View {
       primaryStage.setScene(scene);
       primaryStage.setMaximized(true);
       primaryStage.show();
-      testLobby();
+
+      //      testLobby();
+      testGame();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -268,7 +302,75 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
-    // TODO
+    GridPane container = (GridPane) scene.lookup("#leaderboard-grid");
+    container.getChildren().clear();
+
+    List<LocalPlayer> sortedPlayers = players
+      .stream()
+      .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
+      .toList();
+    for (int i = 0; i < sortedPlayers.size(); i++) {
+      LocalPlayer player = sortedPlayers.get(i);
+
+      Label nickname = new Label(player.getNickname());
+      nickname.getStyleClass().add("leaderboard-entry");
+      container.add(nickname, 0, i);
+
+      Label points = new Label(String.valueOf(player.getPoints()));
+      points.getStyleClass().add("leaderboard-entry");
+      container.add(points, 1, i);
+
+      HBox resources = new HBox();
+      resources.getStyleClass().add("leaderboard-entry");
+      player
+        .getResources()
+        .forEach((resource, amount) -> {
+          // Base container for each entry
+          HBox entryContainer = new HBox();
+          entryContainer.getStyleClass().add("leaderboard-entry");
+
+          // Resource icon
+          ImageView imageView = loadImage(resource);
+          imageView.setFitHeight(25);
+          imageView.setFitWidth(25);
+          entryContainer.getChildren().add(imageView);
+
+          // Amount label
+          Label label = new Label(amount.toString());
+          label.getStyleClass().add(GuiUtils.getColorClass(resource));
+          label.setMaxWidth(Double.MAX_VALUE);
+          entryContainer.getChildren().add(label);
+
+          resources.getChildren().add(entryContainer);
+          // TODO fix alignment
+        });
+      container.add(resources, 2, i);
+
+      HBox objects = new HBox();
+      objects.getStyleClass().add("leaderboard-entry");
+      player
+        .getObjects()
+        .forEach((object, amount) -> {
+          // Base container for each entry
+          HBox entryContainer = new HBox();
+          entryContainer.getStyleClass().add("leaderboard-entry");
+
+          // Object icon
+          ImageView imageView = loadImage(object);
+          imageView.setFitHeight(25);
+          imageView.setFitWidth(25);
+          entryContainer.getChildren().add(imageView);
+
+          // Amount label
+          Label label = new Label(amount.toString());
+          label.setMaxWidth(Double.MAX_VALUE);
+          entryContainer.getChildren().add(label);
+
+          objects.getChildren().add(entryContainer);
+          // TODO fix alignment
+        });
+      container.add(objects, 3, i);
+    }
   }
 
   @Override
@@ -301,6 +403,7 @@ public class Gui extends Application implements View {
   @Override
   public void drawGame(List<LocalPlayer> players) {
     // TODO
+    loadSceneFXML("GameBoard.fxml");
   }
 
   @Override
