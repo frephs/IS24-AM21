@@ -1,9 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards.Commons;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.json.JSONArray;
@@ -29,10 +27,7 @@ public final class CardsLoader {
   private List<Card> cardList = null;
 
   public CardsLoader() {
-    this(
-      "src/main/java/polimi/ingsw/am21/codex/model/Cards/Resources/cards" +
-      ".json"
-    );
+    this("/polimi/ingsw/am21/codex/model/Cards/Commons/cards.json");
     this.loadCards();
   }
 
@@ -52,12 +47,19 @@ public final class CardsLoader {
   }
 
   public CardsLoader(String path) {
-    File file = new File(path);
     try {
-      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
+      InputStream is = getClass().getResourceAsStream(path);
+      if (is == null) {
+        throw new RuntimeException("Failed loading cards json");
+      }
+      String content = new BufferedReader(
+        new InputStreamReader(is, StandardCharsets.UTF_8)
+      )
+        .lines()
+        .collect(Collectors.joining("\n"));
       this.cards = new JSONArray(content);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed loading cards json");
+    } catch (Exception e) {
+      throw new RuntimeException("Failed loading cards json", e);
     }
   }
 

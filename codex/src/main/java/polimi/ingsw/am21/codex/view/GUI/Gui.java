@@ -87,11 +87,14 @@ public class Gui extends Application implements View {
   @Override
   public void start(Stage primaryStage) {
     try {
-      Parent root = FXMLLoader.load(Gui.class.getResource("WindowScene.fxml"));
+      Parent root = FXMLLoader.load(
+        Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
+      );
       scene = new Scene(root, 800, 600);
       notificationLoader = new NotificationLoader(new Stage());
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
+      primaryStage.setMaximized(true);
       primaryStage.show();
       testLobby();
     } catch (IOException e) {
@@ -109,7 +112,7 @@ public class Gui extends Application implements View {
    * */
   public void loadSceneFXML(String fxmlPath) {
     // load the lobby menu
-    Node content = null;
+    Node content;
     try {
       content = FXMLLoader.load(
         Objects.requireNonNull(Gui.class.getResource(fxmlPath))
@@ -125,7 +128,9 @@ public class Gui extends Application implements View {
   private ImageView loadImage(String path) {
     return new ImageView(
       new Image(
-        getClass().getResource(GuiElement.getBasePath() + path).toExternalForm()
+        Objects.requireNonNull(
+          getClass().getResource(GuiElement.getBasePath() + path)
+        ).toExternalForm()
       )
     );
   }
@@ -186,7 +191,7 @@ public class Gui extends Application implements View {
 
   private static Node loadGameEntry(GameEntry game) throws IOException {
     Node gameEntry = FXMLLoader.load(
-      Gui.class.getResource("LobbyMenuGameEntry.fxml")
+      Objects.requireNonNull(Gui.class.getResource("LobbyMenuGameEntry.fxml"))
     );
 
     // Set the game details
@@ -257,22 +262,34 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {}
+  public void drawLobby(Map<UUID, LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawLeaderBoard(List<LocalPlayer> players) {}
+  public void drawLeaderBoard(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawPlayerBoards(List<LocalPlayer> players) {}
+  public void drawPlayerBoards(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawPlayerBoard(LocalPlayer player) {}
+  public void drawPlayerBoard(LocalPlayer player) {
+    // TODO
+  }
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck, Card card) {}
+  public void drawCardDrawn(DrawingDeckType deck, Card card) {
+    // TODO
+  }
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck) {}
+  public void drawCardDrawn(DrawingDeckType deck) {
+    // TODO
+  }
 
   @Override
   public void drawCardPlacement(
@@ -282,16 +299,24 @@ public class Gui extends Application implements View {
   ) {}
 
   @Override
-  public void drawGame(List<LocalPlayer> players) {}
+  public void drawGame(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawGameOver(List<LocalPlayer> players) {}
+  public void drawGameOver(List<LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
-  public void drawCard(Card card) {}
+  public void drawCard(Card card) {
+    // TODO
+  }
 
   @Override
-  public void drawHand(List<Card> hand) {}
+  public void drawHand(List<Card> hand) {
+    // TODO
+  }
 
   @Override
   public void drawPairs(
@@ -340,14 +365,18 @@ public class Gui extends Application implements View {
     front.setStyle("-fx-cursor: hand");
     back.setStyle("-fx-cursor: hand");
 
-    Node starteCardSidesContainer = scene.lookup("#starter-side-container");
-    ((HBox) starteCardSidesContainer).getChildren().add(wrapAndBorder(front));
-    ((HBox) starteCardSidesContainer).getChildren().add(wrapAndBorder(back));
+    Node starterCardSidesContainer = scene.lookup("#starter-side-container");
+    ((HBox) starterCardSidesContainer).getChildren().add(wrapAndBorder(front));
+    ((HBox) starterCardSidesContainer).getChildren().add(wrapAndBorder(back));
   }
 
   @Override
-  public void drawWinner(String nickname) {}
+  public void drawWinner(String nickname) {
+    // TODO
+  }
 
   @Override
-  public void drawChatMessage(ChatMessage message) {}
+  public void drawChatMessage(ChatMessage message) {
+    // TODO
+  }
 }
