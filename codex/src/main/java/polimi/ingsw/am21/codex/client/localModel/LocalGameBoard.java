@@ -3,7 +3,7 @@ package polimi.ingsw.am21.codex.client.localModel;
 import java.util.ArrayList;
 import java.util.List;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 
 public class LocalGameBoard {
 

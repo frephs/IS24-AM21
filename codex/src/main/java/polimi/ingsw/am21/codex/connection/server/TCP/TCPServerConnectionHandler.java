@@ -23,11 +23,10 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMe
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 /** Runnable that handles a TCP connection */
 public class TCPServerConnectionHandler implements Runnable {

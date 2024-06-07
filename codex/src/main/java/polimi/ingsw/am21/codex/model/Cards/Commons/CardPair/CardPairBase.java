@@ -1,11 +1,11 @@
-package polimi.ingsw.am21.codex.model.Cards.Commons;
+package polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 
-public class CardPair<T> {
+public class CardPairBase<T> {
 
   private T first;
   private T second;
 
-  public CardPair(T firstCard, T secondCard) {
+  public CardPairBase(T firstCard, T secondCard) {
     this.first = firstCard;
     this.second = secondCard;
   }

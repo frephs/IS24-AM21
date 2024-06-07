@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.json.JSONArray;
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.Deck;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
