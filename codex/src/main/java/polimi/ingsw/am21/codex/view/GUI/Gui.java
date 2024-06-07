@@ -111,6 +111,9 @@ public class Gui extends Application implements View {
         new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
         new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
       );
+    this.drawComonObjectiveCards(
+        new CardPair<>(cards.getCardFromId(90), cards.getCardFromId(91))
+      );
   }
 
   public Gui() {}
@@ -516,5 +519,28 @@ public class Gui extends Application implements View {
   @Override
   public void drawChatMessage(ChatMessage message) {
     // TODO
+  }
+
+  @Override
+  public void drawComonObjectiveCards(CardPair<Card> cardPair) {
+    GridPane cardsContainer = (GridPane) scene.lookup(
+      "#common-objective-cards"
+    );
+    cardsContainer.getChildren().clear();
+
+    // TODO how do we want to display two sides?
+    List<ImageView> images = List.of(
+      loadCardImage(cardPair.getFirst(), CardSideType.FRONT),
+      loadCardImage(cardPair.getSecond(), CardSideType.FRONT)
+    );
+
+    images.forEach(image -> {
+      image.setPreserveRatio(true);
+      image.setFitWidth(150);
+      image.setStyle("-fx-cursor: hand");
+    });
+
+    cardsContainer.add(wrapAndBorder(images.get(0)), 0, 0);
+    cardsContainer.add(wrapAndBorder(images.get(1)), 1, 0);
   }
 }

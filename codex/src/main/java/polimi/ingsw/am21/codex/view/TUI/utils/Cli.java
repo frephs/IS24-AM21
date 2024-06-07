@@ -334,4 +334,14 @@ public class Cli implements View {
       message.getContent()
     );
   }
+
+  @Override
+  public void drawComonObjectiveCards(CardPair<Card> cardPair) {
+    printUpdate(
+      "Common objective cardPair:\n" +
+      cardPair.getFirst().cardToAscii() +
+      "\n" +
+      cardPair.getSecond().cardToAscii()
+    );
+  }
 }
