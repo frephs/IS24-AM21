@@ -105,6 +105,12 @@ public class Gui extends Application implements View {
 
     this.drawGame(List.of(p1, p2, p3, p4));
     this.drawLeaderBoard(List.of(p1, p2, p3, p4));
+
+    CardsLoader cards = new CardsLoader();
+    this.drawPairs(
+        new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
+        new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
+      );
   }
 
   public Gui() {}
@@ -194,6 +200,7 @@ public class Gui extends Application implements View {
     HBox.setMargin(image, new Insets(0, 10, 10, 10));
     image.setPadding(new Insets(10, 10, 10, 10));
     image.getStyleClass().add("bordered");
+    image.setAlignment(Pos.CENTER);
     return image;
   }
 
@@ -331,8 +338,8 @@ public class Gui extends Application implements View {
 
           // Resource icon
           ImageView imageView = loadImage(resource);
+          imageView.setPreserveRatio(true);
           imageView.setFitHeight(25);
-          imageView.setFitWidth(25);
           entryContainer.getChildren().add(imageView);
 
           // Amount label
@@ -357,8 +364,8 @@ public class Gui extends Application implements View {
 
           // Object icon
           ImageView imageView = loadImage(object);
+          imageView.setPreserveRatio(true);
           imageView.setFitHeight(25);
-          imageView.setFitWidth(25);
           entryContainer.getChildren().add(imageView);
 
           // Amount label
@@ -425,7 +432,35 @@ public class Gui extends Application implements View {
   public void drawPairs(
     CardPair<Card> resourceCards,
     CardPair<Card> goldCards
-  ) {}
+  ) {
+    GridPane resourceCardContainer = (GridPane) scene.lookup(
+      "#resource-card-pair"
+    );
+    GridPane goldCardContainer = (GridPane) scene.lookup("#gold-card-pair");
+
+    resourceCardContainer.getChildren().clear();
+    goldCardContainer.getChildren().clear();
+
+    // TODO how do we want to display two sides?
+    List<ImageView> images = List.of(
+      loadCardImage(resourceCards.getFirst(), CardSideType.FRONT),
+      loadCardImage(resourceCards.getSecond(), CardSideType.FRONT),
+      loadCardImage(goldCards.getFirst(), CardSideType.FRONT),
+      loadCardImage(goldCards.getSecond(), CardSideType.FRONT)
+    );
+
+    images.forEach(image -> {
+      image.setPreserveRatio(true);
+      image.setFitWidth(150);
+      image.setStyle("-fx-cursor: hand");
+    });
+
+    resourceCardContainer.add(wrapAndBorder(images.get(0)), 0, 0);
+    resourceCardContainer.add(wrapAndBorder(images.get(1)), 1, 0);
+
+    goldCardContainer.add(wrapAndBorder(images.get(2)), 0, 0);
+    goldCardContainer.add(wrapAndBorder(images.get(3)), 1, 0);
+  }
 
   @Override
   public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
