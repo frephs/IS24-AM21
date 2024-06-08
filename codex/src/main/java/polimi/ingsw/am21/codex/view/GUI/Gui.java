@@ -187,7 +187,14 @@ public class Gui extends Application implements View {
   ) {}
 
   @Override
-  public void displayException(Exception e) {}
+  public void displayException(Exception exception) {
+    try {
+      exceptionLoader.loadException(exception);
+      Cli.getInstance().displayException(exception);
+    } catch (IOException e) {
+      Cli.getInstance().displayException(e);
+    }
+  }
 
   private static Node loadGameEntry(GameEntry game) throws IOException {
     Node gameEntry = FXMLLoader.load(
