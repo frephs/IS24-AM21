@@ -134,8 +134,8 @@ public class PlayableCard extends Card {
    * */
 
   public String cardToAscii(Map<Integer, String> cardStringMap) {
-    String frontSideString = frontSide.cardToAscii(new HashMap<>());
-    String backSideString = backSide.cardToAscii(new HashMap<>());
+    String frontSideString = frontSide.cardToAscii(cardStringMap);
+    String backSideString = backSide.cardToAscii(cardStringMap);
     return CliUtils.joinMinLines(frontSideString, backSideString);
   }
 
