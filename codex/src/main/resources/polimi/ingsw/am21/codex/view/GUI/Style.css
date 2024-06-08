@@ -101,7 +101,8 @@
   -fx-font-size: 16px;
 }
 
-.text-field {
+.text-field,
+.text-area {
   -fx-background-color: #ede4bc;
   -fx-border-color: #b4a31f;
   -fx-border-width: 1px;
@@ -120,6 +121,12 @@
   -fx-background-radius: 8px;
   -fx-padding: 10px;
 }
+
+/*
+--------------------
+    Chat Message
+--------------------
+*/
 
 .chat-message {
   -fx-background-color: #ede4bc;
@@ -148,6 +155,11 @@
   -fx-border-radius: 100%;
 }
 
+/*
+-------------------
+  Notifications
+-------------------
+*/
 .notification {
   -fx-border-radius: 12px;
   -fx-border-width: 2px;
@@ -163,6 +175,11 @@
   -fx-font-family: "Noyh R Light";
 }
 
+/*
+-------------------
+  Accent Colors
+-------------------
+*/
 .error {
   -fx-background-color: #dc3025;
   -fx-border-color: #571011;
@@ -208,11 +225,11 @@
   -fx-accent: #008860;
 }
 
-.notification-text {
-  -fx-fill: white;
-  -fx-font-size: 1.8em;
-  -fx-font-family: "Noyh R Light";
-}
+/*
+-------------------
+    Progress Bar
+-------------------
+ */
 
 .progress-bar {
   -fx-background-color: transparent;
@@ -230,17 +247,101 @@
   -fx-background-color: transparent;
 }
 
+/*
+-------------------
+    ScrollBar
+-------------------
+*/
+
 .scroll-bar {
   -fx-background-color: #ede4bc;
+  -fx-border-color: #b4a31f;
+  -fx-border-width: 1px;
+  -fx-border-radius: 4px;
+  -fx-background-radius: 4px;
+}
+
+.scroll-bar .thumb {
+  -fx-background-color: transparent;
   -fx-border-color: #b4a31f;
   -fx-border-width: 1px;
   -fx-border-radius: 8px;
   -fx-background-radius: 8px;
 }
 
-.scroll-bar .thumb {
+/*
+-------------------
+Exception Dialog
+-------------------
+*/
+
+.close-button {
+  -fx-background-color: #dc3025;
+  -fx-border-color: #571011;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-text-fill: #ede4bc;
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+  -fx-cursor: hand;
+  -fx-padding: -5px;
+}
+
+.exception-wrapper {
+  -fx-background-color: #c35b55;
+  -fx-background-radius: 8px;
+  -fx-border-color: #571011;
+  -fx-border-width: 4px;
+  -fx-border-radius: 8px;
+  -fx-text-fill: white;
+}
+
+.exception-title {
+  -fx-font-family: "ShadowedGermanica";
+  -fx-font-size: 24px;
+  -fx-underline: true;
+  -fx-padding: 10px;
+  -fx-fill: white;
+}
+.exception-text {
+  -fx-font-family: "Noyh R Light";
+  -fx-font-size: 16px;
+  -fx-fill: white;
+  -fx-padding: 10px;
+}
+
+.exception-wrapper .scroll-bar {
+  -fx-background-color: #edbcbc;
+  -fx-border-color: #b41f1f;
+}
+
+.exception-wrapper .scroll-bar .thumb {
+  -fx-background-color: #b41f1f;
+  -fx-border-color: #b41f1f;
+  -fx-border-width: 1px;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+}
+
+.exception-wrapper .scroll-pane {
   -fx-background-color: transparent;
-  -fx-border-color: #b4a31f;
+
+  -fx-border-color: #b41f1f;
+  -fx-border-width: 1px;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+}
+
+.scroll-pane .viewport {
+  -fx-background-color: transparent;
+  -fx-border-width: 1px;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+}
+
+.exception-message {
+  -fx-background-color: #c35b55;
+  -fx-border-color: #941c1c;
   -fx-border-width: 1px;
   -fx-border-radius: 8px;
   -fx-background-radius: 8px;
