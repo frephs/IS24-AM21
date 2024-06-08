@@ -9,8 +9,10 @@ import polimi.ingsw.am21.codex.client.ClientType;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.view.GUI.GuiClient;
 import polimi.ingsw.am21.codex.view.TUI.CliClient;
 import polimi.ingsw.am21.codex.view.View;
+import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class Main {
 
@@ -81,13 +83,14 @@ public class Main {
     );
     View view;
 
+    ViewClient client;
     if (clientType == ClientType.CLI) {
-      CliClient client = new CliClient();
-      client.start(connectionType, serverAddress, port);
+      client = new CliClient();
     } else {
-      //      // TODO: add gui
-      //      // VIEW = new GUIClient();
+      client = new GuiClient();
     }
+
+    client.start(connectionType, serverAddress, port);
   }
 
   public static void main(String[] args)
