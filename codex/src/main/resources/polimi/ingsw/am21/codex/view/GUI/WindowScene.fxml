@@ -17,10 +17,10 @@
                            <children>
                               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <Text id="window-title" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Title" textAlignment="CENTER" />
+                                    <Text fx:id="windowTitle" id="window-title" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Title" textAlignment="CENTER" />
                                  </children>
                               </HBox>
-                              <VBox id="content" prefHeight="336.0" prefWidth="614.0" />
+                              <VBox fx:id="contant" id="content" prefHeight="336.0" prefWidth="614.0" />
                            </children>
                         </VBox>
                      </children>
