@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
@@ -25,11 +24,16 @@
                   </VBox>
                   <VBox alignment="CENTER">
                      <children>
-                        <Label text="RuleBook" />
-                        <ImageView accessibleRole="BUTTON" fitHeight="84.0" fitWidth="113.0" pickOnBounds="true" preserveRatio="true">
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor></ImageView>
+                        <Label text="Rulebook" />
+                        <Button fx:id="rulebookButton" mnemonicParsing="false" onMouseClicked="openRulebook">
+                                <graphic>
+                                   <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                           <image>
+                                              <Image url="@pictures/rulebook/ruleBook_image.png" />
+                                           </image>
+                                   </ImageView>
+                                </graphic>
+                        </Button>
                         <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="42.0" prefWidth="132.0" text="Player" textAlignment="CENTER" />
                         <ChoiceBox prefHeight="44.0" prefWidth="142.0" />
                      </children>

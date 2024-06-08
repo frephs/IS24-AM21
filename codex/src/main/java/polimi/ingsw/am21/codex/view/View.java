@@ -84,4 +84,5 @@ public interface View {
   void drawWinner(String nickname);
 
   void drawChatMessage(ChatMessage message);
+  void drawComonObjectiveCards(CardPair<Card> cardPair);
 }
