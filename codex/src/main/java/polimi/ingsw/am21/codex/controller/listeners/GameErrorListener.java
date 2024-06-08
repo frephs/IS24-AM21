@@ -6,6 +6,7 @@ public interface GameErrorListener {
   void actionNotAllowed(String cause);
   void unknownResponse();
 
+  void gameAlreadyExists(String gameId);
   void gameNotFound(String gameId);
 
   void notInLobby();

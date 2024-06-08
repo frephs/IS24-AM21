@@ -27,6 +27,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -125,7 +126,7 @@ public class RMIServerConnectionHandlerImpl
   }
 
   public void createGame(String gameId, UUID socketID, Integer players)
-    throws RemoteException, EmptyDeckException {
+    throws RemoteException, EmptyDeckException, GameAlreadyExistsException {
     this.controller.createGame(gameId, players);
   }
 

@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 
 public class GameManager {
 
@@ -59,8 +60,12 @@ public class GameManager {
     return Optional.ofNullable(games.get(gameName));
   }
 
-  public Game createGame(String gameName, Integer players) {
+  public Game createGame(String gameName, Integer players)
+    throws GameAlreadyExistsException {
     Game newGame = new Game(players);
+    if (games.containsKey(gameName)) {
+      throw new GameAlreadyExistsException(gameName);
+    }
     games.put(gameName, newGame);
     return newGame;
   }

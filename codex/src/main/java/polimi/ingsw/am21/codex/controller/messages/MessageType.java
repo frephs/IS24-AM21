@@ -26,6 +26,7 @@ public enum MessageType implements Serializable {
   OBJECTIVE_CARDS(MessageTypeCategory.SERVER_RESPONSE),
   STARTER_CARD_SIDES(MessageTypeCategory.SERVER_RESPONSE),
 
+  GAME_ALREADY_EXISTS(MessageTypeCategory.SERVER_ERROR),
   GAME_ALREADY_STARTED(MessageTypeCategory.SERVER_ERROR),
   INVALID_CARD_PLACEMENT(MessageTypeCategory.SERVER_ERROR),
   GAME_FULL(MessageTypeCategory.SERVER_ERROR),

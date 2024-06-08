@@ -29,10 +29,7 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSides
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -46,6 +43,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -306,6 +304,8 @@ public class TCPServerConnectionHandler implements Runnable {
       controller.createGame(message.getGameId(), message.getPlayers());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
+    } catch (GameAlreadyExistsException e) {
+      send(new GameAlreadyExistsMessage(message.getGameId()));
     }
   }
 

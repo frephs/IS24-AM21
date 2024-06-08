@@ -26,6 +26,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
@@ -92,6 +93,8 @@ public class RMIClientConnectionHandler
       this.localModel.gameCreated(gameId, 0, players);
     } catch (RemoteException | EmptyDeckException e) {
       throw new RuntimeException(e);
+    } catch (GameAlreadyExistsException e) {
+      this.localModel.gameAlreadyExists(gameId);
     }
   }
 
@@ -148,6 +151,8 @@ public class RMIClientConnectionHandler
       throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (GameAlreadyExistsException e) {
+      this.localModel.gameAlreadyExists(gameId);
     }
   }
 

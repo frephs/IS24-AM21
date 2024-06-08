@@ -95,6 +95,14 @@ public class LocalModelContainer
   }
 
   @Override
+  public void gameAlreadyExists(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game '" + gameId + "' already exists"
+    );
+  }
+
+  @Override
   public void gameAlreadyStarted() {
     view.postNotification(NotificationType.ERROR, "Game has already started");
   }
