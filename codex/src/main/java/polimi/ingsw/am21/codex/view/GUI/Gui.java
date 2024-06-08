@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -11,6 +12,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -28,24 +32,48 @@ import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.view.GUI.utils.ExceptionLoader;
 import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
 import polimi.ingsw.am21.codex.view.GUI.utils.NotificationLoader;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
 public class Gui extends Application implements View {
 
-  private ClientConnectionHandler client;
+  private static Gui gui;
 
-  public Gui(ClientConnectionHandler client) {
-    this.client = client;
+  @FXML
+  private Text windowTitle;
 
-    this.start(new Stage());
+  @FXML
+  private Pane content;
+
+  private static ClientConnectionHandler client;
+
+  public Gui() {
+    gui = this;
+  }
+
+  public static Gui getInstance() {
+    return gui;
+  }
+
+  public void setClient(ClientConnectionHandler client) {
+    Gui.client = client;
   }
 
   public void testLobby() {
+    this.postNotification(NotificationType.CONFIRM, "Attento");
+    this.postNotification(NotificationType.WARNING, "Attento");
+    this.postNotification(NotificationType.ERROR, "Attento");
+    this.postNotification(NotificationType.UPDATE, "Attento");
+    this.postNotification(NotificationType.RESPONSE, "Attento");
+
+    displayException(new RuntimeException("Test exception"));
+
     this.drawAvailableGames(
         List.of(
           new GameEntry("Game 1", 2, 4),
@@ -54,12 +82,6 @@ public class Gui extends Application implements View {
           new GameEntry("Game 4", 2, 4)
         )
       );
-
-    this.postNotification(NotificationType.CONFIRM, "Attento");
-    this.postNotification(NotificationType.WARNING, "Attento");
-    this.postNotification(NotificationType.ERROR, "Attento");
-    this.postNotification(NotificationType.UPDATE, "Attento");
-    this.postNotification(NotificationType.RESPONSE, "Attento");
 
     this.drawAvailableTokenColors(
         Arrays.stream(TokenColor.values()).collect(Collectors.toSet())
@@ -72,17 +94,11 @@ public class Gui extends Application implements View {
         new CardPair<>(cardFromId, cards.getCardFromId(101))
       );
     this.drawStarterCardSides(cards.getCardFromId(32));
-    // Add assertions here
   }
 
-  public Gui() {}
-
-  private NotificationLoader notificationLoader;
-
-  @FXML
-  Text windowTitle;
-
-  Scene scene;
+  private static NotificationLoader notificationLoader;
+  private static ExceptionLoader exceptionLoader;
+  private static Scene scene;
 
   @Override
   public void start(Stage primaryStage) {
@@ -91,12 +107,17 @@ public class Gui extends Application implements View {
         Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
       );
       scene = new Scene(root, 800, 600);
+
       notificationLoader = new NotificationLoader(new Stage());
+      exceptionLoader = new ExceptionLoader(new Stage());
+
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
       primaryStage.setMaximized(true);
       primaryStage.show();
-      testLobby();
+
+      drawAvailableGames(new ArrayList<>());
+      //      testLobby();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -168,11 +189,13 @@ public class Gui extends Application implements View {
     NotificationType notificationType,
     String message
   ) {
-    try {
-      notificationLoader.addNotification(notificationType, message);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    Platform.runLater(() -> {
+      try {
+        notificationLoader.addNotification(notificationType, message);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   @Override
@@ -207,18 +230,40 @@ public class Gui extends Application implements View {
         game.getCurrentPlayers() + "/" + game.getMaxPlayers()
       );
 
-    gameEntry.setOnMouseClicked((MouseEvent event) -> {});
+    gameEntry.setOnMouseClicked((MouseEvent event) -> {
+      client.connectToGame(game.getGameId());
+      //TODO change scene on callback
+    });
 
     return gameEntry;
   }
 
   @Override
   public void drawAvailableGames(List<GameEntry> games) {
-    loadSceneFXML("LobbyMenu.fxml");
+    if (games.isEmpty()) {
+      client.listGames();
+    }
 
+    loadSceneFXML("LobbyMenu.fxml");
     ((Text) scene.lookup("#window-title")).setText("Menu");
 
     ((GridPane) scene.lookup("#game-entry-container")).getChildren().clear();
+
+    ((Button) scene.lookup("#create-game-button")).setOnMouseClicked(
+        (MouseEvent event) -> {
+          client.createGame(
+            ((TextField) scene.lookup("#game-id-input")).getText(),
+            ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
+                .toString()
+                .isEmpty()
+              ? 2
+              : Integer.parseInt(
+                ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
+                  .toString()
+              )
+          );
+        }
+      );
 
     for (int i = 0; i < games.size(); i++) {
       GameEntry game = games.get(i);
@@ -249,18 +294,22 @@ public class Gui extends Application implements View {
 
     ((HBox) tokenContainer).getChildren()
       .addAll(
-        Arrays.stream(TokenColor.values())
+        tokenColors
+          .stream()
           .map(tokenColor -> {
-            ImageView imageView = loadImage(tokenColor);
+            ImageView tokenColorImage = loadImage(tokenColor);
 
-            imageView.setStyle("-fx-cursor: hand");
+            tokenColorImage.setStyle("-fx-cursor: hand");
 
-            imageView.setFitHeight(60);
-            imageView.setFitWidth(60);
+            tokenColorImage.setFitHeight(60);
+            tokenColorImage.setFitWidth(60);
 
-            //TODO ADD events
+            tokenColorImage.setOnMouseClicked((MouseEvent event) -> {
+              client.lobbySetToken(tokenColor);
+              //TODO change scene as callback
+            });
 
-            return wrapAndBorder(imageView);
+            return wrapAndBorder(tokenColorImage);
           })
           .toList()
       );
@@ -269,9 +318,7 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {
-    // TODO
-  }
+  public void drawLobby(Map<UUID, LocalPlayer> players) {}
 
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
