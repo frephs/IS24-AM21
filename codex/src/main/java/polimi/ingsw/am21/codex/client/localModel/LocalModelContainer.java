@@ -7,13 +7,11 @@ import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
-import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
-import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
@@ -465,6 +463,9 @@ public class LocalModelContainer
     player
       .getPlayedCards()
       .put(new Position(), new Pair<>(starterCard, starterSide));
+    player.setConnectionStatus(
+      GameController.UserGameContext.ConnectionStatus.CONNECTED
+    );
 
     localGameBoard.getPlayers().add(lobby.getPlayers().get(socketID));
 
@@ -478,22 +479,50 @@ public class LocalModelContainer
   }
 
   @Override
-  public void gameStarted(String gameId, List<String> players) {
+  public void gameStarted(String gameId, GameInfo gameInfo) {
     Map<String, Integer> nicknameToIndex = new HashMap<>();
 
     if (this.localGameBoard.getGameId().equals(gameId)) {
-      localGameBoard
-        .getPlayers()
-        .sort(
-          Comparator.comparingInt(
-            player -> players.indexOf(player.getNickname())
-          )
-        );
-    } else {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "Game " + gameId + " started without you"
-      );
+      localGameBoard.getPlayers().clear();
+
+      gameInfo
+        .getUsers()
+        .forEach((GameInfo.GameInfoUser player) -> {
+          LocalPlayer localPlayer = lobby
+            .getPlayers()
+            .get(player.getSocketID());
+          localPlayer.setNickname(player.getNickname());
+          localPlayer.setToken(player.getTokenColor());
+          localPlayer.setHand(cardsLoader.getCardsFromIds(player.getHandIDs()));
+          localPlayer.setPoints(player.getPoints());
+          if (player.getSecretObjectiveCard().isPresent()) {
+            localPlayer.setObjectiveCard(
+              cardsLoader.getCardFromId(player.getSecretObjectiveCard().get())
+            );
+          }
+          localPlayer.setPoints(localPlayer.getPoints());
+          localPlayer.setAvailableSpots(player.getAvailableSpots());
+          localPlayer.setForbiddenSpots(player.getForbiddenSpots());
+          localPlayer.setConnectionStatus(player.getConnectionStatus());
+          localGameBoard.setGoldCards(
+            CardPair.fromCardIndexPair(cardsLoader, gameInfo.getGoldCards())
+          );
+          localGameBoard.setObjectiveCards(
+            CardPair.fromCardIndexPair(
+              cardsLoader,
+              gameInfo.getObjectiveCards()
+            )
+          );
+          localGameBoard.setResourceCards(
+            CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
+          );
+          localGameBoard.getPlayers().add(localPlayer);
+          nicknameToIndex.put(
+            player.getNickname(),
+            localGameBoard.getPlayers().size() - 1
+          );
+        });
+      view.postNotification(NotificationType.UPDATE, "The Game has started. ");
     }
   }
 
@@ -597,7 +626,9 @@ public class LocalModelContainer
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer drawnCardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) {
     Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
 

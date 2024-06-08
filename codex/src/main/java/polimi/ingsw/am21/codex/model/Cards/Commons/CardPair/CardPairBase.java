@@ -1,6 +1,8 @@
 package polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 
-public class CardPairBase<T> {
+import java.io.Serializable;
+
+public class CardPairBase<T> implements Serializable {
 
   private T first;
   private T second;

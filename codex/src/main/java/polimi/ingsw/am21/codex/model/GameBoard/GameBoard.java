@@ -185,7 +185,14 @@ public class GameBoard {
   }
 
   /**
-   * @return the 2 gold cards
+   * @return the 2 resource cards in the card pair
+   */
+  public CardPair<PlayableCard> getResourceCards() {
+    return this.resourceCards;
+  }
+
+  /**
+   * @return the 2 gold cards in the card pair
    */
   public CardPair<PlayableCard> getGoldCards() {
     return this.goldCards;

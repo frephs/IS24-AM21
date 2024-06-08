@@ -20,4 +20,5 @@ module polimi.ingsw.am21.codex {
   exports polimi.ingsw.am21.codex.controller.listeners;
   exports polimi.ingsw.am21.codex.controller.messages;
   exports polimi.ingsw.am21.codex.controller.messages.viewUpdate.game;
+  exports polimi.ingsw.am21.codex.model;
 }

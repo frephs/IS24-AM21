@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -96,9 +97,9 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void gameStarted(String gameId, List<String> players)
+  public void gameStarted(String gameId, GameInfo gameInfo)
     throws RemoteException {
-    listener.gameStarted(gameId, players);
+    listener.gameStarted(gameId, gameInfo);
   }
 
   @Override

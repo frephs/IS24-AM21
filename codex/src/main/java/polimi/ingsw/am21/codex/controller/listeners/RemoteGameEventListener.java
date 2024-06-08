@@ -45,7 +45,7 @@ public interface RemoteGameEventListener extends Remote {
     CardSideType starterSide
   ) throws RemoteException;
 
-  void gameStarted(String gameId, List<String> players) throws RemoteException;
+  void gameStarted(String gameId, GameInfo gameInfo) throws RemoteException;
 
   /**
    * @param playerId The player that has just finished their turn
@@ -57,14 +57,21 @@ public interface RemoteGameEventListener extends Remote {
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) throws RemoteException;
 
   /**
    * @param playerId The player that has just finished their turn
    */
-  void changeTurn(String gameId, String playerId, Boolean isLastRound)
-    throws RemoteException;
+  void changeTurn(
+    String gameId,
+    String playerId,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) throws RemoteException;
 
   /* current player placed a card */
   void cardPlaced(

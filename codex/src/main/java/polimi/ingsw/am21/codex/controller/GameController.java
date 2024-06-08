@@ -1,10 +1,12 @@
 package polimi.ingsw.am21.codex.controller;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.*;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.controller.utils.RemoteListenerFunction;
@@ -22,6 +24,7 @@ import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
+import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 
@@ -303,7 +306,7 @@ public class GameController {
   GameManager manager;
 
   Map<UUID, UserGameContext> userContexts = new HashMap<>();
-  List<RemoteGameEventListener> listeners = new ArrayList<>();
+  List listeners = new ArrayList<>();
 
   public GameController() {
     manager = new GameManager();
@@ -451,13 +454,13 @@ public class GameController {
 
   private void notifyClients(
     List<Pair<UUID, UserGameContext>> listeners,
-    RemoteListenerFunction<RemoteGameEventListener> function,
+    RemoteListenerFunction function,
     Boolean sameContext
   ) {
     List<UUID> failedListeners = new ArrayList<>();
     listeners.forEach(listener -> {
       try {
-        function.apply(listener.getValue().getListener());
+        function.apply(listener.getValue().getListener(), listener.getKey());
       } catch (RemoteException e) {
         failedListeners.add(listener.getKey());
       }
@@ -471,14 +474,14 @@ public class GameController {
 
   private void notifyClients(
     List<Pair<UUID, UserGameContext>> listeners,
-    RemoteListenerFunction<RemoteGameEventListener> function
+    RemoteListenerFunction function
   ) {
     this.notifyClients(listeners, function, false);
   }
 
   private void notifySameContextClients(
     UUID socketID,
-    RemoteListenerFunction<RemoteGameEventListener> function,
+    RemoteListenerFunction function,
     EventDispatchMode mode
   ) {
     this.notifyClients(
@@ -490,7 +493,7 @@ public class GameController {
 
   private void notifySameContextClients(
     UUID socketID,
-    RemoteListenerFunction<RemoteGameEventListener> function
+    RemoteListenerFunction function
   ) {
     this.notifySameContextClients(
         socketID,
@@ -559,7 +562,7 @@ public class GameController {
     ) {
       this.notifySameContextClients(
           socketID,
-          listener ->
+          (listener, targetSocketID) ->
             listener.playerConnectionChanged(
               socketID,
               userContexts.get(socketID).getNickname().orElse(null),
@@ -658,13 +661,14 @@ public class GameController {
 
     this.notifySameContextClients(
         socketID,
-        listener -> listener.playerJoinedLobby(gameId, socketID)
+        (listener, targetSocketID) ->
+          listener.playerJoinedLobby(gameId, socketID)
       );
 
     //    if (userContexts.get(socketID).getListener() != null) {
     this.notifySameContextClients(
         socketID,
-        listener ->
+        (listener, targetSocketID) ->
           listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game))
       );
     //      try {
@@ -695,7 +699,7 @@ public class GameController {
     lobby.setToken(connectionID, color);
     this.notifySameContextClients(
         connectionID,
-        listener ->
+        (listener, targetSocketID) ->
           listener.playerSetToken(
             gameID,
             connectionID,
@@ -721,7 +725,8 @@ public class GameController {
     userGameContext.setNickname(nickname);
     this.notifySameContextClients(
         socketID,
-        listener -> listener.playerSetNickname(gameId, socketID, nickname)
+        (listener, targetSocketID) ->
+          listener.playerSetNickname(gameId, socketID, nickname)
       );
   }
 
@@ -743,7 +748,7 @@ public class GameController {
 
     this.notifySameContextClients(
         socketID,
-        listener ->
+        (listener, targetSocketID) ->
           listener.playerChoseObjectiveCard(
             gameId,
             socketID,
@@ -753,8 +758,7 @@ public class GameController {
   }
 
   private void sendGameStartedNotification(String gameId, Game game) {
-    this.notifyClients(
-        userContexts
+    this.notifyClients(userContexts
           .entrySet()
           .stream()
           .filter(
@@ -768,17 +772,65 @@ public class GameController {
                 .orElse(false)
           )
           .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
-          .collect(Collectors.toList()),
-        listener ->
-          listener.gameStarted(
+          .collect(Collectors.toList()), (listener, targetSocketID) -> {
+          GameInfo gameInfo = new GameInfo(
             gameId,
-            game
-              .getPlayers()
+            userContexts
+              .entrySet()
               .stream()
-              .map(Player::getNickname)
-              .collect(Collectors.toList())
-          )
-      );
+              .filter(
+                entry ->
+                  entry
+                    .getValue()
+                    .getGameId()
+                    .map(gid -> gid.equals(gameId))
+                    .orElse(false)
+              )
+              .map(entry -> {
+                String nickname = entry.getValue().getNickname().orElse(null);
+                Player player = game.getPlayer(nickname);
+                PlayerBoard playerBoard = player.getBoard();
+                return new GameInfo.GameInfoUser(
+                  entry.getValue().getNickname().orElse(null),
+                  player.getToken(),
+                  entry.getKey(),
+                  entry.getValue().getConnectionStatus(),
+                  playerBoard
+                    .getPlayedCards()
+                    .entrySet()
+                    .stream()
+                    .collect(
+                      Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry2 -> entry2.getValue().getId()
+                      )
+                    ),
+                  playerBoard
+                    .getHand()
+                    .stream()
+                    .map(PlayableCard::getId)
+                    .collect(Collectors.toList()),
+                  game.getScoreBoard().get(nickname),
+                  entry.getKey() == targetSocketID
+                    ? playerBoard.getObjectiveCard().getId()
+                    : null,
+                  playerBoard.getAvailableSpots(),
+                  playerBoard.getForbiddenSpots()
+                );
+              })
+              .toList(),
+            game.getCurrentPlayerIndex(),
+            game.getRemainingRounds().orElse(null),
+            game.getObjectiveCards(),
+            game.getResourceCards(),
+            game.getGoldCards()
+          );
+          try {
+            listener.gameStarted(gameId, gameInfo);
+          } catch (Exception e) {
+            throw e;
+          }
+        });
   }
 
   public void startGame(UUID socketID) throws InvalidActionException {
@@ -808,7 +860,7 @@ public class GameController {
       userContexts.get(socketID).setGameId(gameId, newPlayer.getNickname());
       this.notifySameContextClients(
           socketID,
-          listener ->
+          (listener, targetSocketID) ->
             listener.playerJoinedGame(
               gameId,
               socketID,
@@ -854,7 +906,7 @@ public class GameController {
 
     this.notifySameContextClients(
         connectionID,
-        listener -> listener.gameCreated(gameId, 0, players)
+        (listener, targetSocketID) -> listener.gameCreated(gameId, 0, players)
       );
   }
 
@@ -890,7 +942,7 @@ public class GameController {
 
     this.notifySameContextClients(
         connectionID,
-        listener -> listener.gameDeleted(gameId)
+        (listener, targetSocketID) -> listener.gameDeleted(gameId)
       );
   }
 
@@ -922,11 +974,13 @@ public class GameController {
     game.nextTurn();
     this.notifySameContextClients(
         connectionID,
-        listener ->
+        (listener, targetSocketID) ->
           listener.changeTurn(
             gameId,
             game.getCurrentPlayer().getNickname(),
-            game.isLastRound()
+            game.isLastRound(),
+            game.getCurrentPlayer().getBoard().getAvailableSpots(),
+            game.getCurrentPlayer().getBoard().getForbiddenSpots()
           )
       );
   }
@@ -949,7 +1003,7 @@ public class GameController {
       (playerCardId, pairCardId) ->
         this.notifySameContextClients(
             connectionID,
-            listener ->
+            (listener, targetSocketID) ->
               listener.changeTurn(
                 gameId,
                 game.getCurrentPlayer().getNickname(),
@@ -957,7 +1011,9 @@ public class GameController {
                 drawingSource,
                 deckType,
                 playerCardId,
-                pairCardId
+                pairCardId,
+                game.getCurrentPlayer().getBoard().getAvailableSpots(),
+                game.getCurrentPlayer().getBoard().getForbiddenSpots()
               )
           )
     );
@@ -1003,7 +1059,7 @@ public class GameController {
     );
     this.notifySameContextClients(
         connectionID,
-        listener ->
+        (listener, targetSocketID) ->
           listener.cardPlaced(
             gameId,
             game.getCurrentPlayer().getNickname(),

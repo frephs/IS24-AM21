@@ -47,7 +47,7 @@ public interface GameEventListener extends RemoteGameEventListener {
   );
 
   @Override
-  void gameStarted(String gameId, List<String> players);
+  void gameStarted(String gameId, GameInfo gameInfo);
 
   /**
    * @param playerId The player that has just finished their turn
@@ -60,14 +60,22 @@ public interface GameEventListener extends RemoteGameEventListener {
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   );
 
   /**
    * @param playerId The player that has just finished their turn
    */
   @Override
-  void changeTurn(String gameId, String playerId, Boolean isLastRound);
+  void changeTurn(
+    String gameId,
+    String playerId,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  );
 
   /* current player placed a card */
   @Override

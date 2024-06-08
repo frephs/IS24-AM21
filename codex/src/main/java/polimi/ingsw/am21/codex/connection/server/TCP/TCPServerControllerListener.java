@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
@@ -121,8 +122,8 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void gameStarted(String gameId, List<String> players) {
-    broadcast.accept(new GameStartedMessage(gameId, players));
+  public void gameStarted(String gameId, GameInfo gameInfo) {
+    broadcast.accept(new GameStartedMessage(gameInfo));
   }
 
   @Override

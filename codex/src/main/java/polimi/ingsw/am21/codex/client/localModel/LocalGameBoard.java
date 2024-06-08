@@ -11,6 +11,7 @@ public class LocalGameBoard {
 
   private CardPair<Card> goldCards;
   private CardPair<Card> resourceCards;
+  private CardPair<Card> objectiveCards;
 
   private Card secretObjective;
 
@@ -80,6 +81,14 @@ public class LocalGameBoard {
 
   public void setResourceCards(CardPair<Card> resourceCards) {
     this.resourceCards = resourceCards;
+  }
+
+  public CardPair<Card> getObjectiveCards() {
+    return objectiveCards;
+  }
+
+  public void setObjectiveCards(CardPair<Card> objectiveCards) {
+    this.objectiveCards = objectiveCards;
   }
 
   public CardPair<Card> getGoldCards() {

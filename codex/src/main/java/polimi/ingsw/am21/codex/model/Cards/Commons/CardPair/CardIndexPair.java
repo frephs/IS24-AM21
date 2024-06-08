@@ -8,7 +8,9 @@ public class CardIndexPair extends CardPairBase<Integer> {
     super(firstCard, secondCard);
   }
 
-  public static CardIndexPair fromCardPair(CardPair<Card> cardPair) {
+  public static <T extends Card> CardIndexPair fromCardPair(
+    CardPair<T> cardPair
+  ) {
     return new CardIndexPair(
       cardPair.getFirst().getId(),
       cardPair.getSecond().getId()

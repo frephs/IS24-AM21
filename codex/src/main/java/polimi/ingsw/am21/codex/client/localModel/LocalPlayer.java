@@ -2,9 +2,13 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.Card;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -16,8 +20,13 @@ public class LocalPlayer {
   private TokenColor token;
   private int points;
   private List<Card> hand;
+
+  private GameController.UserGameContext.ConnectionStatus connectionStatus;
+
   private Card objectiveCard;
-  // TODO get objective common objective card from the server
+
+  // this is only present if the player is the current player ( these are the 2 objectiva cards )
+  private CardPair<ObjectiveCard> objectiveCards;
 
   private final Map<ResourceType, Integer> resources = new EnumMap<>(
     ResourceType.class
@@ -126,5 +135,23 @@ public class LocalPlayer {
 
   public Map<Position, Pair<Card, CardSideType>> getPlayedCards() {
     return playedCards;
+  }
+
+  public CardPair<ObjectiveCard> getObjectiveCards() {
+    return objectiveCards;
+  }
+
+  public void setObjectiveCards(CardPair<ObjectiveCard> objectiveCards) {
+    this.objectiveCards = objectiveCards;
+  }
+
+  public GameController.UserGameContext.ConnectionStatus getConnectionStatus() {
+    return connectionStatus;
+  }
+
+  public void setConnectionStatus(
+    GameController.UserGameContext.ConnectionStatus connectionStatus
+  ) {
+    this.connectionStatus = connectionStatus;
   }
 }

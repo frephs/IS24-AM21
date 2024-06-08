@@ -69,6 +69,7 @@ public class Game {
 
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
+    this.currentPlayer = 0;
   }
 
   /**
@@ -376,5 +377,17 @@ public class Game {
 
   public Integer getPlayersSpotsLeft() {
     return this.getMaxPlayers() - this.getPlayersCount();
+  }
+
+  public CardPair<ObjectiveCard> getObjectiveCards() {
+    return this.gameBoard.getObjectiveCards();
+  }
+
+  public CardPair<PlayableCard> getResourceCards() {
+    return this.gameBoard.getResourceCards();
+  }
+
+  public CardPair<PlayableCard> getGoldCards() {
+    return this.gameBoard.getGoldCards();
   }
 }

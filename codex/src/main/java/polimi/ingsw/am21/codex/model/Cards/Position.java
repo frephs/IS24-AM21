@@ -1,6 +1,8 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
 
   private final int x, y;
 
