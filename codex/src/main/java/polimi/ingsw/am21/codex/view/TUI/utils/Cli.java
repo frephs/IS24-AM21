@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -343,5 +344,27 @@ public class Cli implements View {
       "\n" +
       cardPair.getSecond().cardToAscii()
     );
+  }
+
+  @Override
+  public void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  ) {
+    if (firstResourceCard != null) {
+      printUpdate(
+        "Resource cards deck:\n" +
+        firstResourceCard.getSides().get(0).cardToAscii()
+      );
+    } else {
+      printUpdate("Resource cards deck:\n" + "Empty deck");
+    }
+    if (firstGoldCard != null) {
+      printUpdate(
+        "Gold cards deck:\n" + firstGoldCard.getSides().get(0).cardToAscii()
+      );
+    } else {
+      printUpdate("Gold cards deck:\n" + "Empty deck");
+    }
   }
 }

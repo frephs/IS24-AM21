@@ -74,6 +74,7 @@ public class PlayableCard extends Card {
     return playedSideType;
   }
 
+  /** A [front, back] list of sides */
   public List<PlayableSide> getSides() {
     return List.of(frontSide, backSide);
   }

@@ -29,6 +29,7 @@ import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
@@ -133,6 +134,10 @@ public class Gui extends Application implements View {
         new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
         new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
       );
+    this.drawCardDecks(
+        (PlayableCard) cards.getCardFromId(1),
+        (PlayableCard) cards.getCardFromId(41)
+      );
     this.drawComonObjectiveCards(
         new CardPair<>(cards.getCardFromId(90), cards.getCardFromId(91))
       );
@@ -158,9 +163,9 @@ public class Gui extends Application implements View {
       primaryStage.setMaximized(true);
       primaryStage.show();
 
-      drawAvailableGames(new ArrayList<>());
+      //      drawAvailableGames(new ArrayList<>());
       //testLobby();
-      //testGame();
+      testGame();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -596,5 +601,34 @@ public class Gui extends Application implements View {
 
     cardsContainer.add(wrapAndBorder(images.get(0)), 0, 0);
     cardsContainer.add(wrapAndBorder(images.get(1)), 1, 0);
+  }
+
+  @Override
+  public void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  ) {
+    HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
+    HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
+
+    resourceCardsDeck.getChildren().clear();
+    if (firstResourceCard != null) {
+      ImageView resource = loadCardImage(firstResourceCard, CardSideType.BACK);
+      resource.setPreserveRatio(true);
+      resource.setFitWidth(150);
+      resource.setStyle("-fx-cursor: hand");
+
+      resourceCardsDeck.getChildren().add(wrapAndBorder(resource));
+    }
+
+    goldCardsDeck.getChildren().clear();
+    if (firstGoldCard != null) {
+      ImageView gold = loadCardImage(firstGoldCard, CardSideType.BACK);
+      gold.setPreserveRatio(true);
+      gold.setFitWidth(150);
+      gold.setStyle("-fx-cursor: hand");
+
+      goldCardsDeck.getChildren().add(wrapAndBorder(gold));
+    }
   }
 }

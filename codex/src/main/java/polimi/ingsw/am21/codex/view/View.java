@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -85,4 +86,14 @@ public interface View {
 
   void drawChatMessage(ChatMessage message);
   void drawComonObjectiveCards(CardPair<Card> cardPair);
+
+  /**
+   * Displays the cards decks to draw from
+   * @param firstResourceCard The first resource card (null if none)
+   * @param firstGoldCard The first gold card (null if none)
+   */
+  void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  );
 }
