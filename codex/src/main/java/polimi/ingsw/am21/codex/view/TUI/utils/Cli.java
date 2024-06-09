@@ -148,7 +148,7 @@ public class Cli implements View {
   @Override
   public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
     printUpdate(
-      "Available token colors: " +
+      "The available token colors are: " +
       tokenColors
         .stream()
         .map(token -> CliUtils.colorize(token, ColorStyle.NORMAL))
