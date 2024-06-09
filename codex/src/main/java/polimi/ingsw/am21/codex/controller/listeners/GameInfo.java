@@ -24,6 +24,7 @@ public class GameInfo implements Serializable {
     Integer secretObjectiveCard;
     Set<Position> availableSpots;
     Set<Position> forbiddenSpots;
+    Integer index;
 
     public GameInfoUser(
       String nickname,
@@ -35,7 +36,8 @@ public class GameInfo implements Serializable {
       Integer points,
       Integer secretObjectiveCard,
       Set<Position> availableSpots,
-      Set<Position> forbiddenSpots
+      Set<Position> forbiddenSpots,
+      Integer index
     ) {
       this.nickname = nickname;
       this.tokenColor = tokenColor;
@@ -47,6 +49,7 @@ public class GameInfo implements Serializable {
       this.secretObjectiveCard = secretObjectiveCard;
       this.availableSpots = availableSpots;
       this.forbiddenSpots = forbiddenSpots;
+      this.index = index;
     }
 
     public String getNickname() {
@@ -87,6 +90,10 @@ public class GameInfo implements Serializable {
 
     public Set<Position> getForbiddenSpots() {
       return forbiddenSpots;
+    }
+
+    public Integer getIndex() {
+      return index;
     }
   }
 

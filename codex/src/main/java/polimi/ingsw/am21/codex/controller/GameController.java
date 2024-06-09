@@ -815,9 +815,11 @@ public class GameController {
                     ? playerBoard.getObjectiveCard().getId()
                     : null,
                   playerBoard.getAvailableSpots(),
-                  playerBoard.getForbiddenSpots()
+                  playerBoard.getForbiddenSpots(),
+                  game.getPlayers().indexOf(player)
                 );
               })
+              .sorted(Comparator.comparingInt(GameInfo.GameInfoUser::getIndex))
               .toList(),
             game.getCurrentPlayerIndex(),
             game.getRemainingRounds().orElse(null),
