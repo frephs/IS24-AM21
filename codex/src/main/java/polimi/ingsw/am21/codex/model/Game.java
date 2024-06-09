@@ -323,18 +323,20 @@ public class Game {
     }
     currentPlayer = (currentPlayer + 1) % players.size();
     if (this.currentPlayer == 0) {
-      this.remainingRounds--;
-      remainingRoundsChange.accept(this.remainingRounds);
-      if (this.remainingRounds == 0) {
-        this.state = GameState.GAME_OVER;
-        for (Player player : players) {
-          player.evaluateSecretObjective();
-          CardPair<ObjectiveCard> objectiveCards =
-            gameBoard.getObjectiveCards();
-          player.evaluate(objectiveCards.getFirst());
-          player.evaluate(objectiveCards.getSecond());
+      if (this.remainingRounds != null) {
+        this.remainingRounds--;
+        remainingRoundsChange.accept(this.remainingRounds);
+        if (this.remainingRounds == 0) {
+          this.state = GameState.GAME_OVER;
+          for (Player player : players) {
+            player.evaluateSecretObjective();
+            CardPair<ObjectiveCard> objectiveCards =
+              gameBoard.getObjectiveCards();
+            player.evaluate(objectiveCards.getFirst());
+            player.evaluate(objectiveCards.getSecond());
+          }
+          throw new GameOverException();
         }
-        throw new GameOverException();
       }
     }
   }
