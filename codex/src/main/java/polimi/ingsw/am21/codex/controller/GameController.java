@@ -825,11 +825,7 @@ public class GameController {
             game.getResourceCards(),
             game.getGoldCards()
           );
-          try {
-            listener.gameStarted(gameId, gameInfo);
-          } catch (Exception e) {
-            throw e;
-          }
+          listener.gameStarted(gameId, gameInfo);
         });
   }
 
