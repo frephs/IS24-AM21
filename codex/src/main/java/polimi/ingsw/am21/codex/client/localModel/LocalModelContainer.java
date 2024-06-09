@@ -529,6 +529,13 @@ public class LocalModelContainer
       if (localGameBoard.getCurrentPlayer().getSocketID().equals(socketId)) {
         view.postNotification(NotificationType.UPDATE, "It's your turn. ");
         view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+      } else {
+        view.postNotification(
+          NotificationType.UPDATE,
+          "It's " +
+          localGameBoard.getCurrentPlayer().getNickname() +
+          "'s turn. "
+        );
       }
     }
   }
@@ -638,9 +645,11 @@ public class LocalModelContainer
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
   ) {
-    Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
+    if (drawnCardId != null) {
+      Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
+      localGameBoard.getCurrentPlayer().getHand().add(drawnCard);
+    }
 
-    localGameBoard.getCurrentPlayer().getHand().add(drawnCard);
     view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
 
     switch (source) {

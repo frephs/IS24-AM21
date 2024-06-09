@@ -253,7 +253,6 @@ public class Game {
     BiConsumer<Integer, Integer> drawnCardsCallback,
     Consumer<Integer> remainingRoundsChange
   ) throws InvalidActionException {
-    int playerCardId;
     AtomicReference<Integer> pairCardId = new AtomicReference<>();
 
     if (this.state == GameState.GAME_OVER) {
@@ -267,11 +266,10 @@ public class Game {
         this.gameBoard.drawCard(drawingSource, deckType, replacementCard -> {
             pairCardId.set(replacementCard.getId());
           });
-      playerCardId = playerCard.getId();
 
       this.players.get(this.currentPlayer).drawCard(playerCard);
 
-      drawnCardsCallback.accept(playerCardId, pairCardId.get());
+      drawnCardsCallback.accept(playerCard.getId(), pairCardId.get());
     } catch (EmptyDeckException e) {
       this.remainingRounds = 2;
       remainingRoundsChange.accept(this.remainingRounds);

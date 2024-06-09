@@ -811,7 +811,7 @@ public class GameController {
                     .map(PlayableCard::getId)
                     .collect(Collectors.toList()),
                   game.getScoreBoard().get(nickname),
-                  entry.getKey() == targetSocketID
+                  entry.getKey().equals(targetSocketID)
                     ? playerBoard.getObjectiveCard().getId()
                     : null,
                   playerBoard.getAvailableSpots(),
@@ -1016,7 +1016,7 @@ public class GameController {
                 game.isLastRound(),
                 drawingSource,
                 deckType,
-                targetSocketID == connectionID ? playerCardId : null,
+                targetSocketID.equals(connectionID) ? playerCardId : null,
                 pairCardId,
                 game.getCurrentPlayer().getBoard().getAvailableSpots(),
                 game.getCurrentPlayer().getBoard().getForbiddenSpots()
