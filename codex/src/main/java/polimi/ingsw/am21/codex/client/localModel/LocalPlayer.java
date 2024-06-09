@@ -117,16 +117,16 @@ public class LocalPlayer {
     return objects;
   }
 
-  public Set<Position> getAvailableSpots() {
-    return availableSpots;
+  public Optional<Set<Position>> getAvailableSpots() {
+    return Optional.ofNullable(availableSpots);
   }
 
   public void setAvailableSpots(Set<Position> availableSpots) {
     this.availableSpots = availableSpots;
   }
 
-  public Set<Position> getForbiddenSpots() {
-    return forbiddenSpots;
+  public Optional<Set<Position>> getForbiddenSpots() {
+    return Optional.ofNullable(forbiddenSpots);
   }
 
   public void setForbiddenSpots(Set<Position> forbiddenSpots) {

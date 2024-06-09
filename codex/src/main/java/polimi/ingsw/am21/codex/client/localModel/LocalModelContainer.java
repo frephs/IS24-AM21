@@ -475,7 +475,6 @@ public class LocalModelContainer
     );
 
     view.drawLeaderBoard(localGameBoard.getPlayers());
-    view.drawPlayerBoards(localGameBoard.getPlayers());
   }
 
   @Override
@@ -526,7 +525,8 @@ public class LocalModelContainer
         }
       }
       view.postNotification(NotificationType.UPDATE, "The Game has started. ");
-      if (localGameBoard.getCurrentPlayer().getSocketID() == socketId) {
+      clientContextContainer.set(ClientContext.GAME);
+      if (localGameBoard.getCurrentPlayer().getSocketID().equals(socketId)) {
         view.postNotification(NotificationType.UPDATE, "It's your turn. ");
         view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
       }
@@ -707,6 +707,7 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       "It's" + localGameBoard.getCurrentPlayer().getNickname() + "'s turn. "
     );
+    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
   }
 
   @Override
@@ -836,11 +837,11 @@ public class LocalModelContainer
     return this.view;
   }
 
-  public String getGameId() {
+  public Optional<String> getGameId() {
     if (lobby != null) {
-      return lobby.getGameId();
+      return Optional.ofNullable(lobby.getGameId());
     } else {
-      throw new RuntimeException("You are not in a lobby yet");
+      return Optional.empty();
     }
   }
 }

@@ -64,6 +64,15 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     this.connect();
   }
 
+  private Optional<String> getGameIDWithMessage() {
+    if (this.localModel.getGameId().isEmpty()) {
+      this.localModel.notInGame();
+      return Optional.empty();
+    }
+    String gameID = this.localModel.getGameId().get();
+    return Optional.of(gameID);
+  }
+
   /**
    * Runs a thread that synchronously loads incoming messages from
    * inputStream to incomingMessages
@@ -226,7 +235,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbySetToken(TokenColor color) {
-    this.send(new SetTokenColorMessage(color, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SetTokenColorMessage(color, gameID));
   }
 
   @Override
@@ -236,27 +247,37 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbySetNickname(String nickname) {
-    this.send(new SetNicknameMessage(nickname, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SetNicknameMessage(nickname, gameID));
   }
 
   @Override
   public void getObjectiveCards() {
-    this.send(new GetObjectiveCardsMessage(localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new GetObjectiveCardsMessage(gameID));
   }
 
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
-    this.send(new SelectObjectiveMessage(first, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SelectObjectiveMessage(first, gameID));
   }
 
   @Override
   public void getStarterCard() {
-    this.send(new GetStarterCardSideMessage(localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new GetStarterCardSideMessage(gameID));
   }
 
   @Override
   public void lobbyJoinGame(CardSideType cardSide) {
-    this.send(new SelectCardSideMessage(cardSide, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SelectCardSideMessage(cardSide, gameID));
   }
 
   @Override
@@ -265,10 +286,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     CardSideType side,
     Position position
   ) {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     this.send(
-        //TODO: maybe change these messages so a basic authentication is implemented
         new PlaceCardMessage(
-          localModel.getGameId(),
+          gameID,
           localModel.getLocalGameBoard().getPlayerNickname(),
           playerHandCardNumber,
           side,
@@ -287,9 +309,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
   ) {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     this.send(
         new NextTurnActionMessage(
-          this.localModel.getGameId(),
+          gameID,
           this.localModel.getLocalGameBoard().getPlayerNickname(),
           drawingSource,
           deckType
@@ -299,9 +323,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void nextTurn() {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     this.send(
         new NextTurnActionMessage(
-          localModel.getGameId(),
+          gameID,
           localModel.getLocalGameBoard().getPlayerNickname()
         )
       );

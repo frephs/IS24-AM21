@@ -259,7 +259,7 @@ public class Game {
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
-    if (this.remainingRounds == null) {
+    if (this.remainingRounds != null) {
       throw new InvalidNextTurnCallException();
     }
     try {
@@ -292,7 +292,7 @@ public class Game {
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
-    if (this.remainingRounds != null) {
+    if (this.remainingRounds == null) {
       throw new InvalidNextTurnCallException();
     }
 

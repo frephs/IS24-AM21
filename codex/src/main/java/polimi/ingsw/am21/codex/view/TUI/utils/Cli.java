@@ -237,11 +237,17 @@ public class Cli implements View {
     printUpdate("Available spots: ");
     player
       .getAvailableSpots()
-      .forEach(position -> printUpdate(position.toString()));
+      .ifPresent(
+        availableSpots ->
+          availableSpots.forEach(position -> printUpdate(position.toString()))
+      );
     printUpdate("Forbidden spots: ");
     player
       .getForbiddenSpots()
-      .forEach(position -> printUpdate(position.toString()));
+      .ifPresent(
+        forbiddenSpots ->
+          forbiddenSpots.forEach(position -> printUpdate(position.toString()))
+      );
   }
 
   @Override
