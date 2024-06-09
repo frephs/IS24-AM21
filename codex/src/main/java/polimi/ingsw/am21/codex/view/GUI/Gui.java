@@ -245,7 +245,12 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void postNotification(Notification notification) {}
+  public void postNotification(Notification notification) {
+    postNotification(
+      notification.getNotificationType(),
+      notification.getMessage()
+    );
+  }
 
   @Override
   public void postNotification(
@@ -384,7 +389,9 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {}
+  public void drawLobby(Map<UUID, LocalPlayer> players) {
+    // TODO
+  }
 
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
