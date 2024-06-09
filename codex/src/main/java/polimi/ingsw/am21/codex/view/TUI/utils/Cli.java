@@ -234,6 +234,14 @@ public class Cli implements View {
             placedCard.getValue()
           )
       );
+    printUpdate("Available spots: ");
+    player
+      .getAvailableSpots()
+      .forEach(position -> printUpdate(position.toString()));
+    printUpdate("Forbidden spots: ");
+    player
+      .getForbiddenSpots()
+      .forEach(position -> printUpdate(position.toString()));
   }
 
   @Override

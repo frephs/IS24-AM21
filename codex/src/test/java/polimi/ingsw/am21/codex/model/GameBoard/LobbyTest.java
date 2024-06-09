@@ -322,7 +322,7 @@ class LobbyTest {
   void containsSocketID() {
     UUID existingID = UUID.randomUUID();
     UUID nonExistingID = UUID.randomUUID();
-    while (nonExistingID == existingID) nonExistingID = UUID.randomUUID();
+    while (nonExistingID.equals(existingID)) nonExistingID = UUID.randomUUID();
     try {
       lobby.addPlayer(
         existingID,

@@ -371,7 +371,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case PLAYER_SCORES_UPDATE -> handleMessage(
         (PlayerScoresUpdateMessage) message
       );
-      case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
+      case REMAINING_ROUNDS -> handleMessage((RemainingRoundsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
       // Init
       case SOCKET_ID -> handleMessage((SocketIdMessage) message);
@@ -584,11 +584,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.changeTurn(
       message.getGameId(),
       message.getNickname(),
+      message.getPlayerIndex(),
       message.isLastRound(),
       message.getCardSource(),
       message.getDeck(),
       message.getDrawnCardId(),
-      message.getNewPairCardId()
+      message.getNewPairCardId(),
+      message.getAvailableSpots(),
+      message.getForbiddenSpots()
     );
   }
 
@@ -608,8 +611,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.playerScoresUpdate(message.getNewScores());
   }
 
-  public void handleMessage(RemainingTurnsMessage message) {
-    localModel.remainingTurns(message.getTurns());
+  public void handleMessage(RemainingRoundsMessage message) {
+    localModel.remainingRounds(message.getGameID(), message.getRounds());
   }
 
   public void handleMessage(WinningPlayerMessage message) {

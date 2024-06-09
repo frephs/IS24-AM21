@@ -15,35 +15,25 @@ public class LocalGameBoard {
 
   private Card secretObjective;
 
-  /**
-   * Number of players the game contains
-   * */
-  private final int playerNumber;
+  private Integer currentPlayerIndex;
 
-  private String currentPlayer;
+  private Integer remainingRounds;
+  private Integer maxPlayers;
 
-  /**
-   * Index of the player associated with the client
-   */
-  private int myPlayerIndex;
-  private int playerIndex;
+  private Integer playerIndex;
 
-  public LocalGameBoard(String gameId, int players) {
+  public LocalGameBoard(String gameId, Integer maxPlayers) {
     this.gameId = gameId;
-    this.playerNumber = players;
-    this.players = new ArrayList<>(players);
+    this.maxPlayers = maxPlayers;
+    this.players = new ArrayList<>(maxPlayers);
   }
 
   public LocalPlayer getCurrentPlayer() {
-    return players
-      .stream()
-      .filter(player -> player.getNickname().equals(currentPlayer))
-      .findFirst()
-      .orElse(null);
+    return players.get(currentPlayerIndex);
   }
 
-  public void setCurrentPlayer(String currentPlayer) {
-    this.currentPlayer = currentPlayer;
+  public void setCurrentPlayerIndex(Integer currentPlayerIndex) {
+    this.currentPlayerIndex = currentPlayerIndex;
   }
 
   private final List<LocalPlayer> players;
@@ -101,5 +91,13 @@ public class LocalGameBoard {
 
   public List<LocalPlayer> getPlayers() {
     return players;
+  }
+
+  public void setRemainingRounds(Integer remainingRounds) {
+    this.remainingRounds = remainingRounds;
+  }
+
+  public int getRemainingRounds() {
+    return remainingRounds;
   }
 }

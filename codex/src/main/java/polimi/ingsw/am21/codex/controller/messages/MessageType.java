@@ -39,7 +39,7 @@ public enum MessageType implements Serializable {
   NEXT_TURN_UPDATE(MessageTypeCategory.VIEW_UPDATE),
   PLAYER_JOINED_GAME(MessageTypeCategory.VIEW_UPDATE),
   PLAYER_SCORES_UPDATE(MessageTypeCategory.VIEW_UPDATE),
-  REMAINING_TURNS(MessageTypeCategory.VIEW_UPDATE),
+  REMAINING_ROUNDS(MessageTypeCategory.VIEW_UPDATE),
   WINNING_PLAYER(MessageTypeCategory.VIEW_UPDATE),
   AVAILABLE_TOKEN_COLORS(MessageTypeCategory.VIEW_UPDATE),
   GAME_CREATED(MessageTypeCategory.VIEW_UPDATE),

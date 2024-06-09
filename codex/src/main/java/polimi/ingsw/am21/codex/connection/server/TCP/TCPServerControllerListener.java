@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.connection.server.TCP;
 
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -69,8 +68,8 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void remainingTurns(int remainingTurns) {
-    broadcast.accept(new RemainingTurnsMessage(remainingTurns));
+  public void remainingRounds(String gameID, int remainingRounds) {
+    broadcast.accept(new RemainingRoundsMessage(gameID, remainingRounds));
   }
 
   @Override
@@ -97,28 +96,49 @@ public class TCPServerControllerListener implements GameEventListener {
   @Override
   public void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) {
     broadcast.accept(
       new NextTurnUpdateMessage(
         gameId,
-        playerId,
+        playerNickname,
+        playerIndex,
         source,
         deck,
         cardId,
-        newPairCardId
+        newPairCardId,
+        availableSpots,
+        forbiddenSpots
       )
     );
   }
 
   @Override
-  public void changeTurn(String gameId, String playerId, Boolean isLastRound) {
-    broadcast.accept(new NextTurnUpdateMessage(gameId, playerId));
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) {
+    broadcast.accept(
+      new NextTurnUpdateMessage(
+        gameId,
+        playerNickname,
+        playerIndex,
+        availableSpots,
+        forbiddenSpots
+      )
+    );
   }
 
   @Override

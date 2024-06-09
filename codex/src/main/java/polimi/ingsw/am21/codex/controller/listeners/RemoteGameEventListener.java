@@ -52,7 +52,8 @@ public interface RemoteGameEventListener extends Remote {
    */
   void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
@@ -67,7 +68,8 @@ public interface RemoteGameEventListener extends Remote {
    */
   void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
@@ -93,7 +95,8 @@ public interface RemoteGameEventListener extends Remote {
   void playerScoresUpdate(Map<String, Integer> newScores)
     throws RemoteException;
 
-  void remainingTurns(int remainingTurns) throws RemoteException;
+  void remainingRounds(String gameID, int remainingRounds)
+    throws RemoteException;
 
   void winningPlayer(String nickname) throws RemoteException;
 

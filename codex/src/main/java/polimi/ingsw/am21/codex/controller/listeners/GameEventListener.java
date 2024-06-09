@@ -55,7 +55,8 @@ public interface GameEventListener extends RemoteGameEventListener {
   @Override
   void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
@@ -71,7 +72,8 @@ public interface GameEventListener extends RemoteGameEventListener {
   @Override
   void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
@@ -100,7 +102,7 @@ public interface GameEventListener extends RemoteGameEventListener {
   void playerScoresUpdate(Map<String, Integer> newScores);
 
   @Override
-  void remainingTurns(int remainingTurns);
+  void remainingRounds(String gameID, int remainingRounds);
 
   @Override
   void winningPlayer(String nickname);

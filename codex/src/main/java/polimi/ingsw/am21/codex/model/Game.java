@@ -3,8 +3,10 @@ package polimi.ingsw.am21.codex.model;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.json.JSONArray;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -234,7 +236,7 @@ public class Game {
   }
 
   /**
-   * Draws the player card and runs nextTurn();
+   * Draws the player card and runs nextTurnExecute();
    *
    * @param drawingSource      Where we are drawing the card rom
    * @param deckType           The type of deck to draw from.
@@ -242,13 +244,15 @@ public class Game {
    *                           drawn: the first parameter is the id of the card drawn
    *                           by the player, the second is from the one drawn for
    *                           the card pair (if any, null otherwise).
+   * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
    * @throws GameOverException If the game is over.
    */
   public void nextTurn(
     DrawingCardSource drawingSource,
     DrawingDeckType deckType,
-    BiConsumer<Integer, Integer> drawnCardsCallback
-  ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
+    BiConsumer<Integer, Integer> drawnCardsCallback,
+    Consumer<Integer> remainingRoundsChange
+  ) throws InvalidActionException {
     int playerCardId;
     AtomicReference<Integer> pairCardId = new AtomicReference<>();
 
@@ -270,16 +274,29 @@ public class Game {
       drawnCardsCallback.accept(playerCardId, pairCardId.get());
     } catch (EmptyDeckException e) {
       this.remainingRounds = 2;
+      remainingRoundsChange.accept(this.remainingRounds);
+      this.nextTurnExecute(remainingRoundsChange);
       throw e;
     }
-    this.nextTurn();
+    this.nextTurnExecute(remainingRoundsChange);
   }
 
-  public void nextTurn(
-    DrawingCardSource drawingSource,
-    DrawingDeckType deckType
-  ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
-    this.nextTurn(drawingSource, deckType, (a, b) -> {});
+  /**
+   * runs nextTurnExecute()
+   *
+   * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
+   * @throws GameOverException If the game is over.
+   */
+  public void nextTurn(Consumer<Integer> remainingRoundsChange)
+    throws InvalidActionException {
+    if (this.state == GameState.GAME_OVER) {
+      throw new GameOverException();
+    }
+    if (this.remainingRounds != null) {
+      throw new InvalidNextTurnCallException();
+    }
+
+    this.nextTurnExecute(remainingRoundsChange);
   }
 
   /**
@@ -292,22 +309,24 @@ public class Game {
    * points threshold. If either condition is met, the game state is updated
    * to {@link GameState#GAME_OVER} and a {@link GameOverException} is thrown.
    *
+   * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
+   *
    * @throws GameOverException            If the game is already over.
    * @throws InvalidNextTurnCallException if nextTurn is called without the
    *                                      drawing deck information, and it is
    *                                      not the last round
    */
-  public void nextTurn()
-    throws GameOverException, InvalidNextTurnCallException {
+  private void nextTurnExecute(Consumer<Integer> remainingRoundsChange)
+    throws InvalidActionException {
     if (this.state == GameState.GAME_OVER) throw new GameOverException();
     if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
       this.state = GameState.GAME_OVER;
       throw new GameOverException();
     }
-    if (this.remainingRounds == null) throw new InvalidNextTurnCallException();
     currentPlayer = (currentPlayer + 1) % players.size();
     if (this.currentPlayer == 0) {
       this.remainingRounds--;
+      remainingRoundsChange.accept(this.remainingRounds);
       if (this.remainingRounds == 0) {
         this.state = GameState.GAME_OVER;
         for (Player player : players) {

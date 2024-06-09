@@ -971,13 +971,20 @@ public class GameController {
 
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, connectionID);
-    game.nextTurn();
+    game.nextTurn(remainingRounds -> {
+      this.notifySameContextClients(
+          connectionID,
+          (listener, targetSocketID) ->
+            listener.remainingRounds(gameId, remainingRounds)
+        );
+    });
     this.notifySameContextClients(
         connectionID,
         (listener, targetSocketID) ->
           listener.changeTurn(
             gameId,
             game.getCurrentPlayer().getNickname(),
+            game.getCurrentPlayerIndex(),
             game.isLastRound(),
             game.getCurrentPlayer().getBoard().getAvailableSpots(),
             game.getCurrentPlayer().getBoard().getForbiddenSpots()
@@ -1007,15 +1014,23 @@ public class GameController {
               listener.changeTurn(
                 gameId,
                 game.getCurrentPlayer().getNickname(),
+                game.getCurrentPlayerIndex(),
                 game.isLastRound(),
                 drawingSource,
                 deckType,
-                playerCardId,
+                targetSocketID == connectionID ? playerCardId : null,
                 pairCardId,
                 game.getCurrentPlayer().getBoard().getAvailableSpots(),
                 game.getCurrentPlayer().getBoard().getForbiddenSpots()
               )
-          )
+          ),
+      remainingRounds -> {
+        this.notifySameContextClients(
+            connectionID,
+            (listener, targetSocketID) ->
+              listener.remainingRounds(gameId, remainingRounds)
+          );
+      }
     );
   }
 

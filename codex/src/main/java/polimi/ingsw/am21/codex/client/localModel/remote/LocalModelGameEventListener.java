@@ -105,28 +105,47 @@ public class LocalModelGameEventListener
   @Override
   public void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) throws RemoteException {
     listener.changeTurn(
       gameId,
-      playerId,
+      playerNickname,
+      playerIndex,
       isLastRound,
       source,
       deck,
       cardId,
-      newPairCardId
+      newPairCardId,
+      availableSpots,
+      forbiddenSpots
     );
   }
 
   @Override
-  public void changeTurn(String gameId, String playerId, Boolean isLastRound)
-    throws RemoteException {
-    listener.changeTurn(gameId, playerId, isLastRound);
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) throws RemoteException {
+    listener.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots
+    );
   }
 
   @Override
@@ -170,8 +189,9 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void remainingTurns(int remainingTurns) throws RemoteException {
-    listener.remainingTurns(remainingTurns);
+  public void remainingRounds(String gameID, int remainingRounds)
+    throws RemoteException {
+    listener.remainingRounds(gameID, remainingRounds);
   }
 
   @Override

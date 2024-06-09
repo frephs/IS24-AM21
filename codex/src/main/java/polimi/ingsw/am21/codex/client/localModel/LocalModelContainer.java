@@ -480,8 +480,6 @@ public class LocalModelContainer
 
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
-    Map<String, Integer> nicknameToIndex = new HashMap<>();
-
     if (this.localGameBoard.getGameId().equals(gameId)) {
       localGameBoard.getPlayers().clear();
 
@@ -517,19 +515,28 @@ public class LocalModelContainer
             CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
           );
           localGameBoard.getPlayers().add(localPlayer);
-          nicknameToIndex.put(
-            player.getNickname(),
-            localGameBoard.getPlayers().size() - 1
-          );
         });
+
+      localGameBoard.setCurrentPlayerIndex(gameInfo.getCurrentUserIndex());
+      for (int i = 0; i < gameInfo.getUsers().size(); ++i) {
+        UUID userSocketID = gameInfo.getUsers().get(i).getSocketID();
+        if (userSocketID.equals(socketId)) {
+          localGameBoard.setPlayerIndex(i);
+          break;
+        }
+      }
       view.postNotification(NotificationType.UPDATE, "The Game has started. ");
+      if (localGameBoard.getCurrentPlayer().getSocketID() == socketId) {
+        view.postNotification(NotificationType.UPDATE, "It's your turn. ");
+        view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+      }
     }
   }
 
   @Override
   public void cardPlaced(
     String gameId,
-    String playerId,
+    String playerNickname,
     Integer playerHandCardNumber,
     Integer cardId,
     CardSideType side,
@@ -616,12 +623,13 @@ public class LocalModelContainer
   }
 
   /**
-   * @param playerId is the playerId of the new player
+   * @param playerNickname is the playerNickname of the new player
    * */
   @Override
   public void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
@@ -666,24 +674,39 @@ public class LocalModelContainer
       ". "
     );
 
-    changeTurn(gameId, playerId, isLastRound);
+    changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots
+    );
   }
 
   /**
-   * @param playerId is the playerId of the new player
+   * @param playerNickname is the nickname of the new player
    * */
   @Override
-  public void changeTurn(String gameId, String playerId, Boolean isLastRound) {
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) {
     if (isLastRound) {
       view.postNotification(NotificationType.WARNING, "Last round of the game");
     }
 
+    localGameBoard.setCurrentPlayerIndex(playerIndex);
+    localGameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
+    localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
     view.postNotification(
       NotificationType.UPDATE,
       "It's" + localGameBoard.getCurrentPlayer().getNickname() + "'s turn. "
     );
-
-    localGameBoard.setCurrentPlayer(playerId);
   }
 
   @Override
@@ -707,11 +730,17 @@ public class LocalModelContainer
   }
 
   @Override
-  public void remainingTurns(int remainingTurns) {
-    view.postNotification(
-      NotificationType.UPDATE,
-      remainingTurns + "turns left."
-    );
+  public void remainingRounds(String gameID, int remainingRounds) {
+    if (Objects.equals(localGameBoard.getGameId(), gameID)) {
+      if (remainingRounds == 2 || remainingRounds == 1) view.postNotification(
+        NotificationType.UPDATE,
+        remainingRounds == 2
+          ? "The next round will be the last one. "
+          : "The last round has started."
+      );
+
+      this.localGameBoard.setRemainingRounds(remainingRounds);
+    }
   }
 
   public void gameStatusUpdate(GameState state) {
