@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.collections.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.lang.Integer?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.Gui">
+<VBox stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.Gui">
    <children>
       <VBox alignment="TOP_CENTER" styleClass="bordered">
          <children>
@@ -46,22 +53,45 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
                </padding>
             </HBox>
-            <VBox alignment="TOP_CENTER">
+            <VBox alignment="TOP_CENTER" prefHeight="368.0" prefWidth="577.0">
                <VBox.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                </VBox.margin>
                <children>
-                  <Label text="Games" textAlignment="CENTER" />
-                  <GridPane id="game-entry-container" alignment="CENTER" hgap="10.0" styleClass="bordered" vgap="10.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                  </GridPane>
+                  <Label styleClass="no" stylesheets="@Style.css" text="Games" textAlignment="CENTER" />
+                  <HBox alignment="CENTER" prefHeight="330.0" prefWidth="525.0">
+                     <children>
+                        <ScrollPane id="game-entry-scroll" hbarPolicy="NEVER" prefHeight="330.0" prefWidth="572.0" styleClass="bordered">
+                           <content>
+                              <VBox alignment="CENTER" prefHeight="325.0" prefWidth="573.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" prefHeight="322.0" prefWidth="644.0">
+                                       <children>
+                                          <VBox alignment="TOP_CENTER" prefHeight="323.0" prefWidth="537.0">
+                                             <children>
+                                                <GridPane id="game-entry-container" alignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="428.0" vgap="10.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                   <VBox.margin>
+                                                      <Insets />
+                                                   </VBox.margin>
+                                                </GridPane>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </HBox>
                </children>
             </VBox>
          </children>

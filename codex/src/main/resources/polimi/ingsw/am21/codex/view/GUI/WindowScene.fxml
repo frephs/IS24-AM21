@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="515.0" prefWidth="694.0" styleClass="outer-border" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.Gui">
+<AnchorPane styleClass="outer-border" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.Gui">
    <children>
-      <AnchorPane prefHeight="302.50206149035876" prefWidth="484.16996618704803" styleClass="window-border" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane styleClass="window-border" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane prefHeight="299.16870544087817" prefWidth="480.83661013756745" styleClass="inner-border" stylesheets="@Style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane styleClass="inner-border" stylesheets="@Style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <AnchorPane prefHeight="299.16870544087817" prefWidth="480.83661013756745" styleClass="window" stylesheets="@Style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <AnchorPane layoutX="2.500017037110403" layoutY="3.333356049480537" styleClass="window" stylesheets="@Style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <VBox alignment="TOP_CENTER" styleClass="container" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                        <VBox alignment="CENTER" layoutX="20.00013542175293" layoutY="20.00013542175293" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
                            <children>
-                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                              <HBox alignment="CENTER">
                                  <children>
-                                    <Text fx:id="windowTitle" id="window-title" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Title" textAlignment="CENTER" />
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <VBox alignment="CENTER" styleClass="container">
+                                             <children>
+                                                <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                                                   <children>
+                                                      <Text id="window-title" fx:id="windowTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Title" textAlignment="CENTER" />
+                                                   </children>
+                                                </HBox>
+                                                <VBox id="content" fx:id="contant" alignment="CENTER">
+                                                   <padding>
+                                                      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                   </padding>
+                                                </VBox>
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
                                  </children>
                               </HBox>
-                              <VBox fx:id="contant" id="content" prefHeight="336.0" prefWidth="614.0" />
                            </children>
                         </VBox>
                      </children>

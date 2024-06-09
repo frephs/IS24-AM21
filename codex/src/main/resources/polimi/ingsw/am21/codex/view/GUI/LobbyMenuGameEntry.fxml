@@ -12,14 +12,17 @@
       <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="39.0" prefWidth="170.0" stylesheets="@Style.css">
          <children>
             <Text id="game-entry-id" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="game-entry-text" text="Name" textAlignment="CENTER" wrappingWidth="101.96386528015137" />
-            <Text id="game-entry-players" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="game-entry-text" text="P/P" textAlignment="CENTER" wrappingWidth="66.13021576404572" />
+            <Text id="game-entry-players" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="game-entry-text" text="P/P" textAlignment="CENTER" wrappingWidth="66.13021576404572">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin></Text>
          </children>
          <styleClass>
             <String fx:value="bordered" />
             <String fx:value="game-entry" />
          </styleClass>
          <VBox.margin>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
          <cursor>
             <Cursor fx:constant="HAND" />

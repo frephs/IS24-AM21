@@ -4,20 +4,20 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
 <VBox fx:id="notificationContainer" alignment="BOTTOM_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="499.0" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox alignment="CENTER" prefHeight="57.0" prefWidth="361.0" styleClass="notification-text" stylesheets="@Style.css">
+      <VBox alignment="CENTER" prefHeight="54.0" prefWidth="479.0">
          <children>
-            <Text id="notification-text" fx:id="notificationText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="JUSTIFY" wrappingWidth="350.0">
+            <Text id="notification-text" fx:id="notificationText" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="notification-text" text="Text" textAlignment="CENTER" wrappingWidth="280.0">
                <effect>
                   <DropShadow />
-               </effect></Text>
+               </effect>
+            </Text>
          </children>
-      </HBox>
+      </VBox>
       <ProgressBar id="progress-bar" fx:id="progressBar" prefHeight="28.0" prefWidth="452.0" progress="0.53" stylesheets="@Style.css" />
    </children>
    <padding>
