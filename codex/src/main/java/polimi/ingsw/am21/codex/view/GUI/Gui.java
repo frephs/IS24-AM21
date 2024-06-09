@@ -67,33 +67,59 @@ public class Gui extends Application implements View {
   }
 
   public void testLobby() {
-    this.postNotification(NotificationType.CONFIRM, "Attento");
-    this.postNotification(NotificationType.WARNING, "Attento");
-    this.postNotification(NotificationType.ERROR, "Attento");
-    this.postNotification(NotificationType.UPDATE, "Attento");
-    this.postNotification(NotificationType.RESPONSE, "Attento");
+    //    this.postNotification(NotificationType.CONFIRM, "Attento");
+    //    this.postNotification(NotificationType.WARNING, "Attento");
+    //    this.postNotification(NotificationType.ERROR, "Attento");
+    //    this.postNotification(NotificationType.UPDATE, "Attento");
+    //    this.postNotification(NotificationType.RESPONSE, "Attento");
 
-    displayException(new RuntimeException("Test exception"));
+    //    displayException(new RuntimeException("Test exception"));
 
-    this.drawAvailableGames(
-        new ArrayList<>(
-          Collections.nCopies(
-            52,
-            new GameEntry(UUID.randomUUID().toString().substring(0, 3), 2, 4)
-          )
-        )
-      );
+    //    this.drawAvailableGames(
+    //        new ArrayList<>(
+    //          Collections.nCopies(
+    //            52,
+    //            new GameEntry(UUID.randomUUID().toString().substring(0, 3), 2, 4)
+    //          )
+    //        )
+    //      );
+
+    LocalPlayer p1 = new LocalPlayer(UUID.randomUUID());
+    LocalPlayer p2 = new LocalPlayer(UUID.randomUUID());
+    LocalPlayer p3 = new LocalPlayer(UUID.randomUUID());
+    LocalPlayer p4 = new LocalPlayer(UUID.randomUUID());
+
+    p1.setNickname("Player 1");
+    p2.setNickname("Player 2");
+    p3.setNickname("Player 3");
+
+    p1.setToken(TokenColor.RED);
+    p2.setToken(TokenColor.BLUE);
+    p4.setToken(TokenColor.YELLOW);
+
     this.drawAvailableTokenColors(
         Arrays.stream(TokenColor.values()).collect(Collectors.toSet())
       );
 
-    CardsLoader cards = new CardsLoader();
-
-    Card cardFromId = cards.getCardFromId(96);
-    this.drawObjectiveCardChoice(
-        new CardPair<>(cardFromId, cards.getCardFromId(101))
+    this.drawLobby(
+        Map.of(
+          UUID.randomUUID(),
+          p1,
+          UUID.randomUUID(),
+          p2,
+          UUID.randomUUID(),
+          p3,
+          UUID.randomUUID(),
+          p4
+        )
       );
-    this.drawStarterCardSides(cards.getCardFromId(32));
+    //    CardsLoader cards = new CardsLoader();
+    //
+    //    Card cardFromId = cards.getCardFromId(96);
+    //    this.drawObjectiveCardChoice(
+    //        new CardPair<>(cardFromId, cards.getCardFromId(101))
+    //      );
+    //    this.drawStarterCardSides(cards.getCardFromId(32));
   }
 
   public void testGame() {
@@ -160,8 +186,8 @@ public class Gui extends Application implements View {
       primaryStage.setScene(scene);
       primaryStage.setMaximized(true);
       primaryStage.show();
-      drawAvailableGames(new ArrayList<>());
-      //testLobby();
+      //drawAvailableGames(new ArrayList<>());
+      testLobby();
       //testGame();
     } catch (IOException e) {
       e.printStackTrace();
@@ -176,7 +202,7 @@ public class Gui extends Application implements View {
    * Helper function: sets the #content container to the fxml template provided
    * @param fxmlPath the path of the template to load in the #contant container
    * */
-  public void loadSceneFXML(String fxmlPath) {
+  public void loadSceneFXML(String fxmlPath, String containerId) {
     // load the lobby menu
     Node content;
     try {
@@ -187,8 +213,9 @@ public class Gui extends Application implements View {
       displayException(e);
       throw new RuntimeException(e);
     }
-    ((Pane) scene.lookup("#content")).getChildren().clear();
-    ((Pane) scene.lookup("#content")).getChildren().add(content);
+
+    ((Pane) scene.lookup(containerId)).getChildren().clear();
+    ((Pane) scene.lookup(containerId)).getChildren().add(content);
   }
 
   private ImageView loadImage(String path) {
@@ -206,7 +233,8 @@ public class Gui extends Application implements View {
    */
   @FXML
   private ImageView loadImage(GuiElement element) {
-    return loadImage(element.getImagePath());
+    if (element != null) return loadImage(element.getImagePath());
+    else return new ImageView();
   }
 
   /**
@@ -290,7 +318,7 @@ public class Gui extends Application implements View {
     }
 
     Platform.runLater(() -> {
-      loadSceneFXML("LobbyMenu.fxml");
+      loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
     });
 
@@ -347,9 +375,11 @@ public class Gui extends Application implements View {
   @Override
   public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
     Platform.runLater(() -> {
-      loadSceneFXML("LobbyToken.fxml");
+      loadSceneFXML("LobbyToken.fxml", "#content");
 
-      ((Text) scene.lookup("#window-title")).setText("Lobby");
+      ((Text) scene.lookup("#window-title")).setText(
+          "Lobby of the game " //+ client.getGameId() //TODO add game name
+        );
 
       Node tokenContainer = scene.lookup("#token-container");
       ((HBox) tokenContainer).getChildren().clear();
@@ -368,7 +398,7 @@ public class Gui extends Application implements View {
 
               tokenColorImage.setOnMouseClicked((MouseEvent event) -> {
                 client.lobbySetToken(tokenColor);
-                //TODO change scene as callback
+                //TODO change scene as callback of message
               });
 
               return wrapAndBorder(tokenColorImage);
@@ -381,7 +411,31 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {}
+  public void drawLobby(Map<UUID, LocalPlayer> players) {
+    loadSceneFXML("LobbyPlayers.fxml", "#side-content");
+    GridPane playerGrid = ((GridPane) scene.lookup("#lobby-player-container"));
+    for (int i = 0; i < players.size(); i++) {
+      LocalPlayer player = (LocalPlayer) players.values().toArray()[i];
+
+      ImageView token = loadImage(player.getToken());
+      token.setPreserveRatio(true);
+      token.setFitHeight(25);
+
+      HBox tokenContainer = new HBox(token);
+      tokenContainer.alignmentProperty().set(Pos.CENTER_RIGHT);
+      //TODO fix alignment
+      playerGrid.add(token, 0, i);
+
+      Label nickname = new Label(
+        (player.getNickname()) != null
+          ? player.getNickname()
+          : players.keySet().toArray()[i].toString()
+      );
+      nickname.alignmentProperty().setValue(Pos.CENTER);
+      //TODO fix aligment
+      playerGrid.add(nickname, 1, i);
+    }
+  }
 
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
@@ -486,7 +540,7 @@ public class Gui extends Application implements View {
   @Override
   public void drawGame(List<LocalPlayer> players) {
     // TODO
-    loadSceneFXML("GameBoard.fxml");
+    loadSceneFXML("GameBoard.fxml", "#content");
   }
 
   @Override
@@ -540,12 +594,22 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
-    loadSceneFXML("LobbyChooseObjective.fxml");
+    loadSceneFXML("LobbyChooseObjective.fxml", "#content");
 
     ((Text) scene.lookup("#window-title")).setText("Lobby");
 
     ImageView first = loadImage(cardPair.getFirst());
     ImageView second = loadImage(cardPair.getSecond());
+
+    first.setOnMouseClicked((MouseEvent event) -> {
+      client.lobbyChooseObjectiveCard(true);
+      //TODO change scene as callback of message
+    });
+
+    second.setOnMouseClicked((MouseEvent event) -> {
+      client.lobbyChooseObjectiveCard(false);
+      //TODO change scene as callback of message
+    });
 
     first.setPreserveRatio(true);
     second.setPreserveRatio(true);
@@ -563,7 +627,7 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawStarterCardSides(Card cardId) {
-    loadSceneFXML("LobbyChooseStarterCardSide.fxml");
+    loadSceneFXML("LobbyChooseStarterCardSide.fxml", "#content");
 
     ((Text) scene.lookup("#window-title")).setText("Lobby");
 
@@ -578,6 +642,16 @@ public class Gui extends Application implements View {
 
     front.setStyle("-fx-cursor: hand");
     back.setStyle("-fx-cursor: hand");
+
+    front.setOnMouseClicked((MouseEvent event) -> {
+      client.lobbyJoinGame(CardSideType.FRONT);
+      //TODO change scene as callback of message
+    });
+
+    back.setOnMouseClicked((MouseEvent event) -> {
+      client.lobbyJoinGame(CardSideType.BACK);
+      //TODO change scene as callback of message
+    });
 
     Node starterCardSidesContainer = scene.lookup("#starter-side-container");
     ((HBox) starterCardSidesContainer).getChildren().add(wrapAndBorder(front));
