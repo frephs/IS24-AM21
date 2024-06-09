@@ -1032,10 +1032,7 @@ public class GameController {
     );
   }
 
-  public void registerListener(
-    UUID socketID,
-    RemoteGameEventListener listener
-  ) {
+  public void connect(UUID socketID, RemoteGameEventListener listener) {
     if (!userContexts.containsKey(socketID)) {
       userContexts.put(socketID, new UserGameContext(listener));
     } else {

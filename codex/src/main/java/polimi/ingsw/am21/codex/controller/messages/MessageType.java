@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.controller.messages;
 import java.io.Serializable;
 
 public enum MessageType implements Serializable {
+  CONNECT(MessageTypeCategory.CLIENT_ACTION),
   NEXT_TURN_ACTION(MessageTypeCategory.CLIENT_ACTION),
   PLACE_CARD(MessageTypeCategory.CLIENT_ACTION),
   CREATE_GAME(MessageTypeCategory.CLIENT_ACTION),
@@ -24,12 +25,6 @@ public enum MessageType implements Serializable {
   OBJECTIVE_CARDS(MessageTypeCategory.SERVER_RESPONSE),
   STARTER_CARD_SIDES(MessageTypeCategory.SERVER_RESPONSE),
 
-  GAME_ALREADY_STARTED(MessageTypeCategory.SERVER_ERROR),
-  INVALID_CARD_PLACEMENT(MessageTypeCategory.SERVER_ERROR),
-  GAME_FULL(MessageTypeCategory.SERVER_ERROR),
-  GAME_NOT_FOUND(MessageTypeCategory.SERVER_ERROR),
-  NICKNAME_ALREADY_TAKEN(MessageTypeCategory.SERVER_ERROR),
-  TOKEN_COLOR_ALREADY_TAKEN(MessageTypeCategory.SERVER_ERROR),
   INVALID_ACTION(MessageTypeCategory.SERVER_ERROR),
   NOT_A_CLIENT_MESSAGE(MessageTypeCategory.SERVER_ERROR),
   UNKNOWN_MESSAGE_TYPE(MessageTypeCategory.SERVER_ERROR),
@@ -38,10 +33,10 @@ public enum MessageType implements Serializable {
   GAME_OVER(MessageTypeCategory.VIEW_UPDATE),
   NEXT_TURN_UPDATE(MessageTypeCategory.VIEW_UPDATE),
   PLAYER_JOINED_GAME(MessageTypeCategory.VIEW_UPDATE),
+  PLAYER_CHOSE_OBJECTIVE(MessageTypeCategory.VIEW_UPDATE),
   PLAYER_SCORES_UPDATE(MessageTypeCategory.VIEW_UPDATE),
   REMAINING_ROUNDS(MessageTypeCategory.VIEW_UPDATE),
   WINNING_PLAYER(MessageTypeCategory.VIEW_UPDATE),
-  AVAILABLE_TOKEN_COLORS(MessageTypeCategory.VIEW_UPDATE),
   GAME_CREATED(MessageTypeCategory.VIEW_UPDATE),
   GAME_DELETED(MessageTypeCategory.VIEW_UPDATE),
   GAME_STARTED(MessageTypeCategory.VIEW_UPDATE),

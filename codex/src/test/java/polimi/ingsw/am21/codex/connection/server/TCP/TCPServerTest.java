@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.net.PortUnreachableException;
 import java.net.Socket;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,12 +98,14 @@ class TCPServerTest {
           }
         }
       });
+
+      UUID socketID = UUID.randomUUID();
       List.of(
-        new CreateGameMessage("TestGame", 4),
-        new GetAvailableGameLobbiesMessage(),
-        new JoinLobbyMessage("TestGame"),
-        new SetTokenColorMessage(TokenColor.RED, "TestGame"),
-        new SetNicknameMessage("TestNickname", "TestGame")
+        new CreateGameMessage(socketID, "TestGame", 4),
+        new GetAvailableGameLobbiesMessage(socketID),
+        new JoinLobbyMessage(socketID, "TestGame"),
+        new SetTokenColorMessage(socketID, TokenColor.RED, "TestGame"),
+        new SetNicknameMessage(socketID, "TestNickname", "TestGame")
       ).forEach(message -> {
         try {
           outputStream.writeObject(message);
@@ -112,7 +115,6 @@ class TCPServerTest {
           throw new RuntimeException(e);
         }
       });
-
       responsesLatch.await();
 
       assertTrue(
@@ -122,6 +124,7 @@ class TCPServerTest {
           .toList()
           .containsAll(expectedMessages)
       );
+
       server.stop();
       clientSocket.close();
     } catch (IOException e) {

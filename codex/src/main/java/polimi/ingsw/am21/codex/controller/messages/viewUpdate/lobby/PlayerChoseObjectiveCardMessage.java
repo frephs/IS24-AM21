@@ -15,7 +15,7 @@ public class PlayerChoseObjectiveCardMessage extends ViewUpdatingMessage {
     UUID socketId,
     String nickname
   ) {
-    super(MessageType.PLAYER_SET_TOKEN_COLOR);
+    super(MessageType.PLAYER_CHOSE_OBJECTIVE);
     this.gameId = gamedId;
     this.socketId = socketId;
     this.nickname = nickname;

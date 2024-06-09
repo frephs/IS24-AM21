@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.controller.messages.clientActions.lobby;
 
+import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.ActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 
@@ -7,8 +8,8 @@ public class JoinLobbyMessage extends ActionMessage {
 
   private final String lobbyId;
 
-  public JoinLobbyMessage(String lobbyId) {
-    super(MessageType.JOIN_LOBBY);
+  public JoinLobbyMessage(UUID connectionID, String lobbyId) {
+    super(MessageType.JOIN_LOBBY, connectionID);
     this.lobbyId = lobbyId;
   }
 

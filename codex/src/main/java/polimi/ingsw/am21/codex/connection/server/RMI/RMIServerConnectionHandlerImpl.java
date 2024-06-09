@@ -159,10 +159,8 @@ public class RMIServerConnectionHandlerImpl
   }
 
   @Override
-  public void registerListener(
-    UUID connectionID,
-    RemoteGameEventListener listener
-  ) throws RemoteException {
-    this.controller.registerListener(connectionID, listener);
+  public void connect(UUID connectionID, RemoteGameEventListener listener)
+    throws RemoteException {
+    this.controller.connect(connectionID, listener);
   }
 }

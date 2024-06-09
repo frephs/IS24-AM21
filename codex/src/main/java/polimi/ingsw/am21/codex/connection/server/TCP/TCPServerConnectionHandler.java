@@ -8,11 +8,14 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
@@ -22,7 +25,6 @@ import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLob
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
@@ -38,7 +40,6 @@ public class TCPServerConnectionHandler implements Runnable {
   /**
    * A UUID associated with the socket
    */
-  private final UUID socketId;
   /**
    * The Game controller
    */
@@ -61,29 +62,19 @@ public class TCPServerConnectionHandler implements Runnable {
    * The executor that handles the threads for parsing and handling messages
    */
   private final ExecutorService localExecutor;
+  private final TCPServerControllerListener listener;
 
-  /**
-   * The map of active connection handlers, used to handle message broadcasting
-   */
-  private final Map<UUID, TCPServerConnectionHandler> activeHandlers;
-
-  public TCPServerConnectionHandler(
-    Socket socket,
-    GameController controller,
-    UUID socketId,
-    Map<UUID, TCPServerConnectionHandler> activeHandlers
-  ) {
+  public TCPServerConnectionHandler(Socket socket, GameController controller) {
     this.socket = socket;
     try {
       this.socket.setKeepAlive(true);
     } catch (SocketException e) {
       throw new RuntimeException("Failed to enable TCP/IP Keep-Alive", e);
     }
+
     this.controller = controller;
     this.incomingMessages = new ArrayDeque<>();
     this.localExecutor = Executors.newCachedThreadPool();
-    this.socketId = socketId;
-    this.activeHandlers = activeHandlers;
 
     try {
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -94,6 +85,7 @@ public class TCPServerConnectionHandler implements Runnable {
         "from socket."
       );
     }
+    this.listener = new TCPServerControllerListener(this::broadcast);
   }
 
   /** Runs the parser and handler threads */
@@ -108,7 +100,6 @@ public class TCPServerConnectionHandler implements Runnable {
     });
     startMessageParser();
     startMessageHandler();
-    send(new SocketIdMessage(socketId));
   }
 
   /**
@@ -118,7 +109,6 @@ public class TCPServerConnectionHandler implements Runnable {
     try {
       socket.close();
     } catch (IOException ignored) {}
-    activeHandlers.remove(socketId);
   }
 
   /**
@@ -210,6 +200,7 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(Message message)
     throws NotAClientMessageException {
     switch (message.getType()) {
+      case CONNECT -> handleMessage((ConnectMessage) message);
       case NEXT_TURN_ACTION -> handleMessage((NextTurnActionMessage) message);
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
@@ -232,14 +223,18 @@ public class TCPServerConnectionHandler implements Runnable {
     }
   }
 
+  private void handleMessage(ConnectMessage message) {
+    controller.connect(message.getConnectionID(), listener);
+  }
+
   private void handleMessage(NextTurnActionMessage message) {
     try {
       // isLastRound() is present both in the message and the controller, we can use either
       if (controller.isLastRound(message.getGameId())) {
-        controller.nextTurn(socketId);
+        controller.nextTurn(message.getConnectionID());
       } else {
         controller.nextTurn(
-          socketId,
+          message.getConnectionID(),
           message.getCardSource(),
           message.getDeck()
         );
@@ -252,7 +247,7 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(PlaceCardMessage message) {
     try {
       controller.placeCard(
-        socketId,
+        message.getConnectionID(),
         message.getPlayerHandCardNumber(),
         message.getSide(),
         message.getPosition()
@@ -265,7 +260,7 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(CreateGameMessage message) {
     try {
       controller.createGame(
-        socketId,
+        message.getConnectionID(),
         message.getGameId(),
         message.getPlayers()
       );
@@ -276,7 +271,7 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(JoinLobbyMessage message) {
     try {
-      controller.joinLobby(socketId, message.getLobbyId());
+      controller.joinLobby(message.getConnectionID(), message.getLobbyId());
     } catch (InvalidActionException e) {
       send(new InvalidActionMessage(e.getCode(), e.getNotes()));
     }
@@ -285,7 +280,7 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(SelectCardSideMessage message) {
     try {
       controller.joinGame(
-        socketId,
+        message.getConnectionID(),
         message.getLobbyId(),
         message.getCardSideType()
       );
@@ -296,7 +291,10 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(SelectObjectiveMessage message) {
     try {
-      controller.lobbyChooseObjective(socketId, message.isFirst());
+      controller.lobbyChooseObjective(
+        message.getConnectionID(),
+        message.isFirst()
+      );
     } catch (InvalidActionException e) {
       send(new InvalidActionMessage(e.getCode(), e.getNotes()));
     }
@@ -304,7 +302,10 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(SetNicknameMessage message) {
     try {
-      controller.lobbySetNickname(socketId, message.getNickname());
+      controller.lobbySetNickname(
+        message.getConnectionID(),
+        message.getNickname()
+      );
     } catch (InvalidActionException e) {
       send(new InvalidActionMessage(e.getCode(), e.getNotes()));
     }
@@ -312,7 +313,10 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(SetTokenColorMessage message) {
     try {
-      controller.lobbySetTokenColor(socketId, message.getColor());
+      controller.lobbySetTokenColor(
+        message.getConnectionID(),
+        message.getColor()
+      );
     } catch (InvalidActionException e) {
       send(new InvalidActionMessage(e.getCode(), e.getNotes()));
     }
@@ -342,7 +346,7 @@ public class TCPServerConnectionHandler implements Runnable {
       Game game = controller.getGame(message.getGameId());
       Optional<CardPair<ObjectiveCard>> pair = game
         .getLobby()
-        .getPlayerObjectiveCards(socketId);
+        .getPlayerObjectiveCards(message.getConnectionID());
 
       send(
         new ObjectiveCardsMessage(
@@ -361,7 +365,9 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(GetStarterCardSideMessage message) {
     try {
       Game game = controller.getGame(message.getGameId());
-      PlayableCard starterCard = game.getLobby().getStarterCard(socketId);
+      PlayableCard starterCard = game
+        .getLobby()
+        .getStarterCard(message.getConnectionID());
 
       send(new StarterCardSidesMessage(starterCard.getId()));
     } catch (InvalidActionException e) {
@@ -373,7 +379,7 @@ public class TCPServerConnectionHandler implements Runnable {
   public void send(Message message) {
     try {
       if (socket.isConnected() && !socket.isClosed()) {
-        System.out.println("Sending " + message.getType() + " to " + socketId);
+        System.out.println("Sending " + message.getType());
         synchronized (outputStream) {
           outputStream.writeObject(message);
           outputStream.flush();
@@ -398,18 +404,8 @@ public class TCPServerConnectionHandler implements Runnable {
   /**
    * Invokes .send() on all TCPConnectionHandler threads in the pool
    * @param message The message to broadcast to all clients
-   * @param excludeCurrent Whether to exclude the current thread from being targeted,
-   *                       defaults to false
    */
-  public void broadcast(Message message, boolean excludeCurrent) {
-    activeHandlers.forEach((socketId, handler) -> {
-      if (socketId != this.socketId || !excludeCurrent) {
-        handler.send(message);
-      }
-    });
-  }
-
   public void broadcast(Message message) {
-    broadcast(message, false);
+    this.send(message);
   }
 }

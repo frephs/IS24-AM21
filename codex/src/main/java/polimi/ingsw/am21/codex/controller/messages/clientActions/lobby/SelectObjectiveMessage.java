@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.controller.messages.clientActions.lobby;
 
+import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.ActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 
@@ -8,8 +9,12 @@ public class SelectObjectiveMessage extends ActionMessage {
   private final boolean first;
   private final String lobbyId;
 
-  public SelectObjectiveMessage(boolean first, String lobbyId) {
-    super(MessageType.SELECT_OBJECTIVE);
+  public SelectObjectiveMessage(
+    UUID connectionID,
+    boolean first,
+    String lobbyId
+  ) {
+    super(MessageType.SELECT_OBJECTIVE, connectionID);
     this.first = first;
     this.lobbyId = lobbyId;
   }

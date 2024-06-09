@@ -46,10 +46,6 @@ public class RMIClientConnectionHandler
     this.connect();
   }
 
-  private UUID getSocketID() {
-    return this.localModel.getSocketID();
-  }
-
   @Override
   public void connect() {
     try {
@@ -57,9 +53,7 @@ public class RMIClientConnectionHandler
       this.rmiConnectionHandler = (RMIServerConnectionHandler) registry.lookup(
         "//" + this.host + ":" + this.port + "/IS24-AM21-CODEX"
       );
-
-      this.localModel.setSocketId(this.socketID);
-      this.rmiConnectionHandler.registerListener(
+      this.rmiConnectionHandler.connect(
           this.getSocketID(),
           this.localModel.getRemoteListener()
         );
@@ -101,7 +95,7 @@ public class RMIClientConnectionHandler
   @Override
   public void createGame(String gameId, int players) {
     try {
-      rmiConnectionHandler.createGame(this.socketID, gameId, players);
+      rmiConnectionHandler.createGame(this.getSocketID(), gameId, players);
       this.localModel.gameCreated(gameId, 0, players);
     } catch (RemoteException | EmptyDeckException e) {
       this.messageNotSent();
@@ -189,7 +183,7 @@ public class RMIClientConnectionHandler
         gameId,
         numberPlayers
       );
-      rmiConnectionHandler.joinLobby(this.socketID, gameId);
+      rmiConnectionHandler.joinLobby(this.getSocketID(), gameId);
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -245,7 +239,7 @@ public class RMIClientConnectionHandler
     String gameID = this.getGameIDWithMessage().get();
     try {
       localModel.listObjectiveCards(
-        rmiConnectionHandler.getLobbyObjectiveCards(this.socketID)
+        rmiConnectionHandler.getLobbyObjectiveCards(this.getSocketID())
       );
     } catch (GameNotFoundException e) {
       this.localModel.gameNotFound(gameID);
@@ -326,7 +320,7 @@ public class RMIClientConnectionHandler
     String gameID = this.getGameIDWithMessage().get();
     try {
       this.rmiConnectionHandler.placeCard(
-          this.socketID,
+          this.getSocketID(),
           playerHandCardNumber,
           side,
           position

@@ -13,6 +13,10 @@ public class LobbyInfoMessage extends ViewUpdatingMessage {
     this.lobbyUsersInfo = lobbyUsersInfo;
   }
 
+  public LobbyUsersInfo getLobbyUsersInfo() {
+    return lobbyUsersInfo;
+  }
+
   @Override
   public String toString() {
     return (
