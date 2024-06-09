@@ -149,6 +149,7 @@ public class LocalModelContainer
     menu
       .getGames()
       .put(gameId, new GameEntry(gameId, currentPlayers, maxPlayers));
+    listGames();
   }
 
   @Override
@@ -264,6 +265,8 @@ public class LocalModelContainer
         NotificationType.RESPONSE,
         "You joined the lobby of the game: " + gameId
       );
+
+      getView().drawAvailableTokenColors(lobby.getAvailableTokens());
     } else {
       view.postNotification(
         NotificationType.UPDATE,

@@ -12,10 +12,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -79,14 +76,13 @@ public class Gui extends Application implements View {
     displayException(new RuntimeException("Test exception"));
 
     this.drawAvailableGames(
-        List.of(
-          new GameEntry("Game 1", 2, 4),
-          new GameEntry("Game 2", 2, 4),
-          new GameEntry("Game 3", 2, 4),
-          new GameEntry("Game 4", 2, 4)
+        new ArrayList<>(
+          Collections.nCopies(
+            52,
+            new GameEntry(UUID.randomUUID().toString().substring(0, 3), 2, 4)
+          )
         )
       );
-
     this.drawAvailableTokenColors(
         Arrays.stream(TokenColor.values()).collect(Collectors.toSet())
       );
@@ -134,6 +130,7 @@ public class Gui extends Application implements View {
         new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
         new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
       );
+
     this.drawCardDecks(
         (PlayableCard) cards.getCardFromId(1),
         (PlayableCard) cards.getCardFromId(41)
@@ -153,7 +150,8 @@ public class Gui extends Application implements View {
       Parent root = FXMLLoader.load(
         Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
       );
-      scene = new Scene(root, 800, 600);
+
+      scene = new Scene(root, root.getLayoutX(), root.getLayoutY());
 
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
@@ -162,10 +160,9 @@ public class Gui extends Application implements View {
       primaryStage.setScene(scene);
       primaryStage.setMaximized(true);
       primaryStage.show();
-
-      //      drawAvailableGames(new ArrayList<>());
+      drawAvailableGames(new ArrayList<>());
       //testLobby();
-      testGame();
+      //testGame();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -190,7 +187,7 @@ public class Gui extends Application implements View {
       displayException(e);
       throw new RuntimeException(e);
     }
-    //    ((Pane) scene.lookup("#content")).getChildren().clear();
+    ((Pane) scene.lookup("#content")).getChildren().clear();
     ((Pane) scene.lookup("#content")).getChildren().add(content);
   }
 
@@ -281,7 +278,6 @@ public class Gui extends Application implements View {
 
     gameEntry.setOnMouseClicked((MouseEvent event) -> {
       client.connectToGame(game.getGameId());
-      //TODO change scene on callback
     });
 
     return gameEntry;
@@ -293,77 +289,95 @@ public class Gui extends Application implements View {
       client.listGames();
     }
 
-    loadSceneFXML("LobbyMenu.fxml");
-    ((Text) scene.lookup("#window-title")).setText("Menu");
+    Platform.runLater(() -> {
+      loadSceneFXML("LobbyMenu.fxml");
+      ((Text) scene.lookup("#window-title")).setText("Menu");
+    });
 
-    ((GridPane) scene.lookup("#game-entry-container")).getChildren().clear();
+    Platform.runLater(() -> {
+      GridPane gameEntryContainer = (GridPane) ((ScrollPane) scene.lookup(
+          "#game-entry-scroll"
+        )).getContent()
+        .lookup("#game-entry-container");
 
-    ((Button) scene.lookup("#create-game-button")).setOnMouseClicked(
-        (MouseEvent event) -> {
-          client.createGame(
-            ((TextField) scene.lookup("#game-id-input")).getText(),
-            ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
-                .toString()
-                .isEmpty()
-              ? 2
-              : Integer.parseInt(
-                ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
-                  .toString()
-              )
-          );
-        }
-      );
-
-    for (int i = 0; i < games.size(); i++) {
-      GameEntry game = games.get(i);
-      try {
-        Node gameEntry = loadGameEntry(game);
-        int columnIndex = i % 3;
-        int rowIndex = i / 3;
-        ((GridPane) scene.lookup("#game-entry-container")).add(
-            gameEntry,
-            columnIndex,
-            rowIndex
-          );
-      } catch (IOException e) {
-        displayException(e);
-        throw new RuntimeException(e);
+      if (gameEntryContainer != null) {
+        gameEntryContainer.getChildren().clear();
+      } else {
+        System.out.println("game-entry-container not found in the scene.");
+        return;
       }
-    }
+
+      gameEntryContainer.getChildren().clear();
+
+      ((Button) scene.lookup("#create-game-button")).setOnMouseClicked(
+          (MouseEvent event) -> {
+            client.createGame(
+              ((TextField) scene.lookup("#game-id-input")).getText(),
+              ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
+                  .toString()
+                  .isEmpty()
+                ? 2
+                : Integer.parseInt(
+                  ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
+                    .toString()
+                )
+            );
+          }
+        );
+
+      for (int i = 0; i < games.size(); i++) {
+        GameEntry game = games.get(i);
+        try {
+          Node gameEntry = loadGameEntry(game);
+          int columnIndex = i % 3;
+          int rowIndex = i / 3;
+          if (rowIndex > 0 && columnIndex == 0) {
+            gameEntryContainer.addRow(rowIndex, gameEntry);
+          } else {
+            gameEntryContainer.add(gameEntry, columnIndex, rowIndex);
+          }
+        } catch (IOException e) {
+          displayException(e);
+          throw new RuntimeException(e);
+        }
+      }
+    });
   }
 
   @Override
   public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
-    loadSceneFXML("LobbyToken.fxml");
+    Platform.runLater(() -> {
+      loadSceneFXML("LobbyToken.fxml");
 
-    ((Text) scene.lookup("#window-title")).setText("Lobby");
+      ((Text) scene.lookup("#window-title")).setText("Lobby");
 
-    Node tokenContainer = scene.lookup("#token-container");
-    ((HBox) tokenContainer).getChildren().clear();
+      Node tokenContainer = scene.lookup("#token-container");
+      ((HBox) tokenContainer).getChildren().clear();
 
-    ((HBox) tokenContainer).getChildren()
-      .addAll(
-        tokenColors
-          .stream()
-          .map(tokenColor -> {
-            ImageView tokenColorImage = loadImage(tokenColor);
+      ((HBox) tokenContainer).getChildren()
+        .addAll(
+          tokenColors
+            .stream()
+            .map(tokenColor -> {
+              ImageView tokenColorImage = loadImage(tokenColor);
 
-            tokenColorImage.setStyle("-fx-cursor: hand");
+              tokenColorImage.setStyle("-fx-cursor: hand");
 
-            tokenColorImage.setFitHeight(60);
-            tokenColorImage.setFitWidth(60);
+              tokenColorImage.setFitHeight(60);
+              tokenColorImage.setFitWidth(60);
 
-            tokenColorImage.setOnMouseClicked((MouseEvent event) -> {
-              client.lobbySetToken(tokenColor);
-              //TODO change scene as callback
-            });
+              tokenColorImage.setOnMouseClicked((MouseEvent event) -> {
+                client.lobbySetToken(tokenColor);
+                //TODO change scene as callback
+              });
 
-            return wrapAndBorder(tokenColorImage);
-          })
-          .toList()
-      );
+              return wrapAndBorder(tokenColorImage);
+            })
+            .toList()
+        );
 
-    ((HBox) tokenContainer).setAlignment(Pos.CENTER);
+      ((HBox) tokenContainer).setAlignment(Pos.CENTER);
+    });
   }
 
   @Override
