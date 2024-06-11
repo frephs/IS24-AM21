@@ -166,11 +166,6 @@ public abstract class ClientConnectionHandler {
     this.connected = false;
     this.getView().postNotification(Notification.CONNECTION_FAILED);
     this.getView().displayException(e);
-    this.getView()
-      .postNotification(
-        NotificationType.WARNING,
-        "Try reconnecting using: reconnect [" + host + " " + port + "]"
-      );
   }
 
   public void connectionEstablished() {
