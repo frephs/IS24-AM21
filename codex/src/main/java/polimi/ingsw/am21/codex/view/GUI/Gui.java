@@ -281,7 +281,12 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void postNotification(Notification notification) {}
+  public void postNotification(Notification notification) {
+    postNotification(
+      notification.getNotificationType(),
+      notification.getMessage()
+    );
+  }
 
   @Override
   public void postNotification(
@@ -312,9 +317,9 @@ public class Gui extends Application implements View {
         game.getCurrentPlayers() + "/" + game.getMaxPlayers()
       );
 
-    gameEntry.setOnMouseClicked((MouseEvent event) -> {
-      client.connectToGame(game.getGameId());
-    });
+    gameEntry.setOnMouseClicked(
+      (MouseEvent event) -> client.connectToGame(game.getGameId())
+    );
 
     return gameEntry;
   }
@@ -345,20 +350,23 @@ public class Gui extends Application implements View {
 
       gameEntryContainer.getChildren().clear();
 
-      ((Button) scene.lookup("#create-game-button")).setOnMouseClicked(
-          (MouseEvent event) -> {
+      scene
+        .lookup("#create-game-button")
+        .setOnMouseClicked(
+          (MouseEvent event) ->
             client.createGame(
               ((TextField) scene.lookup("#game-id-input")).getText(),
-              ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
+              ((ChoiceBox<?>) scene.lookup("#player-number-input")).getValue()
                   .toString()
                   .isEmpty()
                 ? 2
                 : Integer.parseInt(
-                  ((ChoiceBox) scene.lookup("#player-number-input")).getValue()
+                  ((ChoiceBox<?>) scene.lookup(
+                      "#player-number-input"
+                    )).getValue()
                     .toString()
                 )
-            );
-          }
+            )
         );
 
       for (int i = 0; i < games.size(); i++) {

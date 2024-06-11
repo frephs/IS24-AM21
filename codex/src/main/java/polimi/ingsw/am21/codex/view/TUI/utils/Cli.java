@@ -83,7 +83,10 @@ public class Cli implements View {
 
   @Override
   public void postNotification(Notification notification) {
-    postNotification(notification.notificationType, notification.message);
+    postNotification(
+      notification.getNotificationType(),
+      notification.getMessage()
+    );
   }
 
   @Override

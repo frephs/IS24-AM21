@@ -18,14 +18,6 @@ public class GameAlreadyExistsMessage extends Message {
 
   @Override
   public String toString() {
-    return (
-      "{" +
-      this.getType() +
-      "\",\n" +
-      "  \"gameId\": \"" +
-      this.gameId +
-      "\"\n" +
-      "}"
-    );
+    return getType() + "{" + "gameId=" + gameId + '}';
   }
 }
