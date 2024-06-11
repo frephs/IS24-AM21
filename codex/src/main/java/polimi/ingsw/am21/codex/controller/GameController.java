@@ -685,7 +685,7 @@ public class GameController {
   public void lobbySetTokenColor(UUID connectionID, TokenColor color)
     throws InvalidActionException {
     UserGameContext userGameContext = this.getUserContext(connectionID);
-
+    if (color == null) throw new InvalidTokenColorException();
     String gameID = userGameContext
       .getGameId()
       .orElseThrow(NotInGameException::new);
@@ -969,18 +969,24 @@ public class GameController {
 
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, connectionID);
-    game.nextTurn(remainingRounds -> {
-      this.notifySameContextClients(
-          connectionID,
-          (listener, targetSocketID) ->
-            listener.remainingRounds(gameId, remainingRounds)
-        );
-    });
+    game.nextTurn(
+      () -> this.nextTurnEvent(connectionID, gameId, game),
+      remainingRounds -> {
+        this.notifySameContextClients(
+            connectionID,
+            (listener, targetSocketID) ->
+              listener.remainingRounds(gameId, remainingRounds)
+          );
+      }
+    );
+  }
+
+  private void nextTurnEvent(UUID connectionID, String gameID, Game game) {
     this.notifySameContextClients(
         connectionID,
         (listener, targetSocketID) ->
           listener.changeTurn(
-            gameId,
+            gameID,
             game.getCurrentPlayer().getNickname(),
             game.getCurrentPlayerIndex(),
             game.isLastRound(),
@@ -1022,13 +1028,13 @@ public class GameController {
                 game.getCurrentPlayer().getBoard().getForbiddenSpots()
               )
           ),
-      remainingRounds -> {
+      () -> this.nextTurnEvent(connectionID, gameId, game),
+      remainingRounds ->
         this.notifySameContextClients(
             connectionID,
             (listener, targetSocketID) ->
               listener.remainingRounds(gameId, remainingRounds)
-          );
-      }
+          )
     );
   }
 

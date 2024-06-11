@@ -25,4 +25,5 @@ public interface GameErrorListener {
   void playerNotFound();
   void incompleteLobbyPlayer(String msg);
   void illegalCardSideChoice();
+  void invalidTokenColor();
 }

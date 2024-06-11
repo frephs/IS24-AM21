@@ -21,6 +21,7 @@ public class InvalidActionException extends Exception {
     ILLEGAL_CARD_SIDE_CHOICE,
     LOBBY_FULL,
     NICKNAME_ALREADY_TAKEN,
+    INVALID_TOKEN_COLOR,
     TOKEN_ALREADY_TAKEN,
     GAME_OVER;
 
@@ -48,6 +49,7 @@ public class InvalidActionException extends Exception {
         case ILLEGAL_CARD_SIDE_CHOICE -> "Illegal card side choice";
         case LOBBY_FULL -> "The lobby is full";
         case NICKNAME_ALREADY_TAKEN -> "Nickname already taken";
+        case INVALID_TOKEN_COLOR -> "Invalid token color";
         case TOKEN_ALREADY_TAKEN -> "Token already taken";
         case GAME_OVER -> "Game over";
       };

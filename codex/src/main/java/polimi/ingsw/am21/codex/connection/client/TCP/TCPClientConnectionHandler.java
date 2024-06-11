@@ -454,77 +454,44 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   public void handleMessage(InvalidActionMessage message) {
     switch (message.getCode()) {
-      case PLAYER_NOT_ACTIVE -> {
-        this.localModel.playerNotActive();
-      }
-      case NOT_IN_GAME -> {
-        this.localModel.notInGame();
-      }
-      case GAME_ALREADY_STARTED -> {
-        this.localModel.gameAlreadyStarted();
-      }
-      case INVALID_NEXT_TURN_CALL -> {
-        this.localModel.invalidNextTurnCall();
-      }
-      case GAME_NOT_READY -> {
-        this.localModel.gameNotReady();
-      }
-      case INVALID_GET_OBJECTIVE_CARDS_CALL -> {
-        this.localModel.invalidGetObjectiveCardsCall();
-      }
-      case GAME_NOT_FOUND -> {
-        this.localModel.gameNotFound(
-            message.getNotes().orElse(List.of("")).get(0)
-          );
-      }
-      case PLAYER_NOT_FOUND -> {
-        this.localModel.playerNotFound();
-      }
-      case INCOMPLETE_LOBBY_PLAYER -> {
-        this.localModel.incompleteLobbyPlayer(
-            message
-              .getNotes()
-              .orElse(
-                List.of(
-                  "Incomplete player, finish setting up your player first"
-                )
-              )
-              .get(0)
-          );
-      }
-      case EMPTY_DECK -> {
-        this.localModel.emptyDeck();
-      }
-      case ILLEGAL_PLACING_POSITION -> {
-        this.localModel.invalidCardPlacement(
-            Optional.ofNullable(
-              message.getNotes().orElse(List.of(null)).get(0)
-            ).orElse(message.getCode().getErrorMessage())
-          );
-      }
-      case ILLEGAL_CARD_SIDE_CHOICE -> {
-        this.localModel.illegalCardSideChoice();
-      }
-      case LOBBY_FULL -> {
-        this.localModel.lobbyFull(
-            message.getNotes().orElse(List.of("N/A")).get(0)
-          );
-      }
-      case NICKNAME_ALREADY_TAKEN -> {
-        this.localModel.nicknameTaken(
-            message.getNotes().orElse(List.of("N/A")).get(0)
-          );
-      }
-      case TOKEN_ALREADY_TAKEN -> {
-        this.localModel.tokenTaken(
-            TokenColor.fromString(
-              message.getNotes().orElse(List.of("N/A")).get(0)
+      case PLAYER_NOT_ACTIVE -> this.localModel.playerNotActive();
+      case NOT_IN_GAME -> this.localModel.notInGame();
+      case GAME_ALREADY_STARTED -> this.localModel.gameAlreadyStarted();
+      case INVALID_NEXT_TURN_CALL -> this.localModel.invalidNextTurnCall();
+      case GAME_NOT_READY -> this.localModel.gameNotReady();
+      case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.localModel.invalidGetObjectiveCardsCall();
+      case GAME_NOT_FOUND -> this.localModel.gameNotFound(
+          message.getNotes().orElse(List.of("")).get(0)
+        );
+      case PLAYER_NOT_FOUND -> this.localModel.playerNotFound();
+      case INCOMPLETE_LOBBY_PLAYER -> this.localModel.incompleteLobbyPlayer(
+          message
+            .getNotes()
+            .orElse(
+              List.of("Incomplete player, finish setting up your player first")
             )
-          );
-      }
-      case GAME_OVER -> {
-        this.localModel.gameOver();
-      }
+            .get(0)
+        );
+      case EMPTY_DECK -> this.localModel.emptyDeck();
+      case ILLEGAL_PLACING_POSITION -> this.localModel.invalidCardPlacement(
+          Optional.ofNullable(
+            message.getNotes().orElse(List.of(null)).get(0)
+          ).orElse(message.getCode().getErrorMessage())
+        );
+      case ILLEGAL_CARD_SIDE_CHOICE -> this.localModel.illegalCardSideChoice();
+      case LOBBY_FULL -> this.localModel.lobbyFull(
+          message.getNotes().orElse(List.of("N/A")).get(0)
+        );
+      case NICKNAME_ALREADY_TAKEN -> this.localModel.nicknameTaken(
+          message.getNotes().orElse(List.of("N/A")).get(0)
+        );
+      case INVALID_TOKEN_COLOR -> localModel.invalidTokenColor();
+      case TOKEN_ALREADY_TAKEN -> this.localModel.tokenTaken(
+          TokenColor.fromString(
+            message.getNotes().orElse(List.of("N/A")).get(0)
+          )
+        );
+      case GAME_OVER -> this.localModel.gameOver();
     }
   }
 

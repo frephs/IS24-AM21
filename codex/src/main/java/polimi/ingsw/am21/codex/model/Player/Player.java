@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.model.Player;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -207,13 +208,12 @@ public class Player {
     int cardIndex,
     CardSideType side,
     Position position
-  )
-    throws IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+  ) throws InvalidActionException {
     PlayableCard playedCard;
     try {
       playedCard = board.getHand().get(cardIndex);
     } catch (IndexOutOfBoundsException e) {
-      throw new IndexOutOfBoundsException(
+      throw new IllegalPlacingPositionException(
         "You tried to place a card which either doesn't exist or is not in your hand"
       );
     }

@@ -531,11 +531,13 @@ public class CliClient {
           if (
             command.length < 5 ||
             !Stream.of(command[1], command[2], command[3]).allMatch(
-              s -> s.matches("\\d+")
+              s -> s.matches("-?\\d+")
             ) ||
             !List.of("front", "back").contains(command[4])
           ) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(NotificationType.ERROR, "Invalid place call");
             return;
           }
           int handIndex;
@@ -566,19 +568,46 @@ public class CliClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "draw <deck|resource1|resource2|gold1|gold2>",
+        "draw deck <resource|gold>",
         "Draw a card",
         ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
           if (
-            command.length < 2 ||
+            command.length < 3 ||
+            !List.of("draw", "deck", "resource", "gold").contains(command[1])
+          ) {
+            localModel
+              .getView()
+              .postNotification(NotificationType.WARNING, "Invalid command");
+            return;
+          }
+
+          DrawingCardSource source = DrawingCardSource.Deck;
+          DrawingDeckType type = command[2].equals("resource")
+            ? DrawingDeckType.RESOURCE
+            : DrawingDeckType.GOLD;
+          client.nextTurn(source, type);
+        }
+      }
+    );
+    commandHandlers.add(
+      new CommandHandler(
+        "draw pair <resource1|resource2|gold1|gold2>",
+        "Draw a card",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          if (
+            command.length < 3 ||
             !List.of(
+              "draw",
               "deck",
               "resource1",
-              "resource2",
               "gold1",
+              "resource2",
               "gold2"
             ).contains(command[1])
           ) {
@@ -588,12 +617,10 @@ public class CliClient {
             return;
           }
 
-          DrawingCardSource source = command[1].equals("deck")
-            ? DrawingCardSource.Deck
-            : (command[1].endsWith("1")
-                ? DrawingCardSource.CardPairFirstCard
-                : DrawingCardSource.CardPairSecondCard);
-          DrawingDeckType type = command[1].startsWith("resource")
+          DrawingCardSource source = command[2].endsWith("1")
+            ? DrawingCardSource.CardPairFirstCard
+            : DrawingCardSource.CardPairSecondCard;
+          DrawingDeckType type = command[2].equals("resource")
             ? DrawingDeckType.RESOURCE
             : DrawingDeckType.GOLD;
           client.nextTurn(source, type);

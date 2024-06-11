@@ -349,7 +349,7 @@ public class LocalModelContainer
     lobby.getAvailableTokens().remove(token);
     view.postNotification(
       NotificationType.ERROR,
-      new String[] { "The", " token is already taken" },
+      new String[] { "The ", " token is already taken" },
       token,
       2
     );
@@ -557,7 +557,10 @@ public class LocalModelContainer
     Card card = cardsLoader.getCardFromId(cardId);
     localGameBoard.getCurrentPlayer().addPlayedCards(card, side, position);
 
-    view.postNotification(NotificationType.UPDATE, "Card" + cardId + " placed");
+    view.postNotification(
+      NotificationType.UPDATE,
+      "Card " + cardId + " placed"
+    );
     view.drawCardPlacement(card, side, position);
 
     diffMessage(
@@ -588,8 +591,7 @@ public class LocalModelContainer
 
     localGameBoard.getCurrentPlayer().setAvailableSpots(availablePositions);
     localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenPositions);
-
-    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+    //    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
   }
 
   void diffMessage(int diff, String attributeName) {
@@ -611,7 +613,7 @@ public class LocalModelContainer
         NotificationType.UPDATE,
         new String[] {
           localGameBoard.getCurrentPlayer().getNickname(),
-          (diff > 0 ? "gained" : "lost" + diff),
+          (diff > 0 ? " gained " : " lost " + diff),
           ((Math.abs(diff) != 1) ? "s" : ""),
           ". ",
         },
@@ -676,7 +678,7 @@ public class LocalModelContainer
     view.postNotification(
       NotificationType.UPDATE,
       localGameBoard.getCurrentPlayer().getNickname() +
-      "has drawn a card from the " +
+      " has drawn a card from the " +
       source.toString().toLowerCase() +
       " " +
       deck.toString().toLowerCase() +
@@ -712,11 +714,15 @@ public class LocalModelContainer
     localGameBoard.setCurrentPlayerIndex(playerIndex);
     localGameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
     localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
-    view.postNotification(
-      NotificationType.UPDATE,
-      "It's" + localGameBoard.getCurrentPlayer().getNickname() + "'s turn. "
-    );
-    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+    if (localGameBoard.getCurrentPlayer().getSocketID() == this.socketId) {
+      view.postNotification(NotificationType.UPDATE, "It's your turn. ");
+      view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+    } else {
+      view.postNotification(
+        NotificationType.UPDATE,
+        "It's " + localGameBoard.getCurrentPlayer().getNickname() + "'s turn. "
+      );
+    }
   }
 
   @Override
@@ -840,6 +846,11 @@ public class LocalModelContainer
   @Override
   public void illegalCardSideChoice() {
     view.postNotification(NotificationType.ERROR, "Illegal card side choice. ");
+  }
+
+  @Override
+  public void invalidTokenColor() {
+    view.postNotification(NotificationType.ERROR, "Invalid token color");
   }
 
   public View getView() {

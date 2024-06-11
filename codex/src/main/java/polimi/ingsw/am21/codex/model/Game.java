@@ -250,7 +250,8 @@ public class Game {
   public void nextTurn(
     DrawingCardSource drawingSource,
     DrawingDeckType deckType,
-    BiConsumer<Integer, Integer> drawnCardsCallback,
+    BiConsumer<Integer, Integer> nextTurnEventAfterDraw,
+    Runnable nextTurnWithoutDraw,
     Consumer<Integer> remainingRoundsChange
   ) throws InvalidActionException {
     AtomicReference<Integer> pairCardId = new AtomicReference<>();
@@ -261,6 +262,9 @@ public class Game {
     if (this.remainingRounds != null) {
       throw new InvalidNextTurnCallException();
     }
+
+    Runnable nextTurnEvent = nextTurnWithoutDraw;
+
     try {
       PlayableCard playerCard =
         this.gameBoard.drawCard(drawingSource, deckType, replacementCard -> {
@@ -268,15 +272,15 @@ public class Game {
           });
 
       this.players.get(this.currentPlayer).drawCard(playerCard);
-
-      drawnCardsCallback.accept(playerCard.getId(), pairCardId.get());
+      nextTurnEvent = () ->
+        nextTurnEventAfterDraw.accept(playerCard.getId(), pairCardId.get());
     } catch (EmptyDeckException e) {
       this.remainingRounds = 2;
       remainingRoundsChange.accept(this.remainingRounds);
-      this.nextTurnExecute(remainingRoundsChange);
+      this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
       throw e;
     }
-    this.nextTurnExecute(remainingRoundsChange);
+    this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
   }
 
   /**
@@ -285,8 +289,10 @@ public class Game {
    * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
    * @throws GameOverException If the game is over.
    */
-  public void nextTurn(Consumer<Integer> remainingRoundsChange)
-    throws InvalidActionException {
+  public void nextTurn(
+    Runnable nextTurnWithoutDraw,
+    Consumer<Integer> remainingRoundsChange
+  ) throws InvalidActionException {
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
@@ -294,7 +300,7 @@ public class Game {
       throw new InvalidNextTurnCallException();
     }
 
-    this.nextTurnExecute(remainingRoundsChange);
+    this.nextTurnExecute(nextTurnWithoutDraw, remainingRoundsChange);
   }
 
   /**
@@ -314,18 +320,21 @@ public class Game {
    *                                      drawing deck information, and it is
    *                                      not the last round
    */
-  private void nextTurnExecute(Consumer<Integer> remainingRoundsChange)
-    throws InvalidActionException {
+  private void nextTurnExecute(
+    Runnable nextTurnEvent,
+    Consumer<Integer> remainingRoundsChange
+  ) throws InvalidActionException {
     if (this.state == GameState.GAME_OVER) throw new GameOverException();
     if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
       this.state = GameState.GAME_OVER;
       throw new GameOverException();
     }
     currentPlayer = (currentPlayer + 1) % players.size();
+    boolean remainingRoundsChanged = false;
     if (this.currentPlayer == 0) {
       if (this.remainingRounds != null) {
         this.remainingRounds--;
-        remainingRoundsChange.accept(this.remainingRounds);
+        remainingRoundsChanged = true;
         if (this.remainingRounds == 0) {
           this.state = GameState.GAME_OVER;
           for (Player player : players) {
@@ -339,6 +348,10 @@ public class Game {
         }
       }
     }
+    if (remainingRoundsChanged) remainingRoundsChange.accept(
+      this.remainingRounds
+    );
+    if (nextTurnEvent != null) nextTurnEvent.run();
   }
 
   /**
