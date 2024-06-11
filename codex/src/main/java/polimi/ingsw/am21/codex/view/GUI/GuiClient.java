@@ -3,9 +3,11 @@ package polimi.ingsw.am21.codex.view.GUI;
 import java.util.ArrayList;
 import java.util.Objects;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class GuiClient extends ViewClient {
@@ -18,10 +20,20 @@ public class GuiClient extends ViewClient {
   }
 
   public void start(ConnectionType connectionType, String address, int port) {
+    new Thread(() -> Application.launch(gui.getClass())).start();
+
+    try {
+      while (!gui.isInitialized()) {
+        Thread.sleep(100);
+      }
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
     super.start(connectionType, address, port);
     gui.setClient(client);
-    Application.launch(gui.getClass());
-    gui.drawAvailableGames(new ArrayList<>());
+    client.listGames();
   }
 
   public static void main(String[] args) {
