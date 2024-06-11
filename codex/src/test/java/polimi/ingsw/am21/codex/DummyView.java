@@ -150,4 +150,7 @@ public class DummyView implements View {
     PlayableCard firstResourceCard,
     PlayableCard firstGoldCard
   ) {}
+
+  @Override
+  public void drawNicknameChoice() {}
 }

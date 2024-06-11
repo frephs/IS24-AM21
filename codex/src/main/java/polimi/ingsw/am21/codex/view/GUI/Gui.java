@@ -224,6 +224,7 @@ public class Gui extends Application implements View {
   /**
    * Helper function: sets the #content container to the fxml template provided
    * @param fxmlPath the path of the template to load in the #contant container
+   * @param containerId the container to lead the scene in (e.g. #content, #side-content)
    * */
   public void loadSceneFXML(String fxmlPath, String containerId) {
     // load the lobby menu
@@ -564,7 +565,7 @@ public class Gui extends Application implements View {
   @Override
   public void drawPlayerBoard(LocalPlayer player) {
     // TODO move scene loading somewhere else
-    loadSceneFXML("PlayerBoard.fxml");
+    loadSceneFXML("PlayerBoard.fxml", "#content");
 
     ScrollPane scrollPane = (ScrollPane) scene.lookup(
       "#playerboard-scrollpane"
