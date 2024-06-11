@@ -511,6 +511,20 @@ public class Gui extends Application implements View {
   }
 
   @Override
+  public void drawNicknameChoice() {
+    Platform.runLater(() -> {
+      loadSceneFXML("LobbyNickname.fxml", "#content");
+      ((Button) scene.lookup("#nickname-submit-button")).setOnMouseClicked(
+          (MouseEvent event) -> {
+            String nickname =
+              ((TextField) (scene.lookup("#nickname-input"))).getText();
+            client.lobbySetNickname(nickname);
+          }
+        );
+    });
+  }
+
+  @Override
   public void drawPlayerBoards(List<LocalPlayer> players) {
     // TODO
   }
