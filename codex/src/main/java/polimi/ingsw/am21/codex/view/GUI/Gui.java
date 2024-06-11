@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -177,7 +179,13 @@ public class Gui extends Application implements View {
         Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
       );
 
-      scene = new Scene(root, root.getLayoutX(), root.getLayoutY());
+      Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+      scene = new Scene(
+        root,
+        screenBounds.getWidth(),
+        screenBounds.getHeight()
+      );
 
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
@@ -186,8 +194,8 @@ public class Gui extends Application implements View {
       primaryStage.setScene(scene);
       primaryStage.setMaximized(true);
       primaryStage.show();
-      //drawAvailableGames(new ArrayList<>());
-      testLobby();
+      drawAvailableGames(new ArrayList<>());
+      //testLobby();
       //testGame();
     } catch (IOException e) {
       e.printStackTrace();
@@ -412,29 +420,32 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawLobby(Map<UUID, LocalPlayer> players) {
-    loadSceneFXML("LobbyPlayers.fxml", "#side-content");
-    GridPane playerGrid = ((GridPane) scene.lookup("#lobby-player-container"));
-    for (int i = 0; i < players.size(); i++) {
-      LocalPlayer player = (LocalPlayer) players.values().toArray()[i];
+    Platform.runLater(() -> {
+      loadSceneFXML("LobbyPlayers.fxml", "#side-content");
+      GridPane playerGrid =
+        ((GridPane) scene.lookup("#lobby-player-container"));
+      for (int i = 0; i < players.size(); i++) {
+        LocalPlayer player = (LocalPlayer) players.values().toArray()[i];
 
-      ImageView token = loadImage(player.getToken());
-      token.setPreserveRatio(true);
-      token.setFitHeight(25);
+        ImageView token = loadImage(player.getToken());
+        token.setPreserveRatio(true);
+        token.setFitHeight(25);
 
-      HBox tokenContainer = new HBox(token);
-      tokenContainer.alignmentProperty().set(Pos.CENTER_RIGHT);
-      //TODO fix alignment
-      playerGrid.add(token, 0, i);
+        HBox tokenContainer = new HBox(token);
+        tokenContainer.alignmentProperty().set(Pos.CENTER_RIGHT);
+        //TODO fix alignment
+        playerGrid.add(token, 0, i);
 
-      Label nickname = new Label(
-        (player.getNickname()) != null
-          ? player.getNickname()
-          : players.keySet().toArray()[i].toString()
-      );
-      nickname.alignmentProperty().setValue(Pos.CENTER);
-      //TODO fix aligment
-      playerGrid.add(nickname, 1, i);
-    }
+        Label nickname = new Label(
+          (player.getNickname()) != null
+            ? player.getNickname()
+            : players.keySet().toArray()[i].toString()
+        );
+        nickname.alignmentProperty().setValue(Pos.CENTER);
+        //TODO fix aligment
+        playerGrid.add(nickname, 1, i);
+      }
+    });
   }
 
   @Override
@@ -519,6 +530,7 @@ public class Gui extends Application implements View {
             String nickname =
               ((TextField) (scene.lookup("#nickname-input"))).getText();
             client.lobbySetNickname(nickname);
+            client.getObjectiveCards();
           }
         );
     });
@@ -608,68 +620,73 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
-    loadSceneFXML("LobbyChooseObjective.fxml", "#content");
+    Platform.runLater(() -> {
+      loadSceneFXML("LobbyChooseObjective.fxml", "#content");
 
-    ((Text) scene.lookup("#window-title")).setText("Lobby");
+      ((Text) scene.lookup("#window-title")).setText("Lobby");
 
-    ImageView first = loadImage(cardPair.getFirst());
-    ImageView second = loadImage(cardPair.getSecond());
+      ImageView first = loadImage(cardPair.getFirst());
+      ImageView second = loadImage(cardPair.getSecond());
 
-    first.setOnMouseClicked((MouseEvent event) -> {
-      client.lobbyChooseObjectiveCard(true);
-      //TODO change scene as callback of message
+      first.setOnMouseClicked((MouseEvent event) -> {
+        client.lobbyChooseObjectiveCard(true);
+        client.getStarterCard();
+      });
+
+      second.setOnMouseClicked((MouseEvent event) -> {
+        client.lobbyChooseObjectiveCard(false);
+        client.getStarterCard();
+      });
+
+      first.setPreserveRatio(true);
+      second.setPreserveRatio(true);
+
+      first.setFitWidth(150);
+      second.setFitWidth(150);
+
+      first.setStyle("-fx-cursor: hand");
+      second.setStyle("-fx-cursor: hand");
+
+      Node objectiveContainer = scene.lookup("#objective-container");
+      ((HBox) objectiveContainer).getChildren().add(wrapAndBorder(first));
+      ((HBox) objectiveContainer).getChildren().add(wrapAndBorder(second));
     });
-
-    second.setOnMouseClicked((MouseEvent event) -> {
-      client.lobbyChooseObjectiveCard(false);
-      //TODO change scene as callback of message
-    });
-
-    first.setPreserveRatio(true);
-    second.setPreserveRatio(true);
-
-    first.setFitWidth(150);
-    second.setFitWidth(150);
-
-    first.setStyle("-fx-cursor: hand");
-    second.setStyle("-fx-cursor: hand");
-
-    Node objectiveContainer = scene.lookup("#objective-container");
-    ((HBox) objectiveContainer).getChildren().add(wrapAndBorder(first));
-    ((HBox) objectiveContainer).getChildren().add(wrapAndBorder(second));
   }
 
   @Override
   public void drawStarterCardSides(Card cardId) {
-    loadSceneFXML("LobbyChooseStarterCardSide.fxml", "#content");
+    Platform.runLater(() -> {
+      loadSceneFXML("LobbyChooseStarterCardSide.fxml", "#content");
 
-    ((Text) scene.lookup("#window-title")).setText("Lobby");
+      ((Text) scene.lookup("#window-title")).setText("Lobby");
 
-    ImageView front = loadCardImage(cardId, CardSideType.FRONT);
-    ImageView back = loadCardImage(cardId, CardSideType.BACK);
+      ImageView front = loadCardImage(cardId, CardSideType.FRONT);
+      ImageView back = loadCardImage(cardId, CardSideType.BACK);
 
-    front.setPreserveRatio(true);
-    back.setPreserveRatio(true);
+      front.setPreserveRatio(true);
+      back.setPreserveRatio(true);
 
-    front.setFitWidth(150);
-    back.setFitWidth(150);
+      front.setFitWidth(150);
+      back.setFitWidth(150);
 
-    front.setStyle("-fx-cursor: hand");
-    back.setStyle("-fx-cursor: hand");
+      front.setStyle("-fx-cursor: hand");
+      back.setStyle("-fx-cursor: hand");
 
-    front.setOnMouseClicked((MouseEvent event) -> {
-      client.lobbyJoinGame(CardSideType.FRONT);
-      //TODO change scene as callback of message
+      front.setOnMouseClicked((MouseEvent event) -> {
+        client.lobbyJoinGame(CardSideType.FRONT);
+        //TODO change scene as callback of message
+      });
+
+      back.setOnMouseClicked((MouseEvent event) -> {
+        client.lobbyJoinGame(CardSideType.BACK);
+        //TODO change scene as callback of message
+      });
+
+      Node starterCardSidesContainer = scene.lookup("#starter-side-container");
+      ((HBox) starterCardSidesContainer).getChildren()
+        .add(wrapAndBorder(front));
+      ((HBox) starterCardSidesContainer).getChildren().add(wrapAndBorder(back));
     });
-
-    back.setOnMouseClicked((MouseEvent event) -> {
-      client.lobbyJoinGame(CardSideType.BACK);
-      //TODO change scene as callback of message
-    });
-
-    Node starterCardSidesContainer = scene.lookup("#starter-side-container");
-    ((HBox) starterCardSidesContainer).getChildren().add(wrapAndBorder(front));
-    ((HBox) starterCardSidesContainer).getChildren().add(wrapAndBorder(back));
   }
 
   @Override

@@ -100,6 +100,7 @@ public class LocalModelContainer
       NotificationType.ERROR,
       "Game '" + gameId + "' already exists"
     );
+    listGames();
   }
 
   @Override
@@ -339,6 +340,7 @@ public class LocalModelContainer
           token,
           2
         );
+      getView().drawNicknameChoice();
     } else {
       getView()
         .postNotification(
@@ -360,6 +362,7 @@ public class LocalModelContainer
       token,
       2
     );
+    view.drawAvailableTokenColors(lobby.getAvailableTokens());
   }
 
   /**
@@ -381,6 +384,7 @@ public class LocalModelContainer
         NotificationType.UPDATE,
         "You chose the nickname \"" + nickname + "\""
       );
+      //      view.drawObjectiveCardChoice(lobby.getAvailableObjectives());
     } else {
       view.postNotification(
         NotificationType.UPDATE,
@@ -402,6 +406,11 @@ public class LocalModelContainer
       Optional.ofNullable(nickname).orElse(socketID.toString()) +
       " chose an objective card."
     );
+    if (this.socketId == socketID) {
+      view.drawStarterCardSides(
+        cardsLoader.getCardFromId(lobby.getStarterCardId())
+      );
+    }
   }
 
   public void playerChoseObjectiveCard(Boolean isFirst) {
@@ -429,11 +438,15 @@ public class LocalModelContainer
       cardsLoader.getCardFromId(cardIdPair.getKey()),
       cardsLoader.getCardFromId(cardIdPair.getValue())
     );
-    view.drawObjectiveCardChoice(lobby.getAvailableObjectives());
+    getView().drawObjectiveCardChoice(lobby.getAvailableObjectives());
   }
 
   public void playerGetStarterCardSides(int cardId) {
-    view.drawStarterCardSides(cardsLoader.getCardFromId(cardId));
+    lobby.setStarterCardId(cardId);
+    getView()
+      .drawStarterCardSides(
+        cardsLoader.getCardFromId(lobby.getStarterCardId())
+      );
   }
 
   @Override

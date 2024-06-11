@@ -81,7 +81,7 @@ public interface View {
   void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
 
   void drawObjectiveCardChoice(CardPair<Card> cardPair);
-  void drawStarterCardSides(Card cardId);
+  void drawStarterCardSides(Card card);
   void drawWinner(String nickname);
 
   void drawChatMessage(ChatMessage message);
@@ -96,4 +96,6 @@ public interface View {
     PlayableCard firstResourceCard,
     PlayableCard firstGoldCard
   );
+
+  void drawNicknameChoice();
 }

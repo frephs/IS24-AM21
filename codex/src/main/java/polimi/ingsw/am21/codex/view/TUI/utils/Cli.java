@@ -367,4 +367,7 @@ public class Cli implements View {
       printUpdate("Gold cards deck:\n" + "Empty deck");
     }
   }
+
+  @Override
+  public void drawNicknameChoice() {}
 }
