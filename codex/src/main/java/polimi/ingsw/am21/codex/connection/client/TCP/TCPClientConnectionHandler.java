@@ -154,7 +154,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               getView()
                 .postNotification(
                   NotificationType.WARNING,
-                  "Fetching resources. "
+                  "Fetching resources \n(" +
+                  message
+                    .getType()
+                    .toString()
+                    .toLowerCase()
+                    .replace("get_", "")
+                    .replace("_", " ") +
+                  "). "
                 );
             }
           }
@@ -329,8 +336,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
-      getView()
-        .postNotification(NotificationType.CONFIRM, "Acquiring resources. ");
     }
 
     switch (message.getType()) {

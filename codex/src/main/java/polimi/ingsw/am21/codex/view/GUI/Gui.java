@@ -278,7 +278,10 @@ public class Gui extends Application implements View {
   ) {
     Platform.runLater(() -> {
       try {
-        notificationLoader.addNotification(notificationType, message);
+        notificationLoader.addNotification(
+          notificationType,
+          message.replace(": ", ":\n").replace(".", "")
+        );
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
