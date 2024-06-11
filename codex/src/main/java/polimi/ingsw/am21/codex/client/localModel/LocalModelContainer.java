@@ -531,7 +531,13 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       playerId + " placed card " + cardId
     );
-    view.drawCardPlacement(card, side, position);
+    view.drawCardPlacement(
+      card,
+      side,
+      position,
+      localGameBoard.getCurrentPlayer().getAvailableSpots(),
+      localGameBoard.getCurrentPlayer().getForbiddenSpots()
+    );
 
     diffMessage(
       newPlayerScore - localGameBoard.getCurrentPlayer().getPoints(),

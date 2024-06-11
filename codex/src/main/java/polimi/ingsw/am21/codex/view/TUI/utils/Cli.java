@@ -256,7 +256,9 @@ public class Cli implements View {
   public void drawCardPlacement(
     Card card,
     CardSideType side,
-    Position position
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {
     printUpdate(
       "Card " + card.getId() + " placed at " + position + " on side " + side
