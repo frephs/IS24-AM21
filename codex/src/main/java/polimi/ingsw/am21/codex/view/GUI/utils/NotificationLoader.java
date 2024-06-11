@@ -8,6 +8,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -29,6 +31,14 @@ public class NotificationLoader {
 
   public NotificationLoader(Stage notificationStage) {
     NotificationLoader.notificationStage = notificationStage;
+    //put the notification at the top center of the screen
+
+    // Get the visual bounds of the screen
+    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+    // Center the stage at the top of the screen
+    notificationStage.setX(((screenBounds.getWidth() - 500) / 2));
+    notificationStage.setY(130);
 
     notificationStage.setAlwaysOnTop(true);
     notificationStage.initStyle(StageStyle.TRANSPARENT);
