@@ -383,3 +383,23 @@ Exception Dialog
   -fx-background-radius: 8px;
   -fx-border-radius: 8px;
 }
+
+.grid-cell-active-hover {
+  -fx-border-color: green;
+  -fx-border-width: 2px;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-background-color: rgba(0, 255, 0, 0.2);
+}
+
+.grid-cell-forbidden-hover {
+  -fx-border-color: red;
+  -fx-border-width: 2px;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-background-color: rgba(255, 0, 0, 0.2);
+}
+
+#playerboard-scrollpane {
+  -fx-background-radius: 8px;
+}

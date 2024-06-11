@@ -94,7 +94,9 @@ public class DummyView implements View {
   public void drawCardPlacement(
     Card card,
     CardSideType side,
-    Position position
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {}
 
   @Override
@@ -148,4 +150,7 @@ public class DummyView implements View {
     PlayableCard firstResourceCard,
     PlayableCard firstGoldCard
   ) {}
+
+  @Override
+  public void drawNicknameChoice() {}
 }

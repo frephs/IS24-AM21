@@ -99,7 +99,7 @@ public class GeometricObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     //TODO add cardToAscii implementation
     return "";
   }

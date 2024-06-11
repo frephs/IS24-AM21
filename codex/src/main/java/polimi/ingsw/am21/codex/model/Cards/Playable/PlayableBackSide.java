@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -42,7 +43,7 @@ public class PlayableBackSide extends PlayableSide implements CliCard {
    * */
 
   @Override
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     final int BEGIN = 4;
     for (int i = 0; i < permanentResources.size(); i++) {
       ResourceType resource = permanentResources.get(i);

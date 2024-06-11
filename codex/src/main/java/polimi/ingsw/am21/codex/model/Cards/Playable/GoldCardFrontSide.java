@@ -1,9 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards.Playable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -111,7 +108,7 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
    * */
 
   @Override
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     pointCondition.ifPresent(pointConditionType -> {
       if (pointConditionType == PointConditionType.OBJECTS) {
         pointConditionObject.ifPresent(

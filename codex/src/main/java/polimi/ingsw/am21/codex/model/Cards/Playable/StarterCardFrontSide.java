@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards.Playable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
@@ -19,7 +20,7 @@ public class StarterCardFrontSide extends PlayableFrontSide {
     return "";
   }
 
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     return super.cardToAscii(cardStringMap);
   }
 }

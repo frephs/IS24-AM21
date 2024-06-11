@@ -34,10 +34,7 @@ import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.view.GUI.utils.ExceptionLoader;
-import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
-import polimi.ingsw.am21.codex.view.GUI.utils.GuiUtils;
-import polimi.ingsw.am21.codex.view.GUI.utils.NotificationLoader;
+import polimi.ingsw.am21.codex.view.GUI.utils.*;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
@@ -151,21 +148,39 @@ public class Gui extends Application implements View {
     p3.addResource(ResourceType.PLANT, 2);
     p4.addResource(ResourceType.FUNGI, 2);
 
-    this.drawGame(List.of(p1, p2, p3, p4));
-    this.drawLeaderBoard(List.of(p1, p2, p3, p4));
+    //    this.drawGame(List.of(p1, p2, p3, p4));
+    //    this.drawLeaderBoard(List.of(p1, p2, p3, p4));
 
     CardsLoader cards = new CardsLoader();
-    this.drawPairs(
-        new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
-        new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
-      );
+    //    this.drawPairs(
+    //        new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
+    //        new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
+    //      );
+    //
+    //    this.drawCardDecks(
+    //        (PlayableCard) cards.getCardFromId(1),
+    //        (PlayableCard) cards.getCardFromId(41)
+    //      );
+    //    this.drawComonObjectiveCards(
+    //        new CardPair<>(cards.getCardFromId(90), cards.getCardFromId(91))
+    //      );
 
-    this.drawCardDecks(
-        (PlayableCard) cards.getCardFromId(1),
-        (PlayableCard) cards.getCardFromId(41)
+    p1.setAvailableSpots(new HashSet<>(List.of(new Position(0, 1))));
+
+    this.drawPlayerBoard(p1);
+    this.drawCardPlacement(
+        cards.getCardFromId(81),
+        CardSideType.BACK,
+        new Position(0, 0),
+        p1.getAvailableSpots(),
+        p1.getForbiddenSpots()
       );
-    this.drawComonObjectiveCards(
-        new CardPair<>(cards.getCardFromId(90), cards.getCardFromId(91))
+    this.drawCardPlacement(
+        cards.getCardFromId(1),
+        CardSideType.BACK,
+        new Position(1, 0),
+        p1.getAvailableSpots(),
+        p1.getForbiddenSpots()
       );
   }
 
@@ -214,6 +229,7 @@ public class Gui extends Application implements View {
   /**
    * Helper function: sets the #content container to the fxml template provided
    * @param fxmlPath the path of the template to load in the #contant container
+   * @param containerId the container to lead the scene in (e.g. #content, #side-content)
    * */
   public void loadSceneFXML(String fxmlPath, String containerId) {
     // load the lobby menu
@@ -244,16 +260,14 @@ public class Gui extends Application implements View {
   /**
    * @return an Image view element containing the GuiElement provided
    */
-  @FXML
   private ImageView loadImage(GuiElement element) {
     if (element != null) return loadImage(element.getImagePath());
     else return new ImageView();
   }
 
   /**
-   *
-   * */
-  @FXML
+   * Loads an image view that represents the provided card
+   */
   private ImageView loadCardImage(Card card, CardSideType side) {
     return switch (side) {
       case FRONT -> loadImage(card.getImagePath(CardSideType.FRONT));
@@ -261,7 +275,6 @@ public class Gui extends Application implements View {
     };
   }
 
-  @FXML
   private static HBox wrapAndBorder(ImageView imageView) {
     HBox image = new HBox(imageView);
     HBox.setMargin(image, new Insets(0, 10, 10, 10));
@@ -574,7 +587,84 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawPlayerBoard(LocalPlayer player) {
-    // TODO
+    // TODO move scene loading somewhere else
+    loadSceneFXML("PlayerBoard.fxml", "#content");
+
+    ScrollPane scrollPane = (ScrollPane) scene.lookup(
+      "#playerboard-scrollpane"
+    );
+    GridPane gridPane = new GridPane();
+    gridPane.setId("playerboard-grid");
+
+    for (int row = 0; row < ViewGridPosition.gridSize; row++) {
+      RowConstraints rowConstraint = new RowConstraints();
+      rowConstraint.setMinHeight(GridCell.cellHeight);
+      rowConstraint.setMaxHeight(GridCell.cellHeight);
+      rowConstraint.setPrefHeight(GridCell.cellHeight);
+      rowConstraint.setVgrow(Priority.NEVER);
+      gridPane.getRowConstraints().add(rowConstraint);
+    }
+    for (int col = 0; col < ViewGridPosition.gridSize; col++) {
+      ColumnConstraints colConstraint = new ColumnConstraints();
+      colConstraint.setMinWidth(GridCell.cellWidth);
+      colConstraint.setMaxWidth(GridCell.cellWidth);
+      colConstraint.setPrefWidth(GridCell.cellWidth);
+      colConstraint.setHgrow(Priority.NEVER);
+      gridPane.getColumnConstraints().add(colConstraint);
+    }
+
+    player
+      .getPlayedCards()
+      .forEach((position, cardInfo) -> {
+        GridCell cell = new GridCell(
+          // These cells should never be clickable since we're placing the card right away, but just in case...
+          getCellClickHandler(position)
+        );
+
+        cell.placeCard(loadCardImage(cardInfo.getKey(), cardInfo.getValue()));
+
+        ViewGridPosition viewPos = new ViewGridPosition(position);
+        gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
+      });
+
+    drawAvailablePositions(player.getAvailableSpots(), gridPane);
+    drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
+
+    scrollPane.setContent(gridPane);
+  }
+
+  private Runnable getCellClickHandler(Position position) {
+    return () -> {
+      // TODO
+    };
+  }
+
+  private void drawAvailablePositions(
+    Set<Position> positions,
+    GridPane gridPane
+  ) {
+    positions.forEach(position -> {
+      GridCell cell = new GridCell(getCellClickHandler(position));
+
+      cell.setStatus(GridCellStatus.AVAILABLE);
+
+      ViewGridPosition viewPos = new ViewGridPosition(position);
+      gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
+    });
+  }
+
+  private void drawForbiddenPositions(
+    Set<Position> positions,
+    GridPane gridPane
+  ) {
+    positions.forEach(position -> {
+      GridCell cell = new GridCell(getCellClickHandler(position));
+
+      cell.setStatus(GridCellStatus.FORBIDDEN);
+
+      ViewGridPosition viewPos = new ViewGridPosition(position);
+      gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
+    });
   }
 
   @Override
@@ -591,8 +681,41 @@ public class Gui extends Application implements View {
   public void drawCardPlacement(
     Card card,
     CardSideType side,
-    Position position
-  ) {}
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
+  ) {
+    Platform.runLater(() -> {
+      ViewGridPosition viewPos = new ViewGridPosition(position);
+      GridPane gridPane = (GridPane) scene.lookup("#playerboard-grid");
+
+      gridPane
+        .getChildren()
+        .stream()
+        .filter(
+          child ->
+            GridPane.getRowIndex(child) == viewPos.getRow() &&
+            GridPane.getColumnIndex(child) == viewPos.getCol()
+        )
+        .findFirst()
+        .ifPresentOrElse(
+          current -> {
+            GridCell cell = (GridCell) current;
+            cell.placeCard(loadCardImage(card, side));
+          },
+          () -> {
+            GridCell cell = new GridCell(getCellClickHandler(position));
+
+            cell.placeCard(loadCardImage(card, side));
+
+            gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
+          }
+        );
+
+      drawAvailablePositions(availablePositions, gridPane);
+      drawForbiddenPositions(forbiddenPositions, gridPane);
+    });
+  }
 
   @Override
   public void drawGame(List<LocalPlayer> players) {

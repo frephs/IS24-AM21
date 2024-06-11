@@ -16,6 +16,14 @@ public class Position implements Serializable {
     this.y = 0;
   }
 
+  public int getX() {
+    return x;
+  }
+
+  public int getY() {
+    return y;
+  }
+
   public Position computeAdjacentPosition(AdjacentPosition adjacentPosition) {
     return switch (adjacentPosition) {
       // isometric grid

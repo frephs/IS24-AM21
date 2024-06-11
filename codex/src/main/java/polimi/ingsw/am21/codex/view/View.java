@@ -59,7 +59,13 @@ public interface View {
    */
   void drawCardDrawn(DrawingDeckType deck);
 
-  void drawCardPlacement(Card card, CardSideType side, Position position);
+  void drawCardPlacement(
+    Card card,
+    CardSideType side,
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
+  );
 
   void drawGame(List<LocalPlayer> players);
 
