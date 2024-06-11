@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.Cards.Card;
@@ -51,7 +52,7 @@ public class ObjectiveCard extends Card implements CliCard {
     );
   }
 
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // TODO: Implement TUI method
     return "";
   }

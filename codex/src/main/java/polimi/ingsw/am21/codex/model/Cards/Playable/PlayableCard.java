@@ -133,7 +133,7 @@ public class PlayableCard extends Card {
    * -----------------
    * */
 
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     String frontSideString = frontSide.cardToAscii(cardStringMap);
     String backSideString = backSide.cardToAscii(cardStringMap);
     return CliUtils.joinMinLines(frontSideString, backSideString);

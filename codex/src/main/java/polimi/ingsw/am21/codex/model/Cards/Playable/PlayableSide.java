@@ -61,7 +61,7 @@ public abstract class PlayableSide implements CliCard {
    * -----------------
    * */
 
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // corners
     corners.forEach(
       (cornerPosition, corner) ->
