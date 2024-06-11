@@ -378,3 +378,8 @@ Exception Dialog
   -fx-alignment: center;
   -fx-spacing: 5px;
 }
+
+.rounded {
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
+}

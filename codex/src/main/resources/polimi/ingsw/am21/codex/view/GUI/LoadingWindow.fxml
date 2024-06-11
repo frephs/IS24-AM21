@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="window" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.LoadingWindow">
+
+<VBox styleClass="rounded" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" >
    <children>
-      <ImageView fitHeight="400.0" fitWidth="405.0" layoutX="100.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <image>
-            <Image url="@pictures/CODEX_Rulebook_EN_page_01.png" />
-         </image></ImageView>
-      <ProgressIndicator layoutX="274.0" layoutY="333.0">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-         <effect>
-            <Glow />
-         </effect>
-      </ProgressIndicator>
+      <AnchorPane prefHeight="400.0" prefWidth="378.0" styleClass="rounded" stylesheets="@Style.css">
+         <children>
+            <ImageView fitHeight="400.0" fitWidth="405.0" pickOnBounds="true" preserveRatio="true" styleClass="rounded" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <image>
+                  <Image url="@pictures/CODEX_Rulebook_EN_page_01.png" />
+               </image>
+            </ImageView>
+            <ProgressBar layoutX="102.0" layoutY="352.0" prefHeight="30.0" prefWidth="200.0" />
+         </children>
+      </AnchorPane>
    </children>
-</AnchorPane>
+</VBox>

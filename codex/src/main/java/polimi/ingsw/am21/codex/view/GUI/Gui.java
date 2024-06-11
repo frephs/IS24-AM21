@@ -55,6 +55,7 @@ public class Gui extends Application implements View {
   private Pane content;
 
   private static ClientConnectionHandler client;
+  private boolean isReady = false;
 
   public Gui() {
     gui = this;
@@ -168,24 +169,26 @@ public class Gui extends Application implements View {
       );
   }
 
+  private static Stage primaryStage;
   private static NotificationLoader notificationLoader;
   private static ExceptionLoader exceptionLoader;
   private static Scene scene;
 
   @Override
   public void start(Stage primaryStage) {
+    Gui.primaryStage = primaryStage;
+
     try {
       Parent root = FXMLLoader.load(
-        Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
+        Objects.requireNonNull(Gui.class.getResource("LoadingWindow.fxml"))
       );
 
       Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 
-      scene = new Scene(
-        root,
-        screenBounds.getWidth(),
-        screenBounds.getHeight()
-      );
+      scene = new Scene(root);
+
+      primaryStage.setX((screenBounds.getWidth() - 400) / 2);
+      primaryStage.setY((screenBounds.getHeight() - 400) / 2);
 
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
@@ -193,12 +196,14 @@ public class Gui extends Application implements View {
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
       primaryStage.setMaximized(true);
+
       primaryStage.show();
-      drawAvailableGames(new ArrayList<>());
+      //drawAvailableGames(new ArrayList<>());
       //testLobby();
       //testGame();
+
     } catch (IOException e) {
-      e.printStackTrace();
+      Cli.getInstance().displayException(e);
     }
   }
 
@@ -326,11 +331,26 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawAvailableGames(List<GameEntry> games) {
-    if (games.isEmpty()) {
-      client.listGames();
-    }
-
     Platform.runLater(() -> {
+      Parent root = null;
+      try {
+        root = FXMLLoader.load(
+          Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
+        );
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+      scene = new Scene(
+        root,
+        screenBounds.getWidth(),
+        screenBounds.getHeight()
+      );
+
+      primaryStage.setScene(scene);
+
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
     });
@@ -757,5 +777,11 @@ public class Gui extends Application implements View {
 
       goldCardsDeck.getChildren().add(wrapAndBorder(gold));
     }
+  }
+
+  public boolean isInitialized() {
+    return (
+      scene != null && notificationLoader != null && exceptionLoader != null
+    );
   }
 }
