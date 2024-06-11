@@ -108,7 +108,7 @@ public final class CardsLoader {
       cardList.addAll(starterCardsList);
       cardList.addAll(objectiveCardsList);
     }
-    return cardList.get(id - 1);
+    return cardList.stream().filter(c -> c.getId() == id).findFirst().get();
   }
 
   public List<PlayableCard> loadStarterCards() {
