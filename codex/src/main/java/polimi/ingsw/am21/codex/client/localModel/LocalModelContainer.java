@@ -520,8 +520,8 @@ public class LocalModelContainer
         );
       state.set(ClientContext.GAME);
 
-      view.drawLeaderBoard(localGameBoard.getPlayers());
       view.drawPlayerBoards(localGameBoard.getPlayers());
+      view.drawLeaderBoard(localGameBoard.getPlayers());
     }
 
     localGameBoard.setCurrentPlayer(players.getFirst());

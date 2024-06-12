@@ -587,7 +587,7 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawPlayerBoard(LocalPlayer player) {
-    // TODO move scene loading somewhere else
+    // TODO move scene loading somewhere else to drawPlayerBoards + users switch
     loadSceneFXML("PlayerBoard.fxml", "#content");
 
     ScrollPane scrollPane = (ScrollPane) scene.lookup(

@@ -1,6 +1,12 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -70,7 +76,7 @@ public class CliClient extends ViewClient {
           if (!matchingContext.isEmpty()) {
             Set<CommandHandler> matchingUsages = matchingContext
               .stream()
-              .filter(commandHandlers -> commandHandlers.matchUsageString(line))
+              .filter(commandHandler -> commandHandler.matchUsageString(line))
               .collect(Collectors.toSet());
 
             if (matchingUsages.isEmpty() && !line.isEmpty()) {
@@ -85,7 +91,7 @@ public class CliClient extends ViewClient {
             } else if (!line.isEmpty()) {
               try {
                 matchingUsages.forEach(
-                  commandHandlers -> commandHandlers.handle(line.split(" "))
+                  commandHandler -> commandHandler.handle(line.split(" "))
                 );
               } catch (Exception e) {
                 cli.postNotification(
@@ -201,15 +207,11 @@ public class CliClient extends ViewClient {
           ArrayList<String> usages = new ArrayList<>();
           ArrayList<String> contexts = new ArrayList<>();
           ArrayList<String> descriptions = new ArrayList<>();
-          commandHandlers
-            .stream()
-            .forEach(commandHandler -> {
-              usages.add(commandHandler.getUsage());
-              contexts.add(
-                commandHandler.getContext().toString().toLowerCase()
-              );
-              descriptions.add(commandHandler.getDescription());
-            });
+          commandHandlers.forEach(commandHandler -> {
+            usages.add(commandHandler.getUsage());
+            contexts.add(commandHandler.getContext().toString().toLowerCase());
+            descriptions.add(commandHandler.getDescription());
+          });
           cli.postNotification(
             NotificationType.RESPONSE,
             CliUtils.getTable(
