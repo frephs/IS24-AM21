@@ -828,12 +828,16 @@ public class Gui extends Application implements View {
 
       front.setOnMouseClicked((MouseEvent event) -> {
         client.lobbyJoinGame(CardSideType.FRONT);
-        //TODO change scene as callback of message
+        Platform.runLater(
+          () -> loadSceneFXML("LobbyWaitRoom.fxml", "#content")
+        );
       });
 
       back.setOnMouseClicked((MouseEvent event) -> {
         client.lobbyJoinGame(CardSideType.BACK);
-        //TODO change scene as callback of message
+        Platform.runLater(
+          () -> loadSceneFXML("LobbyWaitRoom.fxml", "#content")
+        );
       });
 
       Node starterCardSidesContainer = scene.lookup("#starter-side-container");
