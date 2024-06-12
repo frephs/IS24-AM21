@@ -128,6 +128,8 @@ public class Gui extends Application implements View {
   }
 
   public void testGame() {
+    drawGameWindow();
+
     LocalPlayer p1 = new LocalPlayer(UUID.randomUUID());
     LocalPlayer p2 = new LocalPlayer(UUID.randomUUID());
     LocalPlayer p3 = new LocalPlayer(UUID.randomUUID());
@@ -172,6 +174,7 @@ public class Gui extends Application implements View {
 
     p1.setAvailableSpots(new HashSet<>(List.of(new Position(0, 1))));
 
+    this.drawPlayerBoards(List.of(p1));
     this.drawPlayerBoard(p1);
     this.drawCardPlacement(
         cards.getCardFromId(81),
@@ -227,8 +230,7 @@ public class Gui extends Application implements View {
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
       //testLobby();
-      //testGame();
-
+      //      testGame();
     } catch (IOException e) {
       Cli.getInstance().displayException(e);
     }
@@ -267,6 +269,26 @@ public class Gui extends Application implements View {
         ).toExternalForm()
       )
     );
+  }
+
+  private void drawGameWindow() {
+    try {
+      Parent root = FXMLLoader.load(
+        Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
+      );
+
+      Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+      scene = new Scene(
+        root,
+        screenBounds.getWidth(),
+        screenBounds.getHeight()
+      );
+
+      primaryStage.setScene(scene);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -360,24 +382,7 @@ public class Gui extends Application implements View {
   @Override
   public void drawAvailableGames(List<GameEntry> games) {
     Platform.runLater(() -> {
-      Parent root = null;
-      try {
-        root = FXMLLoader.load(
-          Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
-        );
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-
-      Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-
-      scene = new Scene(
-        root,
-        screenBounds.getWidth(),
-        screenBounds.getHeight()
-      );
-
-      primaryStage.setScene(scene);
+      drawGameWindow();
 
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
@@ -594,14 +599,12 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawPlayerBoards(List<LocalPlayer> players) {
-    // TODO
+    // TODO handle other players (switch button etc)
+    loadSceneFXML("PlayerBoard.fxml", "#content");
   }
 
   @Override
   public void drawPlayerBoard(LocalPlayer player) {
-    // TODO move scene loading somewhere else to drawPlayerBoards + users switch
-    loadSceneFXML("PlayerBoard.fxml", "#content");
-
     ScrollPane scrollPane = (ScrollPane) scene.lookup(
       "#playerboard-scrollpane"
     );
