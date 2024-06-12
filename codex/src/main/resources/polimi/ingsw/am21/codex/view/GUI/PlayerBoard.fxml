@@ -47,12 +47,13 @@
                <children>
                   <VBox prefHeight="125.0" prefWidth="402.0" spacing="5.0">
                      <children>
-                        <Label alignment="CENTER" prefHeight="42.0" prefWidth="369.0" text="Hand" />
+                        <Label alignment="CENTER" prefHeight="44.0" prefWidth="1063.0" text="Hand" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" />
                         <HBox id="hand-display" prefHeight="78.0" prefWidth="248.0" spacing="10.0">
                            <children>
                               <VBox id="hand-0" prefHeight="78.0" prefWidth="113.0">
                                  <children>
-                                    <ImageView fitHeight="80.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" />
+                                    <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
                                  </children></VBox>
                               <Separator minWidth="-Infinity" orientation="VERTICAL" prefHeight="80.0" prefWidth="0.0">
                                  <padding>
@@ -60,13 +61,13 @@
                                  </padding></Separator>
                               <VBox id="hand-1" prefHeight="78.0" prefWidth="113.0">
                                  <children>
-                                    <ImageView fitHeight="80.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" />
+                                    <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </VBox>
                               <Separator minWidth="0.0" orientation="VERTICAL" prefHeight="80.0" prefWidth="0.0" />
                               <VBox id="hand-2" prefHeight="78.0" prefWidth="113.0">
                                  <children>
-                                    <ImageView fitHeight="80.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" />
+                                    <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </VBox>
                            </children>
