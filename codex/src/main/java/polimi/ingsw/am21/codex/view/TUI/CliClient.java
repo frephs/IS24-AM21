@@ -1,17 +1,20 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.client.localModel.state.ClientContext;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
-import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -27,7 +30,6 @@ import polimi.ingsw.am21.codex.view.ViewClient;
 public class CliClient extends ViewClient {
 
   //TODO move context out of here into viewClient. It's not a concern of the cli
-  private final ContextContainer context = new ContextContainer();
 
   Scanner scanner;
   Cli cli;
@@ -59,42 +61,51 @@ public class CliClient extends ViewClient {
           .stream()
           .filter(
             commandHandler ->
-              commandHandler.getContext() == null ||
-              commandHandler.getContext() == ClientContext.ALL ||
-              commandHandler.getContext() == context.get()
-          )
-          .filter(
-            commandHandler ->
               commandHandler.getUsage().split(" ")[0].equals(command[0])
           )
           .collect(Collectors.toSet());
-
         if (!matchingCommands.isEmpty()) {
-          Set<CommandHandler> matchingUsages = matchingCommands
+          Set<CommandHandler> matchingContext = matchingCommands
             .stream()
-            .filter(commandHandlers -> commandHandlers.matchUsageString(line))
-            .collect(Collectors.toSet());
-          if (matchingUsages.isEmpty() && !line.isEmpty()) {
-            matchingCommands.forEach(
+            .filter(
               commandHandler ->
+                commandHandler.getContext() == ClientContext.MENU ||
+                commandHandler.getContext() == localModel.getState()
+            )
+            .collect(Collectors.toSet());
+          if (!matchingContext.isEmpty()) {
+            Set<CommandHandler> matchingUsages = matchingContext
+              .stream()
+              .filter(commandHandler -> commandHandler.matchUsageString(line))
+              .collect(Collectors.toSet());
+
+            if (matchingUsages.isEmpty() && !line.isEmpty()) {
+              matchingContext.forEach(
+                commandHandler ->
+                  cli.postNotification(
+                    NotificationType.WARNING,
+                    "Invalid command. You maybe looking for: " +
+                    commandHandler.getUsage()
+                  )
+              );
+            } else if (!line.isEmpty()) {
+              try {
+                matchingUsages.forEach(
+                  commandHandler -> commandHandler.handle(line.split(" "))
+                );
+              } catch (Exception e) {
                 cli.postNotification(
-                  NotificationType.WARNING,
-                  "Invalid command. You maybe looking for: " +
-                  commandHandler.getUsage()
-                )
-            );
-          } else if (!line.isEmpty()) {
-            try {
-              matchingCommands.forEach(
-                commandHandlers -> commandHandlers.handle(line.split(" "))
-              );
-            } catch (Exception e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "An error occurred while executing the command. \n"
-              );
-              cli.displayException(e);
+                  NotificationType.ERROR,
+                  "An error occurred while executing the command. \n"
+                );
+                cli.displayException(e);
+              }
             }
+          } else {
+            cli.postNotification(
+              NotificationType.WARNING,
+              "The command is not available in the current context"
+            );
           }
         } else {
           cli.postNotification(
@@ -128,12 +139,6 @@ public class CliClient extends ViewClient {
       this.context = context;
     }
 
-    public CommandHandler(String usage, String description) {
-      this.usage = usage;
-      this.description = description;
-      context = null;
-    }
-
     public boolean matchUsageString(String input) {
       // TODO fix this regex
       String regex = usage
@@ -164,34 +169,11 @@ public class CliClient extends ViewClient {
 
   private final List<CommandHandler> commandHandlers = new LinkedList<>();
 
-  private class ContextContainer {
-
-    private ClientContext context;
-
-    ContextContainer() {
-      context = null;
-    }
-
-    public ClientContext get() {
-      return context;
-    }
-
-    private void set(ClientContext context) {
-      this.context = context;
-      if (context != null) {
-        cli.postNotification(
-          NotificationType.RESPONSE,
-          "You are now in the " + context.toString().toLowerCase()
-        );
-      }
-    }
-  }
-
   private void initializeCommandHandlers() {
     // TODO add optional arguments to usages
 
     commandHandlers.add(
-      new CommandHandler("exit", "Exit the program") {
+      new CommandHandler("exit", "Exit the program", ClientContext.MENU) {
         @Override
         public void handle(String[] command) {
           cli.postNotification(NotificationType.CONFIRM, "Closing...");
@@ -202,38 +184,40 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("reconnect", "Connect to the server") {
+      new CommandHandler(
+        "reconnect",
+        "Connect to the server",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.connect();
-          context.set(null);
         }
       }
     );
 
     commandHandlers.add(
-      new CommandHandler("help", "Display available commands") {
+      new CommandHandler(
+        "help",
+        "Display available commands",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
+          ArrayList<String> contexts = new ArrayList<>();
           ArrayList<String> descriptions = new ArrayList<>();
-          commandHandlers
-            .stream()
-            .filter(
-              commandHandler ->
-                commandHandler.getContext() == null ||
-                commandHandler.getContext() == ClientContext.ALL ||
-                commandHandler.getContext().equals(context.get())
-            )
-            .forEach(commandHandler -> {
-              usages.add(commandHandler.getUsage());
-              descriptions.add(commandHandler.getDescription());
-            });
+          commandHandlers.forEach(commandHandler -> {
+            usages.add(commandHandler.getUsage());
+            contexts.add(commandHandler.getContext().toString().toLowerCase());
+            descriptions.add(commandHandler.getDescription());
+          });
           cli.postNotification(
             NotificationType.RESPONSE,
             CliUtils.getTable(
-              new String[] { "Command", "Description" },
+              new String[] { "Command", "Context", "Description" },
               usages,
+              contexts,
               descriptions
             )
           );
@@ -242,7 +226,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("list-games", "List available games") {
+      new CommandHandler(
+        "list-games",
+        "List available games",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.listGames();
@@ -251,11 +239,14 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("join-game <game-id>", "Join a game") {
+      new CommandHandler(
+        "join-game <game-id>",
+        "Join a game",
+        ClientContext.LIST
+      ) {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
-          context.set(ClientContext.LOBBY);
           // TODO printed lobby is outdated
         }
       }
@@ -278,7 +269,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "leave-game",
         "Leave the current game",
-        ClientContext.ALL
+        ClientContext.MENU
       ) {
         @Override
         public void handle(String[] command) {
@@ -290,7 +281,8 @@ public class CliClient extends ViewClient {
     commandHandlers.add(
       new CommandHandler(
         "create-game <game-id> <number-of-players>",
-        "Create a new game"
+        "Create a new game",
+        ClientContext.LIST
       ) {
         @Override
         public void handle(String[] command) {
@@ -302,7 +294,8 @@ public class CliClient extends ViewClient {
     commandHandlers.add(
       new CommandHandler(
         "create-game-join <game-id> <number-of-players>",
-        "Create a new game and join it."
+        "Create a new game and join it.",
+        ClientContext.LIST
       ) {
         @Override
         public void handle(String[] command) {
@@ -310,7 +303,6 @@ public class CliClient extends ViewClient {
             command[1],
             Integer.parseInt(command[2])
           );
-          context.set(ClientContext.LOBBY);
         }
       }
     );
@@ -414,19 +406,23 @@ public class CliClient extends ViewClient {
           client.lobbyJoinGame(
             command[1].equals("front") ? CardSideType.FRONT : CardSideType.BACK
           );
-          context.set(ClientContext.GAME);
         }
       }
     );
 
     commandHandlers.add(
-      new CommandHandler("show context", "Show the client current context") {
+      new CommandHandler(
+        "show context",
+        "Show the client current context",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           cli.postNotification(
             NotificationType.RESPONSE,
-            (context.get() != null)
-              ? "You are now in the " + context.get().toString().toLowerCase()
+            (localModel.getState() != ClientContext.LIST)
+              ? "You are now in the " +
+              localModel.getState().toString().toLowerCase()
               : "You have not joined any lobby or game yet"
           );
         }
@@ -434,7 +430,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("chat <message>", "Broadcast a message") {
+      new CommandHandler(
+        "chat <message>",
+        "Broadcast a message",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.sendChatMessage(
@@ -465,7 +465,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "show <context|playerboard|leaderboard|card|hand|objective|pairs>",
+        "show <playerboard|leaderboard|card|hand|objective|pairs>",
         "Show game information",
         ClientContext.GAME
       ) {
