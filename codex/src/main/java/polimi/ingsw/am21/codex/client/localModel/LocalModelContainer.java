@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
-import polimi.ingsw.am21.codex.client.localModel.state.LocalModelState;
+import polimi.ingsw.am21.codex.client.localModel.state.ClientContext;
 import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
@@ -31,8 +31,8 @@ public class LocalModelContainer
   /**
    * State of the local model
    * */
-  AtomicReference<LocalModelState> state = new AtomicReference<>(
-    LocalModelState.LIST
+  AtomicReference<ClientContext> state = new AtomicReference<>(
+    ClientContext.LIST
   );
 
   /**
@@ -151,7 +151,7 @@ public class LocalModelContainer
 
   public void listGames() {
     //TODO make listGames use GameEntries
-    if (state.get().equals(LocalModelState.MENU)) {
+    if (state.get().equals(ClientContext.MENU)) {
       view.drawAvailableGames(menu.getGames().values().stream().toList());
     }
   }
@@ -267,7 +267,12 @@ public class LocalModelContainer
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
     } else if (socketId.equals(this.socketId)) {
-      state.set(LocalModelState.LOBBY);
+      state.set(ClientContext.LOBBY);
+      getView()
+        .postNotification(
+          NotificationType.RESPONSE,
+          "You joined the lobby of the game: " + gameId
+        );
 
       lobby = new LocalLobby(gameId);
       localGameBoard = new LocalGameBoard(
@@ -327,7 +332,7 @@ public class LocalModelContainer
       );
 
       lobby.getPlayers().remove(socketID);
-      if (state.get().equals(LocalModelState.LOBBY)) {
+      if (state.get().equals(ClientContext.LOBBY)) {
         view.drawLobby(lobby.getPlayers());
       }
     }
@@ -513,7 +518,7 @@ public class LocalModelContainer
             player -> players.indexOf(player.getNickname())
           )
         );
-      state.set(LocalModelState.GAME);
+      state.set(ClientContext.GAME);
 
       view.drawLeaderBoard(localGameBoard.getPlayers());
       view.drawPlayerBoards(localGameBoard.getPlayers());
@@ -697,7 +702,7 @@ public class LocalModelContainer
 
   @Override
   public void gameOver() {
-    state.set(LocalModelState.GAME_OVER);
+    state.set(ClientContext.GAME_OVER);
     view.drawGameOver(localGameBoard.getPlayers());
   }
 
@@ -714,7 +719,7 @@ public class LocalModelContainer
           diffMessage(diff, "points");
         }));
 
-    if (state.get().equals(LocalModelState.GAME)) view.drawLeaderBoard(
+    if (state.get().equals(ClientContext.GAME)) view.drawLeaderBoard(
       localGameBoard.getPlayers()
     );
   }
@@ -734,7 +739,7 @@ public class LocalModelContainer
 
   @Override
   public void winningPlayer(String nickname) {
-    if (state.get().equals((LocalModelState.GAME_OVER))) {
+    if (state.get().equals((ClientContext.GAME_OVER))) {
       view.drawWinner(nickname);
     }
 
@@ -781,7 +786,7 @@ public class LocalModelContainer
     }
   }
 
-  public LocalModelState getState() {
+  public ClientContext getState() {
     return state.get();
   }
 }

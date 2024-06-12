@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.client.localModel.state;
 
-public enum LocalModelState {
+public enum ClientContext {
   MENU,
   LIST,
   LOBBY,
