@@ -519,23 +519,34 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
-    GridPane container = (GridPane) scene.lookup("#leaderboard-grid");
-    container.getChildren().clear();
+    Platform.runLater(() -> {
+      GridPane container = (GridPane) scene.lookup("#leaderboard-grid");
+      container.getChildren().clear();
 
-    List<LocalPlayer> sortedPlayers = players
-      .stream()
-      .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
-      .toList();
-    for (int i = 0; i < sortedPlayers.size(); i++) {
-      LocalPlayer player = sortedPlayers.get(i);
+      List<LocalPlayer> sortedPlayers = players
+        .stream()
+        .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
+        .toList();
+      for (int i = 0; i < sortedPlayers.size(); i++) {
+        LocalPlayer player = sortedPlayers.get(i);
 
-      Label nickname = new Label(player.getNickname());
-      nickname.getStyleClass().add("leaderboard-entry");
-      container.add(nickname, 0, i);
+        Label nickname = new Label(player.getNickname());
+        nickname.getStyleClass().add("leaderboard-entry");
 
-      Label points = new Label(String.valueOf(player.getPoints()));
-      points.getStyleClass().add("leaderboard-entry");
-      container.add(points, 1, i);
+        Label points = new Label(String.valueOf(player.getPoints()));
+        points.getStyleClass().add("leaderboard-entry");
+
+        container.addRow(i, nickname, points);
+      }
+    });
+  }
+
+  //TODO maybe implement this in the cli
+  public void drawResourcesAndObjects(LocalPlayer player) {
+    Platform.runLater(() -> {
+      HBox container = (HBox) scene.lookup("#player-resources-objects");
+
+      (container).getChildren().clear();
 
       HBox resources = new HBox();
       resources.getStyleClass().add("leaderboard-entry");
@@ -561,7 +572,8 @@ public class Gui extends Application implements View {
           resources.getChildren().add(entryContainer);
           // TODO fix alignment
         });
-      container.add(resources, 2, i);
+      resources.setAlignment(Pos.CENTER);
+      container.getChildren().add(new HBox(resources));
 
       HBox objects = new HBox();
       objects.getStyleClass().add("leaderboard-entry");
@@ -586,8 +598,10 @@ public class Gui extends Application implements View {
           objects.getChildren().add(entryContainer);
           // TODO fix alignment
         });
-      container.add(objects, 3, i);
-    }
+
+      objects.setAlignment(Pos.CENTER);
+      container.getChildren().add(new VBox(objects));
+    });
   }
 
   @Override
@@ -655,7 +669,12 @@ public class Gui extends Application implements View {
       drawAvailablePositions(player.getAvailableSpots(), gridPane);
       drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
 
+      drawAvailablePositions(player.getAvailableSpots(), gridPane);
+      drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
+      drawResourcesAndObjects(player);
+
       scrollPane.setContent(gridPane);
+      //TODO draw resources and objects
     });
   }
 
@@ -771,13 +790,16 @@ public class Gui extends Application implements View {
 
       drawAvailablePositions(availablePositions, gridPane);
       drawForbiddenPositions(forbiddenPositions, gridPane);
+      //TODO draw resources and objects
     });
   }
 
   @Override
   public void drawGame(List<LocalPlayer> players) {
-    // TODO
-    loadSceneFXML("GameBoard.fxml", "#content");
+    Platform.runLater(() -> {
+      loadSceneFXML("GameBoard.fxml", "#side-content");
+      drawPlayerBoards(players);
+    });
   }
 
   @Override
