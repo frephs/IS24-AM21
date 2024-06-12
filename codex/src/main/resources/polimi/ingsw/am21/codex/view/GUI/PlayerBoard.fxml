@@ -5,17 +5,17 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="576.0" prefWidth="662.0" styleClass="window" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="719.0" prefWidth="863.0" styleClass="window" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox alignment="CENTER" layoutX="5.833373069763184" layoutY="5.833373069763184" styleClass="container" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+      <VBox alignment="CENTER" layoutX="5.833373069763184" layoutY="5.833373069763184" prefWidth="855.0" styleClass="container" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
             <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="58.0" prefWidth="245.0" styleClass="title" text="PlayerBoard" />
             <VBox prefHeight="34.0" prefWidth="118.0" />
             <HBox alignment="CENTER">
                <children>
-                  <VBox prefHeight="601.0" prefWidth="457.0" styleClass="bordered">
+                  <VBox prefHeight="552.0" prefWidth="790.0" styleClass="bordered">
                      <children>
-                        <ScrollPane id="playerboard-scrollpane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="324.0" prefWidth="449.0" vbarPolicy="NEVER" vvalue="0.5">
+                        <ScrollPane id="playerboard-scrollpane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="324.0" prefWidth="628.0" vbarPolicy="NEVER" vvalue="0.5" VBox.vgrow="ALWAYS">
                            <content>
                               <GridPane>
                                 <columnConstraints>
@@ -41,50 +41,40 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox alignment="CENTER">
-                     <children>
-                        <Label text="Rulebook" />
-                        <Button fx:id="rulebookButton" mnemonicParsing="false">
-                                <graphic>
-                                   <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                                           <image>
-                                              <Image url="@pictures/rulebook/ruleBook_image.png" />
-                                           </image>
-                                   </ImageView>
-                                </graphic>
-                        </Button>
-                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="42.0" prefWidth="132.0" text="Player" textAlignment="CENTER" />
-                        <ChoiceBox prefHeight="44.0" prefWidth="142.0" />
-                     </children>
-                  </VBox>
                </children>
             </HBox>
             <HBox prefHeight="300.0" prefWidth="589.0">
                <children>
-                  <Separator orientation="VERTICAL" prefHeight="78.0" prefWidth="13.0" />
-                  <VBox prefHeight="125.0" prefWidth="402.0">
+                  <VBox prefHeight="125.0" prefWidth="402.0" spacing="5.0">
                      <children>
                         <Label alignment="CENTER" prefHeight="42.0" prefWidth="369.0" text="Hand" />
-                        <HBox prefHeight="78.0" prefWidth="248.0">
+                        <HBox id="hand-display" prefHeight="78.0" prefWidth="248.0" spacing="10.0">
                            <children>
                               <VBox id="hand-0" prefHeight="78.0" prefWidth="113.0">
                                  <children>
                                     <ImageView fitHeight="80.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" />
                                  </children></VBox>
-                              <Separator orientation="VERTICAL" prefHeight="78.0" prefWidth="7.0" />
-                              <VBox id="hand-0" prefHeight="78.0" prefWidth="113.0">
+                              <Separator minWidth="-Infinity" orientation="VERTICAL" prefHeight="80.0" prefWidth="0.0">
+                                 <padding>
+                                    <Insets left="4.0" />
+                                 </padding></Separator>
+                              <VBox id="hand-1" prefHeight="78.0" prefWidth="113.0">
                                  <children>
                                     <ImageView fitHeight="80.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </VBox>
-                              <Separator orientation="VERTICAL" prefHeight="78.0" prefWidth="18.0" />
-                              <VBox id="hand-0" prefHeight="78.0" prefWidth="113.0">
+                              <Separator minWidth="0.0" orientation="VERTICAL" prefHeight="80.0" prefWidth="0.0" />
+                              <VBox id="hand-2" prefHeight="78.0" prefWidth="113.0">
                                  <children>
                                     <ImageView fitHeight="80.0" fitWidth="109.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </VBox>
                            </children>
                         </HBox>
+                        <Button id="flip-hand-button" mnemonicParsing="false" prefHeight="28.0" prefWidth="56.0" text="Flip">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin></Button>
                      </children>
                   </VBox>
                   <VBox layoutX="23.0" layoutY="10.0" prefHeight="103.0" prefWidth="268.0">
@@ -99,6 +89,22 @@
                      <HBox.margin>
                         <Insets left="30.0" />
                      </HBox.margin>
+                  </VBox>
+                  <VBox alignment="CENTER">
+                     <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="42.0" prefWidth="132.0" text="Player" textAlignment="CENTER" />
+                        <ChoiceBox prefHeight="44.0" prefWidth="142.0" />
+                        <Label text="Rulebook" />
+                        <Button fx:id="rulebookButton" mnemonicParsing="false" prefHeight="12.0" prefWidth="30.0">
+                                <graphic>
+                                   <ImageView fitHeight="21.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
+                                           <image>
+                                              <Image url="@pictures/rulebook/ruleBook_image.png" />
+                                           </image>
+                                   </ImageView>
+                                </graphic>
+                        </Button>
+                     </children>
                   </VBox>
                </children>
             </HBox>

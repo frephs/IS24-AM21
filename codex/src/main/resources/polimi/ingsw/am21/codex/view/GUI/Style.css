@@ -403,3 +403,8 @@ Exception Dialog
 #playerboard-scrollpane {
   -fx-background-radius: 8px;
 }
+
+#flip-hand-button {
+  -fx-font-size: 12px;
+  -fx-padding: 5px;
+}

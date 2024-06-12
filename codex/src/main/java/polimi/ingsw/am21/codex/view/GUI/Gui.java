@@ -66,6 +66,11 @@ public class Gui extends Application implements View {
     Gui.client = client;
   }
 
+  /** The side of the hand the player is currently looking at */
+  private CardSideType visibleHandSide = CardSideType.FRONT;
+  /** The last hand that has been displayed, used to re-render it when flipped */
+  private List<Card> lastHand = new ArrayList<>();
+
   public void testLobby() {
     //    this.postNotification(NotificationType.CONFIRM, "Attento");
     //    this.postNotification(NotificationType.WARNING, "Attento");
@@ -181,6 +186,13 @@ public class Gui extends Application implements View {
         new Position(1, 0),
         p1.getAvailableSpots(),
         p1.getForbiddenSpots()
+      );
+    this.drawHand(
+        List.of(
+          cards.getCardFromId(1),
+          cards.getCardFromId(81),
+          cards.getCardFromId(2)
+        )
       );
   }
 
@@ -639,6 +651,15 @@ public class Gui extends Application implements View {
     };
   }
 
+  private void toggleHandSide() {
+    if (visibleHandSide == CardSideType.FRONT) {
+      visibleHandSide = CardSideType.BACK;
+    } else {
+      visibleHandSide = CardSideType.FRONT;
+    }
+    drawHand(lastHand);
+  }
+
   private void drawAvailablePositions(
     Set<Position> positions,
     GridPane gridPane
@@ -735,7 +756,28 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawHand(List<Card> hand) {
-    // TODO
+    // Save the hand in case we need to flip it
+    lastHand = hand;
+
+    scene
+      .lookup("#flip-hand-button")
+      .setOnMouseClicked(event -> toggleHandSide());
+
+    for (int i = 0; i < hand.size(); i++) {
+      Card card = hand.get(i);
+      VBox vbox = ((VBox) scene.lookup("#hand-" + i));
+
+      ImageView image = loadCardImage(card, visibleHandSide);
+      image.setPreserveRatio(true);
+      image.setFitWidth(150);
+      image.setStyle("-fx-cursor: hand");
+      image.setOnMouseClicked(event -> {
+        // TODO
+      });
+
+      vbox.getChildren().clear();
+      vbox.getChildren().add(image);
+    }
   }
 
   @Override
