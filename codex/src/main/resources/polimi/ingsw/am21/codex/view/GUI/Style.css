@@ -390,6 +390,7 @@ Exception Dialog
   -fx-border-radius: 8px;
   -fx-background-radius: 8px;
   -fx-background-color: rgba(0, 255, 0, 0.2);
+  -fx-cursor: hand;
 }
 
 .grid-cell-forbidden-hover {
@@ -402,9 +403,23 @@ Exception Dialog
 
 #playerboard-scrollpane {
   -fx-background-radius: 8px;
+  -fx-background-color: transparent;
 }
 
 #flip-hand-button {
   -fx-font-size: 12px;
   -fx-padding: 5px;
+}
+
+.hand-selected-card {
+  -fx-border-color: #b4a31f;
+  -fx-border-width: 2px;
+  -fx-border-radius: 8px;
+  -fx-cursor: hand;
+}
+.hand-not-selected-card {
+  -fx-border-color: transparent;
+  -fx-border-width: 2px;
+  -fx-border-radius: 8px;
+  -fx-cursor: hand;
 }

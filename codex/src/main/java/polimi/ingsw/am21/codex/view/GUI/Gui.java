@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view.GUI;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -70,6 +71,12 @@ public class Gui extends Application implements View {
   private CardSideType visibleHandSide = CardSideType.FRONT;
   /** The last hand that has been displayed, used to re-render it when flipped */
   private List<Card> lastHand = new ArrayList<>();
+  /**
+   * The index of the hand that is currently selected, null otherwise
+   */
+  private Integer selectedHandIndex = null;
+
+  // TODO track what user is being displayed
 
   public void testLobby() {
     //    this.postNotification(NotificationType.CONFIRM, "Attento");
@@ -634,7 +641,8 @@ public class Gui extends Application implements View {
         .forEach((position, cardInfo) -> {
           GridCell cell = new GridCell(
             // These cells should never be clickable since we're placing the card right away, but just in case...
-            getCellClickHandler(position)
+            getCellClickHandler(position),
+            getCellPlacementActive()
           );
 
           cell.placeCard(loadCardImage(cardInfo.getKey(), cardInfo.getValue()));
@@ -656,12 +664,23 @@ public class Gui extends Application implements View {
     };
   }
 
+  /**
+   * Returns a supplier that determines whether the playerboard should be clickable or not
+   */
+  private Supplier<Boolean> getCellPlacementActive() {
+    return () -> {
+      return this.selectedHandIndex != null;
+      // TODO && displayedUser == player
+    };
+  }
+
   private void toggleHandSide() {
     if (visibleHandSide == CardSideType.FRONT) {
       visibleHandSide = CardSideType.BACK;
     } else {
       visibleHandSide = CardSideType.FRONT;
     }
+    selectedHandIndex = null;
     drawHand(lastHand);
   }
 
@@ -670,7 +689,10 @@ public class Gui extends Application implements View {
     GridPane gridPane
   ) {
     positions.forEach(position -> {
-      GridCell cell = new GridCell(getCellClickHandler(position));
+      GridCell cell = new GridCell(
+        getCellClickHandler(position),
+        getCellPlacementActive()
+      );
 
       cell.setStatus(GridCellStatus.AVAILABLE);
 
@@ -684,7 +706,10 @@ public class Gui extends Application implements View {
     GridPane gridPane
   ) {
     positions.forEach(position -> {
-      GridCell cell = new GridCell(getCellClickHandler(position));
+      GridCell cell = new GridCell(
+        getCellClickHandler(position),
+        getCellPlacementActive()
+      );
 
       cell.setStatus(GridCellStatus.FORBIDDEN);
 
@@ -730,7 +755,10 @@ public class Gui extends Application implements View {
             cell.placeCard(loadCardImage(card, side));
           },
           () -> {
-            GridCell cell = new GridCell(getCellClickHandler(position));
+            GridCell cell = new GridCell(
+              getCellClickHandler(position),
+              getCellPlacementActive()
+            );
 
             cell.placeCard(loadCardImage(card, side));
 
@@ -775,11 +803,23 @@ public class Gui extends Application implements View {
       ImageView image = loadCardImage(card, visibleHandSide);
       image.setPreserveRatio(true);
       image.setFitWidth(150);
-      image.setStyle("-fx-cursor: hand");
+
+      int finalI = i;
       image.setOnMouseClicked(event -> {
-        // TODO
+        selectedHandIndex = finalI;
+
+        for (int j = 0; j < hand.size(); j++) {
+          // Clear existing class selection
+          (scene.lookup("#hand-" + j)).getStyleClass().clear();
+
+          if (finalI == j) (scene.lookup("#hand-" + j)).getStyleClass()
+            .add("hand-selected-card");
+          else (scene.lookup("#hand-" + j)).getStyleClass()
+            .add("hand-not-selected-card");
+        }
       });
 
+      vbox.getStyleClass().add("hand-not-selected-card");
       vbox.getChildren().clear();
       vbox.getChildren().add(image);
     }
