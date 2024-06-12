@@ -151,7 +151,7 @@ public class LocalModelContainer
 
   public void listGames() {
     //TODO make listGames use GameEntries
-    if (state.get().equals(ClientContext.MENU)) {
+    if (state.get().equals(ClientContext.LIST)) {
       view.drawAvailableGames(menu.getGames().values().stream().toList());
     }
   }

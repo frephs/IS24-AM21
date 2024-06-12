@@ -230,7 +230,7 @@ public class Gui extends Application implements View {
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
       //testLobby();
-      //      testGame();
+      testGame();
     } catch (IOException e) {
       Cli.getInstance().displayException(e);
     }
@@ -605,47 +605,49 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawPlayerBoard(LocalPlayer player) {
-    ScrollPane scrollPane = (ScrollPane) scene.lookup(
-      "#playerboard-scrollpane"
-    );
-    GridPane gridPane = new GridPane();
-    gridPane.setId("playerboard-grid");
+    Platform.runLater(() -> {
+      ScrollPane scrollPane = (ScrollPane) scene.lookup(
+        "#playerboard-scrollpane"
+      );
+      GridPane gridPane = new GridPane();
+      gridPane.setId("playerboard-grid");
 
-    for (int row = 0; row < ViewGridPosition.gridSize; row++) {
-      RowConstraints rowConstraint = new RowConstraints();
-      rowConstraint.setMinHeight(GridCell.cellHeight);
-      rowConstraint.setMaxHeight(GridCell.cellHeight);
-      rowConstraint.setPrefHeight(GridCell.cellHeight);
-      rowConstraint.setVgrow(Priority.NEVER);
-      gridPane.getRowConstraints().add(rowConstraint);
-    }
-    for (int col = 0; col < ViewGridPosition.gridSize; col++) {
-      ColumnConstraints colConstraint = new ColumnConstraints();
-      colConstraint.setMinWidth(GridCell.cellWidth);
-      colConstraint.setMaxWidth(GridCell.cellWidth);
-      colConstraint.setPrefWidth(GridCell.cellWidth);
-      colConstraint.setHgrow(Priority.NEVER);
-      gridPane.getColumnConstraints().add(colConstraint);
-    }
+      for (int row = 0; row < ViewGridPosition.gridSize; row++) {
+        RowConstraints rowConstraint = new RowConstraints();
+        rowConstraint.setMinHeight(GridCell.cellHeight);
+        rowConstraint.setMaxHeight(GridCell.cellHeight);
+        rowConstraint.setPrefHeight(GridCell.cellHeight);
+        rowConstraint.setVgrow(Priority.NEVER);
+        gridPane.getRowConstraints().add(rowConstraint);
+      }
+      for (int col = 0; col < ViewGridPosition.gridSize; col++) {
+        ColumnConstraints colConstraint = new ColumnConstraints();
+        colConstraint.setMinWidth(GridCell.cellWidth);
+        colConstraint.setMaxWidth(GridCell.cellWidth);
+        colConstraint.setPrefWidth(GridCell.cellWidth);
+        colConstraint.setHgrow(Priority.NEVER);
+        gridPane.getColumnConstraints().add(colConstraint);
+      }
 
-    player
-      .getPlayedCards()
-      .forEach((position, cardInfo) -> {
-        GridCell cell = new GridCell(
-          // These cells should never be clickable since we're placing the card right away, but just in case...
-          getCellClickHandler(position)
-        );
+      player
+        .getPlayedCards()
+        .forEach((position, cardInfo) -> {
+          GridCell cell = new GridCell(
+            // These cells should never be clickable since we're placing the card right away, but just in case...
+            getCellClickHandler(position)
+          );
 
-        cell.placeCard(loadCardImage(cardInfo.getKey(), cardInfo.getValue()));
+          cell.placeCard(loadCardImage(cardInfo.getKey(), cardInfo.getValue()));
 
-        ViewGridPosition viewPos = new ViewGridPosition(position);
-        gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
-      });
+          ViewGridPosition viewPos = new ViewGridPosition(position);
+          gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
+        });
 
-    drawAvailablePositions(player.getAvailableSpots(), gridPane);
-    drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
+      drawAvailablePositions(player.getAvailableSpots(), gridPane);
+      drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
 
-    scrollPane.setContent(gridPane);
+      scrollPane.setContent(gridPane);
+    });
   }
 
   private Runnable getCellClickHandler(Position position) {
