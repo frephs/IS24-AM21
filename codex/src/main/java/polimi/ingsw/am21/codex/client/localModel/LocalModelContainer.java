@@ -192,6 +192,7 @@ public class LocalModelContainer
 
   @Override
   public void gameNotFound(String gameId) {
+    menu.getGames().remove(gameId);
     view.postNotification(
       NotificationType.ERROR,
       "Game " + gameId + " not found. "
