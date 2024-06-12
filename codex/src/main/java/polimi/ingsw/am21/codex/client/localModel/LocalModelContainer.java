@@ -2,9 +2,11 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
+import polimi.ingsw.am21.codex.client.localModel.state.LocalModelState;
 import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
@@ -25,6 +27,13 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class LocalModelContainer
   implements GameEventListener, GameErrorListener {
+
+  /**
+   * State of the local model
+   * */
+  AtomicReference<LocalModelState> state = new AtomicReference<>(
+    LocalModelState.LIST
+  );
 
   /**
    * Contains the game entries
@@ -142,7 +151,9 @@ public class LocalModelContainer
 
   public void listGames() {
     //TODO make listGames use GameEntries
-    view.drawAvailableGames(menu.getGames().values().stream().toList());
+    if (state.get().equals(LocalModelState.MENU)) {
+      view.drawAvailableGames(menu.getGames().values().stream().toList());
+    }
   }
 
   @Override
@@ -255,11 +266,14 @@ public class LocalModelContainer
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
     } else if (socketId.equals(this.socketId)) {
+      state.set(LocalModelState.LOBBY);
+
       lobby = new LocalLobby(gameId);
       localGameBoard = new LocalGameBoard(
         gameId,
         menu.getGames().get(gameId).getMaxPlayers()
       );
+
       addToLobby(socketId);
 
       view.postNotification(
@@ -312,7 +326,9 @@ public class LocalModelContainer
       );
 
       lobby.getPlayers().remove(socketID);
-      view.drawLobby(lobby.getPlayers());
+      if (state.get().equals(LocalModelState.LOBBY)) {
+        view.drawLobby(lobby.getPlayers());
+      }
     }
   }
 
@@ -482,9 +498,6 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       "Player " + nickname + " joined game " + gameId + ". "
     );
-
-    view.drawLeaderBoard(localGameBoard.getPlayers());
-    view.drawPlayerBoards(localGameBoard.getPlayers());
   }
 
   @Override
@@ -499,6 +512,10 @@ public class LocalModelContainer
             player -> players.indexOf(player.getNickname())
           )
         );
+      state.set(LocalModelState.GAME);
+
+      view.drawLeaderBoard(localGameBoard.getPlayers());
+      view.drawPlayerBoards(localGameBoard.getPlayers());
     }
 
     localGameBoard.setCurrentPlayer(players.getFirst());
@@ -507,7 +524,6 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       "Game " + gameId + " started."
     );
-    view.drawLeaderBoard(localGameBoard.getPlayers());
   }
 
   @Override
@@ -531,6 +547,7 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       playerId + " placed card " + cardId
     );
+
     view.drawCardPlacement(
       card,
       side,
@@ -679,6 +696,7 @@ public class LocalModelContainer
 
   @Override
   public void gameOver() {
+    state.set(LocalModelState.GAME_OVER);
     view.drawGameOver(localGameBoard.getPlayers());
   }
 
@@ -694,7 +712,10 @@ public class LocalModelContainer
           player.setPoints(newScore);
           diffMessage(diff, "points");
         }));
-    view.drawLeaderBoard(localGameBoard.getPlayers());
+
+    if (state.get().equals(LocalModelState.GAME)) view.drawLeaderBoard(
+      localGameBoard.getPlayers()
+    );
   }
 
   @Override
@@ -712,11 +733,14 @@ public class LocalModelContainer
 
   @Override
   public void winningPlayer(String nickname) {
-    view.drawWinner(nickname);
-    //TODO Back to lobby
+    if (state.get().equals((LocalModelState.GAME_OVER))) {
+      view.drawWinner(nickname);
+    }
+
+    //TODO Back to lobby command and gui interface
     lobby = null;
     localGameBoard = null;
-    listGames();
+    //listGames();
   }
 
   @Override
@@ -754,5 +778,9 @@ public class LocalModelContainer
     } else {
       throw new RuntimeException("You are not in a lobby yet");
     }
+  }
+
+  public LocalModelState getState() {
+    return state.get();
   }
 }

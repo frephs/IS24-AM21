@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.client.localModel.state.LocalModelState;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
@@ -59,42 +60,51 @@ public class CliClient extends ViewClient {
           .stream()
           .filter(
             commandHandler ->
-              commandHandler.getContext() == null ||
-              commandHandler.getContext() == ClientContext.ALL ||
-              commandHandler.getContext() == context.get()
-          )
-          .filter(
-            commandHandler ->
               commandHandler.getUsage().split(" ")[0].equals(command[0])
           )
           .collect(Collectors.toSet());
-
         if (!matchingCommands.isEmpty()) {
-          Set<CommandHandler> matchingUsages = matchingCommands
+          Set<CommandHandler> matchingContext = matchingCommands
             .stream()
-            .filter(commandHandlers -> commandHandlers.matchUsageString(line))
-            .collect(Collectors.toSet());
-          if (matchingUsages.isEmpty() && !line.isEmpty()) {
-            matchingCommands.forEach(
+            .filter(
               commandHandler ->
+                commandHandler.getContext() == LocalModelState.MENU ||
+                commandHandler.getContext() == localModel.getState()
+            )
+            .collect(Collectors.toSet());
+          if (!matchingContext.isEmpty()) {
+            Set<CommandHandler> matchingUsages = matchingContext
+              .stream()
+              .filter(commandHandlers -> commandHandlers.matchUsageString(line))
+              .collect(Collectors.toSet());
+
+            if (matchingUsages.isEmpty() && !line.isEmpty()) {
+              matchingContext.forEach(
+                commandHandler ->
+                  cli.postNotification(
+                    NotificationType.WARNING,
+                    "Invalid command. You maybe looking for: " +
+                    commandHandler.getUsage()
+                  )
+              );
+            } else if (!line.isEmpty()) {
+              try {
+                matchingUsages.forEach(
+                  commandHandlers -> commandHandlers.handle(line.split(" "))
+                );
+              } catch (Exception e) {
                 cli.postNotification(
-                  NotificationType.WARNING,
-                  "Invalid command. You maybe looking for: " +
-                  commandHandler.getUsage()
-                )
-            );
-          } else if (!line.isEmpty()) {
-            try {
-              matchingCommands.forEach(
-                commandHandlers -> commandHandlers.handle(line.split(" "))
-              );
-            } catch (Exception e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "An error occurred while executing the command. \n"
-              );
-              cli.displayException(e);
+                  NotificationType.ERROR,
+                  "An error occurred while executing the command. \n"
+                );
+                cli.displayException(e);
+              }
             }
+          } else {
+            cli.postNotification(
+              NotificationType.WARNING,
+              "The command is not available in the current context"
+            );
           }
         } else {
           cli.postNotification(
@@ -116,22 +126,16 @@ public class CliClient extends ViewClient {
 
     private final String usage;
     private final String description;
-    private final ClientContext context;
+    private final LocalModelState context;
 
     public CommandHandler(
       String usage,
       String description,
-      ClientContext context
+      LocalModelState context
     ) {
       this.usage = usage;
       this.description = description;
       this.context = context;
-    }
-
-    public CommandHandler(String usage, String description) {
-      this.usage = usage;
-      this.description = description;
-      context = null;
     }
 
     public boolean matchUsageString(String input) {
@@ -157,7 +161,7 @@ public class CliClient extends ViewClient {
       return description;
     }
 
-    public ClientContext getContext() {
+    public LocalModelState getContext() {
       return context;
     }
   }
@@ -191,7 +195,7 @@ public class CliClient extends ViewClient {
     // TODO add optional arguments to usages
 
     commandHandlers.add(
-      new CommandHandler("exit", "Exit the program") {
+      new CommandHandler("exit", "Exit the program", LocalModelState.MENU) {
         @Override
         public void handle(String[] command) {
           cli.postNotification(NotificationType.CONFIRM, "Closing...");
@@ -202,7 +206,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("reconnect", "Connect to the server") {
+      new CommandHandler(
+        "reconnect",
+        "Connect to the server",
+        LocalModelState.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.connect();
@@ -212,28 +220,31 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("help", "Display available commands") {
+      new CommandHandler(
+        "help",
+        "Display available commands",
+        LocalModelState.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
+          ArrayList<String> contexts = new ArrayList<>();
           ArrayList<String> descriptions = new ArrayList<>();
           commandHandlers
             .stream()
-            .filter(
-              commandHandler ->
-                commandHandler.getContext() == null ||
-                commandHandler.getContext() == ClientContext.ALL ||
-                commandHandler.getContext().equals(context.get())
-            )
             .forEach(commandHandler -> {
               usages.add(commandHandler.getUsage());
+              contexts.add(
+                commandHandler.getContext().toString().toLowerCase()
+              );
               descriptions.add(commandHandler.getDescription());
             });
           cli.postNotification(
             NotificationType.RESPONSE,
             CliUtils.getTable(
-              new String[] { "Command", "Description" },
+              new String[] { "Command", "Context", "Description" },
               usages,
+              contexts,
               descriptions
             )
           );
@@ -242,7 +253,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("list-games", "List available games") {
+      new CommandHandler(
+        "list-games",
+        "List available games",
+        LocalModelState.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.listGames();
@@ -251,7 +266,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("join-game <game-id>", "Join a game") {
+      new CommandHandler(
+        "join-game <game-id>",
+        "Join a game",
+        LocalModelState.LIST
+      ) {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
@@ -265,7 +284,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "show lobby",
         "List the available players and see their status",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -278,7 +297,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "leave-game",
         "Leave the current game",
-        ClientContext.ALL
+        LocalModelState.MENU
       ) {
         @Override
         public void handle(String[] command) {
@@ -290,7 +309,8 @@ public class CliClient extends ViewClient {
     commandHandlers.add(
       new CommandHandler(
         "create-game <game-id> <number-of-players>",
-        "Create a new game"
+        "Create a new game",
+        LocalModelState.LIST
       ) {
         @Override
         public void handle(String[] command) {
@@ -302,7 +322,8 @@ public class CliClient extends ViewClient {
     commandHandlers.add(
       new CommandHandler(
         "create-game-join <game-id> <number-of-players>",
-        "Create a new game and join it."
+        "Create a new game and join it.",
+        LocalModelState.LIST
       ) {
         @Override
         public void handle(String[] command) {
@@ -319,7 +340,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "get-tokens",
         "Get the available tokens",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -332,7 +353,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "set-token <color>",
         "Set the token color",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -345,7 +366,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "set-nickname <nickname>",
         "Set the nickname",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -358,7 +379,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "get-objectives",
         "Get the available objectives to choose from",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -371,7 +392,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "choose-objective <1|2>",
         "Choose the objective card",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -389,7 +410,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "get-starter-card",
         "Get the starter card to place",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -402,7 +423,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "choose-starter-card-side <front|back>",
         "Choose the starter card side",
-        ClientContext.LOBBY
+        LocalModelState.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -420,7 +441,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("show context", "Show the client current context") {
+      new CommandHandler(
+        "show context",
+        "Show the client current context",
+        LocalModelState.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           cli.postNotification(
@@ -434,7 +459,11 @@ public class CliClient extends ViewClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("chat <message>", "Broadcast a message") {
+      new CommandHandler(
+        "chat <message>",
+        "Broadcast a message",
+        LocalModelState.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.sendChatMessage(
@@ -448,7 +477,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "chat <player> <message>",
         "Send a message to a player",
-        ClientContext.GAME
+        LocalModelState.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -465,9 +494,9 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "show <context|playerboard|leaderboard|card|hand|objective|pairs>",
+        "show <playerboard|leaderboard|card|hand|objective|pairs>",
         "Show game information",
-        ClientContext.GAME
+        LocalModelState.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -549,7 +578,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "place <hand number> <row> <column> <front|back>",
         "Place a card on the game board",
-        ClientContext.GAME
+        LocalModelState.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -588,7 +617,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "draw <deck|resource1|resource2|gold1|gold2>",
         "Draw a card",
-        ClientContext.GAME
+        LocalModelState.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -623,7 +652,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "draw",
         "Pass your turn when no cards to draw are available",
-        ClientContext.GAME
+        LocalModelState.GAME
       ) {
         @Override
         public void handle(String[] command) {
