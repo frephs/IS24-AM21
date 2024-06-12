@@ -660,7 +660,9 @@ public class Gui extends Application implements View {
 
   private Runnable getCellClickHandler(Position position) {
     return () -> {
-      // TODO
+      if (selectedHandIndex != null && visibleHandSide != null) {
+        client.placeCard(selectedHandIndex, visibleHandSide, position);
+      }
     };
   }
 
