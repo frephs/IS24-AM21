@@ -26,4 +26,5 @@ public interface GameErrorListener {
   void incompleteLobbyPlayer(String msg);
   void illegalCardSideChoice();
   void invalidTokenColor();
+  void alreadyPlacedCard();
 }

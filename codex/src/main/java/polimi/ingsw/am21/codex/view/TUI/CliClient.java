@@ -56,15 +56,26 @@ public class CliClient {
 
         Set<CommandHandler> matchingCommands = commandHandlers
           .stream()
-          .filter(
-            commandHandler ->
-              (commandHandler.getContext().isEmpty() ||
-                this.getClientContextContainer().get().isEmpty() ||
-                commandHandler.getContext().get() == ClientContext.ALL ||
-                commandHandler.getContext().get() ==
-                  this.getClientContextContainer().get().get()) &&
-              commandHandler.getUsage().split(" ")[0].equals(command[0])
-          )
+          .filter(commandHandler -> {
+            String usage = commandHandler.getUsage();
+            String[] commandParts = usage
+              .replaceAll("<[a-zA-Z0-9 ]+>", "<>")
+              .split(" ");
+            if (commandParts.length != command.length) {
+              return false;
+            }
+            for (int i = 0; i < commandParts.length; ++i) {
+              if (
+                commandParts[i].startsWith("<") && commandParts[i].endsWith(">")
+              ) {
+                continue;
+              }
+              if (!commandParts[i].equals(command[i])) {
+                return false;
+              }
+            }
+            return true;
+          })
           .collect(Collectors.toSet());
 
         if (!matchingCommands.isEmpty()) {

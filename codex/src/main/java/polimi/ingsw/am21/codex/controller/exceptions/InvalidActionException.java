@@ -17,6 +17,7 @@ public class InvalidActionException extends Exception {
     PLAYER_NOT_FOUND,
     INCOMPLETE_LOBBY_PLAYER,
     EMPTY_DECK,
+    ALREADY_PLACED_CARD,
     ILLEGAL_PLACING_POSITION,
     ILLEGAL_CARD_SIDE_CHOICE,
     LOBBY_FULL,
@@ -45,6 +46,7 @@ public class InvalidActionException extends Exception {
         case PLAYER_NOT_FOUND -> "Player not found";
         case INCOMPLETE_LOBBY_PLAYER -> "Incomplete lobby player";
         case EMPTY_DECK -> "Empty deck";
+        case ALREADY_PLACED_CARD -> "You already placed a card";
         case ILLEGAL_PLACING_POSITION -> "You tried placing a card in a position which is either forbidden, occupied or not reachable";
         case ILLEGAL_CARD_SIDE_CHOICE -> "Illegal card side choice";
         case LOBBY_FULL -> "The lobby is full";

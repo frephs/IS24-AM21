@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.connection.client.RMI;
 
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -53,7 +54,7 @@ public class RMIClientConnectionHandler
         );
       this.connectionEstablished();
       this.listGames();
-    } catch (RemoteException | NotBoundException e) {
+    } catch (Exception e) {
       this.connectionFailed(e);
     }
   }
@@ -114,6 +115,7 @@ public class RMIClientConnectionHandler
           e.getNotes().get(0)
         );
       case EMPTY_DECK -> this.localModel.emptyDeck();
+      case ALREADY_PLACED_CARD -> localModel.alreadyPlacedCard();
       case ILLEGAL_PLACING_POSITION -> this.localModel.invalidCardPlacement(
           ((IllegalPlacingPositionException) e).getReason()
         );

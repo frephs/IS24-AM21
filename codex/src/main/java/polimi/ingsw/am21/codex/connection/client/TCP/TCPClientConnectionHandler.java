@@ -453,6 +453,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   //game
 
   public void handleMessage(InvalidActionMessage message) {
+    // I use this action for finding this method faster :)
+    // handleInvalidActionException
     switch (message.getCode()) {
       case PLAYER_NOT_ACTIVE -> this.localModel.playerNotActive();
       case NOT_IN_GAME -> this.localModel.notInGame();
@@ -473,6 +475,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
             .get(0)
         );
       case EMPTY_DECK -> this.localModel.emptyDeck();
+      case ALREADY_PLACED_CARD -> this.localModel.alreadyPlacedCard();
       case ILLEGAL_PLACING_POSITION -> this.localModel.invalidCardPlacement(
           Optional.ofNullable(
             message.getNotes().orElse(List.of(null)).get(0)

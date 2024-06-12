@@ -240,10 +240,12 @@ public class Game {
    *
    * @param drawingSource      Where we are drawing the card rom
    * @param deckType           The type of deck to draw from.
-   * @param drawnCardsCallback Callback to be called after the cards are
-   *                           drawn: the first parameter is the id of the card drawn
-   *                           by the player, the second is from the one drawn for
-   *                           the card pair (if any, null otherwise).
+   * @param nextTurnEventAfterDraw Callback to be called after the cards are
+   *                               drawn: the first parameter is the id of the card drawn
+   *                               by the player, the second is from the one drawn for
+   *                               the card pair (if any, null otherwise).
+   * @param nextTurnWithoutDraw  Callback to be called if the player cannot draw a card
+   *                             (e.g. because the deck is empty).
    * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
    * @throws GameOverException If the game is over.
    */

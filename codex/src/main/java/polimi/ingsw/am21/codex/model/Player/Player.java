@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
+import polimi.ingsw.am21.codex.model.exceptions.AlreadyPlacedCardGameException;
 
 public class Player {
 
@@ -18,6 +19,7 @@ public class Player {
   private final TokenColor token;
   private int points;
   private final UUID socketId;
+  private Boolean cardPlaced = false;
 
   Player(PlayerBuilder builder, UUID socketId)
     throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
@@ -208,19 +210,20 @@ public class Player {
     int cardIndex,
     CardSideType side,
     Position position
-  ) throws InvalidActionException {
+  ) throws InvalidActionException, AlreadyPlacedCardGameException {
+    if (cardPlaced) throw new AlreadyPlacedCardGameException();
     PlayableCard playedCard;
-    try {
-      playedCard = board.getHand().get(cardIndex);
-    } catch (IndexOutOfBoundsException e) {
+    if (cardIndex < 0 || cardIndex >= board.getHand().size()) {
       throw new IllegalPlacingPositionException(
         "You tried to place a card which either doesn't exist or is not in your hand"
       );
     }
+    playedCard = board.getHand().get(cardIndex);
 
     board.placeCard(playedCard, side, position);
     board.getHand().remove(cardIndex);
     this.points += playedCard.getEvaluator().apply(board);
+    cardPlaced = true;
     return playedCard;
   }
 
@@ -238,5 +241,13 @@ public class Player {
    * */
   public void evaluateSecretObjective() {
     this.evaluate(this.board.getObjectiveCard());
+  }
+
+  public Boolean getCardPlaced() {
+    return cardPlaced;
+  }
+
+  public void resetCardPlaced() {
+    cardPlaced = false;
   }
 }

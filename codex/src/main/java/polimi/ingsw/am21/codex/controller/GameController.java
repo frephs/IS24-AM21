@@ -25,6 +25,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.AlreadyPlacedCardGameException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 
 public class GameController {
@@ -1041,28 +1042,34 @@ public class GameController {
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, connectionID);
     Player currentPlayer = game.getCurrentPlayer();
-    PlayableCard playedCard = currentPlayer.placeCard(
-      playerHandCardNumber,
-      side,
-      position
-    );
-    this.notifySameContextClients(
-        connectionID,
-        (listener, targetSocketID) ->
-          listener.cardPlaced(
-            gameId,
-            game.getCurrentPlayer().getNickname(),
-            playerHandCardNumber,
-            playedCard.getId(),
-            side,
-            position,
-            currentPlayer.getPoints(),
-            currentPlayer.getBoard().getResources(),
-            currentPlayer.getBoard().getObjects(),
-            currentPlayer.getBoard().getAvailableSpots(),
-            currentPlayer.getBoard().getForbiddenSpots()
-          )
+    try {
+      PlayableCard playedCard = currentPlayer.placeCard(
+        playerHandCardNumber,
+        side,
+        position
       );
+      this.notifySameContextClients(
+          connectionID,
+          (listener, targetSocketID) ->
+            listener.cardPlaced(
+              gameId,
+              game.getCurrentPlayer().getNickname(),
+              playerHandCardNumber,
+              playedCard.getId(),
+              side,
+              position,
+              currentPlayer.getPoints(),
+              currentPlayer.getBoard().getResources(),
+              currentPlayer.getBoard().getObjects(),
+              currentPlayer.getBoard().getAvailableSpots(),
+              currentPlayer.getBoard().getForbiddenSpots()
+            )
+        );
+    } catch (AlreadyPlacedCardGameException e) {
+      // we throw another exception because we want to keep the model (game) exceptions separate from
+      // the controller exceptions.
+      throw new AlreadyPlacedCardException();
+    }
   }
 
   public Set<TokenColor> getAvailableTokens(String gameId)

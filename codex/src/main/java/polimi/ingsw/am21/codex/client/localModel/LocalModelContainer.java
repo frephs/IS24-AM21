@@ -853,6 +853,11 @@ public class LocalModelContainer
     view.postNotification(NotificationType.ERROR, "Invalid token color");
   }
 
+  @Override
+  public void alreadyPlacedCard() {
+    view.postNotification(NotificationType.ERROR, "You already placed a card");
+  }
+
   public View getView() {
     return this.view;
   }
