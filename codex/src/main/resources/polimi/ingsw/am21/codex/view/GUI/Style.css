@@ -423,3 +423,9 @@ Exception Dialog
   -fx-border-radius: 8px;
   -fx-cursor: hand;
 }
+
+#player-objective-card {
+  /* This is just to make the card align with the other cards in the hand */
+  -fx-border-color: transparent;
+  -fx-border-width: 2px;
+}

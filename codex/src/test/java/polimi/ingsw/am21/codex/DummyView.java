@@ -143,7 +143,10 @@ public class DummyView implements View {
   }
 
   @Override
-  public void drawComonObjectiveCards(CardPair<Card> cardPair) {}
+  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {}
+
+  @Override
+  public void drawPlayerObjective(Card card) {}
 
   @Override
   public void drawCardDecks(

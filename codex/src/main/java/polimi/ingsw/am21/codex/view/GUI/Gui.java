@@ -204,6 +204,7 @@ public class Gui extends Application implements View {
           cards.getCardFromId(2)
         )
       );
+    this.drawPlayerObjective(cards.getCardFromId(100));
   }
 
   private static Stage primaryStage;
@@ -947,7 +948,7 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void drawComonObjectiveCards(CardPair<Card> cardPair) {
+  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
     GridPane cardsContainer = (GridPane) scene.lookup(
       "#common-objective-cards"
     );
@@ -967,6 +968,18 @@ public class Gui extends Application implements View {
 
     cardsContainer.add(wrapAndBorder(images.get(0)), 0, 0);
     cardsContainer.add(wrapAndBorder(images.get(1)), 1, 0);
+  }
+
+  @Override
+  public void drawPlayerObjective(Card card) {
+    VBox vbox = (VBox) scene.lookup("#player-objective-card");
+    vbox.getChildren().clear();
+
+    ImageView image = loadCardImage(card, CardSideType.FRONT);
+    image.setPreserveRatio(true);
+    image.setFitWidth(150);
+
+    vbox.getChildren().add(image);
   }
 
   @Override

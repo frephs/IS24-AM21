@@ -48,7 +48,6 @@
                   <VBox prefHeight="125.0" prefWidth="402.0" spacing="5.0">
                      <children>
                         <Label alignment="CENTER" prefHeight="44.0" prefWidth="1063.0" text="Hand" />
-                        <HBox prefHeight="100.0" prefWidth="200.0" />
                         <HBox id="hand-display" prefHeight="78.0" prefWidth="248.0" spacing="10.0">
                            <children>
                               <VBox id="hand-0" prefHeight="78.0" prefWidth="113.0">
@@ -78,12 +77,12 @@
                            </VBox.margin></Button>
                      </children>
                   </VBox>
-                  <VBox layoutX="23.0" layoutY="10.0" prefHeight="103.0" prefWidth="268.0">
+                  <VBox layoutX="23.0" layoutY="10.0" prefHeight="189.0" prefWidth="114.0" spacing="5.0">
                      <children>
-                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="42.0" prefWidth="217.0" text="Objective Card" />
-                        <VBox id="hand-0" prefHeight="78.0" prefWidth="113.0">
+                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="44.0" prefWidth="231.0" text="Objective Card" />
+                        <VBox id="player-objective-card" prefHeight="78.0" prefWidth="113.0">
                            <children>
-                              <ImageView fitHeight="80.0" fitWidth="134.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
                            </children>
                         </VBox>
                      </children>

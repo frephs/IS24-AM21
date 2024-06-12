@@ -342,13 +342,18 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawComonObjectiveCards(CardPair<Card> cardPair) {
+  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
     printUpdate(
       "Common objective cardPair:\n" +
       cardPair.getFirst().cardToAscii() +
       "\n" +
       cardPair.getSecond().cardToAscii()
     );
+  }
+
+  @Override
+  public void drawPlayerObjective(Card card) {
+    // TODO
   }
 
   @Override

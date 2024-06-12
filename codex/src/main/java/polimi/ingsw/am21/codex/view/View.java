@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
-import polimi.ingsw.am21.codex.client.localModel.LocalMenu;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
@@ -91,7 +90,8 @@ public interface View {
   void drawWinner(String nickname);
 
   void drawChatMessage(ChatMessage message);
-  void drawComonObjectiveCards(CardPair<Card> cardPair);
+  void drawCommonObjectiveCards(CardPair<Card> cardPair);
+  void drawPlayerObjective(Card card);
 
   /**
    * Displays the cards decks to draw from
