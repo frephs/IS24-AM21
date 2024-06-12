@@ -238,7 +238,7 @@ public class Gui extends Application implements View {
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
       //testLobby();
-      testGame();
+      //testGame();
     } catch (IOException e) {
       Cli.getInstance().displayException(e);
     }
