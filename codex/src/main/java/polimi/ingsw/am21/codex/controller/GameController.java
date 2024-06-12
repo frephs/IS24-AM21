@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.controller;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +35,7 @@ public class GameController {
     IN_GAME,
   }
 
-  public class UserGameContext {
+  public static class UserGameContext {
 
     public enum ConnectionStatus {
       CONNECTED,
@@ -71,34 +70,16 @@ public class GameController {
       String nickname,
       RemoteGameEventListener listener
     ) {
-      this.gameId = null;
+      this.gameId = gameId;
       this.status = status;
       this.nickname = nickname;
       this.connectionStatus = ConnectionStatus.CONNECTED;
-    }
-
-    /* in game constructor */
-    public UserGameContext(String gameId, String nickname) {
-      this(gameId, UserGameContextStatus.IN_GAME, nickname, null);
-    }
-
-    /* in game constructor */
-    public UserGameContext(
-      String gameId,
-      String nickname,
-      RemoteGameEventListener listener
-    ) {
-      this(gameId, UserGameContextStatus.IN_GAME, nickname, listener);
+      this.listener = listener;
     }
 
     /* in lobby constructor */
     public UserGameContext(String gameId) {
       this(gameId, UserGameContextStatus.IN_LOBBY, null, null);
-    }
-
-    /* in lobby constructor */
-    public UserGameContext(String gameId, RemoteGameEventListener listener) {
-      this(gameId, UserGameContextStatus.IN_LOBBY, null, listener);
     }
 
     public RemoteGameEventListener getListener() {
@@ -306,7 +287,6 @@ public class GameController {
   GameManager manager;
 
   Map<UUID, UserGameContext> userContexts = new HashMap<>();
-  List listeners = new ArrayList<>();
 
   public GameController() {
     manager = new GameManager();
@@ -341,11 +321,12 @@ public class GameController {
           disconnectedClient,
           false,
           EventDispatchMode.TOP_DOWN
-        ).forEach(listener -> {
-          listenersToNotify.add(
-            new Pair<>(listener.getKey(), disconnectedClient)
-          );
-        });
+        ).forEach(
+          listener ->
+            listenersToNotify.add(
+              new Pair<>(listener.getKey(), disconnectedClient)
+            )
+        );
     }
 
     while (!listenersToNotify.isEmpty()) {
@@ -407,11 +388,12 @@ public class GameController {
       sameContextClients
         .stream()
         .filter(client -> disconnectedClients.contains(client.getKey()))
-        .forEach(client -> {
-          listenersToNotify.add(
-            new Pair<>(client.getKey(), disconnectedClient)
-          );
-        });
+        .forEach(
+          client ->
+            listenersToNotify.add(
+              new Pair<>(client.getKey(), disconnectedClient)
+            )
+        );
     }
 
     while (!listenersToNotify.isEmpty()) {
@@ -971,13 +953,12 @@ public class GameController {
     this.checkIfCurrentPlayer(game, connectionID);
     game.nextTurn(
       () -> this.nextTurnEvent(connectionID, gameId, game),
-      remainingRounds -> {
+      remainingRounds ->
         this.notifySameContextClients(
             connectionID,
             (listener, targetSocketID) ->
               listener.remainingRounds(gameId, remainingRounds)
-          );
-      }
+          )
     );
   }
 
@@ -1044,14 +1025,6 @@ public class GameController {
     } else {
       userContexts.get(socketID).setListener(listener);
     }
-  }
-
-  public void registerGlobalListener(RemoteGameEventListener listener) {
-    listeners.add(listener);
-  }
-
-  public void unregisterGlobalListener(RemoteGameEventListener listener) {
-    listeners.remove(listener);
   }
 
   public void placeCard(
