@@ -636,6 +636,19 @@ public class Gui extends Application implements View {
   public void drawPlayerBoards(List<LocalPlayer> players) {
     // TODO handle other players (switch button etc)
     loadSceneFXML("PlayerBoard.fxml", "#content");
+    drawHand(
+      players
+        .stream()
+        .filter(
+          player ->
+            player
+              .getNickname()
+              .equals(localModel.getLocalGameBoard().getPlayerNickname())
+        )
+        .findFirst()
+        .get()
+        .getHand()
+    );
   }
 
   @Override
