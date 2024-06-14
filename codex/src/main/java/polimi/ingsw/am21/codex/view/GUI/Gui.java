@@ -243,7 +243,7 @@ public class Gui extends Application implements View {
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
       //testLobby();
-      //testGame();
+      //      testGame();
     } catch (IOException e) {
       Cli.getInstance().displayException(e);
     }
@@ -554,7 +554,7 @@ public class Gui extends Application implements View {
     });
   }
 
-  //TODO maybe implement this in the cli
+  // TODO maybe implement this in the cli
   public void drawResourcesAndObjects(LocalPlayer player) {
     Platform.runLater(() -> {
       HBox container = (HBox) scene.lookup("#player-resources-objects");
@@ -583,10 +583,9 @@ public class Gui extends Application implements View {
           entryContainer.getChildren().add(label);
 
           resources.getChildren().add(entryContainer);
-          // TODO fix alignment
         });
       resources.setAlignment(Pos.CENTER);
-      container.getChildren().add(new HBox(resources));
+      container.getChildren().add(resources);
 
       HBox objects = new HBox();
       objects.getStyleClass().add("leaderboard-entry");
@@ -613,7 +612,7 @@ public class Gui extends Application implements View {
         });
 
       objects.setAlignment(Pos.CENTER);
-      container.getChildren().add(new VBox(objects));
+      container.getChildren().add(objects);
     });
   }
 
