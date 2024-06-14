@@ -239,7 +239,6 @@ public class Gui extends Application implements View {
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
-      primaryStage.setMaximized(true);
 
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
@@ -300,6 +299,7 @@ public class Gui extends Application implements View {
       );
 
       primaryStage.setScene(scene);
+      primaryStage.setMaximized(true);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
