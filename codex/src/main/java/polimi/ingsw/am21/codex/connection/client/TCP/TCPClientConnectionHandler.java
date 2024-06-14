@@ -542,8 +542,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.gameStarted(
       message.getGameId(),
       message.getPlayerIds(),
-      message.getGoldCardPairIds(),
       message.getResourceCardPairIds(),
+      message.getGoldCardPairIds(),
       message.getCommonObjectivesIds()
     );
   }
