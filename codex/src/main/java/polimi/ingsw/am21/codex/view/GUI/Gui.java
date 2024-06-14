@@ -647,6 +647,38 @@ public class Gui extends Application implements View {
         drawHand(player.getHand());
         drawPlayerObjective(player.getObjectiveCard());
       });
+
+    ChoiceBox<String> playerBoardChoiceBox = (ChoiceBox<String>) scene.lookup(
+      "#player-board-choice"
+    );
+
+    players.forEach(
+      player -> playerBoardChoiceBox.getItems().add(player.getNickname())
+    );
+
+    playerBoardChoiceBox.setValue(
+      localModel.getLocalGameBoard().getPlayer().getNickname()
+    );
+
+    playerBoardChoiceBox.setOnAction(event -> {
+      String selectedPlayerNickname = playerBoardChoiceBox.getValue();
+      players
+        .stream()
+        .filter(player -> player.getNickname().equals(selectedPlayerNickname))
+        .findFirst()
+        .ifPresent(this::drawPlayerBoard);
+    });
+
+    players
+      .stream()
+      .filter(
+        player ->
+          player
+            .getNickname()
+            .equals(localModel.getLocalGameBoard().getPlayerNickname())
+      )
+      .findFirst()
+      .ifPresent(player -> drawHand(player.getHand()));
   }
 
   @Override
