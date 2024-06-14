@@ -512,9 +512,7 @@ public class Gui extends Application implements View {
         playerGrid.add(token, 0, i);
 
         Label nickname = new Label(
-          (player.getNickname()) != null
-            ? player.getNickname()
-            : players.keySet().toArray()[i].toString()
+          (player.getNickname()) != null ? player.getNickname() : "<pending>"
         );
         nickname.alignmentProperty().setValue(Pos.CENTER);
         //TODO fix aligment
