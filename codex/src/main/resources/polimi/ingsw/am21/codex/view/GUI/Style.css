@@ -134,6 +134,8 @@
 .chat-message-container .scroll-pane {
   -fx-border-color: #b4a31f;
   -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-background-color: rgba(255, 255, 255, 0.74);
 }
 
 /*
