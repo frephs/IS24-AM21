@@ -6,11 +6,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox styleClass="rounded" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="405.0" prefWidth="405.0" styleClass="rounded" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <AnchorPane prefHeight="400.0" prefWidth="378.0" styleClass="rounded" stylesheets="@Style.css">
          <children>
-            <ImageView fitHeight="405.0" fitWidth="405.0" pickOnBounds="true" preserveRatio="true" styleClass="rounded" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ImageView fitHeight="449.0" fitWidth="405.0" pickOnBounds="true" preserveRatio="true" styleClass="rounded" AnchorPane.bottomAnchor="-49.0" AnchorPane.topAnchor="0.0">
                <image>
                   <Image url="@pictures/CODEX_Rulebook_EN_page_01.png" />
                </image>

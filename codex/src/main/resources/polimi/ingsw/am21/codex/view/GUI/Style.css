@@ -83,6 +83,7 @@
 .label {
   -fx-padding: 10px;
   -fx-border-radius: 12px;
+  -fx-font-family: "Noyh R Light";
 }
 
 .title {
@@ -128,6 +129,11 @@
   -fx-border-radius: 8px;
   -fx-background-radius: 8px;
   -fx-padding: 10px;
+}
+
+.chat-message-container .scroll-pane {
+  -fx-border-color: #b4a31f;
+  -fx-border-radius: 8px;
 }
 
 /*
@@ -428,4 +434,76 @@ Exception Dialog
   /* This is just to make the card align with the other cards in the hand */
   -fx-border-color: transparent;
   -fx-border-width: 2px;
+}
+
+.accordion {
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-background-color: transparent;
+}
+
+.titled-pane {
+  -fx-background-color: transparent;
+}
+
+.titled-pane > .title {
+  -fx-background-color: rgba(
+    180,
+    163,
+    31,
+    0.64
+  ); /* Green background for the header */
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 14pt;
+}
+
+.titled-pane > .title .text {
+  -fx-fill: white;
+}
+
+.titled-pane > .title > .arrow-button .arrow {
+  -fx-background-color: #5d5411;
+  -fx-background-insets:
+    1 0 -1 0,
+    0;
+  -fx-padding: 0.25em 0.3125em 0.25em 0.3125em;
+  -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+}
+
+.titled-pane:collapsed > .title > .arrow-button .arrow {
+  -fx-rotate: -90;
+}
+
+.titled-pane > .content {
+  -fx-background-color: transparent;
+  -fx-border-radius: 0 0 8px 8px;
+  -fx-background-radius: 8px;
+  -fx-border-color: #b4a31f;
+}
+
+.titled-pane:expanded > .title {
+  -fx-background-color: #9e8c0b;
+}
+
+.titled-pane:expanded {
+  /*-fx-padding: 10px 0px 0px 0px;*/
+}
+
+#last-accordion-element > .title {
+  -fx-border-radius: 0px 0px 8px 8px;
+  -fx-background-radius: 0px 0px 8px 8px;
+}
+
+#first-accordion-element > .title {
+  -fx-border-radius: 8px 8px 0px 0px;
+  -fx-background-radius: 8px 8px 0px 0px;
+}
+
+#last-accordion-element:expanded > .title {
+  -fx-border-radius: 0px;
+  -fx-background-radius: 0px;
+}
+
+.scroll-pane {
+  -fx-background-color: transparent;
 }
