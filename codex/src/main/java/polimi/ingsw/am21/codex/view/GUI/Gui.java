@@ -239,6 +239,7 @@ public class Gui extends Application implements View {
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
+      primaryStage.setResizable(false);
 
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
