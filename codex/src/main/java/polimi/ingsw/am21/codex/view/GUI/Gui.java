@@ -81,6 +81,11 @@ public class Gui extends Application implements View {
    * The index of the hand that is currently selected, null otherwise
    */
   private Integer selectedHandIndex = null;
+  /**
+   * A boolean that keeps track of whether the current player has place their card
+   * for their turn
+   */
+  private boolean hasPlacedCard = false;
 
   // TODO track what user is being displayed
 
@@ -751,10 +756,19 @@ public class Gui extends Application implements View {
    * Returns a supplier that determines whether the playerboard should be clickable or not
    */
   private Supplier<Boolean> getCellPlacementActive() {
-    return () -> {
-      return this.selectedHandIndex != null;
-      // TODO && displayedUser == player
-    };
+    return () -> (this.selectedHandIndex != null && canPlayerPlaceCards());
+  }
+
+  private boolean canPlayerPlaceCards() {
+    return (
+      !this.hasPlacedCard &&
+      localModel
+        .getLocalGameBoard()
+        .getCurrentPlayer()
+        .getNickname()
+        .equals(localModel.getLocalGameBoard().getPlayer().getNickname())
+    );
+    // TODO && displayedUser == player
   }
 
   private void toggleHandSide() {
@@ -804,11 +818,13 @@ public class Gui extends Application implements View {
   @Override
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
+    hasPlacedCard = false;
   }
 
   @Override
   public void drawCardDrawn(DrawingDeckType deck) {
     // TODO
+    hasPlacedCard = false;
   }
 
   @Override
@@ -819,6 +835,7 @@ public class Gui extends Application implements View {
     Set<Position> availablePositions,
     Set<Position> forbiddenPositions
   ) {
+    hasPlacedCard = true;
     Platform.runLater(() -> {
       ViewGridPosition viewPos = new ViewGridPosition(position);
       GridPane gridPane = (GridPane) scene.lookup("#playerboard-grid");
@@ -916,16 +933,18 @@ public class Gui extends Application implements View {
 
           int finalI = i;
           image.setOnMouseClicked(event -> {
-            selectedHandIndex = finalI;
+            if (canPlayerPlaceCards()) {
+              selectedHandIndex = finalI;
 
-            for (int j = 0; j < hand.size(); j++) {
-              // Clear existing class selection
-              (scene.lookup("#hand-" + j)).getStyleClass().clear();
+              for (int j = 0; j < hand.size(); j++) {
+                // Clear existing class selection
+                (scene.lookup("#hand-" + j)).getStyleClass().clear();
 
-              if (finalI == j) (scene.lookup("#hand-" + j)).getStyleClass()
-                .add("hand-selected-card");
-              else (scene.lookup("#hand-" + j)).getStyleClass()
-                .add("hand-not-selected-card");
+                if (finalI == j) (scene.lookup("#hand-" + j)).getStyleClass()
+                  .add("hand-selected-card");
+                else (scene.lookup("#hand-" + j)).getStyleClass()
+                  .add("hand-not-selected-card");
+              }
             }
           });
 
