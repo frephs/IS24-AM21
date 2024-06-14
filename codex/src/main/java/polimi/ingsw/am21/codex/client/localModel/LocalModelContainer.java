@@ -493,14 +493,20 @@ public class LocalModelContainer
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
 
     List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
-    lobby.getPlayers().get(socketID).setHand(hand);
+    LocalPlayer localPlayer = lobby.getPlayers().get(socketID);
+    localPlayer.setHand(hand);
 
     Card starterCard = cardsLoader.getCardFromId(starterCardID);
-    lobby
-      .getPlayers()
-      .get(socketID)
+    localPlayer
       .getPlayedCards()
       .put(new Position(), new Pair<>(starterCard, starterSide));
+
+    HashSet<Position> availableSpots = new HashSet<>();
+    availableSpots.add(new Position(0, 1));
+    availableSpots.add(new Position(0, -1));
+    availableSpots.add(new Position(1, 0));
+    availableSpots.add(new Position(-1, 0));
+    localPlayer.setAvailableSpots(availableSpots);
 
     localGameBoard.getPlayers().add(lobby.getPlayers().get(socketID));
 

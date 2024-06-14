@@ -692,9 +692,6 @@ public class Gui extends Application implements View {
 
       drawAvailablePositions(player.getAvailableSpots(), gridPane);
       drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
-
-      drawAvailablePositions(player.getAvailableSpots(), gridPane);
-      drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
       drawResourcesAndObjects(player);
 
       scrollPane.setContent(gridPane);
