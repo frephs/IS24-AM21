@@ -649,6 +649,20 @@ public class Gui extends Application implements View {
         .get()
         .getHand()
     );
+
+    drawPlayerObjective(
+      players
+        .stream()
+        .filter(
+          player ->
+            player
+              .getNickname()
+              .equals(localModel.getLocalGameBoard().getPlayerNickname())
+        )
+        .findFirst()
+        .get()
+        .getObjectiveCard()
+    );
   }
 
   @Override
