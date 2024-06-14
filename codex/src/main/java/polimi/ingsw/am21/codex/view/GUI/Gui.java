@@ -400,6 +400,15 @@ public class Gui extends Application implements View {
 
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
+
+      TextField input = (TextField) scene.lookup("#game-id-input");
+      input
+        .textProperty()
+        .addListener((observable, oldValue, newValue) -> {
+          if (newValue.contains(" ")) {
+            input.setText(newValue.replaceAll("\\s", ""));
+          }
+        });
     });
 
     Platform.runLater(() -> {

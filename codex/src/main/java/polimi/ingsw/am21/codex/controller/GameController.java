@@ -29,10 +29,7 @@ import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class GameController {
 
@@ -398,7 +395,7 @@ public class GameController {
   }
 
   public void createGame(String gameId, Integer players)
-    throws EmptyDeckException, GameAlreadyExistsException {
+    throws EmptyDeckException, GameAlreadyExistsException, InvalidGameNameException {
     manager.createGame(gameId, players);
 
     this.getGameListeners(gameId).forEach(listener -> {
