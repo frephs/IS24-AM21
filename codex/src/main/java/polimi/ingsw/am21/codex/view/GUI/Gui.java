@@ -239,7 +239,6 @@ public class Gui extends Application implements View {
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
-      primaryStage.setResizable(false);
 
       primaryStage.show();
       //drawAvailableGames(new ArrayList<>());
@@ -721,9 +720,6 @@ public class Gui extends Application implements View {
           ViewGridPosition viewPos = new ViewGridPosition(position);
           gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
         });
-
-      drawAvailablePositions(player.getAvailableSpots(), gridPane);
-      drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
 
       drawAvailablePositions(player.getAvailableSpots(), gridPane);
       drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
