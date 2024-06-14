@@ -23,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
@@ -53,6 +54,7 @@ public class Gui extends Application implements View {
   private Pane content;
 
   private static ClientConnectionHandler client;
+  private static LocalModelContainer localModel;
   private boolean isReady = false;
 
   public Gui() {
@@ -65,6 +67,10 @@ public class Gui extends Application implements View {
 
   public void setClient(ClientConnectionHandler client) {
     Gui.client = client;
+  }
+
+  public void setLocalModel(LocalModelContainer localModel) {
+    Gui.localModel = localModel;
   }
 
   /** The side of the hand the player is currently looking at */
@@ -225,8 +231,8 @@ public class Gui extends Application implements View {
 
       scene = new Scene(root);
 
-      primaryStage.setX((screenBounds.getWidth() - 400) / 2);
-      primaryStage.setY((screenBounds.getHeight() - 400) / 2);
+      primaryStage.setX((screenBounds.getWidth() - 405) / 2);
+      primaryStage.setY((screenBounds.getHeight() - 405) / 2);
 
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
@@ -530,13 +536,20 @@ public class Gui extends Application implements View {
       for (int i = 0; i < sortedPlayers.size(); i++) {
         LocalPlayer player = sortedPlayers.get(i);
 
+        ImageView token = loadImage(player.getToken());
+        token.setPreserveRatio(true);
+        token.setFitHeight(25);
+
         Label nickname = new Label(player.getNickname());
         nickname.getStyleClass().add("leaderboard-entry");
 
         Label points = new Label(String.valueOf(player.getPoints()));
         points.getStyleClass().add("leaderboard-entry");
 
-        container.addRow(i, nickname, points);
+        HBox nicknameAndToken = new HBox(token, nickname);
+        nicknameAndToken.setAlignment(Pos.CENTER);
+
+        container.addRow(i, nicknameAndToken, points);
       }
     });
   }
@@ -595,8 +608,8 @@ public class Gui extends Application implements View {
           label.setMaxWidth(Double.MAX_VALUE);
           entryContainer.getChildren().add(label);
 
+          entryContainer.setAlignment(Pos.CENTER);
           objects.getChildren().add(entryContainer);
-          // TODO fix alignment
         });
 
       objects.setAlignment(Pos.CENTER);
@@ -798,7 +811,11 @@ public class Gui extends Application implements View {
   public void drawGame(List<LocalPlayer> players) {
     Platform.runLater(() -> {
       loadSceneFXML("GameBoard.fxml", "#side-content");
+      drawChat(players);
       drawPlayerBoards(players);
+      ((Text) scene.lookup("#window-title")).setText(
+          "Game " + localModel.getGameId()
+        );
     });
   }
 
@@ -964,9 +981,105 @@ public class Gui extends Application implements View {
     // TODO
   }
 
-  @Override
+  //TODO maybe implement this in CLI
+  public void drawChat(List<LocalPlayer> players) {
+    loadSceneFXML("Chat.fxml", "#side-content-bottom");
+    // add recipients to chat-recipient combo box
+
+    ChoiceBox<String> recipientChoiceBox = (ChoiceBox<String>) scene.lookup(
+      "#chat-recipient"
+    );
+
+    players.forEach(
+      player -> recipientChoiceBox.getItems().add(player.getNickname())
+    );
+
+    recipientChoiceBox.getItems().addFirst("Broadcast");
+
+    ((Button) scene.lookup("#chat-send-button")).setOnMouseClicked(
+        (MouseEvent event) -> {
+          String recipient =
+            ((ChoiceBox<String>) scene.lookup("#chat-recipient")).getValue();
+          String message = ((TextField) scene.lookup("#chat-input")).getText();
+          ChatMessage chatMessage;
+
+          if (!Objects.equals(recipient, "Broadcast")) {
+            chatMessage = new ChatMessage(
+              recipient,
+              localModel.getLocalGameBoard().getPlayerNickname(),
+              message
+            );
+          } else {
+            chatMessage = new ChatMessage(
+              localModel.getLocalGameBoard().getPlayerNickname(),
+              message
+            );
+          }
+          client.sendChatMessage(chatMessage);
+          drawChatMessage(chatMessage);
+        }
+      );
+  }
+
   public void drawChatMessage(ChatMessage message) {
-    // TODO
+    Platform.runLater(() -> {
+      VBox chatMessageContainer = (VBox) ((ScrollPane) scene.lookup(
+          "#chat-message-container"
+        )).getContent()
+        .lookup("#chat-message-container-box");
+
+      // Load the chat message template from the FXML file
+      FXMLLoader loader = new FXMLLoader(
+        getClass().getResource("ChatMessage.fxml")
+      );
+
+      try {
+        Node chatMessageTemplate = loader.load();
+
+        // Look up the elements in the template
+        Label senderLabel = (Label) chatMessageTemplate.lookup("#sender");
+        Label messageLabel = (Label) chatMessageTemplate.lookup("#message");
+        ImageView senderTokenImage = (ImageView) chatMessageTemplate.lookup(
+          "#sender-token"
+        );
+
+        // Set the data from the ChatMessage object to the elements in the
+        // template
+        senderLabel.setText(message.getSender());
+        messageLabel.setText(message.getContent());
+
+        Image tokenImage = localModel
+          .getLocalGameBoard()
+          .getPlayers()
+          .stream()
+          .filter(player -> player.getNickname().equals(message.getSender()))
+          .map(player -> loadImage(player.getToken()))
+          .findFirst()
+          .get()
+          .getImage();
+
+        senderTokenImage.setImage(tokenImage);
+        senderTokenImage.setFitWidth(25);
+        senderTokenImage.setFitHeight(25);
+
+        //TODO fix message being displayed twice.
+
+        HBox chatMessage = new HBox(chatMessageTemplate);
+
+        chatMessage.setAlignment(
+          (localModel
+                .getLocalGameBoard()
+                .getPlayerNickname()
+                .equals(message.getSender()))
+            ? Pos.CENTER_RIGHT
+            : Pos.CENTER_LEFT
+        );
+
+        chatMessageContainer.getChildren().add(chatMessage);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    });
   }
 
   @Override
