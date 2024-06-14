@@ -1058,6 +1058,8 @@ public class Gui extends Application implements View {
 
     recipientChoiceBox.getItems().addFirst("Broadcast");
 
+    recipientChoiceBox.setValue("Broadcast");
+
     ((Button) scene.lookup("#chat-send-button")).setOnMouseClicked(
         (MouseEvent event) -> {
           String recipient =
