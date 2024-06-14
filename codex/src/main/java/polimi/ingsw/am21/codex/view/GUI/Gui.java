@@ -855,11 +855,26 @@ public class Gui extends Application implements View {
     Platform.runLater(() -> {
       loadSceneFXML("GameBoard.fxml", "#side-content");
       drawChat(players);
+      drawGameBoard();
       drawPlayerBoards(players);
       ((Text) scene.lookup("#window-title")).setText(
           "Game " + localModel.getGameId()
         );
     });
+  }
+
+  //TODO maybe implement this into the cli
+
+  public void drawGameBoard() {
+    drawPairs(
+      localModel.getLocalGameBoard().getResourceCards(),
+      localModel.getLocalGameBoard().getGoldCards()
+    );
+    //TODO draw decks
+    //TODO draw common objective cards
+    drawCommonObjectiveCards(
+      localModel.getLocalGameBoard().getCommonObjectives()
+    );
   }
 
   @Override
@@ -915,33 +930,41 @@ public class Gui extends Application implements View {
     CardPair<Card> resourceCards,
     CardPair<Card> goldCards
   ) {
-    GridPane resourceCardContainer = (GridPane) scene.lookup(
-      "#resource-card-pair"
-    );
-    GridPane goldCardContainer = (GridPane) scene.lookup("#gold-card-pair");
+    Platform.runLater(() -> {
+      VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
+          "#gameboard-container"
+        )).getContent();
 
-    resourceCardContainer.getChildren().clear();
-    goldCardContainer.getChildren().clear();
+      GridPane resourceCardContainer = (GridPane) commonBoardContainer.lookup(
+        "#resource-card-pair"
+      );
+      GridPane goldCardContainer = (GridPane) commonBoardContainer.lookup(
+        "#gold-card-pair"
+      );
 
-    // TODO how do we want to display two sides?
-    List<ImageView> images = List.of(
-      loadCardImage(resourceCards.getFirst(), CardSideType.FRONT),
-      loadCardImage(resourceCards.getSecond(), CardSideType.FRONT),
-      loadCardImage(goldCards.getFirst(), CardSideType.FRONT),
-      loadCardImage(goldCards.getSecond(), CardSideType.FRONT)
-    );
+      resourceCardContainer.getChildren().clear();
+      goldCardContainer.getChildren().clear();
 
-    images.forEach(image -> {
-      image.setPreserveRatio(true);
-      image.setFitWidth(150);
-      image.setStyle("-fx-cursor: hand");
+      // TODO how do we want to display two sides?
+      List<ImageView> images = List.of(
+        loadCardImage(resourceCards.getFirst(), CardSideType.FRONT),
+        loadCardImage(resourceCards.getSecond(), CardSideType.FRONT),
+        loadCardImage(goldCards.getFirst(), CardSideType.FRONT),
+        loadCardImage(goldCards.getSecond(), CardSideType.FRONT)
+      );
+
+      images.forEach(image -> {
+        image.setPreserveRatio(true);
+        image.setFitWidth(150);
+        image.setStyle("-fx-cursor: hand");
+      });
+
+      resourceCardContainer.add(wrapAndBorder(images.get(0)), 0, 0);
+      resourceCardContainer.add(wrapAndBorder(images.get(1)), 1, 0);
+
+      goldCardContainer.add(wrapAndBorder(images.get(2)), 0, 0);
+      goldCardContainer.add(wrapAndBorder(images.get(3)), 1, 0);
     });
-
-    resourceCardContainer.add(wrapAndBorder(images.get(0)), 0, 0);
-    resourceCardContainer.add(wrapAndBorder(images.get(1)), 1, 0);
-
-    goldCardContainer.add(wrapAndBorder(images.get(2)), 0, 0);
-    goldCardContainer.add(wrapAndBorder(images.get(3)), 1, 0);
   }
 
   @Override
@@ -1123,7 +1146,11 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
-    GridPane cardsContainer = (GridPane) scene.lookup(
+    VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
+        "#gameboard-container"
+      )).getContent();
+
+    GridPane cardsContainer = (GridPane) commonBoardContainer.lookup(
       "#common-objective-cards"
     );
     cardsContainer.getChildren().clear();
