@@ -23,8 +23,8 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 |-------------|---|:-------:|
 | Complete Rules | Model| 🟢 |
 | TUI | View| 🟡🟡|
-| GUI | View |🟡 |
-| Rmi  | Connection | 🟡|
+| GUI | View |🟡🟡 |
+| Rmi  | Connection | 🟡🟡|
 | Socket | Connection| 🟡🟡 | 
 | Chat | Advanced functionality 1 | 🟢|
 | Multiple games  | Advanced functionality 2| 🟢
