@@ -43,10 +43,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 /** Runnable that handles a TCP connection */
 public class TCPServerConnectionHandler implements Runnable {
@@ -302,7 +299,7 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(CreateGameMessage message) {
     try {
       controller.createGame(message.getGameId(), message.getPlayers());
-    } catch (EmptyDeckException e) {
+    } catch (EmptyDeckException | InvalidGameNameException e) {
       throw new RuntimeException(e);
     } catch (GameAlreadyExistsException e) {
       send(new GameAlreadyExistsMessage(message.getGameId()));

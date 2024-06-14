@@ -83,6 +83,11 @@ public class Gui extends Application implements View {
    * The index of the hand that is currently selected, null otherwise
    */
   private Integer selectedHandIndex = null;
+  /**
+   * A boolean that keeps track of whether the current player has place their card
+   * for their turn
+   */
+  private boolean hasPlacedCard = false;
 
   // TODO track what user is being displayed
 
@@ -402,6 +407,15 @@ public class Gui extends Application implements View {
 
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
+
+      TextField input = (TextField) scene.lookup("#game-id-input");
+      input
+        .textProperty()
+        .addListener((observable, oldValue, newValue) -> {
+          if (newValue.contains(" ")) {
+            input.setText(newValue.replaceAll("\\s", ""));
+          }
+        });
     });
 
     Platform.runLater(() -> {
@@ -744,10 +758,19 @@ public class Gui extends Application implements View {
    * Returns a supplier that determines whether the playerboard should be clickable or not
    */
   private Supplier<Boolean> getCellPlacementActive() {
-    return () -> {
-      return this.selectedHandIndex != null;
-      // TODO && displayedUser == player
-    };
+    return () -> (this.selectedHandIndex != null && canPlayerPlaceCards());
+  }
+
+  private boolean canPlayerPlaceCards() {
+    return (
+      !this.hasPlacedCard &&
+      localModel
+        .getLocalGameBoard()
+        .getCurrentPlayer()
+        .getNickname()
+        .equals(localModel.getLocalGameBoard().getPlayer().getNickname())
+    );
+    // TODO && displayedUser == player
   }
 
   private void toggleHandSide() {
@@ -797,11 +820,13 @@ public class Gui extends Application implements View {
   @Override
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
+    hasPlacedCard = false;
   }
 
   @Override
   public void drawCardDrawn(DrawingDeckType deck) {
     // TODO
+    hasPlacedCard = false;
   }
 
   @Override
@@ -812,6 +837,7 @@ public class Gui extends Application implements View {
     Set<Position> availablePositions,
     Set<Position> forbiddenPositions
   ) {
+    hasPlacedCard = true;
     Platform.runLater(() -> {
       ViewGridPosition viewPos = new ViewGridPosition(position);
       GridPane gridPane = (GridPane) scene.lookup("#playerboard-grid");
@@ -887,40 +913,47 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawHand(List<Card> hand) {
-    // Save the hand in case we need to flip it
-    lastHand = hand;
+    Platform.runLater(() -> {
+      // Save the hand in case we need to flip it
+      lastHand = hand;
 
-    scene
-      .lookup("#flip-hand-button")
-      .setOnMouseClicked(event -> toggleHandSide());
+      scene
+        .lookup("#flip-hand-button")
+        .setOnMouseClicked(event -> toggleHandSide());
 
-    for (int i = 0; i < hand.size(); i++) {
-      Card card = hand.get(i);
-      VBox vbox = ((VBox) scene.lookup("#hand-" + i));
+      for (int i = 0; i < 3; i++) {
+        VBox vbox = ((VBox) scene.lookup("#hand-" + i));
 
-      ImageView image = loadCardImage(card, visibleHandSide);
-      image.setPreserveRatio(true);
-      image.setFitWidth(150);
+        vbox.getStyleClass().add("hand-not-selected-card");
+        vbox.getChildren().clear();
 
-      int finalI = i;
-      image.setOnMouseClicked(event -> {
-        selectedHandIndex = finalI;
+        if (i < hand.size()) {
+          Card card = hand.get(i);
+          ImageView image = loadCardImage(card, visibleHandSide);
+          image.setPreserveRatio(true);
+          image.setFitWidth(150);
 
-        for (int j = 0; j < hand.size(); j++) {
-          // Clear existing class selection
-          (scene.lookup("#hand-" + j)).getStyleClass().clear();
+          int finalI = i;
+          image.setOnMouseClicked(event -> {
+            if (canPlayerPlaceCards()) {
+              selectedHandIndex = finalI;
 
-          if (finalI == j) (scene.lookup("#hand-" + j)).getStyleClass()
-            .add("hand-selected-card");
-          else (scene.lookup("#hand-" + j)).getStyleClass()
-            .add("hand-not-selected-card");
+              for (int j = 0; j < hand.size(); j++) {
+                // Clear existing class selection
+                (scene.lookup("#hand-" + j)).getStyleClass().clear();
+
+                if (finalI == j) (scene.lookup("#hand-" + j)).getStyleClass()
+                  .add("hand-selected-card");
+                else (scene.lookup("#hand-" + j)).getStyleClass()
+                  .add("hand-not-selected-card");
+              }
+            }
+          });
+
+          vbox.getChildren().add(image);
         }
-      });
-
-      vbox.getStyleClass().add("hand-not-selected-card");
-      vbox.getChildren().clear();
-      vbox.getChildren().add(image);
-    }
+      }
+    });
   }
 
   @Override

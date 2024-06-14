@@ -19,7 +19,6 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
-import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
@@ -622,7 +621,17 @@ public class LocalModelContainer
     Set<Position> forbiddenPositions
   ) {
     Card card = cardsLoader.getCardFromId(cardId);
-    localGameBoard.getCurrentPlayer().addPlayedCards(card, side, position);
+    LocalPlayer localPlayer = localGameBoard.getCurrentPlayer();
+
+    localPlayer.addPlayedCards(card, side, position);
+
+    List<Card> nextHand = new ArrayList<>();
+    for (int i = 0; i < localPlayer.getHand().size(); i++) {
+      if (i != playerHandCardNumber) {
+        nextHand.add(localPlayer.getHand().get(i));
+      }
+    }
+    localPlayer.setHand(nextHand);
 
     view.postNotification(
       NotificationType.UPDATE,
@@ -633,20 +642,17 @@ public class LocalModelContainer
       card,
       side,
       position,
-      localGameBoard.getCurrentPlayer().getAvailableSpots(),
-      localGameBoard.getCurrentPlayer().getForbiddenSpots()
+      localPlayer.getAvailableSpots(),
+      localPlayer.getForbiddenSpots()
     );
 
-    diffMessage(
-      newPlayerScore - localGameBoard.getCurrentPlayer().getPoints(),
-      "point"
-    );
+    diffMessage(newPlayerScore - localPlayer.getPoints(), "point");
 
     Arrays.stream(ResourceType.values()).forEach(
       resourceType ->
         diffMessage(
           updatedResources.get(resourceType) -
-          localGameBoard.getCurrentPlayer().getResources().get(resourceType),
+          localPlayer.getResources().get(resourceType),
           resourceType
         )
     );
@@ -655,18 +661,19 @@ public class LocalModelContainer
       objectType ->
         diffMessage(
           updatedObjects.get(objectType) -
-          localGameBoard.getCurrentPlayer().getObjects().get(objectType),
+          localPlayer.getObjects().get(objectType),
           objectType
         )
     );
 
-    localGameBoard.getCurrentPlayer().getResources().putAll(updatedResources);
-    localGameBoard.getCurrentPlayer().getObjects().putAll(updatedObjects);
+    localPlayer.getResources().putAll(updatedResources);
+    localPlayer.getObjects().putAll(updatedObjects);
 
-    localGameBoard.getCurrentPlayer().setAvailableSpots(availablePositions);
-    localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenPositions);
+    localPlayer.setAvailableSpots(availablePositions);
+    localPlayer.setForbiddenSpots(forbiddenPositions);
 
-    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+    view.drawPlayerBoard(localPlayer);
+    view.drawHand(localPlayer.getHand());
   }
 
   void diffMessage(int diff, String attributeName) {
