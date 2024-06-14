@@ -88,6 +88,10 @@ public class LocalModelContainer
     return localGameBoard;
   }
 
+  public LocalLobby getLocalLobby() {
+    return lobby;
+  }
+
   @Override
   public void unknownResponse() {
     // TODO use this

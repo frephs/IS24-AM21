@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import polimi.ingsw.am21.codex.client.localModel.LocalLobby;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
@@ -259,6 +260,15 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
+    LocalLobby lobby = localModel.getLocalLobby();
+    lobby
+      .getPlayers()
+      .get(localModel.getSocketID())
+      .setObjectiveCard(
+        first
+          ? lobby.getAvailableObjectives().getFirst()
+          : lobby.getAvailableObjectives().getSecond()
+      );
     this.send(new SelectObjectiveMessage(first, localModel.getGameId()));
   }
 
