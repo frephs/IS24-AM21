@@ -61,7 +61,7 @@
                                  <children>
                                     <HBox>
                                        <children>
-                                          <ChoiceBox prefHeight="44.0" prefWidth="142.0">
+                                          <ChoiceBox id="player-board-choice" prefHeight="44.0" prefWidth="142.0">
                                              <HBox.margin>
                                                 <Insets right="10.0" />
                                              </HBox.margin>
