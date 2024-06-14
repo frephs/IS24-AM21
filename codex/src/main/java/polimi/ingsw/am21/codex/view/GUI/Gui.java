@@ -980,17 +980,13 @@ public class Gui extends Application implements View {
       back.setStyle("-fx-cursor: hand");
 
       front.setOnMouseClicked((MouseEvent event) -> {
+        loadSceneFXML("LobbyWaitRoom.fxml", "#content");
         client.lobbyJoinGame(CardSideType.FRONT);
-        Platform.runLater(
-          () -> loadSceneFXML("LobbyWaitRoom.fxml", "#content")
-        );
       });
 
       back.setOnMouseClicked((MouseEvent event) -> {
+        loadSceneFXML("LobbyWaitRoom.fxml", "#content");
         client.lobbyJoinGame(CardSideType.BACK);
-        Platform.runLater(
-          () -> loadSceneFXML("LobbyWaitRoom.fxml", "#content")
-        );
       });
 
       Node starterCardSidesContainer = scene.lookup("#starter-side-container");
