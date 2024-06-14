@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -29,6 +30,7 @@ import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
+import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -931,12 +933,19 @@ public class Gui extends Application implements View {
           "#gameboard-container"
         )).getContent();
 
-      GridPane resourceCardContainer = (GridPane) commonBoardContainer.lookup(
+      HBox resourceCardContainer = (HBox) commonBoardContainer.lookup(
         "#resource-card-pair"
       );
-      GridPane goldCardContainer = (GridPane) commonBoardContainer.lookup(
+
+      HBox goldCardContainer = (HBox) commonBoardContainer.lookup(
         "#gold-card-pair"
       );
+
+      goldCardContainer.setPadding(new Insets(5));
+      resourceCardContainer.setPadding(new Insets(5));
+
+      resourceCardContainer.setAlignment(Pos.CENTER);
+      goldCardContainer.setAlignment(Pos.CENTER);
 
       resourceCardContainer.getChildren().clear();
       goldCardContainer.getChildren().clear();
@@ -949,17 +958,66 @@ public class Gui extends Application implements View {
         loadCardImage(goldCards.getSecond(), CardSideType.FRONT)
       );
 
+      images
+        .get(0)
+        .setOnMouseClicked(
+          (MouseEvent event) ->
+            client.nextTurn(
+              DrawingCardSource.CardPairFirstCard,
+              DrawingDeckType.RESOURCE
+            )
+        );
+      images
+        .get(1)
+        .setOnMouseClicked(
+          (MouseEvent event) ->
+            client.nextTurn(
+              DrawingCardSource.CardPairSecondCard,
+              DrawingDeckType.RESOURCE
+            )
+        );
+      images
+        .get(2)
+        .setOnMouseClicked(
+          (MouseEvent event) ->
+            client.nextTurn(
+              DrawingCardSource.CardPairFirstCard,
+              DrawingDeckType.GOLD
+            )
+        );
+      images
+        .get(3)
+        .setOnMouseClicked(
+          (MouseEvent event) ->
+            client.nextTurn(
+              DrawingCardSource.CardPairSecondCard,
+              DrawingDeckType.GOLD
+            )
+        );
+
       images.forEach(image -> {
         image.setPreserveRatio(true);
         image.setFitWidth(150);
         image.setStyle("-fx-cursor: hand");
       });
 
-      resourceCardContainer.add(wrapAndBorder(images.get(0)), 0, 0);
-      resourceCardContainer.add(wrapAndBorder(images.get(1)), 1, 0);
+      Separator separator1 = new Separator();
+      Separator separator2 = new Separator();
 
-      goldCardContainer.add(wrapAndBorder(images.get(2)), 0, 0);
-      goldCardContainer.add(wrapAndBorder(images.get(3)), 1, 0);
+      separator1.setOrientation(Orientation.VERTICAL);
+      separator2.setOrientation(Orientation.VERTICAL);
+
+      //set a margin for the separator
+      HBox.setMargin(separator1, new Insets(0, 10, 0, 10));
+      HBox.setMargin(separator2, new Insets(0, 10, 0, 10));
+
+      resourceCardContainer.getChildren().add(images.get(0));
+      resourceCardContainer.getChildren().add(separator1);
+      resourceCardContainer.getChildren().add(images.get(1));
+
+      goldCardContainer.getChildren().add(images.get(2));
+      goldCardContainer.getChildren().add(separator2);
+      goldCardContainer.getChildren().add(images.get(3));
     });
   }
 
@@ -1148,9 +1206,14 @@ public class Gui extends Application implements View {
         "#gameboard-container"
       )).getContent();
 
-    GridPane cardsContainer = (GridPane) commonBoardContainer.lookup(
+    HBox cardsContainer = (HBox) commonBoardContainer.lookup(
       "#common-objective-cards"
     );
+
+    cardsContainer.setPadding(new Insets(5));
+
+    cardsContainer.setAlignment(Pos.CENTER);
+
     cardsContainer.getChildren().clear();
 
     // TODO how do we want to display two sides?
@@ -1165,8 +1228,15 @@ public class Gui extends Application implements View {
       image.setStyle("-fx-cursor: hand");
     });
 
-    cardsContainer.add(wrapAndBorder(images.get(0)), 0, 0);
-    cardsContainer.add(wrapAndBorder(images.get(1)), 1, 0);
+    Separator separator = new Separator();
+    //set a margin for the separator
+    HBox.setMargin(separator, new Insets(0, 10, 0, 10));
+
+    separator.setOrientation(Orientation.VERTICAL);
+
+    cardsContainer.getChildren().add(images.get(0));
+    cardsContainer.getChildren().add(separator);
+    cardsContainer.getChildren().add(images.get(1));
   }
 
   @Override
