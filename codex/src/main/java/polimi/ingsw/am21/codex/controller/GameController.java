@@ -326,7 +326,24 @@ public class GameController {
     game.start();
     this.getGameListeners(gameId).forEach(listener -> {
         try {
-          listener.getValue().gameStarted(gameId, game.getPlayerIds());
+          listener
+            .getValue()
+            .gameStarted(
+              gameId,
+              game.getPlayerIds(),
+              new Pair<>(
+                game.getGameBoard().getResourceCards().getFirst().getId(),
+                game.getGameBoard().getResourceCards().getSecond().getId()
+              ),
+              new Pair<>(
+                game.getGameBoard().getGoldCards().getFirst().getId(),
+                game.getGameBoard().getGoldCards().getSecond().getId()
+              ),
+              new Pair<>(
+                game.getGameBoard().getObjectiveCards().getFirst().getId(),
+                game.getGameBoard().getObjectiveCards().getSecond().getId()
+              )
+            );
         } catch (RemoteException e) {
           // TODO: handle in a better way
           throw new RuntimeException(e);

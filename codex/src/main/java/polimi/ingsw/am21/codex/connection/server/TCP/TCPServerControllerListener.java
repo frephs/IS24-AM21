@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.connection.server.TCP;
 
 import java.util.*;
 import java.util.function.Consumer;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
@@ -10,11 +11,9 @@ import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMes
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.PlayerJoinedGameMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
-import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -111,8 +110,22 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void gameStarted(String gameId, List<String> players) {
-    broadcast.accept(new GameStartedMessage(gameId, players));
+  public void gameStarted(
+    String gameId,
+    List<String> players,
+    Pair<Integer, Integer> goldCardPairIds,
+    Pair<Integer, Integer> resourceCardPairIds,
+    Pair<Integer, Integer> commonObjectivesIds
+  ) {
+    broadcast.accept(
+      new GameStartedMessage(
+        gameId,
+        players,
+        goldCardPairIds,
+        resourceCardPairIds,
+        commonObjectivesIds
+      )
+    );
   }
 
   @Override

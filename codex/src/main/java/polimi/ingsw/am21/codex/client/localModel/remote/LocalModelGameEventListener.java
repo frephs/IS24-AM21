@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.client.localModel.remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -91,9 +92,20 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void gameStarted(String gameId, List<String> players)
-    throws RemoteException {
-    listener.gameStarted(gameId, players);
+  public void gameStarted(
+    String gameId,
+    List<String> players,
+    Pair<Integer, Integer> goldCardPairIds,
+    Pair<Integer, Integer> resourceCardPairIds,
+    Pair<Integer, Integer> commonObjectivesIds
+  ) throws RemoteException {
+    listener.gameStarted(
+      gameId,
+      players,
+      goldCardPairIds,
+      resourceCardPairIds,
+      commonObjectivesIds
+    );
   }
 
   @Override

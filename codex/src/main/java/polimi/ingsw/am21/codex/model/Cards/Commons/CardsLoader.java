@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -293,5 +294,14 @@ public final class CardsLoader {
         }
       }
     }
+  }
+
+  public CardPair<Card> getCardPairFromIds(
+    Pair<Integer, Integer> resourceCardPairIds
+  ) {
+    return new CardPair<>(
+      getCardFromId(resourceCardPairIds.getKey()),
+      getCardFromId(resourceCardPairIds.getValue())
+    );
   }
 }

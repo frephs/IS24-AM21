@@ -3,11 +3,12 @@ package polimi.ingsw.am21.codex.controller.listeners;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
-import polimi.ingsw.am21.codex.model.Cards.ObjectType;
+import javafx.util.Pair;
+import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -41,7 +42,13 @@ public interface RemoteGameEventListener extends Remote {
     CardSideType starterSide
   ) throws RemoteException;
 
-  void gameStarted(String gameId, List<String> players) throws RemoteException;
+  void gameStarted(
+    String gameId,
+    List<String> players,
+    Pair<Integer, Integer> goldCardPairIds,
+    Pair<Integer, Integer> resourceCardPairIds,
+    Pair<Integer, Integer> commonObjectivesIds
+  ) throws RemoteException;
 
   /**
    * @param playerId The player that has just finished their turn

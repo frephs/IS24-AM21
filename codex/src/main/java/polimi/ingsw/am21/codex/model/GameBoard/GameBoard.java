@@ -192,6 +192,13 @@ public class GameBoard {
   }
 
   /**
+   * @return the 2 resource cards
+   */
+  public CardPair<PlayableCard> getResourceCards() {
+    return this.resourceCards;
+  }
+
+  /**
    * @return the number of gold cards left in the deck
    */
   public int goldCardsLeft() {

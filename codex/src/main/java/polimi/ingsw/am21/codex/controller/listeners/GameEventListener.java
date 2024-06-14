@@ -1,8 +1,11 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -32,7 +35,13 @@ public interface GameEventListener extends RemoteGameEventListener {
     CardSideType starterSide
   );
 
-  void gameStarted(String gameId, List<String> players);
+  void gameStarted(
+    String gameId,
+    List<String> players,
+    Pair<Integer, Integer> goldCardPairIds,
+    Pair<Integer, Integer> resourceCardPairIds,
+    Pair<Integer, Integer> commonObjectivesIds
+  );
 
   /**
    * @param playerId The player that has just finished their turn

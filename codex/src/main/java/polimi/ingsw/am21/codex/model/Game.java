@@ -386,4 +386,8 @@ public class Game {
   public Chat getChat() {
     return chat;
   }
+
+  public GameBoard getGameBoard() {
+    return gameBoard;
+  }
 }

@@ -511,7 +511,13 @@ public class LocalModelContainer
   }
 
   @Override
-  public void gameStarted(String gameId, List<String> players) {
+  public void gameStarted(
+    String gameId,
+    List<String> players,
+    Pair<Integer, Integer> goldCardPairIds,
+    Pair<Integer, Integer> resourceCardPairIds,
+    Pair<Integer, Integer> commonObjectivesIds
+  ) {
     Map<String, Integer> nicknameToIndex = new HashMap<>();
 
     if (this.localGameBoard.getGameId().equals(gameId)) {
@@ -522,9 +528,23 @@ public class LocalModelContainer
             player -> players.indexOf(player.getNickname())
           )
         );
+
+      localGameBoard.setResourceCards(
+        cardsLoader.getCardPairFromIds(resourceCardPairIds)
+      );
+
+      localGameBoard.setGoldCards(
+        cardsLoader.getCardPairFromIds(goldCardPairIds)
+      );
+
+      localGameBoard.setCommonObjectives(
+        cardsLoader.getCardPairFromIds(commonObjectivesIds)
+      );
+
       state.set(ClientContext.GAME);
 
       view.drawGame(localGameBoard.getPlayers());
+
       view.drawLeaderBoard(localGameBoard.getPlayers());
       view.drawPlayerBoard(localGameBoard.getPlayer());
     }

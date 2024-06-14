@@ -539,7 +539,13 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(GameStartedMessage message) {
-    localModel.gameStarted(message.getGameId(), message.getPlayerIds());
+    localModel.gameStarted(
+      message.getGameId(),
+      message.getPlayerIds(),
+      message.getGoldCardPairIds(),
+      message.getResourceCardPairIds(),
+      message.getCommonObjectivesIds()
+    );
   }
 
   public void handleMessage(PlayerJoinedLobbyMessage message) {
