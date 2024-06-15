@@ -498,7 +498,7 @@ class Lobby{
 
     setToken(UUID socketId, TokenColor tokenColor) void ~~throws~~ PlayerNotFOundExcpetion, TokenAlreadyTakenExcpetion
 
-    setObjectiveCard(UUID socketId, Boolean firstObjectiveCard) void ~~PlayerBotFoundException~~
+    setObjectiveCard(UUID socketId, Boolean firstObjectiveCard) void ~~PlayerNotFoundException~~
 
     finalizePlayer(UUID socketId, CardSideType cardSide, List~PlayableCard~ hand) Player ~~throws~~ PlayerNotFoundException, IncompletePlayerBuilderException, IllegalCardSideChoiceException, IllegalPlacingPositionException
 
@@ -513,6 +513,15 @@ class Lobby{
 
     getStarterCard(UUID socketId) PlayableCard ~~throws~~ PlayerNotFoundException
 }
+
+PlayerNotFoundExcpetion <-- Lobby: throws
+NicknameAlreadyTakenException <-- Lobby: throws
+TokenAlreadyTakenException <-- Lobby: throws
+IncompletePlayerBuilderException <-- Lobby: throws
+IllegalCardSideChoiceException <-- Lobby: throws
+IllegalPlacingPositionExcpetion <-- Lobby: throws
+
+
 
 class LobbyFullExcpetion {
     +LobbyFullException
@@ -584,6 +593,11 @@ class Game {
     getChat() Chat
     getGameBoard() GameBoard
 }
+
+GameOverExcpetion <-- Game: throws
+EmptyDeckExcpetion <-- Game: throws
+InvalidNextTurnCallExcpetion <-- Game: throws
+
 
 class GameManger {
     -games: Map~String, Game~
@@ -681,6 +695,9 @@ class PlayerBuilder {
     build(UUID socketId) Player
     getStarterCard() PlayableCard
 }
+
+IllegalCardSideChoiceExcpetion <-- PlayerBoard: throws
+IllegalPlacingPositionExcpetion <-- PlayerBoard: throws
 
 class PlayerBoard {
     -hand: List~PlayableCard~
@@ -810,6 +827,8 @@ class GameBoard {
     resourceCardsLeft() int
     drawObjectiveCardPair() cardPair~ObjectiveCard~ ~~throws~~ EmptyDeckException
 }
+
+EmptyDeckExcpetion <-- GameBoard: throws
 
 class PlayerNotFoundExcpetion {
     +PlayerNotFoundException(UUID playerId)
