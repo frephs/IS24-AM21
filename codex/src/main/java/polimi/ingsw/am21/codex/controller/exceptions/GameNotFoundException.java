@@ -11,4 +11,8 @@ public class GameNotFoundException extends InvalidActionException {
   public String getGameID() {
     return this.getNotes().get(0);
   }
+
+  public static GameNotFoundException fromExceptionNotes(List<String> notes) {
+    return new GameNotFoundException(notes.get(0));
+  }
 }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.CreateGameMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.JoinLobbyMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetNicknameMessage;
@@ -34,11 +35,10 @@ class TCPServerTest {
 
     // Please note that this list is not evaluated in order
     List<MessageType> expectedMessages = List.of(
-      MessageType.SOCKET_ID,
       MessageType.GAME_CREATED,
       MessageType.AVAILABLE_GAME_LOBBIES,
       MessageType.PLAYER_JOINED_LOBBY,
-      MessageType.LOBBY_STATUS,
+      MessageType.LOBBY_INFO,
       MessageType.PLAYER_SET_TOKEN_COLOR,
       MessageType.PLAYER_SET_NICKNAME
     );
@@ -62,6 +62,7 @@ class TCPServerTest {
 
       clientSocket = new Socket((String) null, 4567);
       clientSocket.setKeepAlive(true);
+      clientSocket.setTcpNoDelay(true);
       System.out.println("Connected to server");
 
       try {
@@ -84,7 +85,9 @@ class TCPServerTest {
             System.out.println("Received message: " + message);
             receivedMessages.add(message);
             responsesLatch.countDown();
-          } catch (IOException ignored) {} catch (ClassNotFoundException e) {
+          } catch (IOException ignored) {
+            throw new RuntimeException();
+          } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
           }
         }
@@ -101,6 +104,7 @@ class TCPServerTest {
 
       UUID socketID = UUID.randomUUID();
       List.of(
+        new ConnectMessage(socketID),
         new CreateGameMessage(socketID, "TestGame", 4),
         new GetAvailableGameLobbiesMessage(socketID),
         new JoinLobbyMessage(socketID, "TestGame"),

@@ -12,4 +12,10 @@ public class IllegalPlacingPositionException extends InvalidActionException {
   public String getReason() {
     return this.getNotes().get(0);
   }
+
+  public static IllegalPlacingPositionException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new IllegalPlacingPositionException(notes.get(0));
+  }
 }

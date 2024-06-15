@@ -16,7 +16,6 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameManager;
 import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
@@ -27,6 +26,7 @@ import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.AlreadyPlacedCardGameException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class GameController {
 
@@ -372,7 +372,8 @@ public class GameController {
     }
   }
 
-  private UserGameContext getUserContext(UUID connectionID) {
+  private UserGameContext getUserContext(UUID connectionID)
+    throws InvalidActionException {
     if (
       !userContexts.containsKey(connectionID)
     ) throw new PlayerNotFoundException(connectionID);
@@ -568,6 +569,7 @@ public class GameController {
       .keySet()
       .stream()
       .filter(sID ->
+        userContexts.get(sID).getListener() != null &&
         // if includeSelf we also include the client that caused the event
         // otherwise we don't
         (includeSelf || socketID != sID) &&
@@ -593,10 +595,15 @@ public class GameController {
       .collect(Collectors.toList());
   }
 
-  public void removePlayerFromLobby(Game game, UUID socketID) {
+  public void removePlayerFromLobby(Game game, UUID socketID)
+    throws InvalidActionException {
     Lobby lobby = game.getLobby();
-    Pair<CardPair<ObjectiveCard>, PlayableCard> oldPlayerCards =
-      lobby.removePlayer(socketID);
+    Pair<CardPair<ObjectiveCard>, PlayableCard> oldPlayerCards = null;
+    try {
+      oldPlayerCards = lobby.removePlayer(socketID);
+    } catch (PlayerNotFoundGameException e) {
+      throw new PlayerNotFoundException(socketID);
+    }
     game.insertObjectiveCard(oldPlayerCards.getKey().getFirst());
     game.insertObjectiveCard(oldPlayerCards.getKey().getSecond());
     PlayableCard starterCard = oldPlayerCards.getValue();
@@ -679,7 +686,11 @@ public class GameController {
     ) throw new GameAlreadyStartedException();
 
     Lobby lobby = game.getLobby();
-    lobby.setToken(connectionID, color);
+    try {
+      lobby.setToken(connectionID, color);
+    } catch (PlayerNotFoundGameException e) {
+      throw new PlayerNotFoundException(connectionID);
+    }
     this.notifySameContextClients(
         connectionID,
         (listener, targetSocketID) ->
@@ -704,7 +715,11 @@ public class GameController {
     ) throw new GameAlreadyStartedException();
 
     Lobby lobby = game.getLobby();
-    lobby.setNickname(socketID, nickname);
+    try {
+      lobby.setNickname(socketID, nickname);
+    } catch (PlayerNotFoundGameException e) {
+      throw new PlayerNotFoundException(socketID);
+    }
     userGameContext.setNickname(nickname);
     this.notifySameContextClients(
         socketID,
@@ -715,10 +730,10 @@ public class GameController {
 
   public void lobbyChooseObjective(UUID socketID, Boolean first)
     throws InvalidActionException {
-    String gameId = userContexts
-      .get(socketID)
-      .getGameId()
-      .orElseThrow(NotInGameException::new);
+    String gameId =
+      this.getUserContext(socketID)
+        .getGameId()
+        .orElseThrow(NotInGameException::new);
     Game game = this.getGame(gameId);
 
     if (
@@ -727,17 +742,17 @@ public class GameController {
 
     Lobby lobby = game.getLobby();
 
-    lobby.setObjectiveCard(socketID, first);
-
-    this.notifySameContextClients(
-        socketID,
-        (listener, targetSocketID) ->
-          listener.playerChoseObjectiveCard(
-            gameId,
-            socketID,
-            lobby.getPlayerNickname(socketID).orElse(null)
-          )
-      );
+    try {
+      lobby.setObjectiveCard(socketID, first);
+      String playerNickname = lobby.getPlayerNickname(socketID).orElse(null);
+      this.notifySameContextClients(
+          socketID,
+          (listener, targetSocketID) ->
+            listener.playerChoseObjectiveCard(gameId, socketID, playerNickname)
+        );
+    } catch (PlayerNotFoundGameException e) {
+      throw new PlayerNotFoundException(socketID);
+    }
   }
 
   private void sendGameStartedNotification(String gameId, Game game) {
@@ -746,6 +761,7 @@ public class GameController {
           .stream()
           .filter(
             entry ->
+              entry.getValue().getListener() != null &&
               entry.getValue().getConnectionStatus() ==
                 UserGameContext.ConnectionStatus.CONNECTED &&
               entry
@@ -756,52 +772,67 @@ public class GameController {
           )
           .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
           .collect(Collectors.toList()), (listener, targetSocketID) -> {
+          List<GameInfo.GameInfoUser> users = new ArrayList<>();
+
+          userContexts
+            .entrySet()
+            .stream()
+            .filter(
+              entry ->
+                entry
+                  .getValue()
+                  .getGameId()
+                  .map(gid -> gid.equals(gameId))
+                  .orElse(false)
+            )
+            .forEach(entry -> {
+              try {
+                String nickname = entry.getValue().getNickname().orElse(null);
+                Player player = null;
+                player = game.getPlayer(nickname);
+                PlayerBoard playerBoard = player.getBoard();
+                users.add(
+                  new GameInfo.GameInfoUser(
+                    entry.getValue().getNickname().orElse(null),
+                    player.getToken(),
+                    entry.getKey(),
+                    entry.getValue().getConnectionStatus(),
+                    playerBoard
+                      .getPlayedCards()
+                      .entrySet()
+                      .stream()
+                      .collect(
+                        Collectors.toMap(
+                          Map.Entry::getKey,
+                          entry2 -> entry2.getValue().getId()
+                        )
+                      ),
+                    playerBoard
+                      .getHand()
+                      .stream()
+                      .map(PlayableCard::getId)
+                      .collect(Collectors.toList()),
+                    game.getScoreBoard().get(nickname),
+                    entry.getKey().equals(targetSocketID)
+                      ? playerBoard.getObjectiveCard().getId()
+                      : null,
+                    playerBoard.getAvailableSpots(),
+                    playerBoard.getForbiddenSpots(),
+                    game.getPlayers().indexOf(player)
+                  )
+                );
+              } catch (PlayerNotFoundGameException e) {
+                userContexts.put(
+                  entry.getKey(),
+                  new UserGameContext(entry.getValue().getListener())
+                );
+              }
+            });
+
           GameInfo gameInfo = new GameInfo(
             gameId,
-            userContexts
-              .entrySet()
+            users
               .stream()
-              .filter(
-                entry ->
-                  entry
-                    .getValue()
-                    .getGameId()
-                    .map(gid -> gid.equals(gameId))
-                    .orElse(false)
-              )
-              .map(entry -> {
-                String nickname = entry.getValue().getNickname().orElse(null);
-                Player player = game.getPlayer(nickname);
-                PlayerBoard playerBoard = player.getBoard();
-                return new GameInfo.GameInfoUser(
-                  entry.getValue().getNickname().orElse(null),
-                  player.getToken(),
-                  entry.getKey(),
-                  entry.getValue().getConnectionStatus(),
-                  playerBoard
-                    .getPlayedCards()
-                    .entrySet()
-                    .stream()
-                    .collect(
-                      Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry2 -> entry2.getValue().getId()
-                      )
-                    ),
-                  playerBoard
-                    .getHand()
-                    .stream()
-                    .map(PlayableCard::getId)
-                    .collect(Collectors.toList()),
-                  game.getScoreBoard().get(nickname),
-                  entry.getKey().equals(targetSocketID)
-                    ? playerBoard.getObjectiveCard().getId()
-                    : null,
-                  playerBoard.getAvailableSpots(),
-                  playerBoard.getForbiddenSpots(),
-                  game.getPlayers().indexOf(player)
-                );
-              })
               .sorted(Comparator.comparingInt(GameInfo.GameInfoUser::getIndex))
               .toList(),
             game.getCurrentPlayerIndex(),
@@ -874,10 +905,9 @@ public class GameController {
         // we don't need to do anything
       }
     } catch (IncompletePlayerBuilderException e) {
-      throw new InvalidActionException(
-        InvalidActionException.InvalidActionCode.INCOMPLETE_LOBBY_PLAYER,
-        List.of(e.getMessage())
-      );
+      throw new IncompleteLobbyPlayerException(e);
+    } catch (PlayerNotFoundGameException e) {
+      throw new PlayerNotFoundException(socketID);
     }
   }
 
@@ -983,6 +1013,11 @@ public class GameController {
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
   ) throws InvalidActionException {
+    if (deckType == null || drawingSource == null) {
+      this.nextTurn(connectionID);
+      return;
+    }
+
     String gameId = userContexts
       .get(connectionID)
       .getGameId()
@@ -1121,14 +1156,18 @@ public class GameController {
 
   public Integer getLobbyStarterCard(UUID connectionID)
     throws InvalidActionException {
-    return this.getGame(
-        userContexts
-          .get(connectionID)
-          .getGameId()
-          .orElseThrow(NotInGameException::new)
-      )
-      .getLobby()
-      .getStarterCard(connectionID)
-      .getId();
+    try {
+      return this.getGame(
+          userContexts
+            .get(connectionID)
+            .getGameId()
+            .orElseThrow(NotInGameException::new)
+        )
+        .getLobby()
+        .getStarterCard(connectionID)
+        .getId();
+    } catch (PlayerNotFoundGameException e) {
+      throw new PlayerNotFoundException(connectionID);
+    }
   }
 }

@@ -7,6 +7,8 @@ import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -14,7 +16,12 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameState;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
+import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
@@ -856,6 +863,43 @@ public class LocalModelContainer
   @Override
   public void alreadyPlacedCard() {
     view.postNotification(NotificationType.ERROR, "You already placed a card");
+  }
+
+  public void handleInvalidActionException(InvalidActionException e) {
+    switch (e.getCode()) {
+      case PLAYER_NOT_ACTIVE -> this.playerNotActive();
+      case NOT_IN_GAME -> this.notInGame();
+      case GAME_ALREADY_STARTED -> this.gameAlreadyStarted();
+      case INVALID_NEXT_TURN_CALL -> this.invalidNextTurnCall();
+      case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.invalidGetObjectiveCardsCall();
+      case GAME_NOT_READY -> this.gameNotReady();
+      case GAME_NOT_FOUND -> this.gameNotFound(
+          ((GameNotFoundException) e).getGameID()
+        );
+      case PLAYER_NOT_FOUND -> this.playerNotFound();
+      case INCOMPLETE_LOBBY_PLAYER -> this.incompleteLobbyPlayer(
+          e.getNotes().get(0)
+        );
+      case EMPTY_DECK -> this.emptyDeck();
+      case ALREADY_PLACED_CARD -> this.alreadyPlacedCard();
+      case ILLEGAL_PLACING_POSITION -> this.invalidCardPlacement(
+          ((IllegalPlacingPositionException) e).getReason()
+        );
+      case ILLEGAL_CARD_SIDE_CHOICE -> this.invalidCardPlacement(
+          e.getMessage()
+        );
+      case LOBBY_FULL -> this.lobbyFull(((LobbyFullException) e).getGameID());
+      case NICKNAME_ALREADY_TAKEN -> this.nicknameTaken(
+          ((NicknameAlreadyTakenException) e).getNickname()
+        );
+      case INVALID_TOKEN_COLOR -> this.invalidTokenColor();
+      case TOKEN_ALREADY_TAKEN -> this.tokenTaken(
+          TokenColor.fromString(
+            ((TokenAlreadyTakenException) e).getTokenColor()
+          )
+        );
+      case GAME_OVER -> this.gameOver();
+    }
   }
 
   public View getView() {

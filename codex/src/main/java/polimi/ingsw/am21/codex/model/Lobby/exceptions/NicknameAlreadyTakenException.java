@@ -16,4 +16,10 @@ public class NicknameAlreadyTakenException extends InvalidActionException {
   public String getFullMessage() {
     return "Nickname " + this.getNickname() + " is already taken";
   }
+
+  public static NicknameAlreadyTakenException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new NicknameAlreadyTakenException(notes.get(0));
+  }
 }

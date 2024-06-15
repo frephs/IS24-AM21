@@ -19,4 +19,8 @@ public class LobbyFullException extends InvalidActionException {
   public String getGameID() {
     return this.getNotes().get(0);
   }
+
+  public static LobbyFullException fromExceptionNotes(List<String> notes) {
+    return new LobbyFullException(notes.get(0));
+  }
 }

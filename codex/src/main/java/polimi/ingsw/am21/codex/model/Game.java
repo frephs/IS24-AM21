@@ -14,13 +14,13 @@ import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class Game {
 
@@ -99,9 +99,10 @@ public class Game {
    *
    * @param nickname The nickname of the player.
    * @return The state of the player.
-   * @throws PlayerNotFoundException If the player is not found.
+   * @throws PlayerNotFoundGameException If the player is not found.
    */
-  public PlayerState getPlayerState(String nickname) {
+  public PlayerState getPlayerState(String nickname)
+    throws PlayerNotFoundGameException {
     int i = 0;
     while (
       i < players.size() && !players.get(i).getNickname().equals(nickname)
@@ -109,7 +110,7 @@ public class Game {
       i++;
     }
 
-    if (i >= players.size()) throw new PlayerNotFoundException(nickname);
+    if (i >= players.size()) throw new PlayerNotFoundGameException(nickname);
 
     if (i == currentPlayer) return PlayerState.PLAYING;
     return PlayerState.WAITING;
@@ -143,11 +144,11 @@ public class Game {
    *
    * @param nickname The nickname of the player you're looking for
    */
-  public Player getPlayer(String nickname) throws PlayerNotFoundException {
+  public Player getPlayer(String nickname) throws PlayerNotFoundGameException {
     return this.players.stream()
       .filter(player -> Objects.equals(player.getNickname(), nickname))
       .findFirst()
-      .orElseThrow(() -> new PlayerNotFoundException(nickname));
+      .orElseThrow(() -> new PlayerNotFoundGameException(nickname));
   }
 
   /**

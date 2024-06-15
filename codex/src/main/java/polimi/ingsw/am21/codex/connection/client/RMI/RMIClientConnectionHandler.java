@@ -100,40 +100,7 @@ public class RMIClientConnectionHandler
   }
 
   private void handleInvalidActionException(InvalidActionException e) {
-    switch (e.getCode()) {
-      case PLAYER_NOT_ACTIVE -> this.localModel.playerNotActive();
-      case NOT_IN_GAME -> this.localModel.notInGame();
-      case GAME_ALREADY_STARTED -> this.localModel.gameAlreadyStarted();
-      case INVALID_NEXT_TURN_CALL -> this.localModel.invalidNextTurnCall();
-      case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.localModel.invalidGetObjectiveCardsCall();
-      case GAME_NOT_READY -> this.localModel.gameNotReady();
-      case GAME_NOT_FOUND -> this.localModel.gameNotFound(
-          ((GameNotFoundException) e).getGameID()
-        );
-      case PLAYER_NOT_FOUND -> this.localModel.playerNotFound();
-      case INCOMPLETE_LOBBY_PLAYER -> this.localModel.incompleteLobbyPlayer(
-          e.getNotes().get(0)
-        );
-      case EMPTY_DECK -> this.localModel.emptyDeck();
-      case ALREADY_PLACED_CARD -> localModel.alreadyPlacedCard();
-      case ILLEGAL_PLACING_POSITION -> this.localModel.invalidCardPlacement(
-          ((IllegalPlacingPositionException) e).getReason()
-        );
-      case ILLEGAL_CARD_SIDE_CHOICE -> this.localModel.invalidCardPlacement(
-          ((IllegalCardSideChoiceException) e).getMessage()
-        );
-      case LOBBY_FULL -> localModel.lobbyFull(
-        ((LobbyFullException) e).getGameID()
-      );
-      case NICKNAME_ALREADY_TAKEN -> localModel.nicknameTaken(
-        ((NicknameAlreadyTakenException) e).getNickname()
-      );
-      case INVALID_TOKEN_COLOR -> localModel.invalidTokenColor();
-      case TOKEN_ALREADY_TAKEN -> localModel.tokenTaken(
-        TokenColor.fromString(((TokenAlreadyTakenException) e).getTokenColor())
-      );
-      case GAME_OVER -> localModel.gameOver();
-    }
+    this.localModel.handleInvalidActionException(e);
   }
 
   @Override

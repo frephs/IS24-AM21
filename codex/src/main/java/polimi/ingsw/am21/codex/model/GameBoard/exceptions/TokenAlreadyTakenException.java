@@ -13,4 +13,10 @@ public class TokenAlreadyTakenException extends InvalidActionException {
   public String getTokenColor() {
     return this.getNotes().get(0);
   }
+
+  public static TokenAlreadyTakenException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new TokenAlreadyTakenException(TokenColor.valueOf(notes.get(0)));
+  }
 }

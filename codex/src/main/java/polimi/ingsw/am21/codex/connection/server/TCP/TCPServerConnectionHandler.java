@@ -13,7 +13,9 @@ import java.util.function.Function;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
@@ -29,6 +31,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 /** Runnable that handles a TCP connection */
 public class TCPServerConnectionHandler implements Runnable {
@@ -240,7 +243,7 @@ public class TCPServerConnectionHandler implements Runnable {
         );
       }
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -253,7 +256,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getPosition()
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -265,7 +268,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getPlayers()
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -273,7 +276,7 @@ public class TCPServerConnectionHandler implements Runnable {
     try {
       controller.joinLobby(message.getConnectionID(), message.getLobbyId());
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -285,7 +288,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getCardSideType()
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -296,7 +299,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.isFirst()
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -307,7 +310,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getNickname()
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -318,7 +321,7 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getColor()
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -327,7 +330,7 @@ public class TCPServerConnectionHandler implements Runnable {
       Game game = controller.getGame(message.getGameId());
       send(new GameStatusMessage(game.getState()));
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -358,7 +361,7 @@ public class TCPServerConnectionHandler implements Runnable {
         )
       );
     } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -370,8 +373,10 @@ public class TCPServerConnectionHandler implements Runnable {
         .getStarterCard(message.getConnectionID());
 
       send(new StarterCardSidesMessage(starterCard.getId()));
-    } catch (InvalidActionException e) {
-      send(new InvalidActionMessage(e.getCode(), e.getNotes()));
+    } catch (PlayerNotFoundGameException e) {
+      send(InvalidActionMessage.fromException(new PlayerNotFoundException(e)));
+    } catch (GameNotFoundException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 

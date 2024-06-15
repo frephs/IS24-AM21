@@ -11,12 +11,12 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 class LobbyTest {
 
@@ -122,12 +122,12 @@ class LobbyTest {
 
     try {
       this.lobby.setNickname(firstAdded, "test1");
-    } catch (PlayerNotFoundException | NicknameAlreadyTakenException e) {
+    } catch (PlayerNotFoundGameException | NicknameAlreadyTakenException e) {
       fail(e);
     }
     try {
       this.lobby.setNickname(lastAdded, "test2");
-    } catch (PlayerNotFoundException | NicknameAlreadyTakenException e) {
+    } catch (PlayerNotFoundGameException | NicknameAlreadyTakenException e) {
       fail(e);
     }
   }
@@ -150,11 +150,11 @@ class LobbyTest {
     UUID fakeUUID = generateNewSocketID();
     try {
       this.lobby.removePlayer(socketID);
-    } catch (PlayerNotFoundException e) {
+    } catch (PlayerNotFoundGameException e) {
       fail("Player not found");
     }
     assertThrows(
-      PlayerNotFoundException.class,
+      PlayerNotFoundGameException.class,
       () -> this.lobby.removePlayer(fakeUUID)
     );
   }
@@ -176,10 +176,15 @@ class LobbyTest {
 
     try {
       this.lobby.setNickname(socketID, "test");
-    } catch (NicknameAlreadyTakenException e) {
+    } catch (NicknameAlreadyTakenException | PlayerNotFoundGameException e) {
       fail(e);
     }
-    Optional<String> playerNickname = this.lobby.getPlayerNickname(socketID);
+    Optional<String> playerNickname = Optional.empty();
+    try {
+      playerNickname = this.lobby.getPlayerNickname(socketID);
+    } catch (PlayerNotFoundGameException e) {
+      fail(e);
+    }
     if (playerNickname.isEmpty()) fail(
       "could not find player with socket id" + socketID
     );
@@ -207,6 +212,8 @@ class LobbyTest {
       this.lobby.setNickname(socketID2, "test2");
     } catch (NicknameAlreadyTakenException e) {
       fail("Wrongfully thrown NicknameAlreadyTakenException");
+    } catch (PlayerNotFoundGameException e) {
+      fail("Wrongfully thrown PlayerNotFoundGameException");
     }
   }
 
@@ -228,10 +235,16 @@ class LobbyTest {
     try {
       this.lobby.setToken(socketID, TokenColor.GREEN);
     } catch (TokenAlreadyTakenException e) {
-      fail("wrongfully thrown TokenAlreadyTakenException");
+      fail("Wrongfully thrown TokenAlreadyTakenException");
+    } catch (PlayerNotFoundGameException e) {
+      fail("Wrongfully thrown PlayerNotFoundGameException");
     }
-    Optional<TokenColor> playerTokenColor =
-      this.lobby.getPlayerTokenColor(socketID);
+    Optional<TokenColor> playerTokenColor = null;
+    try {
+      playerTokenColor = this.lobby.getPlayerTokenColor(socketID);
+    } catch (PlayerNotFoundGameException e) {
+      fail("Wrongfully thrown PlayerNotFoundGameException");
+    }
     if (playerTokenColor.isEmpty()) fail(
       "could not find player with socket id" + socketID
     );
@@ -258,6 +271,8 @@ class LobbyTest {
       this.lobby.setToken(socketID2, TokenColor.RED);
     } catch (TokenAlreadyTakenException e) {
       fail("Wrongfully thrown TokenAlreadyTakenException");
+    } catch (PlayerNotFoundGameException e) {
+      fail("Wrongfully thrown PlayerNotFoundGameException");
     }
   }
 
@@ -278,11 +293,16 @@ class LobbyTest {
 
     try {
       this.lobby.setNickname(socketID, "test");
-    } catch (NicknameAlreadyTakenException e) {
+    } catch (NicknameAlreadyTakenException | PlayerNotFoundGameException e) {
       fail(e);
     }
 
-    Optional<String> playerNickname = this.lobby.getPlayerNickname(socketID);
+    Optional<String> playerNickname = Optional.empty();
+    try {
+      playerNickname = this.lobby.getPlayerNickname(socketID);
+    } catch (PlayerNotFoundGameException e) {
+      fail(e);
+    }
     if (playerNickname.isEmpty()) fail(
       "could not find player with socket id" + socketID
     );
@@ -341,58 +361,66 @@ class LobbyTest {
   void getPlayerNickname() {
     UUID firstPlayerID = UUID.randomUUID();
     try {
-      lobby.addPlayer(
-        firstPlayerID,
-        mockGameboard.drawObjectiveCardPair(),
-        mockGameboard.drawStarterCardFromDeck()
-      );
-    } catch (Exception e) {
-      fail("Failed to add player", e);
-    }
+      try {
+        lobby.addPlayer(
+          firstPlayerID,
+          mockGameboard.drawObjectiveCardPair(),
+          mockGameboard.drawStarterCardFromDeck()
+        );
+      } catch (Exception e) {
+        fail("Failed to add player", e);
+      }
 
-    Optional<String> playerNickname = lobby.getPlayerNickname(firstPlayerID);
-    assertEquals(Optional.empty(), playerNickname);
+      Optional<String> playerNickname = lobby.getPlayerNickname(firstPlayerID);
+      assertEquals(Optional.empty(), playerNickname);
 
-    try {
-      lobby.setNickname(firstPlayerID, "firstPlayer");
-    } catch (NicknameAlreadyTakenException e) {
-      fail(e);
+      try {
+        lobby.setNickname(firstPlayerID, "firstPlayer");
+      } catch (NicknameAlreadyTakenException e) {
+        fail(e);
+      }
+      playerNickname = lobby.getPlayerNickname(firstPlayerID);
+      if (playerNickname.isEmpty()) {
+        fail("Empty player nickname");
+      }
+      assertEquals("firstPlayer", playerNickname.get());
+    } catch (PlayerNotFoundGameException e) {
+      fail("Player not found", e);
     }
-    playerNickname = lobby.getPlayerNickname(firstPlayerID);
-    if (playerNickname.isEmpty()) {
-      fail("Empty player nickname");
-    }
-    assertEquals("firstPlayer", playerNickname.get());
   }
 
   @Test
   void getPlayerTokenColor() {
-    UUID firstPlayerID = UUID.randomUUID();
     try {
-      lobby.addPlayer(
-        firstPlayerID,
-        mockGameboard.drawObjectiveCardPair(),
-        mockGameboard.drawStarterCardFromDeck()
+      UUID firstPlayerID = UUID.randomUUID();
+      try {
+        lobby.addPlayer(
+          firstPlayerID,
+          mockGameboard.drawObjectiveCardPair(),
+          mockGameboard.drawStarterCardFromDeck()
+        );
+      } catch (Exception e) {
+        fail("Failed to add player", e);
+      }
+
+      Optional<TokenColor> playerTokenColor = lobby.getPlayerTokenColor(
+        firstPlayerID
       );
-    } catch (Exception e) {
-      fail("Failed to add player", e);
-    }
+      assertEquals(Optional.empty(), playerTokenColor);
 
-    Optional<TokenColor> playerTokenColor = lobby.getPlayerTokenColor(
-      firstPlayerID
-    );
-    assertEquals(Optional.empty(), playerTokenColor);
-
-    try {
-      lobby.setToken(firstPlayerID, TokenColor.RED);
-    } catch (TokenAlreadyTakenException e) {
-      fail("wrongfully thrown TokenAlreadyTakenException");
+      try {
+        lobby.setToken(firstPlayerID, TokenColor.RED);
+      } catch (TokenAlreadyTakenException e) {
+        fail("wrongfully thrown TokenAlreadyTakenException");
+      }
+      playerTokenColor = lobby.getPlayerTokenColor(firstPlayerID);
+      if (playerTokenColor.isEmpty()) {
+        fail("Empty player token");
+      }
+      assertEquals(TokenColor.RED, playerTokenColor.get());
+    } catch (PlayerNotFoundGameException e) {
+      fail("Player not found", e);
     }
-    playerTokenColor = lobby.getPlayerTokenColor(firstPlayerID);
-    if (playerTokenColor.isEmpty()) {
-      fail("Empty player token");
-    }
-    assertEquals(TokenColor.RED, playerTokenColor.get());
   }
 
   @Test
