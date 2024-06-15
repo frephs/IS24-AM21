@@ -835,7 +835,7 @@ class PlayerNotFoundExcpetion {
     +PlayerNotFoundExcpetion(String username)
 }
 
-class TokenAlreadyTakenExcepetion {
+class TokenAlreadyTakenException {
     +TokenALreadyTakenExcpetion(TokenColor color)
 
     getTokenColor() TokenColor
