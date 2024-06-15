@@ -40,16 +40,18 @@ classDiagram
 
 class ResourceType {
     <<Enumeration>>
-    PLANT_KINGDOM
-    ANIMAL_KINGDOM
-    FUNGI_KINGDOM
-    INSECT_KINGDOM
+    PLANT
+    ANIMAL
+    FUNGI
+    INSECT
 
     +fromString(String resourceTypeStr) String
     +has(Object value) boolean
     +isResourceType(String value) boolean
     +acceptVisitor(COrnerCOntentVisitor visitor) void
     +acceptVisitor(CornerContentVisitor visitor, int arg) void
+    +getColor() Color
+    +getImagePath() String
 }
 
 class ObjectType {
@@ -58,11 +60,13 @@ class ObjectType {
     INKWELL
     MANUSCRIPT
 
-    +fromString(String str) String
+    +fromString(String str) ObjectType
     +has(Object value) boolean
     +isObjectType(String value) boolean
     +acceptVisitor(CornerContentVisitor visitor) void
     +aceeptVisitor(CornerContentVisitor visitor, int arg) void
+    +getColor() Color
+    +getImagePath() String
 }
 
 class CardSideType {
@@ -82,6 +86,7 @@ class CornerContentType {
     <<Interface>>
     acceptVisitor(CornerContentVisitor visitor) void
     acceptVisitor(CornerContentVisitor visitor, int arg) void
+    getColor() Color
 }
 CornerContentType <|.. ObjectType : Realization
 CornerContentType <|.. ResourceType : Realization
@@ -90,6 +95,8 @@ class CornerContentVisitor {
     <<Interface>>
     visit(ObjectType object, int diff) void
     visit(ResourceType resource, int diff) void
+    visit(ObjectType object, int diff)
+    visit(ResourceType resource, int diff)
 }
 
 CornerContentVisitor <|.. MapUpdater: Realization
@@ -107,6 +114,8 @@ class CornerPosition {
     -index: int
     CornerPosition(int index)
     getOppositeCornerPosition() CornerPosition
+    +getIndex() int
+    +getOppositeCornerPosition() CornerPosition
 }
 
 class EdgePosition{
@@ -157,11 +166,15 @@ class ObjectiveCard {
     %% return points * objective.evaluate()
     getEvaluator() Function~PlayerBoard pb; Integer points~ 
     %% implements the abstract method in Card
+
+    cardToString() String
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
 }
+Card <|.. ObjectiveCard : realization
 
 class Objective {
     <<Abstract>>
-    getEvaluator() Function~PlayerBoard pb; Integer points~ *
+    getEvaluator() Function~PlayerBoard pb; Integer points, Integer~ *
 }
 ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization
@@ -172,6 +185,10 @@ class GeometricObjective {
     GeometricObjective(HashMap ~AdjacentPostion, ResourceType~ geometry)
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer points; Integer~
+
+    cardToString() String
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
 }
 Objective <|.. GeometricObjective : realization
 %% ResourceType "3..n" <-- "n" GeometricObjective: dependency
@@ -184,6 +201,9 @@ class CountingObjective {
     CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
    
     getEvaluator() BiFunction~PlayerBoard pb; Integer points, Integer~
+
+    cardToString() String
+    cardToAscii() String
 
 }
 Objective <|.. CountingObjective : realization
@@ -211,19 +231,24 @@ class PlayableCard {
     SetCoveredCorners(int coveredCorners) void
     
     getEvaluator() Function~PlayerBoard pb; Integer points~
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
+    cardToString() String
 }
 Card <|.. PlayableCard: realization
 %% CardSideType "0..1" <-- "n" PlayableCard: dependency
 
 class PlayableSide {
     <<Abstract>>
-    -corners: HashMap~CornerPosition, Corner~
+    -corners: HashMap~CornerPosition, Corner~CornerContentType~~
 
-    getCorners() HashMap~CornerPosition, Corner~
-    setCorner(CornerPosition position, ResourceType resource)
-    setCorner(CornerPosition position, ObjectType object)
+    getCorners() HashMap~CornerPosition, Corner~CornerContentType~~
+    setCorner(CornerPosition position, Optional ~CornerContentType~ content)
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
     getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
+
+    cardtoAscii(HashMap~Integer, String~ cardStringMap) String
+    cardTostring() String
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -236,6 +261,10 @@ class PlayableBackSide {
 
     getPermanentResources() List~ResourceType~
     getEvaluator() BiFunction~PlayerBoard pb, Integer, Integer~
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap)
+
+    cardToString()
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
@@ -243,7 +272,7 @@ PlayableCard "1" *-- "1"  PlayableBackSide: composition
 
 class PlayableFrontSide {
     <<Abstract>>
-    getEvaluator() BiFunction~PlayerBoard pb; Integer CoveredCorners; Integer points~ *
+   PlayableFrontSide()
 
 }
 PlayableSide <-- PlayableFrontSide: inheritance
@@ -253,6 +282,10 @@ class StarterCardFrontSide {
     StarterCardFrontSide()
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
+
+    cardToString() String
+
+    cardToAsci(HashMap~Integer, String~ cardStringMap) String
 }
 PlayableFrontSide <|.. StarterCardFrontSide: realization
 
@@ -263,8 +296,22 @@ class ResourceCardFrontSide {
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
 
+    cardToAscii(HashMap~Integer, String~) String
+
+    cardToString() String
+
 }
 PlayableFrontSide <|.. ResourceCardFrontSide: realization
+
+class DrawingCardSource {
+        <<Enumeration>>
+    CardPairFirstCard
+    CardPairSecondCard
+    Deck
+    
+    toString() String
+}
+
 
 class GoldCardFrontSide {
     -placementCondition: List~ResourceType~
@@ -278,6 +325,9 @@ class GoldCardFrontSide {
 
     getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
     %%overrides the method in PlayableSide
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
+    cardToString() String
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
