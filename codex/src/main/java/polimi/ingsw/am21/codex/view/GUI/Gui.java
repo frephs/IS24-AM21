@@ -1,7 +1,14 @@
 package polimi.ingsw.am21.codex.view.GUI;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javafx.application.Application;
@@ -15,11 +22,22 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -38,7 +56,13 @@ import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.view.GUI.utils.*;
+import polimi.ingsw.am21.codex.view.GUI.utils.ExceptionLoader;
+import polimi.ingsw.am21.codex.view.GUI.utils.GridCell;
+import polimi.ingsw.am21.codex.view.GUI.utils.GridCellStatus;
+import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
+import polimi.ingsw.am21.codex.view.GUI.utils.GuiUtils;
+import polimi.ingsw.am21.codex.view.GUI.utils.NotificationLoader;
+import polimi.ingsw.am21.codex.view.GUI.utils.ViewGridPosition;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
@@ -707,17 +731,17 @@ public class Gui extends Application implements View {
 
       for (int row = 0; row < ViewGridPosition.gridSize; row++) {
         RowConstraints rowConstraint = new RowConstraints();
-        rowConstraint.setMinHeight(GridCell.cellHeight);
-        rowConstraint.setMaxHeight(GridCell.cellHeight);
-        rowConstraint.setPrefHeight(GridCell.cellHeight);
+        rowConstraint.setMinHeight(GridCell.CELL_HEIGHT);
+        rowConstraint.setMaxHeight(GridCell.CELL_HEIGHT);
+        rowConstraint.setPrefHeight(GridCell.CELL_HEIGHT);
         rowConstraint.setVgrow(Priority.NEVER);
         gridPane.getRowConstraints().add(rowConstraint);
       }
       for (int col = 0; col < ViewGridPosition.gridSize; col++) {
         ColumnConstraints colConstraint = new ColumnConstraints();
-        colConstraint.setMinWidth(GridCell.cellWidth);
-        colConstraint.setMaxWidth(GridCell.cellWidth);
-        colConstraint.setPrefWidth(GridCell.cellWidth);
+        colConstraint.setMinWidth(GridCell.CELL_WIDTH);
+        colConstraint.setMaxWidth(GridCell.CELL_WIDTH);
+        colConstraint.setPrefWidth(GridCell.CELL_WIDTH);
         colConstraint.setHgrow(Priority.NEVER);
         gridPane.getColumnConstraints().add(colConstraint);
       }
@@ -1172,6 +1196,7 @@ public class Gui extends Application implements View {
       );
   }
 
+  @Override
   public void drawChatMessage(ChatMessage message) {
     Platform.runLater(() -> {
       VBox chatMessageContainer = (VBox) ((ScrollPane) scene.lookup(
@@ -1249,7 +1274,6 @@ public class Gui extends Application implements View {
 
     cardsContainer.getChildren().clear();
 
-    // TODO how do we want to display two sides?
     List<ImageView> images = List.of(
       loadCardImage(cardPair.getFirst(), CardSideType.FRONT),
       loadCardImage(cardPair.getSecond(), CardSideType.FRONT)

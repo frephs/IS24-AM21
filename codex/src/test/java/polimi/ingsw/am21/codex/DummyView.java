@@ -30,7 +30,6 @@ public class DummyView implements View {
     this.id = id;
   }
 
-  @Override
   public void postNotification(
     NotificationType notificationType,
     String message

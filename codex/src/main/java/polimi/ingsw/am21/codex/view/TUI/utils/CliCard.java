@@ -1,7 +1,6 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public interface CliCard {
   String cardToString();
