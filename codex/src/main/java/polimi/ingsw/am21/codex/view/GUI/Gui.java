@@ -49,15 +49,8 @@ public class Gui extends Application implements View {
 
   private static Gui gui;
 
-  @FXML
-  private Text windowTitle;
-
-  @FXML
-  private Pane content;
-
   private static ClientConnectionHandler client;
   private static LocalModelContainer localModel;
-  private boolean isReady = false;
 
   public Gui() {
     gui = this;
@@ -524,14 +517,12 @@ public class Gui extends Application implements View {
 
         HBox tokenContainer = new HBox(token);
         tokenContainer.alignmentProperty().set(Pos.CENTER_RIGHT);
-        //TODO fix alignment
         playerGrid.add(token, 0, i);
 
         Label nickname = new Label(
           (player.getNickname()) != null ? player.getNickname() : "<pending>"
         );
         nickname.alignmentProperty().setValue(Pos.CENTER);
-        //TODO fix aligment
         playerGrid.add(nickname, 1, i);
       }
     });
