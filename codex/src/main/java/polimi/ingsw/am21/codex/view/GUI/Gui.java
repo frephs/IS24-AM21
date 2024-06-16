@@ -24,13 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -1021,7 +1015,20 @@ public class Gui extends Application implements View {
    * */
   @Override
   public void drawGameOver(List<LocalPlayer> players) {
-    // TODO
+    Platform.runLater(() -> {
+      ((Text) scene.lookup("#window-title")).setText("Game Over");
+      //draw the final leaderboard int the #side-content container and don't use drawLeaderBoard
+      drawLeaderBoard(players);
+      players.sort((p1, p2) -> p2.getPoints() - p1.getPoints());
+      drawWinner(players.getFirst().getNickname());
+
+      VBox commonBoardContainer = (VBox) scene.lookup(
+        "#common-board-container"
+      );
+
+      VBox commonBoardContainerParent = (VBox) commonBoardContainer.getParent();
+      commonBoardContainerParent.getChildren().remove(commonBoardContainer);
+    });
   }
 
   @Override
@@ -1265,7 +1272,13 @@ public class Gui extends Application implements View {
    * */
   @Override
   public void drawWinner(String nickname) {
-    // TODO
+    Platform.runLater(() -> {
+      loadSceneFXML("Winner.fxml", "#content");
+      ((Text) scene.lookup("#winner-container")).setText(nickname);
+      ((Button) scene.lookup("#back-to-menu-button")).setOnMouseClicked(
+          (MouseEvent event) -> client.listGames()
+        );
+    });
   }
 
   /**
