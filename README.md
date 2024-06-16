@@ -28,8 +28,8 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 | Socket | Connection| 🟡🟡 | 
 | Chat | Advanced functionality 1 | 🟢|
 | Multiple games  | Advanced functionality 2| 🟢
-| Game saving on disk | Advanced functionality 3 | 🔴 |
-| Client disconnection resilience |Advanced functionality 4 | ❌|
+| Client disconnection resilience |Advanced functionality 4 | 🔴|
+| Game saving on disk | Advanced functionality 3 | ❌ |
 
 ## License
 All rights to Codex Naturalis © are owned by Cranio Creations ®, which provided the graphical resources to be used for educational purposes only.
