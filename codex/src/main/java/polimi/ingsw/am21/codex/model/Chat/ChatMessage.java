@@ -15,21 +15,27 @@ public class ChatMessage implements Serializable {
   /**
    * Message for chosen player
    */
-  public ChatMessage(String recipient, String sender, String content) {
+  public ChatMessage(
+    String sender,
+    String recipient,
+    String content,
+    Date timestamp
+  ) {
     this.recipient = recipient;
     this.sender = sender;
     this.content = content;
-    this.timestamp = new Date();
+    this.timestamp = timestamp;
+  }
+
+  public ChatMessage(String sender, String recipient, String content) {
+    this(recipient, sender, content, new Date());
   }
 
   /**
    * Message for all the players
    */
   public ChatMessage(String sender, String content) {
-    this.content = content;
-    this.sender = sender;
-    this.recipient = null;
-    this.timestamp = new Date();
+    this(sender, null, content);
   }
 
   public ChatMessage(UUID sender, String content) {

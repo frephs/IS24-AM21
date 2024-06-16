@@ -380,7 +380,7 @@ public class TCPServerConnectionHandler implements Runnable {
       send(new StarterCardSidesMessage(starterCard.getId()));
     } catch (PlayerNotFoundGameException e) {
       send(InvalidActionMessage.fromException(new PlayerNotFoundException(e)));
-    } catch (GameNotFoundException e) {
+    } catch (InvalidActionException e) {
       send(InvalidActionMessage.fromException(e));
     }
   }
@@ -391,10 +391,14 @@ public class TCPServerConnectionHandler implements Runnable {
 
   public void handleMessage(SendChatMessage message) {
     try {
-      controller.sendChatMessage(message.getGameId(), message.getMessage());
-      broadcast(message, false);
-    } catch (GameNotFoundException e) {
-      throw new RuntimeException(e);
+      controller.sendChatMessage(
+        message.getConnectionID(),
+        message.getMessage().getRecipient().orElse(null),
+        message.getMessage().getContent()
+      );
+      broadcast(message);
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 

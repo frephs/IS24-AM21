@@ -54,7 +54,19 @@ public interface RemoteGameEventListener extends Remote {
   void gameStarted(String gameId, GameInfo gameInfo) throws RemoteException;
 
   /**
-   * @param playerId The player that has just finished their turn
+   * This method is used to change the turn in the game.
+   *
+   * @param gameId The unique identifier of the game that has just ended.
+   * @param playerNickname The nickname of the player that has just finished their turn. This can be null if the game ended because of a disconnection.
+   * @param playerIndex The index of the player that has just finished their turn in the list of players.
+   * @param isLastRound A boolean indicating if this is the last round of the game.
+   * @param source The source from which the card was drawn.
+   * @param deck The type of deck from which the card was drawn.
+   * @param cardId The unique identifier of the card that was drawn. (null if the receiving client is not the one who drew the card)
+   * @param newPairCardId The unique identifier of the new pair card that was drawn.
+   * @param availableSpots A set of positions that are available for the next player to place a card.
+   * @param forbiddenSpots A set of positions that are forbidden for the next player to place a card.
+   * @throws RemoteException If a remote or network error occurs.
    */
   void changeTurn(
     String gameId,
@@ -69,9 +81,6 @@ public interface RemoteGameEventListener extends Remote {
     Set<Position> forbiddenSpots
   ) throws RemoteException;
 
-  /**
-   * @param playerId The player that has just finished their turn
-   */
   void changeTurn(
     String gameId,
     String playerNickname,
@@ -111,8 +120,8 @@ public interface RemoteGameEventListener extends Remote {
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) throws RemoteException;
+
   void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException;
 
-  void chatMessageSent(String gameId, ChatMessage message)
-    throws RemoteException;
+  void chatMessage(String gameID, ChatMessage message) throws RemoteException;
 }

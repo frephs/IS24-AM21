@@ -293,13 +293,10 @@ public class RMIClientConnectionHandler
 
   @Override
   public void sendChatMessage(ChatMessage message) {
-    Optional<String> oGameID = this.getGameIDWithMessage();
-    if (oGameID.isEmpty()) return;
-    String gameID = oGameID.get();
     try {
-      rmiConnectionHandler.sendChatMessage(gameID, message);
-    } catch (GameNotFoundException e) {
-      throw new RuntimeException(e);
+      rmiConnectionHandler.sendChatMessage(getSocketID(), message);
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
     }

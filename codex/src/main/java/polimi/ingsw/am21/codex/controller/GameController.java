@@ -1180,8 +1180,11 @@ public class GameController {
     }
   }
 
-  public void sendChatMessage(UUID connectionID, String message)
-    throws InvalidActionException {
+  public void sendChatMessage(
+    UUID connectionID,
+    String recipientNickname,
+    String message
+  ) throws InvalidActionException {
     Optional<UserGameContext> userGameContext = Optional.ofNullable(
       userContexts.get(connectionID)
     );
@@ -1198,12 +1201,16 @@ public class GameController {
       .get()
       .getNickname()
       .orElseThrow(NotInGameException::new);
-    ChatMessage chatMessage = new ChatMessage(nickname, message;
-    game.getChat().postMessage(chatMessage));
+    ChatMessage chatMessage = new ChatMessage(
+      nickname,
+      recipientNickname,
+      message
+    );
+    game.getChat().postMessage(chatMessage);
 
     notifySameContextClients(connectionID, (listener, targetSocketID) -> {
       try {
-        listener.chatMessage(gameId, nickname, message, chatMessage.getTimestamp(),false);
+        listener.chatMessage(gameId, chatMessage);
       } catch (RemoteException e) {
         if (userContexts.containsKey(targetSocketID)) {
           userContexts.get(targetSocketID).disconnected();
@@ -1211,10 +1218,4 @@ public class GameController {
       }
     });
   }
-
-  public void sendChatMessage(
-    UUID connectionID,
-    String recipientNickname,
-    String message
-  ) {}
 }

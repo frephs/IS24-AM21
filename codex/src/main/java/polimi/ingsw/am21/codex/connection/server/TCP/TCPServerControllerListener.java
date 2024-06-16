@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.connection.server.TCP;
 
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Consumer;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -8,11 +9,11 @@ import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -94,8 +95,8 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void chatMessageSent(String gameId, ChatMessage chatMessage) {
-    broadcast.accept(new SendChatMessage(gameId, chatMessage));
+  public void chatMessage(String gameID, ChatMessage message) {
+    broadcast.accept(new ChatMessageMessage(gameID, message));
   }
 
   @Override

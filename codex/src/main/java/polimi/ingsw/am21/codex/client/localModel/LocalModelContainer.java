@@ -843,16 +843,6 @@ public class LocalModelContainer
   }
 
   @Override
-  public void chatMessageSent(String gameId, ChatMessage chatMessage) {
-    if (Objects.equals(gameId, localGameBoard.getGameId())) {
-      if (!chatMessage.getSender().equals(localGameBoard.getPlayerNickname())) {
-        localGameBoard.getChat().postMessage(chatMessage);
-        view.drawChatMessage(chatMessage);
-      }
-    }
-  }
-
-  @Override
   public void playerConnectionChanged(
     UUID socketID,
     String nickname,
@@ -882,6 +872,16 @@ public class LocalModelContainer
           .ifPresent(token -> setPlayerToken(uuid, token));
       });
     this.clientContextContainer.set(ClientContext.LOBBY);
+  }
+
+  @Override
+  public void chatMessage(String gameID, ChatMessage message) {
+    if (Objects.equals(gameID, localGameBoard.getGameId())) {
+      if (!message.getSender().equals(localGameBoard.getPlayerNickname())) {
+        localGameBoard.getChat().postMessage(message);
+        view.drawChatMessage(message);
+      }
+    }
   }
 
   @Override

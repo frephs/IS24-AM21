@@ -216,8 +216,8 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void chatMessageSent(String gameId, ChatMessage message)
+  public void chatMessage(String gameID, ChatMessage message)
     throws RemoteException {
-    listener.chatMessageSent(gameId, message);
+    listener.chatMessage(gameID, message);
   }
 }

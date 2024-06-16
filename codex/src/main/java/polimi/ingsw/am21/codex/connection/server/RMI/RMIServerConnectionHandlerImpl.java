@@ -145,6 +145,16 @@ public class RMIServerConnectionHandlerImpl
   }
 
   @Override
+  public void sendChatMessage(UUID connectionID, ChatMessage message)
+    throws RemoteException, InvalidActionException {
+    this.controller.sendChatMessage(
+        connectionID,
+        message.getRecipient().orElse(null),
+        message.getContent()
+      );
+  }
+
+  @Override
   public void connect(UUID connectionID, RemoteGameEventListener listener)
     throws RemoteException {
     this.controller.connect(connectionID, listener);

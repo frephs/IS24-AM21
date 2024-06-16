@@ -29,10 +29,10 @@ import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.InvalidActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
@@ -368,10 +368,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void sendChatMessage(ChatMessage message) {
-    Optional<String> oGame = this.getGameIDWithMessage();
-    if (oGame.isEmpty()) return;
-    String gameID = oGame.get();
-    this.send(new SendChatMessage(gameID, message));
+    this.send(new SendChatMessage(getSocketID(), message));
   }
 
   public GameState getGameState() {
@@ -411,7 +408,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case NOT_A_CLIENT_MESSAGE -> handleMessage(
         (NotAClientMessageMessage) message
       );
-      case INVALID_ACTION -> handleMessage((ActionNotAllowedMessage) message);
+      case INVALID_ACTION -> handleMessage((InvalidActionMessage) message);
       // View Updating Messages
       // Lobby
       case GAME_CREATED -> handleMessage((GameCreatedMessage) message);
@@ -640,7 +637,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.winningPlayer(message.getWinnerNickname());
   }
 
-  public void handleMessage(SendChatMessage message) {
-    localModel.chatMessageSent(message.getGameId(), message.getMessage());
+  public void handleMessage(ChatMessageMessage message) {
+    localModel.chatMessage(message.getGameID(), message.getMessage());
   }
 }

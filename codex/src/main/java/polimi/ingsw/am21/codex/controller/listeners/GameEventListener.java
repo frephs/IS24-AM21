@@ -119,5 +119,5 @@ public interface GameEventListener extends RemoteGameEventListener {
   void lobbyInfo(LobbyUsersInfo usersInfo);
 
   @Override
-  void chatMessageSent(String gameId, ChatMessage chatMessage);
+  void chatMessage(String gameID, ChatMessage message);
 }
