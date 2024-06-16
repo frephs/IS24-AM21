@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane styleClass="outer-border" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.Gui">
+<AnchorPane id="root" styleClass="outer-border" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.Gui">
    <children>
       <AnchorPane styleClass="window-border" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -29,7 +29,7 @@
                                                 </HBox>
                                                 <HBox>
                                                    <children>
-                                                      <VBox maxHeight="850.0">
+                                                      <VBox id="side" maxHeight="850.0">
                                                          <children>
                                                             <VBox id="side-content" alignment="CENTER">
                                                                <padding>
