@@ -1145,7 +1145,6 @@ public class Gui extends Application implements View {
     // TODO
   }
 
-  //TODO maybe implement this in CLI
   public void drawChat(List<LocalPlayer> players) {
     loadSceneFXML("Chat.fxml", "#side-content-bottom");
     // add recipients to chat-recipient combo box
