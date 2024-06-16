@@ -17,6 +17,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
@@ -151,6 +152,10 @@ class GameControllerTest {
 
     @Override
     public void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException {}
+
+    @Override
+    public void chatMessage(String gameID, ChatMessage message)
+      throws RemoteException {}
   }
 
   private List<UUID> createGame(String gameId, int maxPlayers, int players) {

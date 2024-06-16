@@ -107,4 +107,8 @@ public class LocalGameBoard {
   public Chat getChat() {
     return chat;
   }
+
+  public LocalPlayer getNextPlayer() {
+    return players.get((currentPlayerIndex + 1) % players.size());
+  }
 }
