@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public enum MessageType implements Serializable {
   CONNECT(MessageTypeCategory.CLIENT_ACTION),
+  HEART_BEAT(MessageTypeCategory.CLIENT_ACTION),
   NEXT_TURN_ACTION(MessageTypeCategory.CLIENT_ACTION),
   PLACE_CARD(MessageTypeCategory.CLIENT_ACTION),
   CREATE_GAME(MessageTypeCategory.CLIENT_ACTION),

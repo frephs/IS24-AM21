@@ -18,6 +18,7 @@ import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
@@ -204,6 +205,7 @@ public class TCPServerConnectionHandler implements Runnable {
     throws NotAClientMessageException {
     switch (message.getType()) {
       case CONNECT -> handleMessage((ConnectMessage) message);
+      case HEART_BEAT -> handleMessage((HeartBeatMessage) message);
       case NEXT_TURN_ACTION -> handleMessage((NextTurnActionMessage) message);
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
@@ -378,6 +380,10 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (GameNotFoundException e) {
       send(InvalidActionMessage.fromException(e));
     }
+  }
+
+  private void handleMessage(HeartBeatMessage message) {
+    controller.heartBeat(message.getConnectionID());
   }
 
   /** Sends a message synchronously to the client socket */

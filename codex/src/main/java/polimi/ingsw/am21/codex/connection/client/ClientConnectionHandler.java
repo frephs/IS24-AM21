@@ -1,6 +1,8 @@
 package polimi.ingsw.am21.codex.connection.client;
 
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -148,6 +150,11 @@ public abstract class ClientConnectionHandler {
    */
   public abstract void nextTurn();
 
+  /**
+   * Sends a heart beat to the server
+   */
+  public abstract void heartBeat();
+
   /*
    * -----------------
    * CONNECTION HANDLING
@@ -180,6 +187,21 @@ public abstract class ClientConnectionHandler {
   public void connectionEstablished() {
     this.connected = true;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
+    System.out.println("Your ID is: " + this.getSocketID());
+    Runnable heartBeatRunnable = new Runnable() {
+      @Override
+      public void run() {
+        if (connected) heartBeat();
+      }
+    };
+
+    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    executor.scheduleAtFixedRate(
+      heartBeatRunnable,
+      0,
+      1,
+      java.util.concurrent.TimeUnit.SECONDS
+    );
   }
 
   public void getObjectivesIfNull() {

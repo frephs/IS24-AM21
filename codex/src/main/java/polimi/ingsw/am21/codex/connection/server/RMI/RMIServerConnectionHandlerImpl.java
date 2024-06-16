@@ -148,4 +148,9 @@ public class RMIServerConnectionHandlerImpl
     throws RemoteException {
     this.controller.connect(connectionID, listener);
   }
+
+  @Override
+  public void heartBeat(UUID connectionID) throws RemoteException {
+    this.controller.heartBeat(connectionID);
+  }
 }

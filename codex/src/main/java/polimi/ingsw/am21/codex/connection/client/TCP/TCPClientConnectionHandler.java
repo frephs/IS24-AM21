@@ -15,6 +15,7 @@ import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -186,7 +187,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         this.socket = new Socket(host, port);
         this.socket.setTcpNoDelay(true);
         connected = true;
-        connectionEstablished();
       } catch (IOException e) {
         connectionFailed(e);
       }
@@ -200,6 +200,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       this.startMessageHandler();
       this.localModel.setSocketId(this.getSocketID());
       this.send(new ConnectMessage(this.getSocketID()));
+      connectionEstablished();
       this.listGames();
     } catch (IOException e) {
       connectionFailed(e);
@@ -338,6 +339,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           localModel.getLocalGameBoard().getPlayerNickname()
         )
       );
+  }
+
+  @Override
+  public void heartBeat() {
+    send(new HeartBeatMessage(this.getSocketID()));
   }
 
   public GameState getGameState() {

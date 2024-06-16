@@ -278,4 +278,13 @@ public class RMIClientConnectionHandler
       this.handleInvalidActionException(e);
     }
   }
+
+  @Override
+  public void heartBeat() {
+    try {
+      rmiConnectionHandler.heartBeat(this.getSocketID());
+    } catch (RemoteException e) {
+      this.messageNotSent();
+    }
+  }
 }

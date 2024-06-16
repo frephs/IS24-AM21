@@ -73,4 +73,6 @@ public interface RMIServerConnectionHandler extends Remote {
 
   public void connect(UUID connectionID, RemoteGameEventListener listener)
     throws RemoteException;
+
+  public void heartBeat(UUID connectionID) throws RemoteException;
 }

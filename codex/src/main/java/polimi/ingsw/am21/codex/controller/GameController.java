@@ -389,7 +389,12 @@ public class GameController {
     for (UUID disconnectedClient : disconnectedClients) {
       sameContextClients
         .stream()
-        .filter(client -> disconnectedClients.contains(client.getKey()))
+        .filter(
+          client ->
+            !disconnectedClients.contains(client.getKey()) &&
+            client.getValue().getConnectionStatus() ==
+              UserGameContext.ConnectionStatus.CONNECTED
+        )
         .forEach(
           client ->
             listenersToNotify.add(
@@ -403,11 +408,11 @@ public class GameController {
       UserGameContext clientToNotifyContext = userContexts.get(
         toNotify.getKey()
       );
-      UserGameContext clientToCheckContext = userContexts.get(
+      UserGameContext disconnectingClientContext = userContexts.get(
         toNotify.getValue()
       );
       if (
-        clientToNotifyContext == null || clientToCheckContext == null
+        clientToNotifyContext == null || disconnectingClientContext == null
       ) continue;
 
       try {
@@ -415,8 +420,8 @@ public class GameController {
           .getListener()
           .playerConnectionChanged(
             toNotify.getValue(),
-            clientToNotifyContext.getNickname().orElse(null),
-            clientToNotifyContext.getConnectionStatus()
+            disconnectingClientContext.getNickname().orElse(null),
+            disconnectingClientContext.getConnectionStatus()
           );
       } catch (RemoteException e) {
         if (userContexts.containsKey(toNotify.getKey())) {
@@ -540,6 +545,9 @@ public class GameController {
 
     // the heartBeat function returns true if the connection has been restored
     // it also updates the last heartbeat value
+
+    System.out.println("Heartbeat from: " + socketID.toString());
+
     if (
       userContexts.containsKey(socketID) &&
       userContexts.get(socketID).heartBeat()
