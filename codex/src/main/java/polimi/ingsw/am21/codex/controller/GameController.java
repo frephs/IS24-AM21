@@ -1179,4 +1179,42 @@ public class GameController {
       throw new PlayerNotFoundException(connectionID);
     }
   }
+
+  public void sendChatMessage(UUID connectionID, String message)
+    throws InvalidActionException {
+    Optional<UserGameContext> userGameContext = Optional.ofNullable(
+      userContexts.get(connectionID)
+    );
+
+    if (userGameContext.isEmpty()) throw new PlayerNotFoundException(
+      connectionID
+    );
+    String gameId = userGameContext
+      .get()
+      .getGameId()
+      .orElseThrow(NotInGameException::new);
+    Game game = this.getGame(gameId);
+    String nickname = userGameContext
+      .get()
+      .getNickname()
+      .orElseThrow(NotInGameException::new);
+    ChatMessage chatMessage = new ChatMessage(nickname, message;
+    game.getChat().postMessage(chatMessage));
+
+    notifySameContextClients(connectionID, (listener, targetSocketID) -> {
+      try {
+        listener.chatMessage(gameId, nickname, message, chatMessage.getTimestamp(),false);
+      } catch (RemoteException e) {
+        if (userContexts.containsKey(targetSocketID)) {
+          userContexts.get(targetSocketID).disconnected();
+        }
+      }
+    });
+  }
+
+  public void sendChatMessage(
+    UUID connectionID,
+    String recipientNickname,
+    String message
+  ) {}
 }
