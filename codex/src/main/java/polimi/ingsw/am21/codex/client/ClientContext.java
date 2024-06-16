@@ -7,4 +7,6 @@ public enum ClientContext {
   ALL,
   LOBBY,
   GAME,
+  MENU,
+  GAME_OVER,
 }
