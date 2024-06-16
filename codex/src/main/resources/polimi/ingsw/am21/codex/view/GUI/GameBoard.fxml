@@ -50,11 +50,11 @@
                   </HBox>
                   <ScrollPane id="gameboard-container" hbarPolicy="NEVER" prefHeight="300.0" prefWidth="517.0" stylesheets="@Style.css">
                      <content>
-                        <VBox prefHeight="228.0" prefWidth="440.0">
+                        <VBox prefHeight="379.0" prefWidth="321.0">
                            <children>
-                              <VBox prefWidth="189.0" styleClass="bordered">
+                              <VBox alignment="CENTER" styleClass="bordered">
                                  <children>
-                                    <Label alignment="CENTER" prefHeight="42.0" prefWidth="476.0" text="Resource card pair" textAlignment="CENTER">
+                                    <Label alignment="CENTER" prefHeight="42.0" text="Resource card pair" textAlignment="CENTER">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -65,9 +65,9 @@
                                     <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
                               </VBox>
-                              <VBox layoutX="10.0" layoutY="10.0" styleClass="bordered">
+                              <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" styleClass="bordered">
                                  <children>
-                                    <Label alignment="CENTER" prefHeight="42.0" prefWidth="475.0" text="Gold card pair" textAlignment="CENTER">
+                                    <Label alignment="CENTER" prefHeight="42.0" text="Gold card pair" textAlignment="CENTER">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -78,17 +78,17 @@
                                     <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
                               </VBox>
-                              <VBox layoutX="10.0" layoutY="143.0" styleClass="bordered">
+                              <VBox alignment="CENTER" layoutX="10.0" layoutY="143.0" styleClass="bordered">
                                  <children>
-                                    <Label alignment="CENTER" prefHeight="42.0" prefWidth="469.0" text="Decks" textAlignment="CENTER" />
-                                    <HBox prefHeight="151.0" prefWidth="414.0">
+                                    <Label alignment="CENTER" prefHeight="42.0" text="Decks" textAlignment="CENTER" />
+                                    <HBox>
                                        <children>
-                                          <VBox layoutX="15.0" layoutY="15.0" prefHeight="103.0" prefWidth="203.0" styleClass="bordered">
+                                          <VBox alignment="CENTER" layoutX="15.0" layoutY="15.0" prefHeight="103.0" styleClass="bordered">
                                              <children>
-                                                <Label alignment="CENTER" prefHeight="33.0" prefWidth="202.0" text="Resource cards" textAlignment="CENTER" />
+                                                <Label alignment="CENTER" prefHeight="33.0" text="Resource cards" textAlignment="CENTER" />
                                                 <HBox id="resource-cards-deck" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                                    <children>
-                                                      <ImageView fitHeight="77.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                                                      <ImageView fitHeight="77.0" fitWidth="190.0" pickOnBounds="true" preserveRatio="true" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -96,12 +96,12 @@
                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                               </HBox.margin>
                                           </VBox>
-                                          <VBox layoutX="10.0" layoutY="10.0" prefHeight="103.0" prefWidth="203.0" styleClass="bordered">
+                                          <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="103.0" styleClass="bordered">
                                              <children>
-                                                <Label alignment="CENTER" prefHeight="33.0" prefWidth="202.0" text="Gold Cards" textAlignment="CENTER" />
+                                                <Label alignment="CENTER" prefHeight="33.0" text="Gold Cards" textAlignment="CENTER" />
                                                 <HBox id="gold-cards-deck" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                                                    <children>
-                                                      <ImageView fitHeight="77.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                                                      <ImageView fitHeight="77.0" fitWidth="190.0" pickOnBounds="true" preserveRatio="true" />
                                                    </children>
                                                 </HBox>
                                              </children>
@@ -120,10 +120,10 @@
                                  </VBox.margin>
                               </VBox>
                               <VBox layoutX="10.0" layoutY="277.0" />
-                              <VBox layoutX="10.0" layoutY="120.0" prefWidth="120.0" styleClass="bordered">
+                              <VBox alignment="CENTER" layoutX="10.0" layoutY="120.0" styleClass="bordered">
                                  <children>
                                     <Label alignment="CENTER" prefHeight="47.0" prefWidth="481.0" text="Common Objective Cards" textAlignment="CENTER" />
-                                    <HBox id="common-objective-cards" />
+                                    <HBox id="common-objective-cards" alignment="CENTER" />
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
