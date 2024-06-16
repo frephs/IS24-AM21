@@ -134,6 +134,7 @@ public class CliClient extends ViewClient {
 
     private final String usage;
     private final String description;
+    private final ClientContext context;
 
     public CommandHandler(
       String usage,
@@ -142,6 +143,7 @@ public class CliClient extends ViewClient {
     ) {
       this.usage = usage;
       this.description = description;
+      this.context = context;
     }
 
     public CommandHandler(String usage, String description) {
@@ -171,7 +173,9 @@ public class CliClient extends ViewClient {
       return description;
     }
 
-    public Optional<ClientContext> getContext() {}
+    public Optional<ClientContext> getContext() {
+      return Optional.ofNullable(context);
+    }
   }
 
   private final List<CommandHandler> commandHandlers = new LinkedList<>();
