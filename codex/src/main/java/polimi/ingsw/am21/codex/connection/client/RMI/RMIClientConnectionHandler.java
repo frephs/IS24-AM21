@@ -280,11 +280,12 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public void heartBeat() {
+  public void heartBeat(Runnable successful, Runnable failed) {
     try {
       rmiConnectionHandler.heartBeat(this.getSocketID());
+      successful.run();
     } catch (RemoteException e) {
-      this.messageNotSent();
+      failed.run();
     }
   }
 }

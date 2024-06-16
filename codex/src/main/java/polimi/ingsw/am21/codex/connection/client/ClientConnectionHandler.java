@@ -155,7 +155,7 @@ public abstract class ClientConnectionHandler {
   /**
    * Sends a heart beat to the server
    */
-  public abstract void heartBeat();
+  public abstract void heartBeat(Runnable successful, Runnable failed);
 
   /*
    * -----------------
@@ -167,11 +167,27 @@ public abstract class ClientConnectionHandler {
 
   public abstract void disconnect();
 
+  private void disconnected() {
+    connectionStatus =
+      GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
+  }
+
   public Boolean isConnected() {
     return (
       this.connectionStatus ==
       GameController.UserGameContext.ConnectionStatus.CONNECTED
     );
+  }
+
+  public Boolean isLosing() {
+    return (
+      this.connectionStatus ==
+      GameController.UserGameContext.ConnectionStatus.LOSING
+    );
+  }
+
+  public Boolean isConnectedOrLosing() {
+    return this.isConnected() || this.isLosing();
   }
 
   public void messageNotSent() {
@@ -192,9 +208,10 @@ public abstract class ClientConnectionHandler {
 
   private void failedHeartBeat() {
     this.consecutiveFailedHeartBeats++;
-    if (this.consecutiveFailedHeartBeats >= 8) {
-      this.disconnect();
-    } else if (this.consecutiveFailedHeartBeats >= 5) {
+    if (this.consecutiveFailedHeartBeats >= 10) {
+      this.disconnected();
+      this.getView().postNotification(Notification.CONNECTION_FAILED);
+    } else if (this.consecutiveFailedHeartBeats >= 2) {
       this.connectionStatus =
         GameController.UserGameContext.ConnectionStatus.LOSING;
       this.getView()
@@ -214,7 +231,13 @@ public abstract class ClientConnectionHandler {
       @Override
       public void run() {
         try {
-          if (isConnected()) heartBeat();
+          if (isConnectedOrLosing()) heartBeat(
+            () -> {
+              connectionStatus =
+                GameController.UserGameContext.ConnectionStatus.CONNECTED;
+            },
+            () -> failedHeartBeat()
+          );
         } catch (Exception e) {
           failedHeartBeat();
         }

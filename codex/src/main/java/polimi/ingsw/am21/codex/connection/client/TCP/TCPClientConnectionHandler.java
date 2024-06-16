@@ -151,7 +151,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     });
   }
 
-  private void send(ClientMessage message) {
+  private void send(
+    ClientMessage message,
+    Runnable successful,
+    Runnable failed
+  ) {
     synchronized (outputStream) {
       if (!waiting) {
         try {
@@ -170,11 +174,18 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           }
         } catch (IOException e) {
           connectionFailed(e);
+          failed.run();
+          return;
         }
       } else {
         this.getView().postNotification(Notification.ALREADY_WAITING);
       }
     }
+    successful.run();
+  }
+
+  private void send(ClientMessage message) {
+    this.send(message, () -> {}, () -> {});
   }
 
   private View getView() {
@@ -346,8 +357,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public void heartBeat() {
-    send(new HeartBeatMessage(this.getSocketID()));
+  public void heartBeat(Runnable successful, Runnable failed) {
+    send(new HeartBeatMessage(this.getSocketID()), successful, failed);
   }
 
   public GameState getGameState() {
