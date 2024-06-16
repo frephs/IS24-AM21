@@ -1,14 +1,7 @@
 package polimi.ingsw.am21.codex.view.GUI;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javafx.application.Application;
@@ -109,22 +102,22 @@ public class Gui extends Application implements View {
   // TODO track what user is being displayed
 
   public void testLobby() {
-    //    this.postNotification(NotificationType.CONFIRM, "Attento");
-    //    this.postNotification(NotificationType.WARNING, "Attento");
-    //    this.postNotification(NotificationType.ERROR, "Attento");
-    //    this.postNotification(NotificationType.UPDATE, "Attento");
-    //    this.postNotification(NotificationType.RESPONSE, "Attento");
+    this.postNotification(NotificationType.CONFIRM, "Attento");
+    this.postNotification(NotificationType.WARNING, "Attento");
+    this.postNotification(NotificationType.ERROR, "Attento");
+    this.postNotification(NotificationType.UPDATE, "Attento");
+    this.postNotification(NotificationType.RESPONSE, "Attento");
 
-    //    displayException(new RuntimeException("Test exception"));
+    displayException(new RuntimeException("Test exception"));
 
-    //    this.drawAvailableGames(
-    //        new ArrayList<>(
-    //          Collections.nCopies(
-    //            52,
-    //            new GameEntry(UUID.randomUUID().toString().substring(0, 3), 2, 4)
-    //          )
-    //        )
-    //      );
+    this.drawAvailableGames(
+        new ArrayList<>(
+          Collections.nCopies(
+            52,
+            new GameEntry(UUID.randomUUID().toString().substring(0, 3), 2, 4)
+          )
+        )
+      );
 
     LocalPlayer p1 = new LocalPlayer(UUID.randomUUID());
     LocalPlayer p2 = new LocalPlayer(UUID.randomUUID());
@@ -155,13 +148,13 @@ public class Gui extends Application implements View {
           p4
         )
       );
-    //    CardsLoader cards = new CardsLoader();
-    //
-    //    Card cardFromId = cards.getCardFromId(96);
-    //    this.drawObjectiveCardChoice(
-    //        new CardPair<>(cardFromId, cards.getCardFromId(101))
-    //      );
-    //    this.drawStarterCardSides(cards.getCardFromId(32));
+    CardsLoader cards = new CardsLoader();
+
+    Card cardFromId = cards.getCardFromId(96);
+    this.drawObjectiveCardChoice(
+        new CardPair<>(cardFromId, cards.getCardFromId(101))
+      );
+    this.drawStarterCardSides(cards.getCardFromId(32));
   }
 
   public void testGame() {
@@ -282,7 +275,7 @@ public class Gui extends Application implements View {
    * @param fxmlPath the path of the template to load in the #contant container
    * @param containerId the container to lead the scene in (e.g. #content, #side-content)
    * */
-  public void loadSceneFXML(String fxmlPath, String containerId) {
+  private void loadSceneFXML(String fxmlPath, String containerId) {
     // load the lobby menu
     Node content;
     try {
@@ -298,6 +291,10 @@ public class Gui extends Application implements View {
     ((Pane) scene.lookup(containerId)).getChildren().add(content);
   }
 
+  /**
+   * Loads an image view element from the provided path
+   * @param path the path of the image to load
+   */
   private ImageView loadImage(String path) {
     return new ImageView(
       new Image(
@@ -308,6 +305,46 @@ public class Gui extends Application implements View {
     );
   }
 
+  /**
+   * Loads an image view element from the provided GuiElement
+   * @param element the GuiElement to load the image for
+   * @return an Image view element containing the GuiElement provided
+   */
+  private ImageView loadImage(GuiElement element) {
+    if (element != null) return loadImage(element.getImagePath());
+    else return new ImageView();
+  }
+
+  /**
+   * Loads an image view that represents the provided card
+   * @param card the card to load the image for
+   * @param side the side of the card to load
+   * @return an Image view element containing the card image
+   */
+  private ImageView loadCardImage(Card card, CardSideType side) {
+    return switch (side) {
+      case FRONT -> loadImage(card.getImagePath(CardSideType.FRONT));
+      case BACK -> loadImage(card.getImagePath(CardSideType.BACK));
+    };
+  }
+
+  /**
+   * Helper method that wraps the given imageview with a border and padding.
+   * @param imageView the image view to wrap
+   */
+  private static HBox wrapAndBorder(ImageView imageView) {
+    HBox image = new HBox(imageView);
+    HBox.setMargin(image, new Insets(0, 10, 10, 10));
+    image.setPadding(new Insets(10, 10, 10, 10));
+    image.getStyleClass().add("bordered");
+    image.setAlignment(Pos.CENTER);
+    return image;
+  }
+
+  /**
+   * Helper method that draws the game window, after the splash screen has been
+   * shown and the client is connected
+   */
   private void drawGameWindow() {
     try {
       Parent root = FXMLLoader.load(
@@ -330,32 +367,11 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * @return an Image view element containing the GuiElement provided
-   */
-  private ImageView loadImage(GuiElement element) {
-    if (element != null) return loadImage(element.getImagePath());
-    else return new ImageView();
-  }
-
-  /**
-   * Loads an image view that represents the provided card
-   */
-  private ImageView loadCardImage(Card card, CardSideType side) {
-    return switch (side) {
-      case FRONT -> loadImage(card.getImagePath(CardSideType.FRONT));
-      case BACK -> loadImage(card.getImagePath(CardSideType.BACK));
-    };
-  }
-
-  private static HBox wrapAndBorder(ImageView imageView) {
-    HBox image = new HBox(imageView);
-    HBox.setMargin(image, new Insets(0, 10, 10, 10));
-    image.setPadding(new Insets(10, 10, 10, 10));
-    image.getStyleClass().add("bordered");
-    image.setAlignment(Pos.CENTER);
-    return image;
-  }
-
+   * Posts a push notification to the user
+   * @param notificationType the type of notification to display
+   * (CONFIRM, WARNING, ERROR, UPDATE, RESPONSE)
+   * @param message the message to display
+   * */
   @Override
   public void postNotification(
     NotificationType notificationType,
@@ -373,6 +389,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Posts a push notification to the user
+   * @param notification the notification to display
+   * */
   @Override
   public void postNotification(Notification notification) {
     postNotification(
@@ -387,8 +407,14 @@ public class Gui extends Application implements View {
     String[] messages,
     Colorable colorable,
     int colorableIndex
-  ) {}
+  ) {
+    // TODO implement or remove from view and leave in cli.
+  }
 
+  /**
+   * Displays an exception to the user
+   * @param exception the exception to display
+   * */
   @Override
   public void displayException(Exception exception) {
     try {
@@ -399,6 +425,9 @@ public class Gui extends Application implements View {
     }
   }
 
+  /**
+   * Helper method to load a game entry Gui Element from the provided game
+   * */
   private static Node loadGameEntry(GameEntry game) throws IOException {
     Node gameEntry = FXMLLoader.load(
       Objects.requireNonNull(Gui.class.getResource("LobbyMenuGameEntry.fxml"))
@@ -417,6 +446,10 @@ public class Gui extends Application implements View {
     return gameEntry;
   }
 
+  /**
+   * Draw the available games in the lobby menu
+   * @param games the list of games to display
+   * */
   @Override
   public void drawAvailableGames(List<GameEntry> games) {
     Platform.runLater(() -> {
@@ -488,13 +521,17 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw a list of available token colors for the player to choose from
+   * @param tokenColors the list of token colors to display
+   * */
   @Override
   public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyToken.fxml", "#content");
 
       ((Text) scene.lookup("#window-title")).setText(
-          "Lobby of the game " //+ client.getGameId() //TODO add game name
+          "Lobby of the game " + localModel.getLocalLobby().getGameId()
         );
 
       Node tokenContainer = scene.lookup("#token-container");
@@ -526,6 +563,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the current status of the lobby and its connected players alongside the lobby window
+   * @param players the list of players to display
+   * */
   @Override
   public void drawLobby(Map<UUID, LocalPlayer> players) {
     Platform.runLater(() -> {
@@ -552,6 +593,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the leaderboard of the game, display the players and their points
+   * @param players the list of players to display
+   * */
   @Override
   public void drawLeaderBoard(List<LocalPlayer> players) {
     Platform.runLater(() -> {
@@ -584,6 +629,10 @@ public class Gui extends Application implements View {
   }
 
   // TODO maybe implement this in the cli
+  /**
+   * Draw a map of the given player available resources and objects to the playerBoard
+   * @param player the player whose resources are to be drawn
+   * */
   public void drawResourcesAndObjects(LocalPlayer player) {
     Platform.runLater(() -> {
       HBox container = (HBox) scene.lookup("#player-resources-objects");
@@ -645,6 +694,9 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the scene for the player to chose a nickname
+   * */
   @Override
   public void drawNicknameChoice() {
     Platform.runLater(() -> {
@@ -660,6 +712,9 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the scene of the game's playerboard playerBoard and
+   * */
   @Override
   public void drawPlayerBoards(List<LocalPlayer> players) {
     // TODO handle other players (switch button etc)
@@ -711,6 +766,10 @@ public class Gui extends Application implements View {
       .ifPresent(player -> drawHand(player.getHand()));
   }
 
+  /**
+   * Draw the placed cards of the given player
+   * @param player the player whose playerboard is to be drawn
+   * */
   @Override
   public void drawPlayerBoard(LocalPlayer player) {
     Platform.runLater(() -> {
@@ -761,6 +820,9 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * @return a runnable that handles the click event on a cell
+   * */
   private Runnable getCellClickHandler(Position position) {
     return () -> {
       if (selectedHandIndex != null && visibleHandSide != null) {
@@ -770,12 +832,15 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Returns a supplier that determines whether the playerboard should be clickable or not
+   * @return a supplier that determines whether the playerboard should be clickable or not
    */
   private Supplier<Boolean> getCellPlacementActive() {
     return () -> (this.selectedHandIndex != null && canPlayerPlaceCards());
   }
 
+  /**
+   * @return a boolean that determines whether the player can place cards
+   * */
   private boolean canPlayerPlaceCards() {
     return (
       !this.hasPlacedCard &&
@@ -788,6 +853,9 @@ public class Gui extends Application implements View {
     // TODO && displayedUser == player
   }
 
+  /**
+   * Toggle the hand side of the player: display the front or back of cards
+   * */
   private void toggleHandSide() {
     if (visibleHandSide == CardSideType.FRONT) {
       visibleHandSide = CardSideType.BACK;
@@ -798,6 +866,11 @@ public class Gui extends Application implements View {
     drawHand(lastHand);
   }
 
+  /**
+   * Helper method to draw the given available position in which cards can be placed in
+   * @param positions the set of positions to draw
+   * @param gridPane the gridpane in which the cards are placed
+   * */
   private void drawAvailablePositions(
     Set<Position> positions,
     GridPane gridPane
@@ -815,6 +888,11 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Helper method to draw the given forbidden position in which cards cannot be placed in
+   * @param positions the set of forbidden positions to draw
+   * @param gridPane the gridpane in which the cards are placed
+   * */
   private void drawForbiddenPositions(
     Set<Position> positions,
     GridPane gridPane
@@ -832,18 +910,35 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Update the decks images after a card has been drawn from a player
+   * @param card the pair of cards to choose from
+   * @param deck the deck from which the cards are drawn
+   * */
   @Override
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
     hasPlacedCard = false;
   }
 
+  /**
+   * Draw the decks image after a card has been drawn from a player
+   * @param deck
+   * */
   @Override
   public void drawCardDrawn(DrawingDeckType deck) {
     // TODO
     hasPlacedCard = false;
   }
 
+  /**
+   * Draw a card in the playerboard
+   * @param card the card to draw
+   * @param side the side of the card placed
+   * @param position the position in which the card is placed
+   * @param availablePositions the set of available positions in which the next cards can be placed
+   * @param forbiddenPositions the set of forbidden positions in which the next cards cannot be placed
+   * */
   @Override
   public void drawCardPlacement(
     Card card,
@@ -889,6 +984,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the playerboard and gameboard scenes after every player has finished in the lobby
+   * @param players the list of players of the current game
+   * */
   @Override
   public void drawGame(List<LocalPlayer> players) {
     Platform.runLater(() -> {
@@ -902,20 +1001,24 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the gameboard contents.
+   * */
   //TODO maybe implement this into the cli
-
   public void drawGameBoard() {
     drawPairs(
       localModel.getLocalGameBoard().getResourceCards(),
       localModel.getLocalGameBoard().getGoldCards()
     );
     //TODO draw decks
-    //TODO draw common objective cards
     drawCommonObjectiveCards(
       localModel.getLocalGameBoard().getCommonObjectives()
     );
   }
 
+  /**
+   * Display the game is over and the final leaderboard
+   * */
   @Override
   public void drawGameOver(List<LocalPlayer> players) {
     // TODO
@@ -923,9 +1026,13 @@ public class Gui extends Application implements View {
 
   @Override
   public void drawCard(Card card) {
-    // TODO
+    // TODO remove this from view and move it to cli
   }
 
+  /**
+   * Draws the hand of the player
+   * @param hand the hand of the player
+   * */
   @Override
   public void drawHand(List<Card> hand) {
     Platform.runLater(() -> {
@@ -971,6 +1078,11 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draws the pairs of resource and gold cards which the player can draw from
+   * @param resourceCards the pair of resource cards
+   * @param goldCards the pair of gold cards
+   * */
   @Override
   public void drawPairs(
     CardPair<Card> resourceCards,
@@ -1069,6 +1181,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the two objective cards the player can choose from in the lobby
+   * @param cardPair the pair of cards to choose from
+   * */
   @Override
   public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
     Platform.runLater(() -> {
@@ -1104,6 +1220,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the sides of the starter card the player can choose from in the lobby
+   * @param cardId the card to choose the side from
+   * */
   @Override
   public void drawStarterCardSides(Card cardId) {
     Platform.runLater(() -> {
@@ -1140,11 +1260,18 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the winner of the game
+   * */
   @Override
   public void drawWinner(String nickname) {
     // TODO
   }
 
+  /**
+   * Load the chat scene for chat messages to be drawn in.
+   * @param players to whom a message can be sent.
+   * */
   public void drawChat(List<LocalPlayer> players) {
     loadSceneFXML("Chat.fxml", "#side-content-bottom");
     // add recipients to chat-recipient combo box
@@ -1186,6 +1313,9 @@ public class Gui extends Application implements View {
       );
   }
 
+  /**
+   * Draw a chat message in the chat window
+   * */
   @Override
   public void drawChatMessage(ChatMessage message) {
     Platform.runLater(() -> {
@@ -1248,6 +1378,10 @@ public class Gui extends Application implements View {
     });
   }
 
+  /**
+   * Draw the common objective cards in the gameboard
+   * @param cardPair the pair of cards to draw
+   * */
   @Override
   public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
     VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
@@ -1286,6 +1420,10 @@ public class Gui extends Application implements View {
     cardsContainer.getChildren().add(images.get(1));
   }
 
+  /**
+   * Draw the player objective card in its player board along side its hand
+   * @param card the objective card to draw
+   * */
   @Override
   public void drawPlayerObjective(Card card) {
     VBox vbox = (VBox) scene.lookup("#player-objective-card");
@@ -1298,11 +1436,17 @@ public class Gui extends Application implements View {
     vbox.getChildren().add(image);
   }
 
+  /**
+   * Draw the card decks in the gameboard
+   * @param firstResourceCard the first resource card to draw
+   * @param firstGoldCard the first gold card to draw
+   * */
   @Override
   public void drawCardDecks(
     PlayableCard firstResourceCard,
     PlayableCard firstGoldCard
   ) {
+    //TODO put this in drawGameBoard
     HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
     HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
 

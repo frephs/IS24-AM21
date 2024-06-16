@@ -390,6 +390,7 @@ public class LocalModelContainer
       token,
       2
     );
+    // TODO only do this if you're in the lobby
     view.drawAvailableTokenColors(lobby.getAvailableTokens());
   }
 
