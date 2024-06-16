@@ -29,11 +29,10 @@ public class CliClient extends ViewClient {
   Scanner scanner;
   Cli cli;
   ClientConnectionHandler client;
-  private final LocalModelContainer localModel;
 
   public CliClient() {
-    cli = Cli.getInstance();
-    localModel = new LocalModelContainer(cli);
+    super(new LocalModelContainer(Cli.getInstance()));
+    cli = (Cli) localModel.getView();
     scanner = new Scanner(System.in);
   }
 

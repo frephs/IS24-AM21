@@ -11,7 +11,8 @@ public class GuiClient extends ViewClient {
   Gui gui;
 
   public GuiClient() {
-    gui = new Gui();
+    super(new LocalModelContainer(new Gui()));
+    gui = (Gui) localModel.getView();
     localModel = new LocalModelContainer(gui);
   }
 
