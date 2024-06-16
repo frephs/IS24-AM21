@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
@@ -182,7 +183,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void connect() {
-    while (!connected) {
+    boolean connected = false;
+    int attempts = 0;
+    while (!connected && attempts++ < 10) {
       try {
         this.socket = new Socket(host, port);
         this.socket.setTcpNoDelay(true);
@@ -191,6 +194,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         connectionFailed(e);
       }
     }
+    if (!connected) return;
     try {
       assert socket != null;
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
