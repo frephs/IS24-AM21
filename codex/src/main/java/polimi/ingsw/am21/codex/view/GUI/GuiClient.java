@@ -1,13 +1,9 @@
 package polimi.ingsw.am21.codex.view.GUI;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.stage.Stage;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
-import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class GuiClient extends ViewClient {
@@ -19,6 +15,7 @@ public class GuiClient extends ViewClient {
     localModel = new LocalModelContainer(gui);
   }
 
+  @Override
   public void start(ConnectionType connectionType, String address, int port) {
     new Thread(() -> Application.launch(gui.getClass())).start();
 

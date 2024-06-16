@@ -2,10 +2,10 @@ package polimi.ingsw.am21.codex.model.Cards.Playable;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Card;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
@@ -133,6 +133,7 @@ public class PlayableCard extends Card {
    * -----------------
    * */
 
+  @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     String frontSideString = frontSide.cardToAscii(cardStringMap);
     String backSideString = backSide.cardToAscii(cardStringMap);

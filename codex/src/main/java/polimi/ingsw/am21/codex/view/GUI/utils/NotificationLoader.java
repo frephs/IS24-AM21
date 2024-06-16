@@ -27,7 +27,7 @@ public class NotificationLoader {
 
   private static Stage notificationStage;
 
-  private Queue<NotificationLayout> notifications = new LinkedList<>();
+  private final Queue<NotificationLayout> notifications = new LinkedList<>();
 
   public NotificationLoader(Stage notificationStage) {
     NotificationLoader.notificationStage = notificationStage;

@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Corner;
+import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
+import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
@@ -61,6 +63,7 @@ public abstract class PlayableSide implements CliCard {
    * -----------------
    * */
 
+  @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // corners
     corners.forEach(

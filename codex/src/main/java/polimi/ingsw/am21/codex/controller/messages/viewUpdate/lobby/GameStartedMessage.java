@@ -5,8 +5,6 @@ import java.util.List;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
-import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 
 public class GameStartedMessage extends ViewUpdatingMessage {
 
