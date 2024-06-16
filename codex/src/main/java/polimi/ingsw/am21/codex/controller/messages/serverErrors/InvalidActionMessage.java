@@ -12,10 +12,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
-import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class InvalidActionMessage extends ErrorMessage {
 
@@ -53,6 +50,12 @@ public class InvalidActionMessage extends ErrorMessage {
       case INVALID_NEXT_TURN_CALL -> new InvalidNextTurnCallException();
       case GAME_NOT_READY -> new GameNotReadyException();
       case INVALID_GET_OBJECTIVE_CARDS_CALL -> new InvalidGetObjectiveCardsCallException();
+      case GAME_ALREADY_EXISTS -> GameAlreadyExistsException.fromExceptionNotes(
+        notes
+      );
+      case INVALID_GAME_NAME -> InvalidGameNameException.fromExceptionNotes(
+        notes
+      );
       case GAME_NOT_FOUND -> GameNotFoundException.fromExceptionNotes(notes);
       case PLAYER_NOT_FOUND -> PlayerNotFoundException.fromExceptionNotes(
         notes

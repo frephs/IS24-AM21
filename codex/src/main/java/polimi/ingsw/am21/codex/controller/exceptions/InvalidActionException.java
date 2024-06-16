@@ -13,6 +13,8 @@ public class InvalidActionException extends Exception {
     INVALID_NEXT_TURN_CALL,
     GAME_NOT_READY,
     INVALID_GET_OBJECTIVE_CARDS_CALL,
+    GAME_ALREADY_EXISTS,
+    INVALID_GAME_NAME,
     GAME_NOT_FOUND,
     PLAYER_NOT_FOUND,
     INCOMPLETE_LOBBY_PLAYER,
@@ -42,6 +44,8 @@ public class InvalidActionException extends Exception {
         case INVALID_NEXT_TURN_CALL -> "Invalid next turn call";
         case INVALID_GET_OBJECTIVE_CARDS_CALL -> "Invalid get objective card call";
         case GAME_NOT_READY -> "Game not ready";
+        case GAME_ALREADY_EXISTS -> "Game already exists";
+        case INVALID_GAME_NAME -> "Invalid game name";
         case GAME_NOT_FOUND -> "Game not found";
         case PLAYER_NOT_FOUND -> "Player not found";
         case INCOMPLETE_LOBBY_PLAYER -> "Incomplete lobby player";
