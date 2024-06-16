@@ -55,7 +55,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   private final ExecutorService threadManager = Executors.newCachedThreadPool();
 
   private Boolean waiting = false;
-  private Integer debouncerCount = 0;
 
   private final Queue<Message> incomingMessages;
 
@@ -145,8 +144,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   private void send(ClientMessage message) {
     synchronized (outputStream) {
-      if (!waiting || debouncerCount >= 2) {
-        debouncerCount = 0;
+      if (!waiting) {
         try {
           if (socket.isConnected() && !socket.isClosed()) {
             outputStream.writeObject(message);
@@ -173,7 +171,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         }
       } else {
         this.getView().postNotification(Notification.ALREADY_WAITING);
-        debouncerCount++;
       }
     }
   }

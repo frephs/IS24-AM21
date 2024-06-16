@@ -93,6 +93,7 @@ public class TCPServerConnectionHandler implements Runnable {
     this.socket = socket;
     try {
       this.socket.setKeepAlive(true);
+      this.socket.setTcpNoDelay(true);
     } catch (SocketException e) {
       throw new RuntimeException("Failed to enable TCP/IP Keep-Alive", e);
     }
