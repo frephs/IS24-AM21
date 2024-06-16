@@ -26,9 +26,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class RMIClientConnectionHandler
   extends ClientConnectionHandler
@@ -90,8 +88,12 @@ public class RMIClientConnectionHandler
     try {
       rmiConnectionHandler.createGame(gameId, this.socketID, players);
       this.localModel.gameCreated(gameId, 0, players);
-    } catch (RemoteException | EmptyDeckException e) {
+    } catch (
+      RemoteException | EmptyDeckException | InvalidGameNameException e
+    ) {
       throw new RuntimeException(e);
+    } catch (GameAlreadyExistsException e) {
+      this.localModel.gameAlreadyExists(gameId);
     }
   }
 
@@ -144,10 +146,12 @@ public class RMIClientConnectionHandler
       // TODO
       this.localModel.gameCreated(gameId, 0, numberPlayers);
       this.localModel.playerJoinedLobby(gameId, this.getSocketID());
-    } catch (EmptyDeckException e) {
+    } catch (EmptyDeckException | InvalidGameNameException e) {
       throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (GameAlreadyExistsException e) {
+      this.localModel.gameAlreadyExists(gameId);
     }
   }
 

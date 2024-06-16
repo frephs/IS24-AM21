@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -29,7 +30,6 @@ public class DummyView implements View {
     this.id = id;
   }
 
-  @Override
   public void postNotification(
     NotificationType notificationType,
     String message
@@ -93,7 +93,9 @@ public class DummyView implements View {
   public void drawCardPlacement(
     Card card,
     CardSideType side,
-    Position position
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {}
 
   @Override
@@ -138,4 +140,19 @@ public class DummyView implements View {
       )
     );
   }
+
+  @Override
+  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {}
+
+  @Override
+  public void drawPlayerObjective(Card card) {}
+
+  @Override
+  public void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  ) {}
+
+  @Override
+  public void drawNicknameChoice() {}
 }

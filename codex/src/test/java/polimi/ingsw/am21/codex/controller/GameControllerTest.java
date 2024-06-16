@@ -13,6 +13,8 @@ import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidGameNameException;
 
 class GameControllerTest {
 
@@ -24,7 +26,8 @@ class GameControllerTest {
   }
 
   @Test
-  void getGames() throws EmptyDeckException {
+  void getGames()
+    throws EmptyDeckException, GameAlreadyExistsException, InvalidGameNameException {
     assertEquals(0, controller.getGames().size());
 
     controller.createGame("test", 4);
@@ -36,7 +39,7 @@ class GameControllerTest {
 
   @Test
   void getCurrentSlots()
-    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException {
+    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId1 = "test1";
     final String gameId2 = "test2";
 
@@ -52,7 +55,8 @@ class GameControllerTest {
   }
 
   @Test
-  void getMaxSlots() throws EmptyDeckException {
+  void getMaxSlots()
+    throws EmptyDeckException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId1 = "test1";
     final String gameId2 = "test2";
 
@@ -65,7 +69,8 @@ class GameControllerTest {
   }
 
   @Test
-  void getGame() throws EmptyDeckException {
+  void getGame()
+    throws EmptyDeckException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId = "test";
 
     assertThrows(GameNotFoundException.class, () -> controller.getGame(gameId));
@@ -79,7 +84,7 @@ class GameControllerTest {
 
   @Test
   void removePlayerFromLobby()
-    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException {
+    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 
@@ -100,7 +105,8 @@ class GameControllerTest {
   }
 
   @Test
-  void joinLobby() throws EmptyDeckException {
+  void joinLobby()
+    throws EmptyDeckException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 
@@ -115,7 +121,7 @@ class GameControllerTest {
 
   @Test
   void lobbySetTokenColor()
-    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException {
+    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId = "test";
     final UUID playerId1 = UUID.randomUUID();
     final UUID playerId2 = UUID.randomUUID();
@@ -186,7 +192,7 @@ class GameControllerTest {
 
   @Test
   void lobbySetNickname()
-    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException {
+    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 
@@ -204,7 +210,7 @@ class GameControllerTest {
 
   @Test
   void lobbyChooseObjective()
-    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException {
+    throws EmptyDeckException, GameAlreadyStartedException, LobbyFullException, GameNotFoundException, GameAlreadyExistsException, InvalidGameNameException {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 

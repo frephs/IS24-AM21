@@ -40,16 +40,18 @@ classDiagram
 
 class ResourceType {
     <<Enumeration>>
-    PLANT_KINGDOM
-    ANIMAL_KINGDOM
-    FUNGI_KINGDOM
-    INSECT_KINGDOM
+    PLANT
+    ANIMAL
+    FUNGI
+    INSECT
 
     +fromString(String resourceTypeStr) String
     +has(Object value) boolean
     +isResourceType(String value) boolean
     +acceptVisitor(COrnerCOntentVisitor visitor) void
     +acceptVisitor(CornerContentVisitor visitor, int arg) void
+    +getColor() Color
+    +getImagePath() String
 }
 
 class ObjectType {
@@ -58,11 +60,13 @@ class ObjectType {
     INKWELL
     MANUSCRIPT
 
-    +fromString(String str) String
+    +fromString(String str) ObjectType
     +has(Object value) boolean
     +isObjectType(String value) boolean
     +acceptVisitor(CornerContentVisitor visitor) void
     +aceeptVisitor(CornerContentVisitor visitor, int arg) void
+    +getColor() Color
+    +getImagePath() String
 }
 
 class CardSideType {
@@ -82,6 +86,7 @@ class CornerContentType {
     <<Interface>>
     acceptVisitor(CornerContentVisitor visitor) void
     acceptVisitor(CornerContentVisitor visitor, int arg) void
+    getColor() Color
 }
 CornerContentType <|.. ObjectType : Realization
 CornerContentType <|.. ResourceType : Realization
@@ -90,6 +95,8 @@ class CornerContentVisitor {
     <<Interface>>
     visit(ObjectType object, int diff) void
     visit(ResourceType resource, int diff) void
+    visit(ObjectType object, int diff)
+    visit(ResourceType resource, int diff)
 }
 
 CornerContentVisitor <|.. MapUpdater: Realization
@@ -107,6 +114,8 @@ class CornerPosition {
     -index: int
     CornerPosition(int index)
     getOppositeCornerPosition() CornerPosition
+    +getIndex() int
+    +getOppositeCornerPosition() CornerPosition
 }
 
 class EdgePosition{
@@ -157,11 +166,15 @@ class ObjectiveCard {
     %% return points * objective.evaluate()
     getEvaluator() Function~PlayerBoard pb; Integer points~ 
     %% implements the abstract method in Card
+
+    cardToString() String
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
 }
+Card <|.. ObjectiveCard : realization
 
 class Objective {
     <<Abstract>>
-    getEvaluator() Function~PlayerBoard pb; Integer points~ *
+    getEvaluator() Function~PlayerBoard pb; Integer points, Integer~ *
 }
 ObjectiveCard "1" *-- "1" Objective: composition
 Card <|.. ObjectiveCard: realization
@@ -172,6 +185,10 @@ class GeometricObjective {
     GeometricObjective(HashMap ~AdjacentPostion, ResourceType~ geometry)
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer points; Integer~
+
+    cardToString() String
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
 }
 Objective <|.. GeometricObjective : realization
 %% ResourceType "3..n" <-- "n" GeometricObjective: dependency
@@ -184,6 +201,9 @@ class CountingObjective {
     CountingObjective(HashMap~ResourceType; int~ resources, HashMap~ObjectType; int~ objects)
    
     getEvaluator() BiFunction~PlayerBoard pb; Integer points, Integer~
+
+    cardToString() String
+    cardToAscii() String
 
 }
 Objective <|.. CountingObjective : realization
@@ -211,19 +231,24 @@ class PlayableCard {
     SetCoveredCorners(int coveredCorners) void
     
     getEvaluator() Function~PlayerBoard pb; Integer points~
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
+    cardToString() String
 }
 Card <|.. PlayableCard: realization
 %% CardSideType "0..1" <-- "n" PlayableCard: dependency
 
 class PlayableSide {
     <<Abstract>>
-    -corners: HashMap~CornerPosition, Corner~
+    -corners: HashMap~CornerPosition, Corner~CornerContentType~~
 
-    getCorners() HashMap~CornerPosition, Corner~
-    setCorner(CornerPosition position, ResourceType resource)
-    setCorner(CornerPosition position, ObjectType object)
+    getCorners() HashMap~CornerPosition, Corner~CornerContentType~~
+    setCorner(CornerPosition position, Optional ~CornerContentType~ content)
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~ *
     getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
+
+    cardtoAscii(HashMap~Integer, String~ cardStringMap) String
+    cardTostring() String
 }
 %% CornerPosition "1..4" <-- "n" PlayableSide: dependency
 %% ResourceType "0..4" <-- "n" PlayableSide: dependency
@@ -236,6 +261,10 @@ class PlayableBackSide {
 
     getPermanentResources() List~ResourceType~
     getEvaluator() BiFunction~PlayerBoard pb, Integer, Integer~
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap)
+
+    cardToString()
 }
 PlayableSide <|.. PlayableBackSide: realization
 PlayableCard "1" *-- "1"  PlayableBackSide: composition
@@ -243,7 +272,7 @@ PlayableCard "1" *-- "1"  PlayableBackSide: composition
 
 class PlayableFrontSide {
     <<Abstract>>
-    getEvaluator() BiFunction~PlayerBoard pb; Integer CoveredCorners; Integer points~ *
+   PlayableFrontSide()
 
 }
 PlayableSide <-- PlayableFrontSide: inheritance
@@ -253,6 +282,10 @@ class StarterCardFrontSide {
     StarterCardFrontSide()
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
+
+    cardToString() String
+
+    cardToAsci(HashMap~Integer, String~ cardStringMap) String
 }
 PlayableFrontSide <|.. StarterCardFrontSide: realization
 
@@ -263,8 +296,22 @@ class ResourceCardFrontSide {
 
     getEvaluator() BiFunction~PlayerBoard pb; Integer coveredCorners; Integer points~
 
+    cardToAscii(HashMap~Integer, String~) String
+
+    cardToString() String
+
 }
 PlayableFrontSide <|.. ResourceCardFrontSide: realization
+
+class DrawingCardSource {
+        <<Enumeration>>
+    CardPairFirstCard
+    CardPairSecondCard
+    Deck
+    
+    toString() String
+}
+
 
 class GoldCardFrontSide {
     -placementCondition: List~ResourceType~
@@ -278,6 +325,9 @@ class GoldCardFrontSide {
 
     getPlaceabilityChecker() Function~Playerboard pb, boolean isPlaceable~
     %%overrides the method in PlayableSide
+
+    cardToAscii(HashMap~Integer, String~ cardStringMap) String
+    cardToString() String
 }
 ResourceCardFrontSide <|-- GoldCardFrontSide: inheritance
 %% ResourceType "1..5" <-- "n" GoldCardFrontSide: dependency
@@ -417,7 +467,9 @@ class TokenColor{
     YELLOW
     BLACK
 
-    +toString() String
+    +getColor() Color
+    +fromString(String color) TokenColor
+    +getImagePath() String
 }
 
 
@@ -431,83 +483,133 @@ class Lobby{
     %% counts how many players you can still add to the game
 
     %% arraylist of available tokens
-    -tokens: TokenColor[4]
-    Lobby(int players)
 
-    setNickname(UUID socketId, String nickname) void
-    setToken(UUID socketId, TokenColor token) void
+    Lobby(int maxplayers)
+    Lobby()
+
+    getRemainingPlayerSlots() int
+    getPlayersCount() int
+
+    addPlayer(UUID socketId, CardPair~ObjectiveCard~ objectiveCards, PlayableCard starterCard) void
+
+    removePlayer(UUID socketId) Pair~CardPair~ObjectiveCard~, PlayableCard~ ~~throws~~ PlayerNotFoundExcpetion
+
+    setNickname(UUID socketId, String nickname) void ~~throws~~ PlayerNotFoundExcpetion, NicknameAlreadyTakenException
+
+    setToken(UUID socketId, TokenColor tokenColor) void ~~throws~~ PlayerNotFOundExcpetion, TokenAlreadyTakenExcpetion
+
+    setObjectiveCard(UUID socketId, Boolean firstObjectiveCard) void ~~PlayerNotFoundException~~
+
+    finalizePlayer(UUID socketId, CardSideType cardSide, List~PlayableCard~ hand) Player ~~throws~~ PlayerNotFoundException, IncompletePlayerBuilderException, IllegalCardSideChoiceException, IllegalPlacingPositionException
+
+    getPlayerObjectuveCards(UUID socketId) Optional~CardPair~ObjectiveCard~~
+
+    containsSocketID(UUID socketId) boolean
+    getPlayerNickname(UUID socketId) Optional~String~ ~~throws~~ PlayerNotFoundException
+    getPlayerTokenColor(UUID socketId) Optional~TokenColor~ ~~throws~~ PlayerNotFoundException
+
+    getAvailableColors() Set~TokenColor~
+    getPlayerInfo() Map~UUID socketId, Pair~String, TokenColor~~
+
+    getStarterCard(UUID socketId) PlayableCard ~~throws~~ PlayerNotFoundException
+}
+
+PlayerNotFoundExcpetion <-- Lobby: throws
+NicknameAlreadyTakenException <-- Lobby: throws
+TokenAlreadyTakenException <-- Lobby: throws
+IncompletePlayerBuilderException <-- Lobby: throws
+IllegalCardSideChoiceException <-- Lobby: throws
+IllegalPlacingPositionExcpetion <-- Lobby: throws
 
 
-    %% sets the objectiveCard in the player builder, draws the player hand from the respective decks and returns the player object
-    finalizePlayer(UUID socketId, ObjectiveCard objectiveCard) Player
 
+class LobbyFullExcpetion {
+    +LobbyFullException
+}
+
+class IllegalCardSideChoiceException {
+    +IllegalCardSideChoiceException()
+}
+
+class IllegalPlacingPositionException {
+    +IllegalPlacingPositionException()
+    +IllegalPlacingPositionExcpetion(String message)
+}
+
+
+class NicknameAlreadyTakenException {
+    +NicknameALreadyTakenException(String nickname)
+
+    +getNickname() String
 }
 
 class Game {
-
-    -players: Player[2..4]
+    -WINNING_POINTS: ~final~ int
+    -players: List~Player~
     -gameBoard: GameBoard
     -lobby: Lobby
-    -state: GameState[0..1]
+    -state: GameState
+    -RemainingRounds: Integer
+    -currentPlayer: Integer
+    -maxPlayer: Integer
+    -chat: Chat
 
-    %% Initially set to Optional.empty() if not empty it means the game is will be played [remainingRounds] rounds
-    %% eg.
-    %% if you the second player while playing reaches 20 points we will set the remaining rounds to 2
-    %% everytime the round ends we will decrement the remaining rounds if the value is 0 we will end the game
-    -remainingRounds: Optional~int~
-
-    %% returns the current game lobby
-    +getLobby(): Lobby
-
-    %% index of the player list
-    -currentPlayer: int
-
-    %% constructor: creates all the game assets. initially "state" is set to GAME_INIT 
     Game(int players)
+    Game(int players, JSONArray cards)
 
-    %% initializes the game by extracting the cards from the decks and setting the state to PLAYING
+    getLobby() Lobby
     start() void
 
-    %% extracts the card pairs to be placed in the common area of the GameBoard
-    setGameboardCommonCards() void ~~throws~~ GameOverException
-
-    %% useful getters
-    getGameState() GameState
-
-    %% returns player state of the nickname based on the current player index
+    drawObjectiveCardPair() CardPair~ObjectiveCard~
+    getState() GameState
     getPlayerState(String nickname) PlayerState
-
-    %% returns the scoreboard
-    getScoreBoard() HashMap~String, int~
-
-    %% returns the current player
+    getScoreBoard() Map~String, Integer~
     getCurrentPlayer() Player
-
-    %% method that will be called by the lobby when the player building process is finalized
+    getPlayers() List~Player~
+    getPlayerIds() List~String~
+    getCurrentPlayerIndex() Integer
     addPlayer(Player player) void
+    isGameOver() boole
+    setGameOver() void
+    getRemainingRounds() Optional~Integer~
+    isResourceDeckEmpty() boole
+    isGoldDeckEmpty() boole
+    areDecksEmpty() boole
 
-    %% changes the current player index after checking if the current player has 20+ points we set remainingRounds to 2
-    nextTurn() void ~~throws~~ GameOverException
+    nextTurn(DrawingCardSource drawingSource, DrawingDeckType, deckType, BiConsumer~Integer, Integer~ drawCardsCallback) void ~~throws~~ GameOverException, EmptyDeckExcpetion, InvalidNextTurnCallExcpetion
+    nextTurn(DrawingCardSource drawingSource, DrawingDeckType deckType) void ~~throws~~ GameOverExcpetion, EmptyDeckExcpetion, InvalidNextTurnCallExcpetion
+    nextTurn() void ~~throws~~ GameOverExcpetion, InvalidNextTurnCallExcpetion
 
-    %% returns true if the game state is GAME_OVER
-    getGameOver() boolean
+    getPlayerOrder() List~String~
+    drawStarterCard() PlayableCard ~~throws~~ EmptyDeckExcpetion
+    insertObjectiveCard(ObjectiveCard objectiveCard)
+    insertStarterCard(PlayableCard starterCard)
+    isLastRound() boole
+    drawHand() List~PlayableCard~ ~~throws~~ EmptyDeckExcpetion
 
-    %% sets the game state to GAME_OVER
-    setGameOver() void ~~throws~~ GameOverException
+    getPlayersCount() Integer
+    getMaxPlayer() Integer
+    getPlayersSpotsLeft() Integer
+    getChat() Chat
+    getGameBoard() GameBoard
+}
 
-    %% returns the remaining rounds including the current one
-    getRemainingRounds() Optional<int>
+GameOverExcpetion <-- Game: throws
+EmptyDeckExcpetion <-- Game: throws
+InvalidNextTurnCallExcpetion <-- Game: throws
 
-    isResourceDeckEmpty() boolean
-    isGoldDeckEmpty() boolean
 
-    areDecksEmpty() boolean
+class GameManger {
+    -games: Map~String, Game~
 
-    %% draw a card from the respective deck and adds it to the player's hand
-    drawCurrentPlayerCardFromDeck(DeckType deckType) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
+    GameManger()
 
-    %% draw a card from the common board and adds it to the player hands, if the first is true the first card in the pair is drawn, otherwise the second
-    drawCurrentPlayerCardFromPair(DeckType deckType, boolean first) PlayableCard ~~throws~~ EmptyDeckException, GameOverException
+    getGames() Set~String~
+    getCurrentSlots() Map~String, Integer~
+    getMaxSlots() Map~String, Integer~
+    getGame(String gameName) Optional~Game~
+    createGame(String gameName, Integer players) Game
+    deleteGame(String gameName) void 
 }
 
 
@@ -522,7 +624,6 @@ Game --|> EmptyDeckException : composition
 class GameState {
     <<Enumeration>>
     GAME_INIT
-    %%WAITING
     PLAYING
     GAME_OVER
 }
@@ -551,27 +652,24 @@ class Player {
     -points: int
     -token: TokenColor
     -board: PlayerBoard
+    -socketId: UUID
+    -cardPlacedThisTurn: boole
 
     %% the player constructor takes the bulder, that is used to get necessary information to build the player
     %% and the board that is initialized inside the build() function drawing and setting the necessary cards in hand
-    Player(PlayerBuilder builder)
+    Player(PlayerBuilder builder, UUID socketId)
 
-    getNickname() String
-    getToken() TokenColor
-    getPoints() int
-    getBoard() PlayerBoard
-
-    %% increments player points
-    incrementPlayerPoints(int points) void
-
-    %% receive card and put it in the player's hand
-    receiveDrawnCard(PlayableCard card) void
-
-    %% calls the player board placeCard method with the cardIndex as parameter and updates the player's points calling the getEvaluator method of the played card 
-    placeCard(int cardIndex, CardSidesType side, Position position) void
-
-    %% evaluate takes objective card (calls the getEvaluator method of the objective card) and increments the player points. called by Game.setGameOver() which will pass the player's secret objective and the game common objectives. 
-    evaluate(ObjectiveCard objectiveCard) void
+    getSocketId() UUID
+    +getNickname() String
+    +getBoard() PlayerBoard
+    +getToken() TokenColor
+    +getPoints() int
+    +hasPlacedCardThisTurn() boole
+    +toggleCardPlacedThisTurn() void
+    +drawCard(PlayableCard card) void
+    +placeCard(int cardIndex, CardSideType side, Position position) PlayableCard
+    +evaluate(ObjectiveCard objectiveCard) void
+    +evaluateSecretObjective() void
 }
 
 Player *-- PlayerBuilder : composition
@@ -581,19 +679,28 @@ class PlayerBuilder {
     -token: TokenColor
     -objectiveCard: ObjectiveCard
     -starterCard: PlayableCard
-    -hand: PlayableCard[3]
+    -cards: List~PlayableCard~
+
+    PlayerBuilder(PlayableCard card)
 
     setNickname(String nickname) PlayerBuilder
-    setToken(TokenColor tokenColor) PlayerBuilder
+    getNickname() Optional~String~
+    setTokenColor(TokenColor token) PlayerBuilder
+    getTokenColor() Optional~TokenColor~
+    getHand() Optional~List~PlayableCard~~
+    setHand(List~PlayableCard~ cards) PlayerBuilder
+    setStarterCard(PlayableCard starteCard) PlayerBuilder
+    setStarterCardSide(CardSideType side) void
     setObjectiveCard(ObjectiveCard objectiveCard) PlayerBuilder
-    setStarterCard(PlayableCard starterCard) PlayerBuilder
-    setHand(PlayableCard[3] hand) PlayerBuilder
-    build() Player
+    build(UUID socketId) Player
+    getStarterCard() PlayableCard
 }
 
+IllegalCardSideChoiceExcpetion <-- PlayerBoard: throws
+IllegalPlacingPositionExcpetion <-- PlayerBoard: throws
+
 class PlayerBoard {
-    %%FIXME: type of cards
-    -cards: PlayableCard[3]
+    -hand: List~PlayableCard~
     -objectiveCard: ObjectiveCard
 
     -playedCards: HashMap~Position, PlayableCard~
@@ -603,29 +710,40 @@ class PlayerBoard {
     -forbiddenSpots: Set~Position~
     %% the available spots for the player to place a card on the board
 
-    -resources: HashMap~ResourceType, int~
-    -objects: HashMap~Objects, int~
-    %% the resources and objects the player has on the board
+    -resources: HashMap~ResourceType, Integer~
+    -objects: HashMap~Objects, Integer~
 
-    PlayerBoard(PlayableCard[3] cards, PlayableCard starterCard, objectiveCard: ObjectiveCard)
-    %% constructor: initializes the player board with the player hand, the starter card in (0,0) and the objective card
+    mapUpdater: MapUpdater
 
-    receiveDrawnCard(PlayableCard card) void
-    placeCard(int playedCardIndex, cardSidesType side, Position position) void
-    %% sets the played side in the card object, puts the card in the played cards hashmap and updates the available spots and player's resources and objects
+    availableSpots: Set~Position~
+    forbiddenSpots: Set~Position~
+    
+    PlayerBoard(List~PlayableCard~ hand, PlayableCard starterCard, ObjectiveCard objectiveCard) ~~throws~~ IllegalCardSideChoiceException, IllegalPlacingPositionException
 
-    getPlayedCards() HashMap~Position, PlayableCard~
+    getObjectiveCard() ObjectiveCard
+    getHand() List~PlayableCard~
+    getPlaceableCardSides() List~PlayableSide~
 
+    drawCard(PlayableCard card)
+    placeCard(PlayableCard playedCard, CardSdieType playedSideType, Position position)
+
+    updateResourcesAndObjects(PlayableCard playedCard, Position position)
+    updateResourcesAndObjectsMaps(Corner~T~ corner, int delta)
+    updateAvailableSpots(PlayableSide playableSide, Position position)
+    getObjects() Map~ObjectType, Integer~
+    getResources() Map~ResourceType, Integer~
+    getPlayedCards() Map~Position, PlayableCard~
     getAvailableSpots() Set~Position~
     getForbiddenSpots() Set~Position~
-
-    updateResourcesandObjects(PlayableCard playedCard, Position position) void
-    %% updates the player's resources and objects after a card has been placed on the board
-
-    updateAvailableSpots(Position position) void
-    %% updats the list of available spots in which card can be placed
-
 }
+
+class MapUpdater {
+    MapUpdater()
+    visit(ObjectType object, int delta) void
+    visit(ResourceType resource, int delta) void
+}
+CornerContentVisitor <.. MapUpdater : realization
+PlayerBoard *-- MapUpdater : contains
 
 %%class PlayerActions {
 %%    <<Interface>>
@@ -650,6 +768,8 @@ class DrawingDeckType {
     <<Enumeration>>
     RESOURCE
     GOLD
+
+    toString() String
 }
 
 class DrawingSourceType {
@@ -679,8 +799,9 @@ class GameBoard {
     -resourceDeck: Deck~PlayableCard~
     -resourceCards: CardPair~PlayableCard~
     -objectiveCards: CardPair~ObjectiveCard~
-    -allCards: List~Card~
 
+    GameBoard fromJSON(JSONArray cards)
+    GameBoard(CardsLoader loader)
     %% the game board has two constructors, one with parameters and one without
     %% the constructor with parameters is used to restore a game from a save file
     GameBoard(CardPair~Goldcards~ goldCards, CardPair~PlayableCard~ resourceCards, \nCardPair~ObjectiveCard~ objectiveCards, \nDeck~PlayableCard~ starterDeck, \nDeck~ObjectiveCard~ objectiveDeck, \nDeck~PlayableCard~ resourceDeck, \nDeck~GoldCard~ goldDeck)
@@ -688,23 +809,45 @@ class GameBoard {
     GameBoard(List~PlayableCard~ goldCardsList,\n \nList~PlayableCard~ starterCardsList, \nList~ObjectiveCard~ objectiveCardsList, \nList~PlayableCard~ resourceCardsList)
 
     drawGoldCardFromDeck() PlayableCard ~~throws~~ EmptyDeckException
-    drawGoldCardFromPair(boolean first) PlayableCard ~~throws~~ EmptyDeckException
-    getGoldCards() CardPair~PlayableCard~
-    getGoldCardsLeft() int
-
-    drawStarterCard() PlayableCard ~~throws~~ EmptyDeckException
-    getStarterCardsLeft() int
-
-    drawObjectiveCardFromDeck() ObjectiveCard ~~throws~~ EmptyDeckException
-    drawObjectiveCardFromPair(boolean first) ObjectiveCard ~~throws~~ EmptyDeckException
+    +drawCard() PlayableCard
+    +drawCard(DrawingCardSource drawingSource, DrawingDeckType deckType) PlayableCard ~~throws~~ EmptyDeckException
+    +getGoldCard() CardPair~PlayableCard~
+    +getResourceCards() CardPair~PlayableCard~
+    +goldCardsLeft() int
+    +drawStarterCardFromDeck() PlayableCard ~~EmptyDeckExcpetion~~
+    +starteCardsLeft() int
+    drawObjectiveCardFromDeck() ObjectiveCard ~~EmptyDeckExcpetion~~
     getObjectiveCards() CardPair~ObjectiveCard~
-    getObjectiveCardsLeft() int
-
-    drawResourceCardFromDeck() PlayableCard ~~throws~~ EmptyDeckException
-    drawResourceCardFromPair(boolean first) PlayableCard ~~throws~~ EmptyDeckException
-    getResourceCards() CardPair~PlayableCard~
-    getResourceCardsLeft() int
+    insertObjectiveCard(ObjectiveCard card) void
+    insertStarterCard(PlayableCard card) void
+    objectiveCardsLeft() int
+    drawResourceCardFromDeck() PlayableCard ~~throws~~ EmptyDeckExcpetion
+    drawResourceCardFromDeck(int n) List~PlayableCard~
+    drawResourceCardFromPair(Boolean first) PlayableCard~EmptyDeckExcpetion~
+    resourceCardsLeft() int
+    drawObjectiveCardPair() cardPair~ObjectiveCard~ ~~throws~~ EmptyDeckException
 }
+
+EmptyDeckExcpetion <-- GameBoard: throws
+
+class PlayerNotFoundExcpetion {
+    +PlayerNotFoundException(UUID playerId)
+    +PlayerNotFoundExcpetion(String username)
+}
+
+class TokenAlreadyTakenException {
+    +TokenALreadyTakenExcpetion(TokenColor color)
+
+    getTokenColor() TokenColor
+}
+
+class IncompletePlayerBuilderException {
+    +IncompletePlayerBuilderException(String message)
+
+    +checkPlayerBuilder(Player.PlayerBuilder playerBuilder)
+}
+
+
 
 class EmptyDeckException {
     +EmptyDeckException()

@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import polimi.ingsw.am21.codex.client.localModel.LocalLobby;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
@@ -29,10 +30,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessag
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameFullMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.GameNotFoundMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.NicknameAlreadyTakenMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.TokenColorAlreadyTakenMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
@@ -157,7 +155,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               getView()
                 .postNotification(
                   NotificationType.WARNING,
-                  "Sending request. "
+                  "Fetching resources \n(" +
+                  message
+                    .getType()
+                    .toString()
+                    .toLowerCase()
+                    .replace("get_", "")
+                    .replace("_", " ") +
+                  "). "
                 );
             }
           }
@@ -252,6 +257,15 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
+    LocalLobby lobby = localModel.getLocalLobby();
+    lobby
+      .getPlayers()
+      .get(localModel.getSocketID())
+      .setObjectiveCard(
+        first
+          ? lobby.getAvailableObjectives().getFirst()
+          : lobby.getAvailableObjectives().getSecond()
+      );
     this.send(new SelectObjectiveMessage(first, localModel.getGameId()));
   }
 
@@ -332,8 +346,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
-      getView()
-        .postNotification(NotificationType.CONFIRM, "Response received. ");
     }
 
     switch (message.getType()) {
@@ -350,6 +362,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       // Game
       case GAME_STATUS -> handleMessage((GameStatusMessage) message);
       // Server Errors
+      case GAME_ALREADY_EXISTS -> handleMessage(
+        (GameAlreadyExistsMessage) message
+      );
       case GAME_ALREADY_STARTED -> handleMessage(
         (GameAlreadyStartedMessage) message
       );
@@ -446,6 +461,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    */
 
   //game
+  public void handleMessage(GameAlreadyExistsMessage message) {
+    localModel.gameAlreadyExists(message.getGameId());
+  }
 
   public void handleMessage(InvalidCardPlacementMessage message) {
     localModel.invalidCardPlacement(message.getReason());
@@ -518,7 +536,13 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(GameStartedMessage message) {
-    localModel.gameStarted(message.getGameId(), message.getPlayerIds());
+    localModel.gameStarted(
+      message.getGameId(),
+      message.getPlayerIds(),
+      message.getResourceCardPairIds(),
+      message.getGoldCardPairIds(),
+      message.getCommonObjectivesIds()
+    );
   }
 
   public void handleMessage(PlayerJoinedLobbyMessage message) {

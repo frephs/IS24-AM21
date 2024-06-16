@@ -205,9 +205,13 @@ public class Player {
         "You tried to place a card which either doesn't exist or is not in your hand"
       );
     }
-
-    board.placeCard(playedCard, side, position);
-    this.points += playedCard.getEvaluator().apply(board);
+    try {
+      board.placeCard(playedCard, side, position);
+      this.points += playedCard.getEvaluator().apply(board);
+    } catch (Exception e) {
+      cardPlacedThisTurn = false;
+      throw e;
+    }
     return playedCard;
   }
 

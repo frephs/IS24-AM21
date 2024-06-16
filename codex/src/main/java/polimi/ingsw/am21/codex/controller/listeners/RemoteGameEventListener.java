@@ -2,7 +2,11 @@ package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -41,7 +45,13 @@ public interface RemoteGameEventListener extends Remote {
     CardSideType starterSide
   ) throws RemoteException;
 
-  void gameStarted(String gameId, List<String> players) throws RemoteException;
+  void gameStarted(
+    String gameId,
+    List<String> players,
+    Pair<Integer, Integer> goldCardPairIds,
+    Pair<Integer, Integer> resourceCardPairIds,
+    Pair<Integer, Integer> commonObjectivesIds
+  ) throws RemoteException;
 
   /**
    * @param playerId The player that has just finished their turn

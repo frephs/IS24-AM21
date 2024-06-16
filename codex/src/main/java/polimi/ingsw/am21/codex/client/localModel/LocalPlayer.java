@@ -20,6 +20,7 @@ public class LocalPlayer {
   private List<Card> hand;
   private Card objectiveCard;
   // TODO get objective common objective card from the server
+  // TODO keep track of the order in which cards are being placed (needed for GUI)
 
   private final Map<ResourceType, Integer> resources = new EnumMap<>(
     ResourceType.class
@@ -28,8 +29,8 @@ public class LocalPlayer {
     ObjectType.class
   );
 
-  private Set<Position> availableSpots;
-  private Set<Position> forbiddenSpots;
+  private Set<Position> availableSpots = new HashSet<>();
+  private Set<Position> forbiddenSpots = new HashSet<>();
 
   private final Map<Position, Pair<Card, CardSideType>> playedCards =
     new HashMap<>();

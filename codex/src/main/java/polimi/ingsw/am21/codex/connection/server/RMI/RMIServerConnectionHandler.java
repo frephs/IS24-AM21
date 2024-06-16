@@ -23,9 +23,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public interface RMIServerConnectionHandler extends Remote {
   Set<String> getGames() throws RemoteException;
@@ -62,7 +60,7 @@ public interface RMIServerConnectionHandler extends Remote {
     throws RemoteException, GameNotFoundException, IncompletePlayerBuilderException, EmptyDeckException, GameNotReadyException, IllegalCardSideChoiceException, IllegalPlacingPositionException, GameAlreadyStartedException;
 
   void createGame(String gameId, UUID socketID, Integer players)
-    throws RemoteException, EmptyDeckException;
+    throws RemoteException, EmptyDeckException, GameAlreadyExistsException, InvalidGameNameException;
 
   void deleteGame(String gameId) throws RemoteException;
 

@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards.Playable;
 
-import java.util.Map;
+import java.util.HashMap;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
@@ -36,7 +36,7 @@ public class ResourceCardFrontSide
    * */
 
   @Override
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     if (!cardStringMap.containsKey(5) && points > 0) {
       cardStringMap.put(5, StringUtils.center(String.valueOf(points), 5, ' '));
     }

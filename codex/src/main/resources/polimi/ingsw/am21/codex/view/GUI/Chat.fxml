@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="264.0" prefWidth="533.0" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox alignment="CENTER" prefHeight="23.0" prefWidth="512.0" stylesheets="@Style.css">
+         <children>
+            <Label alignment="CENTER" styleClass="subtitle" stylesheets="@Style.css" text="Chat" textAlignment="CENTER" />
+         </children>
+      </HBox>
+      <VBox alignment="CENTER" prefHeight="116.0" prefWidth="505.0">
+         <opaqueInsets>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </opaqueInsets>
+         <children>
+            <HBox prefHeight="133.0" prefWidth="512.0" styleClass="chat-message-container" stylesheets="@Style.css">
+               <children>
+                  <ScrollPane id="chat-message-container" hbarPolicy="NEVER" prefHeight="65.0" prefWidth="488.0">
+                     <content>
+                        <VBox id="chat-message-container-box" prefWidth="462.0" />
+                     </content></ScrollPane>
+               </children>
+            </HBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </VBox>
+      <HBox alignment="CENTER">
+         <children>
+            <ChoiceBox id="chat-recipient" prefHeight="39.0" prefWidth="146.0" styleClass="hbox">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </ChoiceBox>
+            <TextField id="chat-input" prefHeight="39.0" prefWidth="363.0" promptText="Your chat message" />
+            <Button id="chat-send-button" mnemonicParsing="false" prefHeight="0.0" prefWidth="98.0" stylesheets="@Style.css" text="Send">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" />
+   </padding>
+   <styleClass>
+      <String fx:value="bordered" />
+      <String fx:value="container" />
+   </styleClass>
+</VBox>

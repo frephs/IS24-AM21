@@ -354,7 +354,7 @@ public class Game {
   }
 
   public Boolean isLastRound() {
-    return this.remainingRounds == 1;
+    return remainingRounds != null && this.remainingRounds == 1;
   }
 
   public List<PlayableCard> drawHand() throws EmptyDeckException {
@@ -385,5 +385,9 @@ public class Game {
 
   public Chat getChat() {
     return chat;
+  }
+
+  public GameBoard getGameBoard() {
+    return gameBoard;
   }
 }

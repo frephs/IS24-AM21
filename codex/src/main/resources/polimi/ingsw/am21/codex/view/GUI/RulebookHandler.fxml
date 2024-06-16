@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="window" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="polimi.ingsw.am21.codex.view.GUI.utils.RulebookHandler">
+   <children>
+      <Button fx:id="NextPageButton" layoutX="527.0" layoutY="338.0" mnemonicParsing="false" onMouseClicked="#handleNextPage" text="Next" />
+      <Button fx:id="previousPageButton" layoutX="14.0" layoutY="338.0" mnemonicParsing="false" onMouseClicked="#handlePreviousPage" text="Previous" />
+      <HBox fx:id="pageContainer" layoutX="35.0" layoutY="31.0" prefHeight="290.0" prefWidth="521.0">
+         <children>
+            <ImageView fx:id="leftPage" fitHeight="290.0" fitWidth="521.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </HBox>
+      <Button fx:id="closeButton" layoutX="541.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#closeRulebook" text="x" />
+   </children>
+</AnchorPane>

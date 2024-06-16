@@ -1,10 +1,12 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.function.Function;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
-public abstract class Card implements CliCard {
+public abstract class Card implements CliCard, GuiElement {
 
   /**
    * A unique identifier for the card
@@ -30,4 +32,16 @@ public abstract class Card implements CliCard {
    * returns the points of the card.
    */
   public abstract Function<PlayerBoard, Integer> getEvaluator();
+
+  @Override
+  public String getImagePath() {
+    return getImagePath(CardSideType.FRONT);
+  }
+
+  public String getImagePath(CardSideType sideType) {
+    return switch (sideType) {
+      case FRONT -> "cards/front/" + String.format("%03d", id) + ".png";
+      case BACK -> "cards/back/" + String.format("%03d", id) + ".png";
+    };
+  }
 }

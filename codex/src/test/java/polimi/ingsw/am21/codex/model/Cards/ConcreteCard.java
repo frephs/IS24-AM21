@@ -23,7 +23,7 @@ class ConcreteCard extends Card {
     return "";
   }
 
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // TODO: Implement TUI method
     return "";
   }

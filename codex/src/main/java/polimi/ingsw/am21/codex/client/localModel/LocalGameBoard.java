@@ -13,6 +13,7 @@ public class LocalGameBoard {
 
   private CardPair<Card> goldCards;
   private CardPair<Card> resourceCards;
+  private CardPair<Card> commonObjectives;
 
   private Card secretObjective;
   private Chat chat = new Chat();
@@ -108,5 +109,13 @@ public class LocalGameBoard {
 
   public Chat getChat() {
     return chat;
+  }
+
+  public void setCommonObjectives(CardPair<Card> objectiveCardPair) {
+    this.commonObjectives = objectiveCardPair;
+  }
+
+  public CardPair<Card> getCommonObjectives() {
+    return commonObjectives;
   }
 }

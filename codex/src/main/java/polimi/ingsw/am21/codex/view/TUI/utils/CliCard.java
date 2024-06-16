@@ -1,6 +1,6 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
-import java.util.Map;
+import java.util.HashMap;
 
 public interface CliCard {
   String cardToString();
@@ -10,7 +10,7 @@ public interface CliCard {
    * @return The rendered ASCII string
    */
   default String cardToAscii() {
-    return cardToAscii(Map.of());
+    return cardToAscii(new HashMap<>());
   }
 
   /**
@@ -18,10 +18,10 @@ public interface CliCard {
    * @param cardStringMap Maps the position of the item to the corresponding string to render inside the card
    * @return The rendered ASCII string
    */
-  String cardToAscii(Map<Integer, String> cardStringMap);
+  String cardToAscii(HashMap<Integer, String> cardStringMap);
 
-  static String playableCardToAscii(Map<Integer, String> cardStringMap) {
-    String cardString =
+  static String playableCardToAscii(HashMap<Integer, String> cardStringMap) {
+    return (
       "┌───" +
       (cardStringMap.containsKey(0) ? "┬" : "─") +
       "─────" +
@@ -74,8 +74,7 @@ public interface CliCard {
       (cardStringMap.containsKey(3) ? "┴" : "─") +
       "─────" +
       (cardStringMap.containsKey(2) ? "┴" : "─") +
-      "───┘ ";
-
-    return cardString;
+      "───┘ "
+    );
   }
 }

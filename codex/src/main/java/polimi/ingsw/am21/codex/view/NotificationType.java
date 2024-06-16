@@ -20,4 +20,14 @@ public enum NotificationType implements Colorable {
       case CONFIRM -> Color.GREEN;
     };
   }
+
+  public String getStyleClass() {
+    return switch (this) {
+      case WARNING -> "warning";
+      case ERROR -> "error";
+      case RESPONSE -> "response";
+      case UPDATE -> "update";
+      case CONFIRM -> "confirm";
+    };
+  }
 }
