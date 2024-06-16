@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -157,6 +158,8 @@ public abstract class ClientConnectionHandler {
    */
   public abstract void heartBeat(Runnable successful, Runnable failed);
 
+  public abstract void sendChatMessage(ChatMessage message);
+
   /*
    * -----------------
    * CONNECTION HANDLING
@@ -257,5 +260,12 @@ public abstract class ClientConnectionHandler {
     if (localModel.getAvailableObjectives() == null) {
       getObjectiveCards();
     }
+  }
+
+  /**
+   * @return local model for testing purposes
+   * */
+  LocalModelContainer getLocalModel() {
+    return localModel;
   }
 }

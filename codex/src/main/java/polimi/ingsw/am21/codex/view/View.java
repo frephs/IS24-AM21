@@ -9,7 +9,9 @@ import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
@@ -56,7 +58,13 @@ public interface View {
    */
   void drawCardDrawn(DrawingDeckType deck);
 
-  void drawCardPlacement(Card card, CardSideType side, Position position);
+  void drawCardPlacement(
+    Card card,
+    CardSideType side,
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
+  );
 
   void drawGame(List<LocalPlayer> players);
 
@@ -78,6 +86,22 @@ public interface View {
   void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
 
   void drawObjectiveCardChoice(CardPair<Card> cardPair);
-  void drawStarterCardSides(Card cardId);
+  void drawStarterCardSides(Card card);
   void drawWinner(String nickname);
+
+  void drawChatMessage(ChatMessage message);
+  void drawCommonObjectiveCards(CardPair<Card> cardPair);
+  void drawPlayerObjective(Card card);
+
+  /**
+   * Displays the cards decks to draw from
+   * @param firstResourceCard The first resource card (null if none)
+   * @param firstGoldCard The first gold card (null if none)
+   */
+  void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  );
+
+  void drawNicknameChoice();
 }

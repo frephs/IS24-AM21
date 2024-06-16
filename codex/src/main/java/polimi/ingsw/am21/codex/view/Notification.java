@@ -15,11 +15,19 @@ public enum Notification {
     "You are already waiting for a response"
   );
 
-  public NotificationType notificationType;
-  public String message;
+  private final NotificationType notificationType;
+  private final String message;
 
   Notification(NotificationType notificationType, String message) {
     this.notificationType = notificationType;
     this.message = message;
+  }
+
+  public NotificationType getNotificationType() {
+    return notificationType;
+  }
+
+  public String getMessage() {
+    return message;
   }
 }

@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.client.localModel.remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
@@ -13,6 +14,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -211,5 +213,11 @@ public class LocalModelGameEventListener
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException {
     listener.lobbyInfo(usersInfo);
+  }
+
+  @Override
+  public void chatMessageSent(String gameId, ChatMessage message)
+    throws RemoteException {
+    listener.chatMessageSent(gameId, message);
   }
 }

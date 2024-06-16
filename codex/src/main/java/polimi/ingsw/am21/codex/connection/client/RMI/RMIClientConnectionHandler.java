@@ -18,6 +18,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
@@ -25,6 +26,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class RMIClientConnectionHandler
   extends ClientConnectionHandler
@@ -286,6 +288,20 @@ public class RMIClientConnectionHandler
       successful.run();
     } catch (RemoteException e) {
       failed.run();
+    }
+  }
+
+  @Override
+  public void sendChatMessage(ChatMessage message) {
+    Optional<String> oGameID = this.getGameIDWithMessage();
+    if (oGameID.isEmpty()) return;
+    String gameID = oGameID.get();
+    try {
+      rmiConnectionHandler.sendChatMessage(gameID, message);
+    } catch (GameNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (RemoteException e) {
+      this.messageNotSent();
     }
   }
 }

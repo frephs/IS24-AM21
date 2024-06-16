@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.Objective;
@@ -27,7 +28,7 @@ public class ConcreteObjective extends Objective {
   }
 
   @Override
-  public String cardToAscii(Map<Integer, String> cardStringMap) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     return "";
   }
 }

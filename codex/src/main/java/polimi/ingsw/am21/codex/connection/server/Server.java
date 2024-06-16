@@ -35,4 +35,9 @@ public class Server {
     System.out.println("Starting TCP server on port " + this.tcpPort);
     this.tcpServer.start();
   }
+
+  public void stop() {
+    this.rmiServer.stop();
+    this.tcpServer.stop();
+  }
 }

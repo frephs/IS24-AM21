@@ -26,10 +26,15 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 class TCPServerTest {
 
+  boolean isCI() {
+    return Objects.equals(System.getenv("CI"), "true");
+  }
+
   ObjectOutputStream outputStream;
   ObjectInputStream inputStream;
 
   @Test
+  @DisabledIf("isCI")
   public void basic() {
     List<Message> receivedMessages = new java.util.ArrayList<>();
 

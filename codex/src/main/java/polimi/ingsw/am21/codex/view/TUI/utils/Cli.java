@@ -8,7 +8,9 @@ import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -80,7 +82,10 @@ public class Cli implements View {
 
   @Override
   public void postNotification(Notification notification) {
-    postNotification(notification.notificationType, notification.message);
+    postNotification(
+      notification.getNotificationType(),
+      notification.getMessage()
+    );
   }
 
   @Override
@@ -145,7 +150,7 @@ public class Cli implements View {
   @Override
   public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
     printUpdate(
-      "Available token colors: " +
+      "The available token colors are: " +
       tokenColors
         .stream()
         .map(token -> CliUtils.colorize(token, ColorStyle.NORMAL))
@@ -213,7 +218,7 @@ public class Cli implements View {
           player.getToken().getColor(),
           ColorStyle.NORMAL
         ) +
-        ":\n"
+        ":"
       );
       drawPlayerBoard(player);
     });
@@ -264,7 +269,9 @@ public class Cli implements View {
   public void drawCardPlacement(
     Card card,
     CardSideType side,
-    Position position
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
   ) {
     printUpdate(
       "Card " + card.getId() + " placed at " + position + " on side " + side
@@ -333,4 +340,57 @@ public class Cli implements View {
       CliUtils.colorize("Winner: " + nickname, Color.GREEN, ColorStyle.BOLD)
     );
   }
+
+  @Override
+  public void drawChatMessage(ChatMessage message) {
+    printUpdate(
+      CliUtils.colorize(
+        message.getSender(),
+        Color.PURPLE,
+        ColorStyle.BACKGROUND
+      ) +
+      "said " +
+      message.getContent()
+    );
+  }
+
+  @Override
+  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
+    printUpdate(
+      "Common objective cardPair:\n" +
+      cardPair.getFirst().cardToAscii() +
+      "\n" +
+      cardPair.getSecond().cardToAscii()
+    );
+  }
+
+  @Override
+  public void drawPlayerObjective(Card card) {
+    // TODO
+  }
+
+  @Override
+  public void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  ) {
+    if (firstResourceCard != null) {
+      printUpdate(
+        "Resource cards deck:\n" +
+        firstResourceCard.getSides().get(0).cardToAscii()
+      );
+    } else {
+      printUpdate("Resource cards deck:\n" + "Empty deck");
+    }
+    if (firstGoldCard != null) {
+      printUpdate(
+        "Gold cards deck:\n" + firstGoldCard.getSides().get(0).cardToAscii()
+      );
+    } else {
+      printUpdate("Gold cards deck:\n" + "Empty deck");
+    }
+  }
+
+  @Override
+  public void drawNicknameChoice() {}
 }

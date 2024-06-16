@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefWidth="855.0" styleClass="container" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="58.0" prefWidth="245.0" styleClass="subtitle" text="PlayerBoard" />
+      <VBox prefHeight="34.0" prefWidth="118.0" />
+      <HBox alignment="CENTER">
+         <children>
+            <VBox prefHeight="552.0" prefWidth="790.0" styleClass="bordered">
+               <children>
+                  <ScrollPane id="playerboard-scrollpane" hbarPolicy="NEVER" hvalue="0.5" pannable="true" prefHeight="324.0" prefWidth="628.0" vbarPolicy="NEVER" vvalue="0.5" VBox.vgrow="ALWAYS">
+                     <content>
+                        <GridPane>
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.halignment="CENTER">
+                                 <children>
+                                    <ImageView fitHeight="141.0" fitWidth="156.0" layoutX="-2.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </GridPane>
+                     </content>
+                  </ScrollPane>
+                  <HBox>
+                     <children>
+                        <VBox alignment="CENTER" prefHeight="53.0" prefWidth="758.0">
+                           <children>
+                              <HBox id="player-resources-objects" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" />
+                           </children>
+                        </VBox>
+                        <VBox>
+                           <children>
+                              <HBox alignment="CENTER" prefHeight="53.0" prefWidth="378.0">
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                                 <children>
+                                    <HBox>
+                                       <children>
+                                          <ChoiceBox id="player-board-choice" prefHeight="44.0" prefWidth="142.0">
+                                             <HBox.margin>
+                                                <Insets right="10.0" />
+                                             </HBox.margin>
+                                          </ChoiceBox>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="rulebookButton" mnemonicParsing="false" prefHeight="12.0" prefWidth="30.0">
+                                            <graphic>
+                                               <ImageView fitHeight="21.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
+                                                       <image>
+                                                          <Image url="@pictures/rulebook/ruleBook_image.png" />
+                                                       </image>
+                                               </ImageView>
+                                            </graphic>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="177.0" prefWidth="833.0" spacing="40.0">
+         <children>
+            <VBox prefHeight="125.0" prefWidth="402.0" spacing="5.0">
+               <children>
+                  <Label alignment="CENTER" prefHeight="44.0" prefWidth="639.0" text="Hand" />
+                  <HBox id="hand-display" prefHeight="100.0" prefWidth="809.0" spacing="10.0">
+                     <children>
+                        <VBox id="hand-0" prefHeight="104.0" prefWidth="154.0">
+                           <children>
+                              <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </VBox>
+                        <Separator minWidth="0.0" orientation="VERTICAL" prefHeight="100.0" prefWidth="0.0">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Separator>
+                        <VBox id="hand-1" minWidth="-Infinity" prefHeight="104.0" prefWidth="154.0">
+                           <children>
+                              <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </VBox>
+                        <Separator minWidth="0.0" orientation="VERTICAL" prefHeight="80.0" prefWidth="0.0" />
+                        <VBox id="hand-2" minWidth="-Infinity" prefHeight="104.0" prefWidth="154.0">
+                           <children>
+                              <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Button id="flip-hand-button" mnemonicParsing="false" prefHeight="28.0" prefWidth="56.0" text="Flip">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox layoutX="23.0" layoutY="10.0" prefHeight="184.0" prefWidth="97.0">
+               <children>
+                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="44.0" prefWidth="368.0" text="Objective Card" />
+                  <VBox id="player-objective-card" prefHeight="100.0" prefWidth="111.0">
+                     <children>
+                        <ImageView fitHeight="100.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <HBox.margin>
+                  <Insets left="30.0" />
+               </HBox.margin>
+            </VBox>
+            <HBox />
+         </children>
+      </HBox>
+   </children>
+</VBox>

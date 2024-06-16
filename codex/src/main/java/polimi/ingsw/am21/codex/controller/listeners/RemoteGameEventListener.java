@@ -3,12 +3,18 @@ package polimi.ingsw.am21.codex.controller.listeners;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -106,4 +112,7 @@ public interface RemoteGameEventListener extends Remote {
     GameController.UserGameContext.ConnectionStatus status
   ) throws RemoteException;
   void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException;
+
+  void chatMessageSent(String gameId, ChatMessage message)
+    throws RemoteException;
 }

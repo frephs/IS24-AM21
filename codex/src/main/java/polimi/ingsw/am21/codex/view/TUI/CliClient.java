@@ -16,30 +16,34 @@ import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.ViewClient;
 
-public class CliClient {
+public class CliClient extends ViewClient {
 
-  Scanner scanner = new Scanner(System.in);
-  Cli cli = Cli.getInstance();
+  Scanner scanner;
+  Cli cli;
   ClientConnectionHandler client;
+  private final LocalModelContainer localModel;
 
-  private final LocalModelContainer localModel = new LocalModelContainer(cli);
+  public CliClient() {
+    cli = Cli.getInstance();
+    localModel = new LocalModelContainer(cli);
+    scanner = new Scanner(System.in);
+  }
 
   private LocalModelContainer.ClientContextContainer getClientContextContainer() {
     return localModel.getClientContextContainer();
   }
 
+  @Override
   public void start(ConnectionType connectionType, String address, int port) {
-    if (connectionType == ConnectionType.TCP) {
-      client = new TCPClientConnectionHandler(address, port, localModel);
-    } else {
-      client = new RMIClientConnectionHandler(address, port, localModel);
-    }
+    super.start(connectionType, address, port);
 
     cli.postNotification(
       NotificationType.CONFIRM,
@@ -104,6 +108,11 @@ public class CliClient {
               );
               cli.displayException(e);
             }
+          } else {
+            cli.postNotification(
+              NotificationType.WARNING,
+              "The command is not available in the current context"
+            );
           }
         } else {
           cli.postNotification(
@@ -125,7 +134,6 @@ public class CliClient {
 
     private final String usage;
     private final String description;
-    private final ClientContext context;
 
     public CommandHandler(
       String usage,
@@ -134,7 +142,6 @@ public class CliClient {
     ) {
       this.usage = usage;
       this.description = description;
-      this.context = context;
     }
 
     public CommandHandler(String usage, String description) {
@@ -164,9 +171,7 @@ public class CliClient {
       return description;
     }
 
-    public Optional<ClientContext> getContext() {
-      return Optional.ofNullable(context);
-    }
+    public Optional<ClientContext> getContext() {}
   }
 
   private final List<CommandHandler> commandHandlers = new LinkedList<>();
@@ -178,7 +183,7 @@ public class CliClient {
       this.getClientContextContainer();
 
     commandHandlers.add(
-      new CommandHandler("exit", "Exit the program") {
+      new CommandHandler("exit", "Exit the program", ClientContext.MENU) {
         @Override
         public void handle(String[] command) {
           cli.postNotification(NotificationType.CONFIRM, "Closing...");
@@ -189,7 +194,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("reconnect", "Connect to the server") {
+      new CommandHandler(
+        "reconnect",
+        "Connect to the server",
+        ClientContext.ALL
+      ) {
         @Override
         public void handle(String[] command) {
           client.connect();
@@ -199,10 +208,15 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("help", "Display available commands") {
+      new CommandHandler(
+        "help",
+        "Display available commands",
+        ClientContext.ALL
+      ) {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
+          ArrayList<String> contexts = new ArrayList<>();
           ArrayList<String> descriptions = new ArrayList<>();
           commandHandlers
             .stream()
@@ -225,13 +239,17 @@ public class CliClient {
             )
             .forEach(commandHandler -> {
               usages.add(commandHandler.getUsage());
+              contexts.add(
+                commandHandler.getContext().toString().toLowerCase()
+              );
               descriptions.add(commandHandler.getDescription());
             });
           cli.postNotification(
             NotificationType.RESPONSE,
             CliUtils.getTable(
-              new String[] { "Command", "Description" },
+              new String[] { "Command", "Context", "Description" },
               usages,
+              contexts,
               descriptions
             )
           );
@@ -240,7 +258,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("list-games", "List available games") {
+      new CommandHandler(
+        "list-games",
+        "List available games",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.listGames();
@@ -249,7 +271,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("join-game <game-id>", "Join a game") {
+      new CommandHandler(
+        "join-game <game-id>",
+        "Join a game",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
@@ -274,7 +300,7 @@ public class CliClient {
       new CommandHandler(
         "leave-game",
         "Leave the current game",
-        ClientContext.ALL
+        ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -286,7 +312,8 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler(
         "create-game <game-id> <number-of-players>",
-        "Create a new game"
+        "Create a new game",
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
@@ -305,7 +332,8 @@ public class CliClient {
     commandHandlers.add(
       new CommandHandler(
         "create-game-join <game-id> <number-of-players>",
-        "Create a new game and join it."
+        "Create a new game and join it.",
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
@@ -385,6 +413,7 @@ public class CliClient {
         @Override
         public void handle(String[] command) {
           if (!List.of("1", "2").contains(command[1])) {
+            // TODO Handle invalid command
             return;
           }
           client.getObjectivesIfNull();
@@ -429,7 +458,11 @@ public class CliClient {
     );
 
     commandHandlers.add(
-      new CommandHandler("show context", "Show the client current context") {
+      new CommandHandler(
+        "show context",
+        "Show the client current context",
+        ClientContext.MENU
+      ) {
         @Override
         public void handle(String[] command) {
           cli.postNotification(
@@ -448,7 +481,41 @@ public class CliClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "show <context|playerboard|leaderboard|card|hand|objective|pairs>",
+        "chat <message>",
+        "Broadcast a message",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          client.sendChatMessage(
+            new ChatMessage(localModel.getSocketID(), command[1])
+          );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "chat <player> <message>",
+        "Send a message to a player",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          client.sendChatMessage(
+            new ChatMessage(
+              localModel.getLocalGameBoard().getPlayerNickname(),
+              command[1],
+              command[2]
+            )
+          );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "show <playerboard|leaderboard|card|hand|objective|pairs>",
         "Show game information",
         ClientContext.GAME
       ) {

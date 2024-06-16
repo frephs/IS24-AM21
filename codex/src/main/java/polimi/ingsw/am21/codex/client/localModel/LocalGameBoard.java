@@ -2,8 +2,10 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
+import polimi.ingsw.am21.codex.model.Chat.Chat;
 
 public class LocalGameBoard {
 
@@ -14,6 +16,7 @@ public class LocalGameBoard {
   private CardPair<Card> objectiveCards;
 
   private Card secretObjective;
+  private Chat chat = new Chat();
 
   private Integer currentPlayerIndex;
 
@@ -99,5 +102,9 @@ public class LocalGameBoard {
 
   public int getRemainingRounds() {
     return remainingRounds;
+  }
+
+  public Chat getChat() {
+    return chat;
   }
 }

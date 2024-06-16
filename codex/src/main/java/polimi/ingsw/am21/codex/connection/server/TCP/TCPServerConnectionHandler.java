@@ -19,6 +19,7 @@ import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
@@ -72,6 +73,7 @@ public class TCPServerConnectionHandler implements Runnable {
     this.socket = socket;
     try {
       this.socket.setKeepAlive(true);
+      this.socket.setTcpNoDelay(true);
     } catch (SocketException e) {
       throw new RuntimeException("Failed to enable TCP/IP Keep-Alive", e);
     }
@@ -138,7 +140,7 @@ public class TCPServerConnectionHandler implements Runnable {
           send(new UnknownMessageTypeMessage());
         } catch (IOException e) {
           System.err.println(
-            "IOException caught when parsing message from " +
+            "IOException caught when parsing message from client at " +
             socket.getInetAddress() +
             ". Parser is exiting.\n"
           );
@@ -224,6 +226,7 @@ public class TCPServerConnectionHandler implements Runnable {
       case GET_STARTER_CARD_SIDE -> handleMessage(
         (GetStarterCardSideMessage) message
       );
+      case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
       default -> throw new NotAClientMessageException();
     }
   }
@@ -384,6 +387,15 @@ public class TCPServerConnectionHandler implements Runnable {
 
   private void handleMessage(HeartBeatMessage message) {
     controller.heartBeat(message.getConnectionID());
+  }
+
+  public void handleMessage(SendChatMessage message) {
+    try {
+      controller.sendChatMessage(message.getGameId(), message.getMessage());
+      broadcast(message, false);
+    } catch (GameNotFoundException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /** Sends a message synchronously to the client socket */

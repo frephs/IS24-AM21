@@ -2,6 +2,8 @@ package polimi.ingsw.am21.codex.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidGameNameException;
 
 public class GameManager {
 
@@ -59,8 +61,15 @@ public class GameManager {
     return Optional.ofNullable(games.get(gameName));
   }
 
-  public Game createGame(String gameName, Integer players) {
+  public Game createGame(String gameName, Integer players)
+    throws GameAlreadyExistsException, InvalidGameNameException {
     Game newGame = new Game(players);
+    if (gameName.contains(" ")) {
+      throw new InvalidGameNameException(gameName);
+    }
+    if (games.containsKey(gameName)) {
+      throw new GameAlreadyExistsException(gameName);
+    }
     games.put(gameName, newGame);
     return newGame;
   }

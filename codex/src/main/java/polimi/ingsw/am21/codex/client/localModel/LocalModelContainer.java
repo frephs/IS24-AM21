@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
@@ -15,6 +16,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameState;
@@ -32,6 +34,13 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class LocalModelContainer
   implements GameEventListener, GameErrorListener {
+
+  /**
+   * State of the local model
+   * */
+  AtomicReference<ClientContext> state = new AtomicReference<>(
+    ClientContext.MENU
+  );
 
   /**
    * Contains the game entries
@@ -110,10 +119,23 @@ public class LocalModelContainer
     return localGameBoard;
   }
 
+  public LocalLobby getLocalLobby() {
+    return lobby;
+  }
+
   @Override
   public void unknownResponse() {
     // TODO use this
     view.postNotification(Notification.UNKNOWN_RESPONSE);
+  }
+
+  @Override
+  public void gameAlreadyExists(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game '" + gameId + "' already exists"
+    );
+    listGames();
   }
 
   @Override
@@ -148,13 +170,15 @@ public class LocalModelContainer
               )
             )
       );
-      listGames();
     }
+    listGames();
   }
 
   public void listGames() {
     //TODO make listGames use GameEntries
-    view.drawAvailableGames(menu.getGames().values().stream().toList());
+    if (state.get().equals(ClientContext.MENU)) {
+      view.drawAvailableGames(menu.getGames().values().stream().toList());
+    }
   }
 
   @Override
@@ -162,6 +186,7 @@ public class LocalModelContainer
     menu
       .getGames()
       .put(gameId, new GameEntry(gameId, currentPlayers, maxPlayers));
+    listGames();
   }
 
   @Override
@@ -192,6 +217,7 @@ public class LocalModelContainer
 
   @Override
   public void gameNotFound(String gameId) {
+    menu.getGames().remove(gameId);
     view.postNotification(
       NotificationType.ERROR,
       "Game " + gameId + " not found. "
@@ -246,18 +272,28 @@ public class LocalModelContainer
       );
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
     } else if (socketId.equals(this.socketId)) {
+      state.set(ClientContext.LOBBY);
+      getView()
+        .postNotification(
+          NotificationType.RESPONSE,
+          "You joined the lobby of the game: " + gameId
+        );
+
       lobby = new LocalLobby(gameId);
       if (!menu.getGames().containsKey(gameId)) this.listGames();
       localGameBoard = new LocalGameBoard(
         gameId,
         menu.getGames().get(gameId).getMaxPlayers()
       );
+
       addToLobby(socketId);
       this.getClientContextContainer().set(ClientContext.GAME);
       view.postNotification(
         NotificationType.RESPONSE,
         "You joined the lobby of the game: " + gameId
       );
+
+      getView().drawAvailableTokenColors(lobby.getAvailableTokens());
     } else {
       view.postNotification(
         NotificationType.UPDATE,
@@ -302,7 +338,9 @@ public class LocalModelContainer
       );
 
       lobby.getPlayers().remove(socketID);
-      view.drawLobby(lobby.getPlayers());
+      if (state.get().equals(ClientContext.LOBBY)) {
+        view.drawLobby(lobby.getPlayers());
+      }
     }
   }
 
@@ -335,6 +373,7 @@ public class LocalModelContainer
           token,
           2
         );
+      getView().drawNicknameChoice();
     } else {
       getView()
         .postNotification(
@@ -360,6 +399,8 @@ public class LocalModelContainer
       token,
       2
     );
+    // TODO only do this if you're in the lobby
+    view.drawAvailableTokenColors(lobby.getAvailableTokens());
   }
 
   /**
@@ -401,6 +442,11 @@ public class LocalModelContainer
       Optional.ofNullable(nickname).orElse(socketID.toString()) +
       " chose an objective card."
     );
+    if (this.socketId == socketID) {
+      view.drawStarterCardSides(
+        cardsLoader.getCardFromId(lobby.getStarterCardId())
+      );
+    }
   }
 
   public CardPair<Card> getAvailableObjectives() {
@@ -432,11 +478,15 @@ public class LocalModelContainer
       cardsLoader.getCardFromId(cardIdPair.getKey()),
       cardsLoader.getCardFromId(cardIdPair.getValue())
     );
-    view.drawObjectiveCardChoice(lobby.getAvailableObjectives());
+    getView().drawObjectiveCardChoice(lobby.getAvailableObjectives());
   }
 
   public void playerGetStarterCardSides(int cardId) {
-    view.drawStarterCardSides(cardsLoader.getCardFromId(cardId));
+    lobby.setStarterCardId(cardId);
+    getView()
+      .drawStarterCardSides(
+        cardsLoader.getCardFromId(lobby.getStarterCardId())
+      );
   }
 
   @Override
@@ -454,7 +504,12 @@ public class LocalModelContainer
     Integer starterCardID,
     CardSideType starterSide
   ) {
+    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
+
+    // Initialize hand
     List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
+    LocalPlayer localPlayer = lobby.getPlayers().get(socketID);
+    localPlayer.setHand(hand);
 
     Card starterCard = cardsLoader.getCardFromId(starterCardID);
 
@@ -568,7 +623,13 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       "Card " + cardId + " placed"
     );
-    view.drawCardPlacement(card, side, position);
+    view.drawCardPlacement(
+      card,
+      side,
+      position,
+      availablePositions,
+      forbiddenPositions
+    );
 
     diffMessage(
       newPlayerScore - localGameBoard.getCurrentPlayer().getPoints(),
@@ -734,6 +795,7 @@ public class LocalModelContainer
 
   @Override
   public void gameOver() {
+    state.set(ClientContext.GAME_OVER);
     view.drawGameOver(localGameBoard.getPlayers());
   }
 
@@ -778,6 +840,16 @@ public class LocalModelContainer
     lobby = null;
     localGameBoard = null;
     listGames();
+  }
+
+  @Override
+  public void chatMessageSent(String gameId, ChatMessage chatMessage) {
+    if (Objects.equals(gameId, localGameBoard.getGameId())) {
+      if (!chatMessage.getSender().equals(localGameBoard.getPlayerNickname())) {
+        localGameBoard.getChat().postMessage(chatMessage);
+        view.drawChatMessage(chatMessage);
+      }
+    }
   }
 
   @Override
@@ -912,5 +984,9 @@ public class LocalModelContainer
     } else {
       return Optional.empty();
     }
+  }
+
+  public ClientContext getState() {
+    return state.get();
   }
 }

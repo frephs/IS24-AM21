@@ -5,6 +5,7 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 public interface GameErrorListener {
   void unknownResponse();
 
+  void gameAlreadyExists(String gameId);
   void gameNotFound(String gameId);
 
   void notInLobby();

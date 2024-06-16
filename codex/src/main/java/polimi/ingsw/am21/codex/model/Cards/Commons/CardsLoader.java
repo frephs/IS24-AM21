@@ -1,16 +1,16 @@
 package polimi.ingsw.am21.codex.model.Cards.Commons;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Builder.CardBuilder;
 import polimi.ingsw.am21.codex.model.Cards.Builder.CardType;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
@@ -29,10 +29,7 @@ public final class CardsLoader {
   private List<Card> cardList = null;
 
   public CardsLoader() {
-    this(
-      "src/main/java/polimi/ingsw/am21/codex/model/Cards/Resources/cards" +
-      ".json"
-    );
+    this("/polimi/ingsw/am21/codex/model/Cards/Commons/cards.json");
     this.loadCards();
   }
 
@@ -52,12 +49,19 @@ public final class CardsLoader {
   }
 
   public CardsLoader(String path) {
-    File file = new File(path);
     try {
-      String content = new String(Files.readAllBytes(Paths.get(file.toURI())));
+      InputStream is = getClass().getResourceAsStream(path);
+      if (is == null) {
+        throw new RuntimeException("Failed loading cards json");
+      }
+      String content = new BufferedReader(
+        new InputStreamReader(is, StandardCharsets.UTF_8)
+      )
+        .lines()
+        .collect(Collectors.joining("\n"));
       this.cards = new JSONArray(content);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed loading cards json");
+    } catch (Exception e) {
+      throw new RuntimeException("Failed loading cards json", e);
     }
   }
 
@@ -83,6 +87,7 @@ public final class CardsLoader {
     this.goldCardsList.clear();
     this.objectiveCardsList.clear();
     this.loadCards();
+    loaded = true;
     starterCardsList.addAll(this.starterCardsList);
     resourceCardsList.addAll(this.resourceCardsList);
     goldCardsList.addAll(this.goldCardsList);
@@ -98,7 +103,6 @@ public final class CardsLoader {
   }
 
   public Card getCardFromId(int id) {
-    this.loadCards();
     if (cardList == null) {
       this.cardList = new ArrayList<Card>();
       cardList.addAll(resourceCardsList);
@@ -106,7 +110,7 @@ public final class CardsLoader {
       cardList.addAll(starterCardsList);
       cardList.addAll(objectiveCardsList);
     }
-    return cardList.get(id);
+    return cardList.stream().filter(c -> c.getId() == id).findFirst().get();
   }
 
   public List<PlayableCard> loadStarterCards() {
@@ -291,5 +295,14 @@ public final class CardsLoader {
         }
       }
     }
+  }
+
+  public CardPair<Card> getCardPairFromIds(
+    Pair<Integer, Integer> resourceCardPairIds
+  ) {
+    return new CardPair<>(
+      getCardFromId(resourceCardPairIds.getKey()),
+      getCardFromId(resourceCardPairIds.getValue())
+    );
   }
 }

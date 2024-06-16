@@ -5,6 +5,7 @@ import java.util.*;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
@@ -116,4 +117,7 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   @Override
   void lobbyInfo(LobbyUsersInfo usersInfo);
+
+  @Override
+  void chatMessageSent(String gameId, ChatMessage chatMessage);
 }

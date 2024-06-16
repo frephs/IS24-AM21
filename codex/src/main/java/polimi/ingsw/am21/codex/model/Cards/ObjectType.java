@@ -1,10 +1,11 @@
 package polimi.ingsw.am21.codex.model.Cards;
 
 import java.util.Arrays;
+import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
-public enum ObjectType implements CornerContentType, Colorable {
+public enum ObjectType implements CornerContentType, Colorable, GuiElement {
   QUILL,
   INKWELL,
   MANUSCRIPT;
@@ -47,5 +48,17 @@ public enum ObjectType implements CornerContentType, Colorable {
   @Override
   public Color getColor() {
     return Color.YELLOW;
+  }
+
+  @Override
+  public String getImagePath() {
+    return (
+      "objects/" +
+      switch (this) {
+        case QUILL -> "pen.png";
+        case INKWELL -> "ink.png";
+        case MANUSCRIPT -> "manuscript.png";
+      }
+    );
   }
 }

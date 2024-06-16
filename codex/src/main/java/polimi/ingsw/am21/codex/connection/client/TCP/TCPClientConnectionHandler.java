@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import polimi.ingsw.am21.codex.client.localModel.LocalLobby;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -17,6 +18,7 @@ import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -27,6 +29,7 @@ import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.InvalidActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
@@ -36,6 +39,7 @@ import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -202,6 +206,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         this.socket.setTcpNoDelay(true);
         connected = true;
       } catch (IOException e) {
+        getView().displayException(e);
         connectionFailed(e);
       }
     }
@@ -361,6 +366,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     send(new HeartBeatMessage(this.getSocketID()), successful, failed);
   }
 
+  @Override
+  public void sendChatMessage(ChatMessage message) {
+    Optional<String> oGame = this.getGameIDWithMessage();
+    if (oGame.isEmpty()) return;
+    String gameID = oGame.get();
+    this.send(new SendChatMessage(gameID, message));
+  }
+
   public GameState getGameState() {
     //TODO
     return null;
@@ -375,8 +388,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
-      getView()
-        .postNotification(NotificationType.CONFIRM, "Response received. ");
     }
 
     switch (message.getType()) {
@@ -400,7 +411,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case NOT_A_CLIENT_MESSAGE -> handleMessage(
         (NotAClientMessageMessage) message
       );
-      case INVALID_ACTION -> handleMessage((InvalidActionMessage) message);
+      case INVALID_ACTION -> handleMessage((ActionNotAllowedMessage) message);
       // View Updating Messages
       // Lobby
       case GAME_CREATED -> handleMessage((GameCreatedMessage) message);
@@ -435,6 +446,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
       case REMAINING_ROUNDS -> handleMessage((RemainingRoundsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
+      case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
+      // Init
       default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
     }
   }
@@ -625,5 +638,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   public void handleMessage(WinningPlayerMessage message) {
     localModel.winningPlayer(message.getWinnerNickname());
+  }
+
+  public void handleMessage(SendChatMessage message) {
+    localModel.chatMessageSent(message.getGameId(), message.getMessage());
   }
 }

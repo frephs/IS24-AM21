@@ -4,13 +4,13 @@ import java.util.LinkedList;
 
 public class Chat {
 
-  private final LinkedList<Message> sentMessage;
+  private final LinkedList<ChatMessage> sentMessages;
 
   public Chat() {
-    sentMessage = new LinkedList<>();
+    sentMessages = new LinkedList<>();
   }
 
-  public void postMessage(Message message) {
-    sentMessage.push(message);
+  public void postMessage(ChatMessage message) {
+    sentMessages.push(message);
   }
 }

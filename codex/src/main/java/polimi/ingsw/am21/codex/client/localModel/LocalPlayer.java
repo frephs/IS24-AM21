@@ -35,8 +35,8 @@ public class LocalPlayer {
     ObjectType.class
   );
 
-  private Set<Position> availableSpots;
-  private Set<Position> forbiddenSpots;
+  private Set<Position> availableSpots = new HashSet<>();
+  private Set<Position> forbiddenSpots = new HashSet<>();
 
   private final Map<Position, Pair<Card, CardSideType>> playedCards =
     new HashMap<>();

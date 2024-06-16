@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Position implements Serializable {
 
-  private final int x, y;
+  private final Integer x, y;
 
   public Position(int x, int y) {
     this.x = x;
@@ -14,6 +14,14 @@ public class Position implements Serializable {
   public Position() {
     this.x = 0;
     this.y = 0;
+  }
+
+  public int getX() {
+    return x;
+  }
+
+  public int getY() {
+    return y;
   }
 
   public Position computeAdjacentPosition(AdjacentPosition adjacentPosition) {
@@ -37,7 +45,7 @@ public class Position implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Position position = (Position) o;
-    return x == position.x && y == position.y;
+    return x.equals(position.x) && y.equals(position.y);
   }
 
   @Override
