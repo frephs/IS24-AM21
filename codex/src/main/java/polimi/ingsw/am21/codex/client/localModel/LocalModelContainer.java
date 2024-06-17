@@ -389,6 +389,11 @@ public class LocalModelContainer
           2
         );
     }
+
+    if (lobby.getPlayers().get(this.socketId).getToken() == null) {
+      view.drawAvailableTokenColors(lobby.getAvailableTokens());
+    }
+
     view.drawLobby(lobby.getPlayers());
   }
 
