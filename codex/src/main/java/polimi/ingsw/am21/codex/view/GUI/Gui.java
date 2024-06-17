@@ -830,6 +830,7 @@ public class Gui extends Application implements View {
     return () -> {
       if (selectedHandIndex != null && visibleHandSide != null) {
         client.placeCard(selectedHandIndex, visibleHandSide, position);
+        selectedHandIndex = null;
       }
     };
   }
