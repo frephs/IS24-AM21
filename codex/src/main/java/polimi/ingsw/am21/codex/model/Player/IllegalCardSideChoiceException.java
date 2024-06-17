@@ -1,8 +1,10 @@
 package polimi.ingsw.am21.codex.model.Player;
 
-public class IllegalCardSideChoiceException extends Exception {
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+
+public class IllegalCardSideChoiceException extends InvalidActionException {
 
   public IllegalCardSideChoiceException() {
-    super("You do not currently satisfy this side's placing conditions");
+    super(InvalidActionCode.ILLEGAL_CARD_SIDE_CHOICE);
   }
 }

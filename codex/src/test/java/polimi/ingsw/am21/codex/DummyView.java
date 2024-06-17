@@ -7,7 +7,7 @@ import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;

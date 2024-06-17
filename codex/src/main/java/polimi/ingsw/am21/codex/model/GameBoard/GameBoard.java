@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.json.JSONArray;
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.Deck;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -185,17 +185,17 @@ public class GameBoard {
   }
 
   /**
-   * @return the 2 gold cards
-   */
-  public CardPair<PlayableCard> getGoldCards() {
-    return this.goldCards;
-  }
-
-  /**
-   * @return the 2 resource cards
+   * @return the 2 resource cards in the card pair
    */
   public CardPair<PlayableCard> getResourceCards() {
     return this.resourceCards;
+  }
+
+  /**
+   * @return the 2 gold cards in the card pair
+   */
+  public CardPair<PlayableCard> getGoldCards() {
+    return this.goldCards;
   }
 
   /**

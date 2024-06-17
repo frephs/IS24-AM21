@@ -11,7 +11,8 @@ public class GuiClient extends ViewClient {
   Gui gui;
 
   public GuiClient() {
-    gui = new Gui();
+    super(new LocalModelContainer(new Gui()));
+    gui = (Gui) localModel.getView();
     localModel = new LocalModelContainer(gui);
   }
 
@@ -31,7 +32,6 @@ public class GuiClient extends ViewClient {
     super.start(connectionType, address, port);
     gui.setClient(client);
     gui.setLocalModel(localModel);
-    client.listGames();
   }
 
   public static void main(String[] args) {

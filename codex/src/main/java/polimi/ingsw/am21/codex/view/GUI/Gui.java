@@ -33,7 +33,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -198,15 +198,15 @@ public class Gui extends Application implements View {
         cards.getCardFromId(81),
         CardSideType.BACK,
         new Position(0, 0),
-        p1.getAvailableSpots(),
-        p1.getForbiddenSpots()
+        p1.getAvailableSpots().orElse(new HashSet<>()),
+        p1.getForbiddenSpots().orElse(new HashSet<>())
       );
     this.drawCardPlacement(
         cards.getCardFromId(1),
         CardSideType.BACK,
         new Position(1, 0),
-        p1.getAvailableSpots(),
-        p1.getForbiddenSpots()
+        p1.getAvailableSpots().orElse(new HashSet<>()),
+        p1.getForbiddenSpots().orElse(new HashSet<>())
       );
     this.drawHand(
         List.of(
@@ -808,8 +808,14 @@ public class Gui extends Application implements View {
           gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
         });
 
-      drawAvailablePositions(player.getAvailableSpots(), gridPane);
-      drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
+      drawAvailablePositions(
+        player.getAvailableSpots().orElse(new HashSet<>()),
+        gridPane
+      );
+      drawForbiddenPositions(
+        player.getForbiddenSpots().orElse(new HashSet<>()),
+        gridPane
+      );
       drawResourcesAndObjects(player);
 
       scrollPane.setContent(gridPane);
@@ -1022,7 +1028,7 @@ public class Gui extends Application implements View {
     //drawCardDecks();
 
     drawCommonObjectiveCards(
-      localModel.getLocalGameBoard().getCommonObjectives()
+      localModel.getLocalGameBoard().getObjectiveCards()
     );
   }
 

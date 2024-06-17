@@ -1,26 +1,26 @@
 package polimi.ingsw.am21.codex.connection.client.RMI;
 
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
-import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
-import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
-import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
+import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
@@ -42,10 +42,6 @@ public class RMIClientConnectionHandler
     super(host, port, localModel);
   }
 
-  private UUID getSocketID() {
-    return this.localModel.getSocketID();
-  }
-
   @Override
   public void connect() {
     try {
@@ -53,13 +49,12 @@ public class RMIClientConnectionHandler
       this.rmiConnectionHandler = (RMIServerConnectionHandler) registry.lookup(
         "//" + this.host + ":" + this.port + "/IS24-AM21-CODEX"
       );
-      this.localModel.setSocketId(UUID.randomUUID());
-      this.rmiConnectionHandler.registerListener(
+      this.rmiConnectionHandler.connect(
           this.getSocketID(),
           this.localModel.getRemoteListener()
         );
       this.connectionEstablished();
-    } catch (RemoteException | NotBoundException e) {
+    } catch (Exception e) {
       this.connectionFailed(e);
     }
   }
@@ -67,6 +62,15 @@ public class RMIClientConnectionHandler
   @Override
   public void disconnect() {
     // TODO
+  }
+
+  private Optional<String> getGameIDWithMessage() {
+    if (this.localModel.getGameId().isEmpty()) {
+      this.localModel.notInGame();
+      return Optional.empty();
+    }
+    String gameID = this.localModel.getGameId().get();
+    return Optional.of(gameID);
   }
 
   @Override
@@ -86,52 +90,38 @@ public class RMIClientConnectionHandler
   @Override
   public void createGame(String gameId, int players) {
     try {
-      rmiConnectionHandler.createGame(gameId, this.socketID, players);
+      rmiConnectionHandler.createGame(this.getSocketID(), gameId, players);
       this.localModel.gameCreated(gameId, 0, players);
-    } catch (
-      RemoteException | EmptyDeckException | InvalidGameNameException e
-    ) {
-      throw new RuntimeException(e);
-    } catch (GameAlreadyExistsException e) {
-      this.localModel.gameAlreadyExists(gameId);
+    } catch (RemoteException | EmptyDeckException e) {
+      this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
+  }
+
+  private void handleInvalidActionException(InvalidActionException e) {
+    this.localModel.handleInvalidActionException(e);
   }
 
   @Override
   public void connectToGame(String gameId) {
     try {
-      rmiConnectionHandler.joinLobby(gameId, this.getSocketID());
-      this.localModel.playerJoinedLobby(gameId, this.getSocketID());
-    } catch (GameAlreadyStartedException e) {
-      this.localModel.gameAlreadyStarted();
-    } catch (LobbyFullException e) {
-      this.localModel.lobbyFull(gameId);
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(gameId);
+      rmiConnectionHandler.joinLobby(this.getSocketID(), gameId);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
   @Override
   public void leaveGameLobby() {
     try {
-      this.rmiConnectionHandler.leaveLobby(
-          this.localModel.getGameId(),
-          this.getSocketID()
-        );
-      this.localModel.playerLeftLobby(
-          this.localModel.getGameId(),
-          this.getSocketID()
-        );
+      this.rmiConnectionHandler.leaveLobby(this.getSocketID());
     } catch (RemoteException e) {
       this.messageNotSent();
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(localModel.getGameId());
-      this.localModel.playerLeftLobby(
-          this.localModel.getGameId(),
-          this.getSocketID()
-        );
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
@@ -139,43 +129,26 @@ public class RMIClientConnectionHandler
   public void createAndConnectToGame(String gameId, int numberPlayers) {
     try {
       rmiConnectionHandler.createGame(
-        gameId,
         this.getSocketID(),
+        gameId,
         numberPlayers
       );
-      // TODO
-      this.localModel.gameCreated(gameId, 0, numberPlayers);
-      this.localModel.playerJoinedLobby(gameId, this.getSocketID());
-    } catch (EmptyDeckException | InvalidGameNameException e) {
-      throw new RuntimeException(e);
+      rmiConnectionHandler.joinLobby(this.getSocketID(), gameId);
     } catch (RemoteException e) {
       this.messageNotSent();
-    } catch (GameAlreadyExistsException e) {
-      this.localModel.gameAlreadyExists(gameId);
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
   @Override
   public void lobbySetToken(TokenColor color) {
     try {
-      rmiConnectionHandler.lobbySetTokenColor(
-        this.localModel.getGameId(),
-        this.getSocketID(),
-        color
-      );
-      this.localModel.playerSetToken(
-          this.localModel.getGameId(),
-          this.getSocketID(),
-          color
-        );
-      // TODO: implement
-      //      localPlayer = new LocalPlayer(color);
-    } catch (GameAlreadyStartedException e) {
-      localModel.gameAlreadyStarted();
-    } catch (GameNotFoundException e) {
-      localModel.gameNotFound(this.localModel.getGameId());
+      rmiConnectionHandler.lobbySetTokenColor(this.getSocketID(), color);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
@@ -187,20 +160,11 @@ public class RMIClientConnectionHandler
   @Override
   public void lobbySetNickname(String nickname) {
     try {
-      rmiConnectionHandler.lobbySetNickname(
-        this.localModel.getGameId(),
-        this.getSocketID(),
-        nickname
-      );
-      //      this.localModel.getLocalGameBoard().getPlayer().setNickname(nickname);
-    } catch (NicknameAlreadyTakenException e) {
-      this.localModel.nicknameTaken(nickname);
-    } catch (GameAlreadyStartedException e) {
-      this.localModel.gameAlreadyStarted();
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(localModel.getGameId());
+      rmiConnectionHandler.lobbySetNickname(this.getSocketID(), nickname);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
@@ -208,33 +172,24 @@ public class RMIClientConnectionHandler
   public void getObjectiveCards() {
     try {
       localModel.listObjectiveCards(
-        rmiConnectionHandler.getLobbyObjectiveCards(
-          this.localModel.getGameId(),
-          this.socketID
-        )
+        rmiConnectionHandler.getLobbyObjectiveCards(this.getSocketID())
       );
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(localModel.getGameId());
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
     try {
-      rmiConnectionHandler.lobbyChooseObjective(
-        this.localModel.getGameId(),
-        this.getSocketID(),
-        first
-      );
+      rmiConnectionHandler.lobbyChooseObjective(this.getSocketID(), first);
       this.localModel.playerChoseObjectiveCard(first);
-    } catch (GameAlreadyStartedException e) {
-      this.localModel.gameAlreadyStarted();
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(localModel.getGameId());
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
@@ -242,45 +197,25 @@ public class RMIClientConnectionHandler
   public void getStarterCard() {
     try {
       localModel.playerGetStarterCardSides(
-        rmiConnectionHandler.getLobbyStarterCard(
-          localModel.getGameId(),
-          socketID
-        )
+        rmiConnectionHandler.getLobbyStarterCard(socketID)
       );
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(localModel.getGameId());
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
   @Override
   public void lobbyJoinGame(CardSideType cardSide) {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     try {
-      rmiConnectionHandler.joinGame(
-        this.localModel.getGameId(),
-        this.getSocketID(),
-        cardSide
-      );
-      // TODO
-      //      this.localModel.playerJoinedGame(this.localModel.getGameId(), this.getSocketID(), localPlayer.getNickname(), localPlayer.getToken(), );
-    } catch (GameNotReadyException e) {
-      this.localModel.gameNotStarted();
-    } catch (GameAlreadyStartedException e) {
-      this.localModel.playerLeftLobby(
-          this.localModel.getGameId(),
-          this.getSocketID()
-        );
-    } catch (EmptyDeckException e) {
-      localModel.emptyDeck();
-    } catch (
-      IllegalCardSideChoiceException
-      | IllegalPlacingPositionException
-      | GameNotFoundException e
-    ) {
-      throw new RuntimeException(e);
+      rmiConnectionHandler.joinGame(this.getSocketID(), gameID, cardSide);
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
@@ -290,50 +225,28 @@ public class RMIClientConnectionHandler
     CardSideType side,
     Position position
   ) {
-    if (this.localModel.getGameId() == null) {
-      this.localModel.notInGame();
-    }
-
     try {
       this.rmiConnectionHandler.placeCard(
-          this.localModel.getGameId(),
-          this.localModel.getLocalGameBoard().getPlayer().getNickname(),
+          this.getSocketID(),
           playerHandCardNumber,
           side,
           position
         );
-    } catch (GameNotFoundException e) {
-      localModel.gameNotFound(this.localModel.getGameId());
-    } catch (PlayerNotActive e) {
-      localModel.playerNotActive();
-    } catch (IllegalCardSideChoiceException e) {
-      localModel.invalidCardPlacement("Illegal Card Side Choice");
-      throw new RuntimeException(e);
-    } catch (IllegalPlacingPositionException e) {
-      localModel.invalidCardPlacement("Illegal Placing Position");
-      throw new RuntimeException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
-    } catch (CardAlreadyPlacedException e) {
-      localModel.actionNotAllowed(e.getMessage());
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
   @Override
   public void leaveLobby() {
     try {
-      rmiConnectionHandler.leaveLobby(
-        this.localModel.getGameId(),
-        this.getSocketID()
-      );
-      this.localModel.playerLeftLobby(
-          this.localModel.getGameId(),
-          this.getSocketID()
-        );
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(this.localModel.getGameId());
+      rmiConnectionHandler.leaveLobby(this.getSocketID());
     } catch (RemoteException e) {
       this.messageNotSent();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
@@ -344,52 +257,44 @@ public class RMIClientConnectionHandler
   ) {
     try {
       this.rmiConnectionHandler.nextTurn(
-          localModel.getGameId(),
-          localModel.getLocalGameBoard().getPlayer().getNickname(),
+          this.getSocketID(),
           drawingSource,
           deckType
         );
     } catch (RemoteException e) {
       this.messageNotSent();
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(this.localModel.getGameId());
-    } catch (InvalidNextTurnCallException e) {
-      this.localModel.invalidNextTurnCall();
-    } catch (PlayerNotActive e) {
-      this.localModel.playerNotActive();
-    } catch (GameOverException e) {
-      this.localModel.gameOver();
-    } catch (EmptyDeckException e) {
-      this.localModel.emptyDeck();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     }
   }
 
   @Override
   public void nextTurn() {
     try {
-      rmiConnectionHandler.nextTurn(
-        localModel.getGameId(),
-        localModel.getLocalGameBoard().getPlayer().getNickname()
-      );
+      rmiConnectionHandler.nextTurn(this.getSocketID());
     } catch (RemoteException e) {
       this.messageNotSent();
-    } catch (GameNotFoundException e) {
-      this.localModel.gameNotFound(localModel.getGameId());
-    } catch (InvalidNextTurnCallException e) {
-      this.localModel.invalidNextTurnCall();
-    } catch (PlayerNotActive e) {
-      this.localModel.playerNotActive();
-    } catch (GameOverException e) {
-      this.localModel.gameOver();
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
+    }
+  }
+
+  @Override
+  public void heartBeat(Runnable successful, Runnable failed) {
+    try {
+      rmiConnectionHandler.heartBeat(this.getSocketID());
+      successful.run();
+    } catch (RemoteException e) {
+      failed.run();
     }
   }
 
   @Override
   public void sendChatMessage(ChatMessage message) {
     try {
-      rmiConnectionHandler.sendChatMessage(localModel.getGameId(), message);
-    } catch (GameNotFoundException e) {
-      throw new RuntimeException(e);
+      rmiConnectionHandler.sendChatMessage(getSocketID(), message);
+    } catch (InvalidActionException e) {
+      this.handleInvalidActionException(e);
     } catch (RemoteException e) {
       this.messageNotSent();
     }

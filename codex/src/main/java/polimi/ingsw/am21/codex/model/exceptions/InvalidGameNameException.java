@@ -1,12 +1,21 @@
 package polimi.ingsw.am21.codex.model.exceptions;
 
-public class InvalidGameNameException extends Exception {
+import java.util.List;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+
+public class InvalidGameNameException extends InvalidActionException {
 
   public InvalidGameNameException(String gameName) {
-    super(
-      "Game name " +
-      gameName +
-      " is invalid. Game names can only contain letters and numbers."
-    );
+    super(InvalidActionCode.INVALID_GAME_NAME, List.of(gameName));
+  }
+
+  public String getGameName() {
+    return getNotes().get(0);
+  }
+
+  public static InvalidGameNameException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new InvalidGameNameException(notes.get(0));
   }
 }

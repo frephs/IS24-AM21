@@ -22,15 +22,6 @@ public class TCPServer {
    * The Game controller to use
    */
   private final GameController controller;
-  /**
-   * A map with the socket ids as keys and the corresponding connection handlers as values
-   */
-  private final Map<UUID, TCPServerConnectionHandler> activeHandlers;
-
-  /**
-   * The listener for the controller associated to this server
-   */
-  private final TCPServerControllerListener controllerListener;
 
   private ServerSocket serverSocket;
   private final CountDownLatch serverReadyLatch;
@@ -38,19 +29,11 @@ public class TCPServer {
   public TCPServer(Integer port, GameController controller) {
     this.port = port;
     this.controller = controller;
-    this.activeHandlers = new HashMap<>();
 
-    this.controllerListener = new TCPServerControllerListener(message -> {
-      for (TCPServerConnectionHandler handler : activeHandlers.values()) {
-        handler.send(message);
-      }
-    });
     this.serverReadyLatch = new CountDownLatch(1);
   }
 
   public void start() throws PortUnreachableException {
-    controller.registerGlobalListener(controllerListener);
-
     // Using try-with-resources here will automatically shut down the executor if
     // no longer needed, as it implements the AutoCloseable interface.
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
@@ -79,11 +62,8 @@ public class TCPServer {
 
           TCPServerConnectionHandler handler = new TCPServerConnectionHandler(
             connectionSocket,
-            controller,
-            socketId,
-            activeHandlers
+            controller
           );
-          activeHandlers.put(socketId, handler);
 
           executor.execute(handler);
         } catch (IOException error) {
@@ -97,8 +77,6 @@ public class TCPServer {
 
       // Propagate the error so that the RMI client can be closed as well
       throw new PortUnreachableException();
-    } finally {
-      controller.unregisterGlobalListener(controllerListener);
     }
   }
 
@@ -106,8 +84,6 @@ public class TCPServer {
     try {
       serverSocket.close();
     } catch (IOException ignored) {}
-    controller.unregisterGlobalListener(controllerListener);
-    System.out.println("TCP Server stopped.");
   }
 
   public CountDownLatch getServerReadyLatch() {

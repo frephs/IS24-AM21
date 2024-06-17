@@ -1,18 +1,19 @@
 package polimi.ingsw.am21.codex.connection.server.TCP;
 
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Consumer;
-import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.CardPlacedMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.NextTurnUpdateMessage;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.PlayerJoinedGameMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
@@ -68,8 +69,8 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void remainingTurns(int remainingTurns) {
-    broadcast.accept(new RemainingTurnsMessage(remainingTurns));
+  public void remainingRounds(String gameID, int remainingRounds) {
+    broadcast.accept(new RemainingRoundsMessage(gameID, remainingRounds));
   }
 
   @Override
@@ -78,54 +79,77 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void chatMessageSent(String gameId, ChatMessage chatMessage) {
-    broadcast.accept(new SendChatMessage(gameId, chatMessage));
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    broadcast.accept(
+      new PlayerConnectionChangedMessage(socketID, nickname, status)
+    );
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    broadcast.accept(new LobbyInfoMessage(usersInfo));
+  }
+
+  @Override
+  public void chatMessage(String gameID, ChatMessage message) {
+    broadcast.accept(new ChatMessageMessage(gameID, message));
   }
 
   @Override
   public void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) {
     broadcast.accept(
       new NextTurnUpdateMessage(
         gameId,
-        playerId,
+        playerNickname,
+        playerIndex,
         source,
         deck,
         cardId,
-        newPairCardId
+        newPairCardId,
+        availableSpots,
+        forbiddenSpots
       )
     );
   }
 
   @Override
-  public void changeTurn(String gameId, String playerId, Boolean isLastRound) {
-    broadcast.accept(new NextTurnUpdateMessage(gameId, playerId));
-  }
-
-  @Override
-  public void gameStarted(
+  public void changeTurn(
     String gameId,
-    List<String> players,
-    Pair<Integer, Integer> goldCardPairIds,
-    Pair<Integer, Integer> resourceCardPairIds,
-    Pair<Integer, Integer> commonObjectivesIds
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) {
     broadcast.accept(
-      new GameStartedMessage(
+      new NextTurnUpdateMessage(
         gameId,
-        players,
-        goldCardPairIds,
-        resourceCardPairIds,
-        commonObjectivesIds
+        playerNickname,
+        playerIndex,
+        availableSpots,
+        forbiddenSpots
       )
     );
+  }
+
+  @Override
+  public void gameStarted(String gameId, GameInfo gameInfo) {
+    broadcast.accept(new GameStartedMessage(gameInfo));
   }
 
   @Override
@@ -151,8 +175,15 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerSetToken(String gameId, UUID socketID, TokenColor token) {
-    broadcast.accept(new PlayerSetTokenColorMessage(gameId, socketID, token));
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) {
+    broadcast.accept(
+      new PlayerSetTokenColorMessage(gameId, socketID, nickname, token)
+    );
   }
 
   @Override
@@ -165,7 +196,11 @@ public class TCPServerControllerListener implements GameEventListener {
     String gameId,
     UUID socketID,
     String nickname
-  ) {}
+  ) {
+    broadcast.accept(
+      new PlayerChoseObjectiveCardMessage(gameId, socketID, nickname)
+    );
+  }
 
   @Override
   public void playerJoinedGame(

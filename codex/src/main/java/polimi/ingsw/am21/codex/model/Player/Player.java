@@ -3,11 +3,14 @@ package polimi.ingsw.am21.codex.model.Player;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.model.Cards.*;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
+import polimi.ingsw.am21.codex.model.exceptions.AlreadyPlacedCardGameException;
 
 public class Player {
 
@@ -16,7 +19,7 @@ public class Player {
   private final TokenColor token;
   private int points;
   private final UUID socketId;
-  private Boolean cardPlacedThisTurn = false;
+  private Boolean cardPlaced = false;
 
   Player(PlayerBuilder builder, UUID socketId)
     throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
@@ -26,7 +29,7 @@ public class Player {
     this.board = new PlayerBoard(
       builder.cards,
       builder.starterCard,
-      builder.objectiveCard
+      builder.getObjectiveCard().orElse(null)
     );
     this.socketId = socketId;
   }
@@ -41,10 +44,15 @@ public class Player {
     private TokenColor token;
     private List<PlayableCard> cards;
     private PlayableCard starterCard;
-    private ObjectiveCard objectiveCard;
+    private Boolean selectedFirstObjectiveCard;
+    private final CardPair<ObjectiveCard> secretObjectives;
 
-    public PlayerBuilder(PlayableCard card) {
+    public PlayerBuilder(
+      PlayableCard card,
+      CardPair<ObjectiveCard> secretObjectives
+    ) {
       this.starterCard = card;
+      this.secretObjectives = secretObjectives;
     }
 
     /**
@@ -108,11 +116,32 @@ public class Player {
       this.starterCard.setPlayedSideType(side);
     }
 
+    public CardPair<ObjectiveCard> getObjectiveCards() {
+      return secretObjectives;
+    }
+
+    public Boolean hasSelectedObjectiveCard() {
+      return selectedFirstObjectiveCard != null;
+    }
+
     /**
-     * @param objectiveCard chosen by the client controller (physical player)
+     * @return the player objective card
      */
-    public PlayerBuilder setObjectiveCard(ObjectiveCard objectiveCard) {
-      this.objectiveCard = objectiveCard;
+    public Optional<ObjectiveCard> getObjectiveCard() {
+      return Optional.ofNullable(this.selectedFirstObjectiveCard).map(
+        selectedFirstObjectiveCard ->
+          selectedFirstObjectiveCard
+            ? secretObjectives.getFirst()
+            : secretObjectives.getSecond()
+      );
+    }
+
+    /**
+     * @param first true if the player selects the first card in the pair
+     */
+    public PlayerBuilder setObjectiveCard(Boolean first) {
+      ObjectiveCard selectedObjectiveCard;
+      this.selectedFirstObjectiveCard = first;
       return this;
     }
 
@@ -162,20 +191,6 @@ public class Player {
   }
 
   /**
-   * @return if a player has already played a card this turn
-   * */
-  public Boolean hasPlacedCardThisTurn() {
-    return cardPlacedThisTurn;
-  }
-
-  /**
-   * Toggle the cardPlayedThisTurn boolean
-   * */
-  public void toggleCardPlacedThisTurn() {
-    this.cardPlacedThisTurn = !cardPlacedThisTurn;
-  }
-
-  /**
    * @param card drawn from the GameBoard which is added to the players hand
    */
   public void drawCard(PlayableCard card) {
@@ -195,23 +210,20 @@ public class Player {
     int cardIndex,
     CardSideType side,
     Position position
-  )
-    throws IndexOutOfBoundsException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
+  ) throws InvalidActionException, AlreadyPlacedCardGameException {
+    if (cardPlaced) throw new AlreadyPlacedCardGameException();
     PlayableCard playedCard;
-    try {
-      playedCard = board.getHand().get(cardIndex);
-    } catch (IndexOutOfBoundsException e) {
-      throw new IndexOutOfBoundsException(
+    if (cardIndex < 0 || cardIndex >= board.getHand().size()) {
+      throw new IllegalPlacingPositionException(
         "You tried to place a card which either doesn't exist or is not in your hand"
       );
     }
-    try {
-      board.placeCard(playedCard, side, position);
-      this.points += playedCard.getEvaluator().apply(board);
-    } catch (Exception e) {
-      cardPlacedThisTurn = false;
-      throw e;
-    }
+    playedCard = board.getHand().get(cardIndex);
+
+    board.placeCard(playedCard, side, position);
+    board.getHand().remove(cardIndex);
+    this.points += playedCard.getEvaluator().apply(board);
+    cardPlaced = true;
     return playedCard;
   }
 
@@ -229,5 +241,13 @@ public class Player {
    * */
   public void evaluateSecretObjective() {
     this.evaluate(this.board.getObjectiveCard());
+  }
+
+  public Boolean getCardPlaced() {
+    return cardPlaced;
+  }
+
+  public void resetCardPlaced() {
+    cardPlaced = false;
   }
 }

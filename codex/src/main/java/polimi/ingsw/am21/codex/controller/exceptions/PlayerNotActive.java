@@ -1,8 +1,8 @@
 package polimi.ingsw.am21.codex.controller.exceptions;
 
-public class PlayerNotActive extends Exception {
+public class PlayerNotActive extends InvalidActionException {
 
   public PlayerNotActive() {
-    super("Player not currently in turn");
+    super(InvalidActionCode.PLAYER_NOT_ACTIVE);
   }
 }
