@@ -1,66 +1,145 @@
 package polimi.ingsw.am21.codex.view.GUI.utils;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import polimi.ingsw.am21.codex.view.GUI.Gui;
 
 public class RulebookHandler {
 
-  @FXML
-  private HBox pageContainer;
+  private static Stage rulebookStage;
+  private RulebookLayout rulebookLayout;
 
-  @FXML
-  private ImageView page;
+  public RulebookHandler(Stage rulebookStage) {
+    RulebookHandler.rulebookStage = rulebookStage;
+    RulebookHandler.rulebookStage.initStyle(StageStyle.TRANSPARENT);
+  }
 
-  private final List<Image> pages;
-  private int currentPage = 0;
+  public void loadRulebook() throws IOException {
+    rulebookLayout = new RulebookLayout();
+    rulebookLayout.loadRulebook();
+    Platform.runLater(this::showRulebook);
+  }
 
-  public RulebookHandler() {
-    //pages = List.of(new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-1-1.png"), new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-1-2.png"), new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-3-1.png"), new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-4-1.png"), new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-5-1.png"), new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-6-1.png"), new Image("codex/src/main/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-7-1.png"));
-    /*pages = List.of(
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-1-1.png"),
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-1-2.png"),
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-3-1.png"),
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-4-1.png"),
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-5-1.png"),
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-6-1.png"),
-        new Image("/resources/polimi/ingsw/am21/codex/view/GUI/pictures/rulebook/CODEX_Rulebook_EN-7-1.png")
+  private void showRulebook() {
+    Scene rulebookScene = new Scene(rulebookLayout.getParent());
+    rulebookScene.setFill(Color.TRANSPARENT);
+    rulebookStage.setScene(rulebookScene);
+    rulebookStage.setAlwaysOnTop(true);
+    rulebookStage.show();
+  }
+
+  public static class RulebookLayout extends DraggableLayout {
+
+    Parent rulebookLayout;
+
+    @FXML
+    Node rulebookContainer;
+
+    @FXML
+    private HBox pageContainer;
+
+    @FXML
+    private ImageView page;
+
+    @FXML
+    private final List<Image> pages = new ArrayList<>();
+
+    private int currentPage = 0;
+
+    public RulebookLayout() {}
+
+    public void loadRulebook() throws IOException {
+      FXMLLoader fxmlLoader = new FXMLLoader(
+        Gui.class.getResource("RulebookHandler.fxml")
       );
-      page.setImage(pages.get(currentPage));*/
-    // TODO fix this
-    pages = List.of();
-  }
-
-  @FXML
-  private void handleNextPage() {
-    if (currentPage < pages.size() - 1) {
-      currentPage++;
-      updatePageView();
-    } else {
-      currentPage = 0;
-      updatePageView();
+      fxmlLoader.setController(this);
+      rulebookLayout = fxmlLoader.load();
+      loadRulebookDetails();
     }
-  }
 
-  @FXML
-  public void handlePreviousPage() {
-    if (currentPage > 0) {
-      currentPage--;
+    public void loadRulebookDetails() {
+      for (int i = 1; i <= 12; i++) {
+        pages.add(
+          new Image(
+            String.valueOf(
+              Gui.class.getResource(
+                  "pictures/rulebook/CODEX_Rulebook_EN-" +
+                  String.format("%02d", i) +
+                  ".png"
+                )
+            )
+          )
+        );
+      }
       updatePageView();
-    } else {
-      currentPage = pages.size() - 1;
-      updatePageView();
+
+      pageContainer.setOnScroll(event -> {
+        if (event.getDeltaY() < 0) {
+          handleNextPage();
+        } else {
+          handlePreviousPage();
+        }
+      });
+
+      rulebookLayout
+        .lookup("#next-page-button")
+        .setOnMouseClicked(event -> handleNextPage());
+
+      rulebookLayout
+        .lookup("#previous-page-button")
+        .setOnMouseClicked(event -> handlePreviousPage());
+
+      rulebookLayout
+        .lookup("#close-rulebook-button")
+        .setOnMouseClicked(event -> closeRulebook());
     }
-  }
 
-  @FXML
-  public void closeRulebook() {
-    pageContainer.setVisible(false);
-  }
+    @FXML
+    private void handleNextPage() {
+      if (currentPage < pages.size() - 1) {
+        currentPage++;
+        updatePageView();
+      }
+    }
 
-  private void updatePageView() {
-    page.setImage(pages.get(currentPage));
+    @FXML
+    private void handlePreviousPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        updatePageView();
+      }
+    }
+
+    @FXML
+    public void closeRulebook() {
+      rulebookStage.hide();
+    }
+
+    private void updatePageView() {
+      page.setImage(pages.get(currentPage));
+    }
+
+    public Parent getParent() {
+      return rulebookLayout;
+    }
+
+    @Override
+    public void setDraggable(Stage stage) {
+      setDraggable(rulebookStage, new VBox(rulebookContainer));
+    }
   }
 }
