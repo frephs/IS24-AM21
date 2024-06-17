@@ -4,16 +4,16 @@ import java.util.Objects;
 import javafx.application.Application;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class GuiClient extends ViewClient {
 
-  Gui gui;
+  private Gui gui;
 
-  public GuiClient() {
-    super(new LocalModelContainer(new Gui()));
-    gui = (Gui) localModel.getView();
-    localModel = new LocalModelContainer(gui);
+  public GuiClient(LocalModelContainer localModel) {
+    super(new Gui(localModel));
+    gui = (Gui) view;
   }
 
   @Override
@@ -30,8 +30,6 @@ public class GuiClient extends ViewClient {
     }
 
     super.start(connectionType, address, port);
-    gui.setClient(client);
-    gui.setLocalModel(localModel);
   }
 
   public static void main(String[] args) {
@@ -39,7 +37,7 @@ public class GuiClient extends ViewClient {
       "Usage: GuiClient <connection-type> <address> <port>"
     );
 
-    GuiClient guiClient = new GuiClient();
+    GuiClient guiClient = new GuiClient(new LocalModelContainer());
 
     // TODO add defaults from config file
     guiClient.start(

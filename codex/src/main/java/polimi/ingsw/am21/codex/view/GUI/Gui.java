@@ -57,8 +57,9 @@ public class Gui extends Application implements View {
   private static ClientConnectionHandler client;
   private static LocalModelContainer localModel;
 
-  public Gui() {
+  public Gui(LocalModelContainer localModel) {
     gui = this;
+    this.localModel = localModel;
   }
 
   public static Gui getInstance() {
@@ -710,6 +711,11 @@ public class Gui extends Application implements View {
           }
         );
     });
+  }
+
+  @Override
+  public LocalModelContainer getLocalModel() {
+    return localModel;
   }
 
   @Override

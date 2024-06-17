@@ -60,12 +60,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   private final Queue<Message> incomingMessages;
 
-  public TCPClientConnectionHandler(
-    String host,
-    int port,
-    LocalModelContainer localModel
-  ) {
-    super(host, port, localModel);
+  public TCPClientConnectionHandler(String host, int port, View view) {
+    super(host, port, view);
     this.incomingMessages = new ArrayDeque<>();
   }
 

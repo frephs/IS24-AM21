@@ -1,107 +1,329 @@
 package polimi.ingsw.am21.codex.view;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
-import polimi.ingsw.am21.codex.model.Cards.Card;
+import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
+import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
+import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
-public interface View {
-  void postNotification(NotificationType notificationType, String message);
+public abstract class View implements GameEventListener {
 
-  void postNotification(Notification notification);
+  private LocalModelContainer localModel;
 
-  void postNotification(
+  public View(LocalModelContainer localModel) {
+    this.localModel = localModel;
+  }
+
+  public abstract void postNotification(
+    NotificationType notificationType,
+    String message
+  );
+
+  public abstract void postNotification(Notification notification);
+
+  public abstract void postNotification(
     NotificationType notificationType,
     String[] messages,
     Colorable colorable,
     int colorableIndex
   );
 
-  void displayException(Exception e);
+  public LocalModelContainer getLocalModel() {
+    return localModel;
+  }
 
-  // lobby
-  void drawAvailableGames(List<GameEntry> games);
+  @Override
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    localModel.gameCreated(gameId, currentPlayers, maxPlayers);
+  }
 
-  void drawAvailableTokenColors(Set<TokenColor> tokenColors);
+  @Override
+  public void gameDeleted(String gameId) {
+    localModel.gameDeleted(gameId);
+    postNotification(
+      NotificationType.UPDATE,
+      "Game " + gameId + " has been deleted"
+    );
+  }
 
-  void drawLobby(Map<UUID, LocalPlayer> players);
+  @Override
+  public void playerJoinedLobby(String gameId, UUID socketID) {
+    localModel.playerJoinedLobby(gameId, socketID);
+    String message;
+    if (localModel.getGameId().equals(gameId)) {
+      message = socketID.toString() + " joined your game";
+    } else {
+      message = socketID.toString() + " joined game " + gameId;
+    }
 
-  // game
+    postNotification(NotificationType.UPDATE, message);
+  }
 
-  void drawLeaderBoard(List<LocalPlayer> players);
+  @Override
+  public void playerLeftLobby(String gameId, UUID socketID) {
+    localModel.playerLeftLobby(gameId, socketID);
+    String message;
 
-  void drawPlayerBoards(List<LocalPlayer> players);
+    if (localModel.getGameId().map(gameId::equals).orElse(false)) {
+      message = socketID + " left your game";
+    } else {
+      message = socketID + " left game " + gameId;
+    }
 
-  void drawPlayerBoard(LocalPlayer player);
+    postNotification(NotificationType.UPDATE, message);
+  }
 
-  /**
-   * Displays that the client player has drawn a card from a deck
-   * @param deck The deck the card has been drawn from
-   * @param card The card that has been drawn
-   */
-  void drawCardDrawn(DrawingDeckType deck, Card card);
+  @Override
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) {
+    localModel.playerSetToken(gameId, socketID, nickname, token);
+    postNotification(
+      NotificationType.UPDATE,
+      "Player " +
+      nickname +
+      " has set their token to " +
+      token.toString().toLowerCase()
+    );
+  }
 
-  /**
-   * Displays that a card has been drawn from a deck
-   * @param deck The deck that the card has been drawn from
-   */
-  void drawCardDrawn(DrawingDeckType deck);
+  @Override
+  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
+    localModel.playerSetNickname(gameId, socketID, nickname);
+    postNotification(
+      NotificationType.UPDATE,
+      "Player " + nickname + " has set their nickname"
+    );
+  }
 
-  void drawCardPlacement(
-    Card card,
+  @Override
+  public void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    String nickname
+  ) {
+    localModel.playerChoseObjectiveCard(gameId, socketID, nickname);
+    postNotification(
+      NotificationType.UPDATE,
+      "Player " + nickname + " has chosen their objective card"
+    );
+  }
+
+  @Override
+  public void playerJoinedGame(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor color,
+    List<Integer> handIDs,
+    Integer starterCardID,
+    CardSideType starterSide
+  ) {
+    localModel.playerJoinedGame(
+      gameId,
+      socketID,
+      nickname,
+      color,
+      handIDs,
+      starterCardID,
+      starterSide
+    );
+    postNotification(
+      NotificationType.UPDATE,
+      "Player " +
+      nickname +
+      " has joined the game with token " +
+      color.toString().toLowerCase()
+    );
+  }
+
+  @Override
+  public void gameStarted(String gameId, GameInfo gameInfo) {
+    getLocalModel().getClientContextContainer().set(ClientContext.GAME);
+    localModel.gameStarted(gameId, gameInfo);
+    postNotification(
+      NotificationType.UPDATE,
+      "Game " + gameId + " has started"
+    );
+  }
+
+  @Override
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    DrawingCardSource source,
+    DrawingDeckType deck,
+    Integer cardId,
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
+  ) {
+    localModel.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      source,
+      deck,
+      cardId,
+      newPairCardId,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
+    );
+
+    postNotification(
+      NotificationType.UPDATE,
+      "It's " +
+      playerNickname +
+      "'s turn" +
+      (isLastRound ? " (last round)" : "")
+    );
+  }
+
+  @Override
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
+  ) {
+    localModel.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
+    );
+
+    postNotification(
+      NotificationType.UPDATE,
+      "It's " +
+      playerNickname +
+      "'s turn" +
+      (isLastRound ? " (last round)" : "")
+    );
+  }
+
+  @Override
+  public void cardPlaced(
+    String gameId,
+    String playerId,
+    Integer playerHandCardNumber,
+    Integer cardId,
     CardSideType side,
     Position position,
-    Set<Position> availablePositions,
-    Set<Position> forbiddenPositions
-  );
+    int newPlayerScore,
+    Map<ResourceType, Integer> updatedResources,
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) {
+    localModel.cardPlaced(
+      gameId,
+      playerId,
+      playerHandCardNumber,
+      cardId,
+      side,
+      position,
+      newPlayerScore,
+      updatedResources,
+      updatedObjects,
+      availableSpots,
+      forbiddenSpots
+    );
+  }
 
-  void drawGame(List<LocalPlayer> players);
+  @Override
+  public void gameOver() {
+    localModel.gameOver();
+    postNotification(NotificationType.UPDATE, "Game over");
+  }
 
-  void drawGameOver(List<LocalPlayer> players);
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    localModel.playerScoresUpdate(newScores);
+  }
 
-  void drawCard(Card card);
+  @Override
+  public void remainingRounds(String gameID, int remainingRounds) {
+    localModel.remainingRounds(gameID, remainingRounds);
+    postNotification(NotificationType.UPDATE, remainingRounds + " rounds left");
+  }
 
-  /**
-   * Displays the hand of the client player
-   */
-  void drawHand(List<Card> hand);
+  @Override
+  public void winningPlayer(String nickname) {
+    localModel.winningPlayer(nickname);
+    postNotification(NotificationType.UPDATE, nickname + " has won the game!");
+  }
 
-  /**
-   * Displays the pairs the players can draw from
-   * @param resourceCards The resource cards pair
-   * @param goldCards The gold cards pair
-   */
+  @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    localModel.playerConnectionChanged(socketID, nickname, status);
+    postNotification(
+      NotificationType.UPDATE,
+      "Player " +
+      nickname +
+      " has " +
+      status.toString().toLowerCase() +
+      " the game"
+    );
+  }
 
-  void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    localModel.lobbyInfo(usersInfo);
+  }
 
-  void drawObjectiveCardChoice(CardPair<Card> cardPair);
-  void drawStarterCardSides(Card card);
-  void drawWinner(String nickname);
+  @Override
+  public void chatMessage(String gameID, ChatMessage message) {
+    localModel.chatMessage(gameID, message);
+  }
 
-  void drawChatMessage(ChatMessage message);
-  void drawCommonObjectiveCards(CardPair<Card> cardPair);
-  void drawPlayerObjective(Card card);
+  public void printPrompt() {
+    System.out.print("\r> ");
+  }
 
-  /**
-   * Displays the cards decks to draw from
-   * @param firstResourceCard The first resource card (null if none)
-   * @param firstGoldCard The first gold card (null if none)
-   */
-  void drawCardDecks(
-    PlayableCard firstResourceCard,
-    PlayableCard firstGoldCard
-  );
-
-  void drawNicknameChoice();
+  public void printUpdate(String string) {
+    System.out.println(
+      "\r" +
+      string +
+      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
+    );
+    printPrompt();
+  }
 }

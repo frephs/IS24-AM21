@@ -28,16 +28,14 @@ public abstract class ClientConnectionHandler {
     GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
   private Integer consecutiveFailedHeartBeats = 0;
 
-  public ClientConnectionHandler(
-    String host,
-    Integer port,
-    LocalModelContainer localModel
-  ) {
+  private View view;
+
+  public ClientConnectionHandler(String host, Integer port, View view) {
     this.host = host;
     this.port = port;
-    this.localModel = localModel;
     this.socketID = UUID.randomUUID();
     this.localModel.setSocketId(socketID);
+    this.view = view;
   }
 
   protected UUID getSocketID() {
@@ -45,7 +43,11 @@ public abstract class ClientConnectionHandler {
   }
 
   View getView() {
-    return localModel.getView();
+    return view;
+  }
+
+  LocalModelContainer getLocalModelContainer() {
+    return this.localModel;
   }
 
   /*

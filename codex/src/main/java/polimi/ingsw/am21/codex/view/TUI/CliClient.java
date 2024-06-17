@@ -10,8 +10,6 @@ import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
-import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -28,15 +26,16 @@ public class CliClient extends ViewClient {
 
   Scanner scanner;
   Cli cli;
+  ClientConnectionHandler client;
 
-  public CliClient() {
-    super(new LocalModelContainer(new Cli(new Cli.Options(true))));
+  public CliClient(LocalModelContainer localModel) {
+    super(new Cli(new Cli.Options(true), localModel));
     cli = (Cli) localModel.getView();
     scanner = new Scanner(System.in);
   }
 
   private LocalModelContainer.ClientContextContainer getClientContextContainer() {
-    return localModel.getClientContextContainer();
+    return view.getLocalModel().getClientContextContainer();
   }
 
   @Override

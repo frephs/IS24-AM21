@@ -58,8 +58,6 @@ public class LocalModelContainer
    * */
   private LocalGameBoard localGameBoard;
 
-  private final View view;
-
   private final CardsLoader cardsLoader = new CardsLoader();
 
   private UUID socketId;
@@ -90,9 +88,7 @@ public class LocalModelContainer
     return clientContextContainer;
   }
 
-  public LocalModelContainer(View view) {
-    this.view = view;
-
+  public LocalModelContainer() {
     cardsLoader.loadCards();
 
     try {

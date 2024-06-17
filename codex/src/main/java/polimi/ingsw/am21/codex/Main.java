@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import polimi.ingsw.am21.codex.client.ClientType;
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -81,10 +82,11 @@ public class Main {
     View view;
 
     ViewClient client;
+    LocalModelContainer localModel = new LocalModelContainer();
     if (clientType == ClientType.CLI) {
-      client = new CliClient();
+      client = new CliClient(localModel);
     } else {
-      client = new GuiClient();
+      client = new GuiClient(localModel);
     }
 
     client.start(connectionType, serverAddress, port);

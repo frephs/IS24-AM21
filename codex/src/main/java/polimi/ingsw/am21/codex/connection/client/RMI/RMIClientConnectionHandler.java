@@ -27,6 +27,7 @@ import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.*;
+import polimi.ingsw.am21.codex.view.View;
 
 public class RMIClientConnectionHandler
   extends ClientConnectionHandler
@@ -34,12 +35,8 @@ public class RMIClientConnectionHandler
 
   private RMIServerConnectionHandler rmiConnectionHandler;
 
-  public RMIClientConnectionHandler(
-    String host,
-    Integer port,
-    LocalModelContainer localModel
-  ) {
-    super(host, port, localModel);
+  public RMIClientConnectionHandler(String host, Integer port, View view) {
+    super(host, port, view);
   }
 
   @Override
