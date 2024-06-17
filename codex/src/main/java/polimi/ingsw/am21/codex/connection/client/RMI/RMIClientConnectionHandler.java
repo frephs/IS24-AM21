@@ -1,7 +1,5 @@
 package polimi.ingsw.am21.codex.connection.client.RMI;
 
-import java.rmi.ConnectException;
-import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -10,9 +8,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -20,13 +18,7 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
-import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class RMIClientConnectionHandler
   extends ClientConnectionHandler
@@ -40,6 +32,7 @@ public class RMIClientConnectionHandler
     LocalModelContainer localModel
   ) {
     super(host, port, localModel);
+    this.connectionType = ConnectionType.RMI;
   }
 
   @Override

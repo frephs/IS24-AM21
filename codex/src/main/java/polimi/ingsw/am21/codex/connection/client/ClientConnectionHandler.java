@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -27,6 +28,7 @@ public abstract class ClientConnectionHandler {
   private GameController.UserGameContext.ConnectionStatus connectionStatus =
     GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
   private Integer consecutiveFailedHeartBeats = 0;
+  protected ConnectionType connectionType;
 
   public ClientConnectionHandler(
     String host,
@@ -46,6 +48,10 @@ public abstract class ClientConnectionHandler {
 
   View getView() {
     return localModel.getView();
+  }
+
+  public ConnectionType getConnectionType() {
+    return connectionType;
   }
 
   /*

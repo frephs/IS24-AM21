@@ -67,6 +67,11 @@ public class Gui extends Application implements View {
 
   public void setClient(ClientConnectionHandler client) {
     Gui.client = client;
+    Platform.runLater(() -> {
+      primaryStage.setTitle(
+        primaryStage.getTitle() + " [" + client.getConnectionType() + "]"
+      );
+    });
   }
 
   public void setLocalModel(LocalModelContainer localModel) {
