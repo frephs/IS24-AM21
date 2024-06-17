@@ -334,6 +334,7 @@ public class Game {
       this.state = GameState.GAME_OVER;
       throw new GameOverException();
     }
+    this.getCurrentPlayer().resetCardPlaced();
     currentPlayer = (currentPlayer + 1) % players.size();
     boolean remainingRoundsChanged = false;
     if (this.currentPlayer == 0) {
