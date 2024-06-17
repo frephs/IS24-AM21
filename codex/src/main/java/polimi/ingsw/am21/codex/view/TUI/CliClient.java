@@ -30,7 +30,7 @@ public class CliClient extends ViewClient {
   Cli cli;
 
   public CliClient() {
-    super(new LocalModelContainer(Cli.getInstance()));
+    super(new LocalModelContainer(new Cli(new Cli.Options(true))));
     cli = (Cli) localModel.getView();
     scanner = new Scanner(System.in);
   }
