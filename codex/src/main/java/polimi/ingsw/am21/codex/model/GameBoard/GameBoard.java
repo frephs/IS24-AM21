@@ -125,6 +125,13 @@ public class GameBoard {
   }
 
   /**
+   * Returns the first card of the gold deck, without drawing it
+   */
+  public PlayableCard peekGoldCardFromDeck() {
+    return this.goldDeck.peek();
+  }
+
+  /**
    * Draws a gold card from the deck
    *
    * @return a gold card drawn from the gold cards deck
@@ -262,6 +269,13 @@ public class GameBoard {
    */
   public int objectiveCardsLeft() {
     return this.objectiveDeck.cardsLeft();
+  }
+
+  /**
+   * Returns the first card of the resource deck, without drawing it
+   */
+  public PlayableCard peekResourceCardFromDeck() {
+    return this.resourceDeck.peek();
   }
 
   /**

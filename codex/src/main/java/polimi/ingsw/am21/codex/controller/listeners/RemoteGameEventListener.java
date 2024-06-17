@@ -78,7 +78,9 @@ public interface RemoteGameEventListener extends Remote {
     Integer cardId,
     Integer newPairCardId,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) throws RemoteException;
 
   void changeTurn(
@@ -87,7 +89,9 @@ public interface RemoteGameEventListener extends Remote {
     Integer playerIndex,
     Boolean isLastRound,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) throws RemoteException;
 
   /* current player placed a card */

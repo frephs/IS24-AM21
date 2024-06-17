@@ -935,6 +935,8 @@ public class Gui extends Application implements View {
   public void drawCardDrawn(DrawingDeckType deck) {
     // TODO
     hasPlacedCard = false;
+    drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
+    drawGameBoard();
   }
 
   /**
@@ -1028,8 +1030,10 @@ public class Gui extends Application implements View {
       localModel.getLocalGameBoard().getGoldCards()
     );
 
-    //TODO draw decks
-    //drawCardDecks();
+    drawCardDecks(
+      localModel.getLocalGameBoard().getResourceDeckTopCard(),
+      localModel.getLocalGameBoard().getGoldDeckTopCard()
+    );
 
     drawCommonObjectiveCards(
       localModel.getLocalGameBoard().getObjectiveCards()
@@ -1486,29 +1490,44 @@ public class Gui extends Application implements View {
     PlayableCard firstResourceCard,
     PlayableCard firstGoldCard
   ) {
-    //TODO put this in drawGameBoard
-    HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
-    HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
+    Platform.runLater(() -> {
+      //TODO put this in drawGameBoard
+      HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
+      HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
 
-    resourceCardsDeck.getChildren().clear();
-    if (firstResourceCard != null) {
-      ImageView resource = loadCardImage(firstResourceCard, CardSideType.BACK);
-      resource.setPreserveRatio(true);
-      resource.setFitWidth(150);
-      resource.setStyle("-fx-cursor: hand");
+      resourceCardsDeck.getChildren().clear();
+      if (firstResourceCard != null) {
+        ImageView resource = loadCardImage(
+          firstResourceCard,
+          CardSideType.BACK
+        );
+        resource.setPreserveRatio(true);
+        resource.setFitWidth(150);
+        resource.setStyle("-fx-cursor: hand");
 
-      resourceCardsDeck.getChildren().add(wrapAndBorder(resource));
-    }
+        resource.setOnMouseClicked(
+          (MouseEvent event) ->
+            client.nextTurn(DrawingCardSource.Deck, DrawingDeckType.RESOURCE)
+        );
 
-    goldCardsDeck.getChildren().clear();
-    if (firstGoldCard != null) {
-      ImageView gold = loadCardImage(firstGoldCard, CardSideType.BACK);
-      gold.setPreserveRatio(true);
-      gold.setFitWidth(150);
-      gold.setStyle("-fx-cursor: hand");
+        resourceCardsDeck.getChildren().add((resource));
+      }
 
-      goldCardsDeck.getChildren().add(wrapAndBorder(gold));
-    }
+      goldCardsDeck.getChildren().clear();
+      if (firstGoldCard != null) {
+        ImageView gold = loadCardImage(firstGoldCard, CardSideType.BACK);
+        gold.setPreserveRatio(true);
+        gold.setFitWidth(150);
+        gold.setStyle("-fx-cursor: hand");
+
+        gold.setOnMouseClicked(
+          (MouseEvent event) ->
+            client.nextTurn(DrawingCardSource.Deck, DrawingDeckType.GOLD)
+        );
+
+        goldCardsDeck.getChildren().add((gold));
+      }
+    });
   }
 
   public boolean isInitialized() {

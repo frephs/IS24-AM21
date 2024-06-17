@@ -18,13 +18,13 @@ public class GameInfo implements Serializable {
     private final TokenColor tokenColor;
     private final UUID socketID;
     private final GameController.UserGameContext.ConnectionStatus connectionStatus;
-    Map<Position, Integer> playedCards;
-    List<Integer> handIDs;
-    Integer points;
-    Integer secretObjectiveCard;
-    Set<Position> availableSpots;
-    Set<Position> forbiddenSpots;
-    Integer index;
+    private final Map<Position, Integer> playedCards;
+    private final List<Integer> handIDs;
+    private final Integer points;
+    private final Integer secretObjectiveCard;
+    private final Set<Position> availableSpots;
+    private final Set<Position> forbiddenSpots;
+    private final Integer index;
 
     public GameInfoUser(
       String nickname,
@@ -104,6 +104,8 @@ public class GameInfo implements Serializable {
   private final CardIndexPair objectiveCards;
   private final CardIndexPair resourceCards;
   private final CardIndexPair goldCards;
+  private final Integer resourceDeckTopCardId;
+  private final Integer goldDeckTopCardId;
 
   public GameInfo(
     String gameId,
@@ -112,7 +114,9 @@ public class GameInfo implements Serializable {
     Integer remainingRounds,
     CardIndexPair objectiveCards,
     CardIndexPair resourceCards,
-    CardIndexPair goldCards
+    CardIndexPair goldCards,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     this.gameId = gameId;
     this.users = users;
@@ -121,6 +125,8 @@ public class GameInfo implements Serializable {
     this.objectiveCards = objectiveCards;
     this.resourceCards = resourceCards;
     this.goldCards = goldCards;
+    this.resourceDeckTopCardId = resourceDeckTopCardId;
+    this.goldDeckTopCardId = goldDeckTopCardId;
   }
 
   public GameInfo(
@@ -130,7 +136,9 @@ public class GameInfo implements Serializable {
     Integer remainingRounds,
     CardPair<ObjectiveCard> objectiveCards,
     CardPair<PlayableCard> resourceCards,
-    CardPair<PlayableCard> goldCards
+    CardPair<PlayableCard> goldCards,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     this(
       gameId,
@@ -139,7 +147,9 @@ public class GameInfo implements Serializable {
       remainingRounds,
       CardIndexPair.fromCardPair(objectiveCards),
       CardIndexPair.fromCardPair(resourceCards),
-      CardIndexPair.fromCardPair(goldCards)
+      CardIndexPair.fromCardPair(goldCards),
+      resourceDeckTopCardId,
+      goldDeckTopCardId
     );
   }
 
@@ -173,5 +183,13 @@ public class GameInfo implements Serializable {
 
   public Optional<Integer> getRemainingRounds() {
     return Optional.ofNullable(remainingRounds);
+  }
+
+  public Integer getResourceDeckTopCardId() {
+    return resourceDeckTopCardId;
+  }
+
+  public Integer getGoldDeckTopCardId() {
+    return goldDeckTopCardId;
   }
 }

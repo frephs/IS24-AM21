@@ -377,14 +377,14 @@ public class Cli implements View {
     if (firstResourceCard != null) {
       printUpdate(
         "Resource cards deck:\n" +
-        firstResourceCard.getSides().get(0).cardToAscii()
+        firstResourceCard.getSides().get(1).cardToAscii()
       );
     } else {
       printUpdate("Resource cards deck:\n" + "Empty deck");
     }
     if (firstGoldCard != null) {
       printUpdate(
-        "Gold cards deck:\n" + firstGoldCard.getSides().get(0).cardToAscii()
+        "Gold cards deck:\n" + firstGoldCard.getSides().get(1).cardToAscii()
       );
     } else {
       printUpdate("Gold cards deck:\n" + "Empty deck");

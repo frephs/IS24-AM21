@@ -64,11 +64,13 @@ public interface GameEventListener extends RemoteGameEventListener {
     Integer cardId,
     Integer newPairCardId,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   );
 
   /**
-   * @param playerId The player that has just finished their turn
+   * @param playerNickname The player that has just finished their turn
    */
   @Override
   void changeTurn(
@@ -77,7 +79,9 @@ public interface GameEventListener extends RemoteGameEventListener {
     Integer playerIndex,
     Boolean isLastRound,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   );
 
   /* current player placed a card */
