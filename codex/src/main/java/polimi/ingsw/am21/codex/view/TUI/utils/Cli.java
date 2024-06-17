@@ -22,19 +22,27 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class Cli implements View {
 
-  private static final Cli instance = new Cli(true);
-  Boolean colored;
+  public static class Options {
 
-  private Cli(Boolean colored) {
-    this.colored = colored;
+    private final Boolean colored;
+
+    public Options(Boolean colored) {
+      this.colored = colored;
+    }
+
+    public Boolean isColored() {
+      return colored;
+    }
   }
 
-  public static Cli getInstance() {
-    return instance;
+  Cli.Options options;
+
+  public Cli(Cli.Options options) {
+    this.options = options;
   }
 
   public Boolean isColored() {
-    return colored;
+    return options.isColored();
   }
 
   public void printPrompt() {
@@ -53,6 +61,7 @@ public class Cli implements View {
   public void displayException(Exception e) {
     printUpdate(
       CliUtils.colorize(
+        options,
         e.getMessage() +
         "\n " +
         Stream.of(e.getStackTrace())
@@ -71,6 +80,7 @@ public class Cli implements View {
   ) {
     printUpdate(
       CliUtils.colorize(
+        options,
         message,
         notificationType.getColor(),
         notificationType == NotificationType.ERROR
@@ -100,11 +110,17 @@ public class Cli implements View {
       .limit(2)
       .map(
         e ->
-          CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
+          CliUtils.colorize(
+            options,
+            e,
+            notificationType.getColor(),
+            ColorStyle.NORMAL
+          )
       )
       .forEach(result::add);
     result.add(
       CliUtils.colorize(
+        options,
         colorable,
         colorableIndex == 0 ? ColorStyle.BOLD : ColorStyle.NORMAL
       )
@@ -113,7 +129,12 @@ public class Cli implements View {
       .skip(2)
       .map(
         e ->
-          CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
+          CliUtils.colorize(
+            options,
+            e,
+            notificationType.getColor(),
+            ColorStyle.NORMAL
+          )
       )
       .forEach(result::add);
     printUpdate(String.join("", result));
@@ -153,7 +174,7 @@ public class Cli implements View {
       "The available token colors are: " +
       tokenColors
         .stream()
-        .map(token -> CliUtils.colorize(token, ColorStyle.NORMAL))
+        .map(token -> CliUtils.colorize(options, token, ColorStyle.NORMAL))
         .collect(Collectors.joining(" "))
     );
   }
@@ -170,6 +191,7 @@ public class Cli implements View {
           TokenColor token = localPlayer.getToken();
           return (
             CliUtils.colorize(
+              options,
               (nickname != null) ? nickname : "<pending>",
               token != null ? token.getColor() : Color.GRAY,
               ColorStyle.NORMAL
@@ -192,12 +214,14 @@ public class Cli implements View {
           int points = player.getPoints();
           return (
             CliUtils.colorize(
+              options,
               nickname,
               player.getToken().getColor(),
               ColorStyle.NORMAL
             ) +
             " - " +
             CliUtils.colorize(
+              options,
               String.valueOf(points),
               Color.YELLOW,
               ColorStyle.BOLD
@@ -214,6 +238,7 @@ public class Cli implements View {
       printUpdate(
         "Player " +
         CliUtils.colorize(
+          options,
           player.getNickname(),
           player.getToken().getColor(),
           ColorStyle.NORMAL
@@ -257,7 +282,9 @@ public class Cli implements View {
 
   @Override
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
-    printUpdate("Card drawn from deck " + deck + ":\n" + card.cardToAscii());
+    printUpdate(
+      "Card drawn from deck " + deck + ":\n" + card.cardToAscii(options)
+    );
   }
 
   @Override
@@ -290,14 +317,17 @@ public class Cli implements View {
 
   @Override
   public void drawCard(Card card) {
-    printUpdate("Card drawn:\n" + card.cardToAscii());
+    printUpdate("Card drawn:\n" + card.cardToAscii(options));
   }
 
   @Override
   public void drawHand(List<Card> hand) {
     printUpdate(
       "Hand:\n" +
-      hand.stream().map(Card::cardToAscii).collect(Collectors.joining("\n"))
+      hand
+        .stream()
+        .map(card -> card.cardToAscii(options))
+        .collect(Collectors.joining("\n"))
     );
   }
 
@@ -308,14 +338,14 @@ public class Cli implements View {
   ) {
     printUpdate(
       "Resource cards pair:\n" +
-      resourceCards.getFirst().cardToAscii() +
+      resourceCards.getFirst().cardToAscii(options) +
       "\n" +
-      resourceCards.getSecond().cardToAscii() +
+      resourceCards.getSecond().cardToAscii(options) +
       "\n" +
       "Gold cards pair:\n" +
-      goldCards.getFirst().cardToAscii() +
+      goldCards.getFirst().cardToAscii(options) +
       "\n" +
-      goldCards.getSecond().cardToAscii()
+      goldCards.getSecond().cardToAscii(options)
     );
   }
 
@@ -323,21 +353,26 @@ public class Cli implements View {
   public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
     printUpdate(
       "Objective cards pair:\n" +
-      cardPair.getFirst().cardToAscii() +
+      cardPair.getFirst().cardToAscii(options) +
       "\n" +
-      cardPair.getSecond().cardToAscii()
+      cardPair.getSecond().cardToAscii(options)
     );
   }
 
   @Override
   public void drawStarterCardSides(Card cardId) {
-    printUpdate("Starter card sides:\n" + cardId.cardToAscii());
+    printUpdate("Starter card sides:\n" + cardId.cardToAscii(options));
   }
 
   @Override
   public void drawWinner(String nickname) {
     printUpdate(
-      CliUtils.colorize("Winner: " + nickname, Color.GREEN, ColorStyle.BOLD)
+      CliUtils.colorize(
+        options,
+        "Winner: " + nickname,
+        Color.GREEN,
+        ColorStyle.BOLD
+      )
     );
   }
 
@@ -345,6 +380,7 @@ public class Cli implements View {
   public void drawChatMessage(ChatMessage message) {
     printUpdate(
       CliUtils.colorize(
+        options,
         message.getSender(),
         Color.PURPLE,
         ColorStyle.BACKGROUND
@@ -358,9 +394,9 @@ public class Cli implements View {
   public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
     printUpdate(
       "Common objective cardPair:\n" +
-      cardPair.getFirst().cardToAscii() +
+      cardPair.getFirst().cardToAscii(options) +
       "\n" +
-      cardPair.getSecond().cardToAscii()
+      cardPair.getSecond().cardToAscii(options)
     );
   }
 
@@ -377,14 +413,15 @@ public class Cli implements View {
     if (firstResourceCard != null) {
       printUpdate(
         "Resource cards deck:\n" +
-        firstResourceCard.getSides().get(1).cardToAscii()
+        firstResourceCard.getSides().get(1).cardToAscii(options)
       );
     } else {
       printUpdate("Resource cards deck:\n" + "Empty deck");
     }
     if (firstGoldCard != null) {
       printUpdate(
-        "Gold cards deck:\n" + firstGoldCard.getSides().get(1).cardToAscii()
+        "Gold cards deck:\n" +
+        firstGoldCard.getSides().get(1).cardToAscii(options)
       );
     } else {
       printUpdate("Gold cards deck:\n" + "Empty deck");
