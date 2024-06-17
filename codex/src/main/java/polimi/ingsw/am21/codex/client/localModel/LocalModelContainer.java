@@ -322,7 +322,7 @@ public class LocalModelContainer
         return gameEntry;
       });
 
-    if (socketID == this.socketId) {
+    if (socketID.equals(this.socketId)) {
       lobby = null;
       localGameBoard = null;
 
@@ -442,7 +442,7 @@ public class LocalModelContainer
       Optional.ofNullable(nickname).orElse(socketID.toString()) +
       " chose an objective card."
     );
-    if (this.socketId == socketID) {
+    if (this.socketId.equals(socketID)) {
       view.drawStarterCardSides(
         cardsLoader.getCardFromId(lobby.getStarterCardId())
       );
@@ -782,7 +782,9 @@ public class LocalModelContainer
     localGameBoard.setCurrentPlayerIndex(playerIndex);
     localGameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
     localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
-    if (localGameBoard.getCurrentPlayer().getSocketID() == this.socketId) {
+    if (
+      localGameBoard.getCurrentPlayer().getSocketID().equals(this.getSocketID())
+    ) {
       view.postNotification(NotificationType.UPDATE, "It's your turn. ");
       view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
     } else {
