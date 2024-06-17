@@ -1001,7 +1001,7 @@ public class Gui extends Application implements View {
       drawPlayerBoards(players);
       drawLeaderBoard(players);
       ((Text) scene.lookup("#window-title")).setText(
-          "Game " + localModel.getGameId()
+          "Game " + localModel.getGameId().get()
         );
 
       scene
