@@ -33,7 +33,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -204,15 +204,15 @@ public class Gui extends Application implements View {
         cards.getCardFromId(81),
         CardSideType.BACK,
         new Position(0, 0),
-        p1.getAvailableSpots(),
-        p1.getForbiddenSpots()
+        p1.getAvailableSpots().orElse(new HashSet<>()),
+        p1.getForbiddenSpots().orElse(new HashSet<>())
       );
     this.drawCardPlacement(
         cards.getCardFromId(1),
         CardSideType.BACK,
         new Position(1, 0),
-        p1.getAvailableSpots(),
-        p1.getForbiddenSpots()
+        p1.getAvailableSpots().orElse(new HashSet<>()),
+        p1.getForbiddenSpots().orElse(new HashSet<>())
       );
     this.drawHand(
         List.of(
@@ -689,7 +689,7 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Draw the scene for the player to chose a nickname
+   * Draw the scene for the player to choose a nickname
    * */
   @Override
   public void drawNicknameChoice() {
@@ -706,9 +706,6 @@ public class Gui extends Application implements View {
     });
   }
 
-  /**
-   * Draw the scene of the game's playerboard playerBoard and
-   * */
   @Override
   public void drawPlayerBoards(List<LocalPlayer> players) {
     // TODO handle other players (switch button etc)
@@ -747,6 +744,9 @@ public class Gui extends Application implements View {
         .findFirst()
         .ifPresent(this::drawPlayerBoard);
     });
+
+    // Draw the default player board
+    drawPlayerBoard(localModel.getLocalGameBoard().getPlayer());
 
     players
       .stream()
@@ -805,8 +805,14 @@ public class Gui extends Application implements View {
           gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
         });
 
-      drawAvailablePositions(player.getAvailableSpots(), gridPane);
-      drawForbiddenPositions(player.getForbiddenSpots(), gridPane);
+      drawAvailablePositions(
+        player.getAvailableSpots().orElse(new HashSet<>()),
+        gridPane
+      );
+      drawForbiddenPositions(
+        player.getForbiddenSpots().orElse(new HashSet<>()),
+        gridPane
+      );
       drawResourcesAndObjects(player);
 
       scrollPane.setContent(gridPane);
@@ -913,6 +919,7 @@ public class Gui extends Application implements View {
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
     hasPlacedCard = false;
+    drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
   }
 
   /**
@@ -989,6 +996,7 @@ public class Gui extends Application implements View {
       drawChat(players);
       drawGameBoard();
       drawPlayerBoards(players);
+      drawLeaderBoard(players);
       ((Text) scene.lookup("#window-title")).setText(
           "Game " + localModel.getGameId()
         );
@@ -1006,7 +1014,7 @@ public class Gui extends Application implements View {
     );
     //TODO draw decks
     drawCommonObjectiveCards(
-      localModel.getLocalGameBoard().getCommonObjectives()
+      localModel.getLocalGameBoard().getObjectiveCards()
     );
   }
 

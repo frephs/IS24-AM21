@@ -1,13 +1,13 @@
-package polimi.ingsw.am21.codex.model.Cards.Commons;
+package polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 
-import polimi.ingsw.am21.codex.model.Cards.Card;
+import java.io.Serializable;
 
-public class CardPair<T extends Card> {
+public class CardPairBase<T> implements Serializable {
 
   private T first;
   private T second;
 
-  public CardPair(T firstCard, T secondCard) {
+  public CardPairBase(T firstCard, T secondCard) {
     this.first = firstCard;
     this.second = secondCard;
   }

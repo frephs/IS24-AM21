@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.controller.messages.clientActions.game;
 
+import java.util.UUID;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -11,13 +12,14 @@ public class PlaceCardMessage extends GameActionMessage {
   private final Position position;
 
   public PlaceCardMessage(
+    UUID connectionID,
     String gameId,
     String playerNickname,
     int playerHandCardNumber,
     CardSideType side,
     Position position
   ) {
-    super(MessageType.PLACE_CARD, gameId, playerNickname);
+    super(MessageType.PLACE_CARD, connectionID, gameId, playerNickname);
     this.playerHandCardNumber = playerHandCardNumber;
     this.side = side;
     this.position = position;

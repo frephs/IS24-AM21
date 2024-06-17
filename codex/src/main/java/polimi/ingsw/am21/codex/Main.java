@@ -26,9 +26,6 @@ public class Main {
     System.out.println("Client Parameters: ");
     System.out.println("--rmi: use RMI connection (by default it uses TCP)");
     System.out.println(
-      "--ip=<ip>: specify the address of the server to connect to, if starting a client (default: 127.0.0.1)"
-    );
-    System.out.println(
       "--port=<port>: specify the port to connect to " +
       "(default: " +
       ConnectionType.TCP.getDefaultPort() +
@@ -66,9 +63,9 @@ public class Main {
   }
 
   private static void startClient(
+    String serverAddress,
     ClientType clientType,
     ConnectionType connectionType,
-    String serverAddress,
     Integer port
   ) throws MalformedURLException, NotBoundException, RemoteException {
     System.out.println(
@@ -108,9 +105,6 @@ public class Main {
       AtomicReference<Integer> tcpPort = new AtomicReference<>(
         ConnectionType.TCP.getDefaultPort()
       );
-      AtomicReference<Integer> rmiPort = new AtomicReference<>(
-        ConnectionType.RMI.getDefaultPort()
-      );
 
       Arrays.stream(args)
         .filter(arg -> arg.startsWith("--tcp-port"))
@@ -118,6 +112,9 @@ public class Main {
         .ifPresent(arg -> {
           tcpPort.set(Integer.parseInt(arg.split("=")[1]));
         });
+      AtomicReference<Integer> rmiPort = new AtomicReference<>(
+        ConnectionType.RMI.getDefaultPort()
+      );
 
       Arrays.stream(args)
         .filter(arg -> arg.startsWith("--rmi-port"))
@@ -132,9 +129,6 @@ public class Main {
       AtomicReference<String> serverAddress = new AtomicReference<>(
         "127.0.0.1"
       );
-      AtomicReference<Integer> port = new AtomicReference<>(
-        connectionType.getDefaultPort()
-      );
 
       if (Arrays.asList(args).contains("--cli")) {
         clientType = ClientType.CLI;
@@ -143,6 +137,10 @@ public class Main {
       if (Arrays.asList(args).contains("--rmi")) {
         connectionType = ConnectionType.RMI;
       }
+
+      AtomicReference<Integer> port = new AtomicReference<>(
+        connectionType.getDefaultPort()
+      );
 
       Arrays.stream(args)
         .filter(arg -> arg.startsWith("--ip"))
@@ -158,7 +156,7 @@ public class Main {
           port.set(Integer.parseInt(arg.split("=")[1]));
         });
 
-      startClient(clientType, connectionType, serverAddress.get(), port.get());
+      startClient(serverAddress.get(), clientType, connectionType, port.get());
     }
   }
 

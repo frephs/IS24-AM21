@@ -3,9 +3,11 @@ package polimi.ingsw.am21.codex.model;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.json.JSONArray;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -13,13 +15,13 @@ import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.Chat;
 import polimi.ingsw.am21.codex.model.GameBoard.*;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class Game {
 
@@ -71,7 +73,7 @@ public class Game {
 
     this.state = GameState.PLAYING;
     Collections.shuffle(players);
-    currentPlayer = 0;
+    this.currentPlayer = 0;
   }
 
   /**
@@ -99,9 +101,10 @@ public class Game {
    *
    * @param nickname The nickname of the player.
    * @return The state of the player.
-   * @throws PlayerNotFoundException If the player is not found.
+   * @throws PlayerNotFoundGameException If the player is not found.
    */
-  public PlayerState getPlayerState(String nickname) {
+  public PlayerState getPlayerState(String nickname)
+    throws PlayerNotFoundGameException {
     int i = 0;
     while (
       i < players.size() && !players.get(i).getNickname().equals(nickname)
@@ -109,7 +112,7 @@ public class Game {
       i++;
     }
 
-    if (i >= players.size()) throw new PlayerNotFoundException(nickname);
+    if (i >= players.size()) throw new PlayerNotFoundGameException(nickname);
 
     if (i == currentPlayer) return PlayerState.PLAYING;
     return PlayerState.WAITING;
@@ -143,11 +146,11 @@ public class Game {
    *
    * @param nickname The nickname of the player you're looking for
    */
-  public Player getPlayer(String nickname) throws PlayerNotFoundException {
+  public Player getPlayer(String nickname) throws PlayerNotFoundGameException {
     return this.players.stream()
       .filter(player -> Objects.equals(player.getNickname(), nickname))
       .findFirst()
-      .orElseThrow(() -> new PlayerNotFoundException(nickname));
+      .orElseThrow(() -> new PlayerNotFoundGameException(nickname));
   }
 
   /**
@@ -169,7 +172,6 @@ public class Game {
    *
    * @return The index of current player.
    */
-
   public Integer getCurrentPlayerIndex() {
     return this.currentPlayer;
   }
@@ -237,52 +239,73 @@ public class Game {
   }
 
   /**
-   * Draws the player card and runs nextTurn();
+   * Draws the player card and runs nextTurnExecute();
    *
    * @param drawingSource      Where we are drawing the card rom
    * @param deckType           The type of deck to draw from.
-   * @param drawnCardsCallback Callback to be called after the cards are
-   *                           drawn: the first parameter is the id of the card drawn
-   *                           by the player, the second is from the one drawn for
-   *                           the card pair (if any, null otherwise).
+   * @param nextTurnEventAfterDraw Callback to be called after the cards are
+   *                               drawn: the first parameter is the id of the card drawn
+   *                               by the player, the second is from the one drawn for
+   *                               the card pair (if any, null otherwise).
+   * @param nextTurnWithoutDraw  Callback to be called if the player cannot draw a card
+   *                             (e.g. because the deck is empty).
+   * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
    * @throws GameOverException If the game is over.
    */
   public void nextTurn(
     DrawingCardSource drawingSource,
     DrawingDeckType deckType,
-    BiConsumer<Integer, Integer> drawnCardsCallback
-  ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
-    int playerCardId;
+    BiConsumer<Integer, Integer> nextTurnEventAfterDraw,
+    Runnable nextTurnWithoutDraw,
+    Consumer<Integer> remainingRoundsChange
+  ) throws InvalidActionException {
     AtomicReference<Integer> pairCardId = new AtomicReference<>();
 
+    if (this.state == GameState.GAME_OVER) {
+      throw new GameOverException();
+    }
+    if (this.remainingRounds != null) {
+      throw new InvalidNextTurnCallException();
+    }
+
+    Runnable nextTurnEvent = nextTurnWithoutDraw;
+
+    try {
+      PlayableCard playerCard =
+        this.gameBoard.drawCard(drawingSource, deckType, replacementCard -> {
+            pairCardId.set(replacementCard.getId());
+          });
+
+      this.players.get(this.currentPlayer).drawCard(playerCard);
+      nextTurnEvent = () ->
+        nextTurnEventAfterDraw.accept(playerCard.getId(), pairCardId.get());
+    } catch (EmptyDeckException e) {
+      this.remainingRounds = 2;
+      remainingRoundsChange.accept(this.remainingRounds);
+      this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
+      throw e;
+    }
+    this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
+  }
+
+  /**
+   * runs nextTurnExecute()
+   *
+   * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
+   * @throws GameOverException If the game is over.
+   */
+  public void nextTurn(
+    Runnable nextTurnWithoutDraw,
+    Consumer<Integer> remainingRoundsChange
+  ) throws InvalidActionException {
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
     if (this.remainingRounds == null) {
       throw new InvalidNextTurnCallException();
     }
-    try {
-      PlayableCard playerCard =
-        this.gameBoard.drawCard(drawingSource, deckType, replacementCard -> {
-            pairCardId.set(replacementCard.getId());
-          });
-      playerCardId = playerCard.getId();
 
-      this.players.get(this.currentPlayer).drawCard(playerCard);
-
-      drawnCardsCallback.accept(playerCardId, pairCardId.get());
-    } catch (EmptyDeckException e) {
-      this.remainingRounds = 2;
-      throw e;
-    }
-    this.nextTurn();
-  }
-
-  public void nextTurn(
-    DrawingCardSource drawingSource,
-    DrawingDeckType deckType
-  ) throws GameOverException, EmptyDeckException, InvalidNextTurnCallException {
-    this.nextTurn(drawingSource, deckType, (a, b) -> {});
+    this.nextTurnExecute(nextTurnWithoutDraw, remainingRoundsChange);
   }
 
   /**
@@ -295,35 +318,46 @@ public class Game {
    * points threshold. If either condition is met, the game state is updated
    * to {@link GameState#GAME_OVER} and a {@link GameOverException} is thrown.
    *
+   * @param remainingRoundsChange Callback triggered if the number of remaining rounds changes (so when the next (or current) round  will be the last one
+   *
    * @throws GameOverException            If the game is already over.
    * @throws InvalidNextTurnCallException if nextTurn is called without the
    *                                      drawing deck information, and it is
    *                                      not the last round
    */
-  public void nextTurn()
-    throws GameOverException, InvalidNextTurnCallException {
+  private void nextTurnExecute(
+    Runnable nextTurnEvent,
+    Consumer<Integer> remainingRoundsChange
+  ) throws InvalidActionException {
     if (this.state == GameState.GAME_OVER) throw new GameOverException();
     if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
       this.state = GameState.GAME_OVER;
       throw new GameOverException();
     }
-    if (this.remainingRounds == null) throw new InvalidNextTurnCallException();
-    players.get(currentPlayer).toggleCardPlacedThisTurn();
+    this.getCurrentPlayer().resetCardPlaced();
     currentPlayer = (currentPlayer + 1) % players.size();
+    boolean remainingRoundsChanged = false;
     if (this.currentPlayer == 0) {
-      this.remainingRounds--;
-      if (this.remainingRounds == 0) {
-        this.state = GameState.GAME_OVER;
-        for (Player player : players) {
-          player.evaluateSecretObjective();
-          CardPair<ObjectiveCard> objectiveCards =
-            gameBoard.getObjectiveCards();
-          player.evaluate(objectiveCards.getFirst());
-          player.evaluate(objectiveCards.getSecond());
+      if (this.remainingRounds != null) {
+        this.remainingRounds--;
+        remainingRoundsChanged = true;
+        if (this.remainingRounds == 0) {
+          this.state = GameState.GAME_OVER;
+          for (Player player : players) {
+            player.evaluateSecretObjective();
+            CardPair<ObjectiveCard> objectiveCards =
+              gameBoard.getObjectiveCards();
+            player.evaluate(objectiveCards.getFirst());
+            player.evaluate(objectiveCards.getSecond());
+          }
+          throw new GameOverException();
         }
-        throw new GameOverException();
       }
     }
+    if (remainingRoundsChanged) remainingRoundsChange.accept(
+      this.remainingRounds
+    );
+    if (nextTurnEvent != null) nextTurnEvent.run();
   }
 
   /**
@@ -354,7 +388,7 @@ public class Game {
   }
 
   public Boolean isLastRound() {
-    return remainingRounds != null && this.remainingRounds == 1;
+    return this.remainingRounds != null && this.remainingRounds == 1;
   }
 
   public List<PlayableCard> drawHand() throws EmptyDeckException {
@@ -381,6 +415,18 @@ public class Game {
 
   public Integer getPlayersSpotsLeft() {
     return this.getMaxPlayers() - this.getPlayersCount();
+  }
+
+  public CardPair<ObjectiveCard> getObjectiveCards() {
+    return this.gameBoard.getObjectiveCards();
+  }
+
+  public CardPair<PlayableCard> getResourceCards() {
+    return this.gameBoard.getResourceCards();
+  }
+
+  public CardPair<PlayableCard> getGoldCards() {
+    return this.gameBoard.getGoldCards();
   }
 
   public Chat getChat() {

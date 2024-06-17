@@ -1,14 +1,21 @@
 package polimi.ingsw.am21.codex.model.Player;
 
-public class IllegalPlacingPositionException extends Exception {
+import java.util.List;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 
-  public IllegalPlacingPositionException() {
-    super(
-      "You tried placing a card in a position which is either forbidden, occupied or not reachable"
-    );
+public class IllegalPlacingPositionException extends InvalidActionException {
+
+  public IllegalPlacingPositionException(String reason) {
+    super(InvalidActionCode.ILLEGAL_PLACING_POSITION, List.of(reason));
   }
 
-  public IllegalPlacingPositionException(String message) {
-    super(message);
+  public String getReason() {
+    return this.getNotes().get(0);
+  }
+
+  public static IllegalPlacingPositionException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new IllegalPlacingPositionException(notes.get(0));
   }
 }

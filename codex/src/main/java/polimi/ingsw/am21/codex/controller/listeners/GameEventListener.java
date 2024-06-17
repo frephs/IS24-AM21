@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.rmi.RemoteException;
 import java.util.*;
-import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
@@ -23,7 +23,12 @@ public interface GameEventListener extends RemoteGameEventListener {
   void playerLeftLobby(String gameId, UUID socketID);
 
   @Override
-  void playerSetToken(String gameId, UUID socketID, TokenColor token);
+  void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  );
 
   @Override
   void playerSetNickname(String gameId, UUID socketID, String nickname);
@@ -43,12 +48,23 @@ public interface GameEventListener extends RemoteGameEventListener {
   );
 
   @Override
-  void gameStarted(
+  void gameStarted(String gameId, GameInfo gameInfo);
+
+  /**
+   * @param playerId The player that has just finished their turn
+   */
+  @Override
+  void changeTurn(
     String gameId,
-    List<String> players,
-    Pair<Integer, Integer> goldCardPairIds,
-    Pair<Integer, Integer> resourceCardPairIds,
-    Pair<Integer, Integer> commonObjectivesIds
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    DrawingCardSource source,
+    DrawingDeckType deck,
+    Integer cardId,
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   );
 
   /**
@@ -57,19 +73,12 @@ public interface GameEventListener extends RemoteGameEventListener {
   @Override
   void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
-    DrawingCardSource source,
-    DrawingDeckType deck,
-    Integer cardId,
-    Integer newPairCardId
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   );
-
-  /**
-   * @param playerId The player that has just finished their turn
-   */
-  @Override
-  void changeTurn(String gameId, String playerId, Boolean isLastRound);
 
   /* current player placed a card */
   @Override
@@ -88,17 +97,27 @@ public interface GameEventListener extends RemoteGameEventListener {
   );
 
   @Override
-  void gameOver() throws RemoteException;
+  void gameOver();
 
   @Override
   void playerScoresUpdate(Map<String, Integer> newScores);
 
   @Override
-  void remainingTurns(int remainingTurns);
+  void remainingRounds(String gameID, int remainingRounds);
 
   @Override
   void winningPlayer(String nickname);
 
   @Override
-  void chatMessageSent(String gameId, ChatMessage chatMessage);
+  void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  );
+
+  @Override
+  void lobbyInfo(LobbyUsersInfo usersInfo);
+
+  @Override
+  void chatMessage(String gameID, ChatMessage message);
 }

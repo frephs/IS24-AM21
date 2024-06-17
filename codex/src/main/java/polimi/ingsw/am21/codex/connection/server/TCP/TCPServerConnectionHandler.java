@@ -8,14 +8,17 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.exceptions.CardAlreadyPlacedException;
-import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
-import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotActive;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
@@ -23,27 +26,14 @@ import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.*;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.*;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Game;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.PlayerNotFoundException;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
-import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.*;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 /** Runnable that handles a TCP connection */
 public class TCPServerConnectionHandler implements Runnable {
@@ -55,7 +45,6 @@ public class TCPServerConnectionHandler implements Runnable {
   /**
    * A UUID associated with the socket
    */
-  private final UUID socketId;
   /**
    * The Game controller
    */
@@ -78,18 +67,9 @@ public class TCPServerConnectionHandler implements Runnable {
    * The executor that handles the threads for parsing and handling messages
    */
   private final ExecutorService localExecutor;
+  private final TCPServerControllerListener listener;
 
-  /**
-   * The map of active connection handlers, used to handle message broadcasting
-   */
-  private final Map<UUID, TCPServerConnectionHandler> activeHandlers;
-
-  public TCPServerConnectionHandler(
-    Socket socket,
-    GameController controller,
-    UUID socketId,
-    Map<UUID, TCPServerConnectionHandler> activeHandlers
-  ) {
+  public TCPServerConnectionHandler(Socket socket, GameController controller) {
     this.socket = socket;
     try {
       this.socket.setKeepAlive(true);
@@ -97,11 +77,10 @@ public class TCPServerConnectionHandler implements Runnable {
     } catch (SocketException e) {
       throw new RuntimeException("Failed to enable TCP/IP Keep-Alive", e);
     }
+
     this.controller = controller;
     this.incomingMessages = new ArrayDeque<>();
     this.localExecutor = Executors.newCachedThreadPool();
-    this.socketId = socketId;
-    this.activeHandlers = activeHandlers;
 
     try {
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -112,6 +91,7 @@ public class TCPServerConnectionHandler implements Runnable {
         "from socket."
       );
     }
+    this.listener = new TCPServerControllerListener(this::broadcast);
   }
 
   /** Runs the parser and handler threads */
@@ -126,7 +106,6 @@ public class TCPServerConnectionHandler implements Runnable {
     });
     startMessageParser();
     startMessageHandler();
-    send(new SocketIdMessage(socketId));
   }
 
   /**
@@ -136,7 +115,6 @@ public class TCPServerConnectionHandler implements Runnable {
     try {
       socket.close();
     } catch (IOException ignored) {}
-    activeHandlers.remove(socketId);
   }
 
   /**
@@ -228,6 +206,8 @@ public class TCPServerConnectionHandler implements Runnable {
   private void handleMessage(Message message)
     throws NotAClientMessageException {
     switch (message.getType()) {
+      case CONNECT -> handleMessage((ConnectMessage) message);
+      case HEART_BEAT -> handleMessage((HeartBeatMessage) message);
       case NEXT_TURN_ACTION -> handleMessage((NextTurnActionMessage) message);
       case PLACE_CARD -> handleMessage((PlaceCardMessage) message);
       case CREATE_GAME -> handleMessage((CreateGameMessage) message);
@@ -251,169 +231,111 @@ public class TCPServerConnectionHandler implements Runnable {
     }
   }
 
+  private void handleMessage(ConnectMessage message) {
+    controller.connect(message.getConnectionID(), listener);
+  }
+
   private void handleMessage(NextTurnActionMessage message) {
     try {
       // isLastRound() is present both in the message and the controller, we can use either
       if (controller.isLastRound(message.getGameId())) {
-        controller.nextTurn(message.getGameId(), message.getPlayerNickname());
+        controller.nextTurn(message.getConnectionID());
       } else {
         controller.nextTurn(
-          message.getGameId(),
-          message.getPlayerNickname(),
+          message.getConnectionID(),
           message.getCardSource(),
           message.getDeck()
         );
       }
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getGameId()));
-    } catch (
-      PlayerNotActive
-      | GameOverException
-      | EmptyDeckException
-      | InvalidNextTurnCallException
-      | PlayerNotFoundException e
-    ) {
-      send(new ActionNotAllowedMessage(e.getMessage()));
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(PlaceCardMessage message) {
     try {
       controller.placeCard(
-        message.getGameId(),
-        message.getPlayerNickname(),
+        message.getConnectionID(),
         message.getPlayerHandCardNumber(),
         message.getSide(),
         message.getPosition()
       );
-    } catch (PlayerNotActive | CardAlreadyPlacedException e) {
-      send(new ActionNotAllowedMessage(e.getMessage()));
-    } catch (
-      IllegalPlacingPositionException | IllegalCardSideChoiceException e
-    ) {
-      send(new InvalidCardPlacementMessage(e.getMessage()));
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getGameId()));
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(CreateGameMessage message) {
     try {
-      controller.createGame(message.getGameId(), message.getPlayers());
-    } catch (EmptyDeckException | InvalidGameNameException e) {
-      throw new RuntimeException(e);
-    } catch (GameAlreadyExistsException e) {
-      send(new GameAlreadyExistsMessage(message.getGameId()));
+      controller.createGame(
+        message.getConnectionID(),
+        message.getGameId(),
+        message.getPlayers()
+      );
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
-  /*
-   * TODO also, in other messages, make sure that we are not in the lobby state;
-   *  otherwise, use ActionNotAllowedMessage
-   */
-
   private void handleMessage(JoinLobbyMessage message) {
     try {
-      controller.joinLobby(message.getLobbyId(), socketId);
-
-      Map<UUID, Pair<String, TokenColor>> playersInfo = new HashMap<>();
-      controller
-        .getGame(message.getLobbyId())
-        .getPlayers()
-        .forEach(
-          player ->
-            playersInfo.put(
-              player.getSocketId(),
-              new Pair<>(player.getNickname(), player.getToken())
-            )
-        );
-      playersInfo.putAll(
-        controller.getGame(message.getLobbyId()).getLobby().getPlayersInfo()
-      );
-
-      send(new LobbyStatusMessage(playersInfo));
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getLobbyId()));
-    } catch (LobbyFullException e) {
-      send(new GameFullMessage(message.getLobbyId()));
-    } catch (GameAlreadyStartedException e) {
-      send(new GameAlreadyStartedMessage());
+      controller.joinLobby(message.getConnectionID(), message.getLobbyId());
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(SelectCardSideMessage message) {
     try {
       controller.joinGame(
+        message.getConnectionID(),
         message.getLobbyId(),
-        socketId,
         message.getCardSideType()
       );
-    } catch (GameNotReadyException | EmptyDeckException e) {
-      send(new ActionNotAllowedMessage(e.getMessage()));
-    } catch (
-      IllegalCardSideChoiceException | IllegalPlacingPositionException e
-    ) {
-      send(new InvalidCardPlacementMessage(e.getMessage()));
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getLobbyId()));
-    } catch (GameAlreadyStartedException e) {
-      send(new GameAlreadyStartedMessage());
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(SelectObjectiveMessage message) {
     try {
       controller.lobbyChooseObjective(
-        message.getLobbyId(),
-        socketId,
+        message.getConnectionID(),
         message.isFirst()
       );
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getLobbyId()));
-    } catch (GameAlreadyStartedException e) {
-      send(new GameAlreadyStartedMessage());
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(SetNicknameMessage message) {
     try {
       controller.lobbySetNickname(
-        message.getLobbyId(),
-        socketId,
+        message.getConnectionID(),
         message.getNickname()
       );
-    } catch (NicknameAlreadyTakenException e) {
-      send(new NicknameAlreadyTakenMessage(message.getNickname()));
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getLobbyId()));
-    } catch (GameAlreadyStartedException e) {
-      send(new GameAlreadyStartedMessage());
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(SetTokenColorMessage message) {
     try {
       controller.lobbySetTokenColor(
-        message.getLobbyId(),
-        socketId,
+        message.getConnectionID(),
         message.getColor()
       );
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getLobbyId()));
-    } catch (TokenAlreadyTakenException e) {
-      send(new TokenColorAlreadyTakenMessage(message.getColor()));
-    } catch (GameAlreadyStartedException e) {
-      send(new GameAlreadyStartedMessage());
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(GetGameStatusMessage message) {
     try {
       Game game = controller.getGame(message.getGameId());
-
       send(new GameStatusMessage(game.getState()));
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getGameId()));
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -432,7 +354,7 @@ public class TCPServerConnectionHandler implements Runnable {
       Game game = controller.getGame(message.getGameId());
       Optional<CardPair<ObjectiveCard>> pair = game
         .getLobby()
-        .getPlayerObjectiveCards(socketId);
+        .getPlayerObjectiveCards(message.getConnectionID());
 
       send(
         new ObjectiveCardsMessage(
@@ -443,28 +365,40 @@ public class TCPServerConnectionHandler implements Runnable {
             )
         )
       );
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getGameId()));
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
   private void handleMessage(GetStarterCardSideMessage message) {
     try {
       Game game = controller.getGame(message.getGameId());
-      PlayableCard starterCard = game.getLobby().getStarterCard(socketId);
+      PlayableCard starterCard = game
+        .getLobby()
+        .getStarterCard(message.getConnectionID());
 
       send(new StarterCardSidesMessage(starterCard.getId()));
-    } catch (GameNotFoundException e) {
-      send(new GameNotFoundMessage(message.getGameId()));
+    } catch (PlayerNotFoundGameException e) {
+      send(InvalidActionMessage.fromException(new PlayerNotFoundException(e)));
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
+  }
+
+  private void handleMessage(HeartBeatMessage message) {
+    controller.heartBeat(message.getConnectionID());
   }
 
   public void handleMessage(SendChatMessage message) {
     try {
-      controller.sendChatMessage(message.getGameId(), message.getMessage());
-      broadcast(message, false);
-    } catch (GameNotFoundException e) {
-      throw new RuntimeException(e);
+      controller.sendChatMessage(
+        message.getConnectionID(),
+        message.getMessage().getRecipient().orElse(null),
+        message.getMessage().getContent()
+      );
+      broadcast(message);
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
     }
   }
 
@@ -472,7 +406,7 @@ public class TCPServerConnectionHandler implements Runnable {
   public void send(Message message) {
     try {
       if (socket.isConnected() && !socket.isClosed()) {
-        System.out.println("Sending " + message.getType() + " to " + socketId);
+        System.out.println("Sending " + message.getType());
         synchronized (outputStream) {
           outputStream.writeObject(message);
           outputStream.flush();
@@ -497,18 +431,8 @@ public class TCPServerConnectionHandler implements Runnable {
   /**
    * Invokes .send() on all TCPConnectionHandler threads in the pool
    * @param message The message to broadcast to all clients
-   * @param excludeCurrent Whether to exclude the current thread from being targeted,
-   *                       defaults to false
    */
-  public void broadcast(Message message, boolean excludeCurrent) {
-    activeHandlers.forEach((socketId, handler) -> {
-      if (socketId != this.socketId || !excludeCurrent) {
-        handler.send(message);
-      }
-    });
-  }
-
   public void broadcast(Message message) {
-    broadcast(message, false);
+    this.send(message);
   }
 }

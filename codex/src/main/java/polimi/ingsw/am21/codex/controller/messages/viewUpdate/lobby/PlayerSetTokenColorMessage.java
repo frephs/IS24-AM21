@@ -10,16 +10,19 @@ public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
   private final String gameId;
   private final UUID socketId;
   private final TokenColor color;
+  private final String nickname;
 
   public PlayerSetTokenColorMessage(
     String gamedId,
     UUID socketId,
+    String nickname,
     TokenColor color
   ) {
     super(MessageType.PLAYER_SET_TOKEN_COLOR);
     this.gameId = gamedId;
     this.socketId = socketId;
     this.color = color;
+    this.nickname = nickname;
   }
 
   public String getGameId() {
@@ -34,6 +37,10 @@ public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
     return color;
   }
 
+  public String getNickname() {
+    return nickname;
+  }
+
   @Override
   public String toString() {
     return (
@@ -45,6 +52,8 @@ public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
       socketId +
       ", color=" +
       color +
+      ", nickname='" +
+      nickname +
       '}'
     );
   }

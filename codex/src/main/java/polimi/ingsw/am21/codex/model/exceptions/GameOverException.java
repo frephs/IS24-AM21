@@ -1,8 +1,10 @@
 package polimi.ingsw.am21.codex.model.exceptions;
 
-public class GameOverException extends Exception {
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+
+public class GameOverException extends InvalidActionException {
 
   public GameOverException() {
-    super("Game is over");
+    super(InvalidActionCode.GAME_OVER);
   }
 }

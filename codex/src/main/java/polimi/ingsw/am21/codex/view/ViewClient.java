@@ -11,6 +11,10 @@ public abstract class ViewClient {
   protected LocalModelContainer localModel;
   protected ClientConnectionHandler client;
 
+  public ViewClient(LocalModelContainer localModel) {
+    this.localModel = localModel;
+  }
+
   public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
       client = new TCPClientConnectionHandler(address, port, localModel);

@@ -1,8 +1,10 @@
 package polimi.ingsw.am21.codex.model.Cards.Commons;
 
-public class EmptyDeckException extends Exception {
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+
+public class EmptyDeckException extends InvalidActionException {
 
   public EmptyDeckException() {
-    super("Deck is empty");
+    super(InvalidActionCode.EMPTY_DECK);
   }
 }

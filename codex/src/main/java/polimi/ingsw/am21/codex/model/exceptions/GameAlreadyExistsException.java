@@ -1,8 +1,21 @@
 package polimi.ingsw.am21.codex.model.exceptions;
 
-public class GameAlreadyExistsException extends Exception {
+import java.util.List;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 
-  public GameAlreadyExistsException(String gameId) {
-    super("Game " + gameId + " already exists.");
+public class GameAlreadyExistsException extends InvalidActionException {
+
+  public GameAlreadyExistsException(String gameID) {
+    super(InvalidActionCode.GAME_ALREADY_EXISTS, List.of(gameID));
+  }
+
+  public String getGameID() {
+    return getNotes().get(0);
+  }
+
+  public static GameAlreadyExistsException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new GameAlreadyExistsException(notes.get(0));
   }
 }
