@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.model.Cards.EdgePosition;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
@@ -75,7 +76,7 @@ public class GeometricObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToString() {
+  public String cardToString(Cli.Options options) {
     return (
       "group of cards positioned as following: \n" +
       geometry
@@ -90,6 +91,7 @@ public class GeometricObjective extends Objective implements CliCard {
               .toLowerCase() +
             ": " +
             CliUtils.colorize(
+              options,
               adjacentPositionResourceTypeEntry.getValue(),
               ColorStyle.UNDERLINED
             )
@@ -99,7 +101,10 @@ public class GeometricObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+  public String cardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  ) {
     //TODO add cardToAscii implementation
     return "";
   }

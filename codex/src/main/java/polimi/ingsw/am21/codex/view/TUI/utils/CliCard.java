@@ -3,14 +3,14 @@ package polimi.ingsw.am21.codex.view.TUI.utils;
 import java.util.HashMap;
 
 public interface CliCard {
-  String cardToString();
+  String cardToString(Cli.Options options);
 
   /**
    * Converts the card to an ASCII representation
    * @return The rendered ASCII string
    */
-  default String cardToAscii() {
-    return cardToAscii(new HashMap<>());
+  default String cardToAscii(Cli.Options options) {
+    return cardToAscii(options, new HashMap<>());
   }
 
   /**
@@ -18,9 +18,15 @@ public interface CliCard {
    * @param cardStringMap Maps the position of the item to the corresponding string to render inside the card
    * @return The rendered ASCII string
    */
-  String cardToAscii(HashMap<Integer, String> cardStringMap);
+  String cardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  );
 
-  static String playableCardToAscii(HashMap<Integer, String> cardStringMap) {
+  static String playableCardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  ) {
     return (
       "┌───" +
       (cardStringMap.containsKey(0) ? "┬" : "─") +

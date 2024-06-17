@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.Objective;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 
 public class ConcreteObjective extends Objective {
 
@@ -18,17 +19,20 @@ public class ConcreteObjective extends Objective {
   }
 
   @Override
-  public String cardToString() {
+  public String cardToString(Cli.Options options) {
     return "";
   }
 
   @Override
-  public String cardToAscii() {
-    return super.cardToAscii();
+  public String cardToAscii(Cli.Options options) {
+    return super.cardToAscii(options);
   }
 
   @Override
-  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+  public String cardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  ) {
     return "";
   }
 }

@@ -252,7 +252,8 @@ public class Gui extends Application implements View {
       //testLobby();
       //      testGame();
     } catch (IOException e) {
-      Cli.getInstance().displayException(e);
+      // TODO: Handle exception
+      System.err.println(e);
     }
   }
 
@@ -409,9 +410,11 @@ public class Gui extends Application implements View {
   public void displayException(Exception exception) {
     try {
       exceptionLoader.loadException(exception);
-      Cli.getInstance().displayException(exception);
+      // TODO: Handle exception
+      System.err.println(exception);
     } catch (IOException e) {
-      Cli.getInstance().displayException(e);
+      // TODO: Handle exception
+      System.err.println(exception);
     }
   }
 

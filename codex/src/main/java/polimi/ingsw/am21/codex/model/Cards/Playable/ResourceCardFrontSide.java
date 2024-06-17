@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
 public class ResourceCardFrontSide
@@ -36,15 +37,18 @@ public class ResourceCardFrontSide
    * */
 
   @Override
-  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+  public String cardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  ) {
     if (!cardStringMap.containsKey(5) && points > 0) {
       cardStringMap.put(5, StringUtils.center(String.valueOf(points), 5, ' '));
     }
-    return super.cardToAscii(cardStringMap);
+    return super.cardToAscii(options, cardStringMap);
   }
 
   @Override
-  public String cardToString() {
+  public String cardToString(Cli.Options options) {
     // TODO: Implement TUI method
     return "";
   }

@@ -16,6 +16,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
@@ -25,9 +26,12 @@ public class DummyView implements View {
 
   final String id;
 
+  Cli.Options options;
+
   public DummyView(String id) {
     super();
     this.id = id;
+    this.options = new Cli.Options(true);
   }
 
   public void postNotification(
@@ -36,6 +40,7 @@ public class DummyView implements View {
   ) {
     System.out.println(
       CliUtils.colorize(
+        options,
         "[" + id + "] " + message,
         notificationType.getColor(),
         ColorStyle.NORMAL
@@ -57,6 +62,7 @@ public class DummyView implements View {
   @Override
   public void displayException(Exception e) {
     CliUtils.colorize(
+      options,
       "[" + id + "] " + e.getMessage(),
       NotificationType.ERROR.getColor(),
       ColorStyle.NORMAL
@@ -129,6 +135,7 @@ public class DummyView implements View {
   public void drawChatMessage(ChatMessage message) {
     System.out.println(
       CliUtils.colorize(
+        options,
         "[" +
         id +
         "] received a message from: " +

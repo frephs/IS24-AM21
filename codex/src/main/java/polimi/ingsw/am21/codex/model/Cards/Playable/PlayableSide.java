@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.model.Cards.Corner;
 import polimi.ingsw.am21.codex.model.Cards.CornerContentType;
 import polimi.ingsw.am21.codex.model.Cards.CornerPosition;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
@@ -64,7 +65,10 @@ public abstract class PlayableSide implements CliCard {
    * */
 
   @Override
-  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+  public String cardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  ) {
     // corners
     corners.forEach(
       (cornerPosition, corner) ->
@@ -74,17 +78,17 @@ public abstract class PlayableSide implements CliCard {
             content ->
               cardStringMap.put(
                 cornerPosition.getIndex(),
-                CliUtils.colorize(content, ColorStyle.BOLD, 1)
+                CliUtils.colorize(options, content, ColorStyle.BOLD, 1)
               ),
             () -> cardStringMap.put(cornerPosition.getIndex(), " ")
           )
     );
 
-    return CliCard.playableCardToAscii(cardStringMap);
+    return CliCard.playableCardToAscii(options, cardStringMap);
   }
 
   @Override
-  public String cardToString() {
+  public String cardToString(Cli.Options options) {
     // TODO add cardToString implementation
     return "";
   }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
@@ -42,20 +43,29 @@ public class PlayableBackSide extends PlayableSide implements CliCard {
    * */
 
   @Override
-  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+  public String cardToAscii(
+    Cli.Options options,
+    HashMap<Integer, String> cardStringMap
+  ) {
     final int BEGIN = 4;
     for (int i = 0; i < permanentResources.size(); i++) {
       ResourceType resource = permanentResources.get(i);
       cardStringMap.put(
         BEGIN + i,
-        CliUtils.colorizeAndCenter(List.of(resource), 5, ' ', ColorStyle.BOLD)
+        CliUtils.colorizeAndCenter(
+          options,
+          List.of(resource),
+          5,
+          ' ',
+          ColorStyle.BOLD
+        )
       );
     }
-    return super.cardToAscii(cardStringMap);
+    return super.cardToAscii(options, cardStringMap);
   }
 
   @Override
-  public String cardToString() {
+  public String cardToString(Cli.Options options) {
     // TODO: Implement TUI method
     return "";
   }

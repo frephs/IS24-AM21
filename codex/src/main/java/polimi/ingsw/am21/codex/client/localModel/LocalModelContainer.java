@@ -231,15 +231,16 @@ public class LocalModelContainer
   }
 
   public void showAvailableTokens() {
-    getView()
-      .postNotification(
-        NotificationType.RESPONSE,
-        "Available tokens: " +
-        this.lobby.getAvailableTokens()
-          .stream()
-          .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
-          .collect(Collectors.joining(" "))
-      );
+    //TODO: H: move this inside view
+    //    getView()
+    //      .postNotification(
+    //        NotificationType.RESPONSE,
+    //        "Available tokens: " +
+    //        this.lobby.getAvailableTokens()
+    //          .stream()
+    //          .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
+    //          .collect(Collectors.joining(" "))
+    //      );
   }
 
   public void listLobbyPlayers() {
