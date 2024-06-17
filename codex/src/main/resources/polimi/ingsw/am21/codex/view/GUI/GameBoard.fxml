@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox id="gameboard" prefWidth="500.0" stylesheets="@Style.css">
          <children>
@@ -50,7 +46,7 @@
                   </HBox>
                   <ScrollPane id="gameboard-container" hbarPolicy="NEVER" prefHeight="300.0" prefWidth="517.0" stylesheets="@Style.css">
                      <content>
-                        <VBox prefHeight="379.0" prefWidth="321.0">
+                        <VBox prefHeight="379.0" prefWidth="321.0" stylesheets="@Style.css">
                            <children>
                               <VBox alignment="CENTER" styleClass="bordered">
                                  <children>
@@ -119,8 +115,7 @@
                                     <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
                               </VBox>
-                              <VBox layoutX="10.0" layoutY="277.0" />
-                              <VBox alignment="CENTER" layoutX="10.0" layoutY="120.0" styleClass="bordered">
+                              <VBox alignment="CENTER" styleClass="bordered">
                                  <children>
                                     <Label alignment="CENTER" prefHeight="47.0" prefWidth="481.0" text="Common Objective Cards" textAlignment="CENTER" />
                                     <HBox id="common-objective-cards" alignment="CENTER" />

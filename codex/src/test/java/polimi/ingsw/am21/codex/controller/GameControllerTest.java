@@ -101,7 +101,9 @@ class GameControllerTest {
       Integer cardId,
       Integer newPairCardId,
       Set<Position> availableSpots,
-      Set<Position> forbiddenSpots
+      Set<Position> forbiddenSpots,
+      Integer resourceDeckTopCardId,
+      Integer goldDeckTopCardId
     ) throws RemoteException {}
 
     @Override
@@ -111,7 +113,9 @@ class GameControllerTest {
       Integer playerIndex,
       Boolean isLastRound,
       Set<Position> availableSpots,
-      Set<Position> forbiddenSpots
+      Set<Position> forbiddenSpots,
+      Integer resourceDeckTopCardId,
+      Integer goldDeckTopCardId
     ) throws RemoteException {}
 
     @Override

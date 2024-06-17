@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.Chat;
 
 public class LocalGameBoard {
@@ -14,6 +15,9 @@ public class LocalGameBoard {
   private CardPair<Card> goldCards;
   private CardPair<Card> resourceCards;
   private CardPair<Card> objectiveCards;
+
+  private PlayableCard resourceDeckTopCard;
+  private PlayableCard goldDeckTopCard;
 
   private Card secretObjective;
   private Chat chat = new Chat();
@@ -110,5 +114,21 @@ public class LocalGameBoard {
 
   public LocalPlayer getNextPlayer() {
     return players.get((currentPlayerIndex + 1) % players.size());
+  }
+
+  public PlayableCard getResourceDeckTopCard() {
+    return resourceDeckTopCard;
+  }
+
+  public void setResourceDeckTopCard(PlayableCard resourceDeckTopCard) {
+    this.resourceDeckTopCard = resourceDeckTopCard;
+  }
+
+  public PlayableCard getGoldDeckTopCard() {
+    return goldDeckTopCard;
+  }
+
+  public void setGoldDeckTopCard(PlayableCard goldDeckTopCard) {
+    this.goldDeckTopCard = goldDeckTopCard;
   }
 }

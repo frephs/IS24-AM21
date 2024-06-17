@@ -846,7 +846,9 @@ public class GameController {
             game.getRemainingRounds().orElse(null),
             game.getObjectiveCards(),
             game.getResourceCards(),
-            game.getGoldCards()
+            game.getGoldCards(),
+            game.getGameBoard().peekResourceCardFromDeck().getId(),
+            game.getGameBoard().peekGoldCardFromDeck().getId()
           );
           listener.gameStarted(gameId, gameInfo);
         });
@@ -1010,7 +1012,9 @@ public class GameController {
             game.getCurrentPlayerIndex(),
             game.isLastRound(),
             game.getCurrentPlayer().getBoard().getAvailableSpots(),
-            game.getCurrentPlayer().getBoard().getForbiddenSpots()
+            game.getCurrentPlayer().getBoard().getForbiddenSpots(),
+            game.getGameBoard().peekResourceCardFromDeck().getId(),
+            game.getGameBoard().peekGoldCardFromDeck().getId()
           )
       );
   }
@@ -1032,6 +1036,18 @@ public class GameController {
 
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, connectionID);
+
+    // If the player has not placed a card yet, throw an exception
+    game
+      .getPlayers()
+      .stream()
+      .filter(
+        player ->
+          player.getSocketId().equals(connectionID) && player.getCardPlaced()
+      )
+      .findFirst()
+      .orElseThrow(CardNotPlacedException::new);
+
     game.nextTurn(
       drawingSource,
       deckType,
@@ -1049,7 +1065,9 @@ public class GameController {
                 targetSocketID.equals(connectionID) ? playerCardId : null,
                 pairCardId,
                 game.getCurrentPlayer().getBoard().getAvailableSpots(),
-                game.getCurrentPlayer().getBoard().getForbiddenSpots()
+                game.getCurrentPlayer().getBoard().getForbiddenSpots(),
+                game.getGameBoard().peekResourceCardFromDeck().getId(),
+                game.getGameBoard().peekGoldCardFromDeck().getId()
               )
           ),
       () -> this.nextTurnEvent(connectionID, gameId, game),

@@ -623,6 +623,18 @@ public class LocalModelContainer
           break;
         }
       }
+
+      localGameBoard.setResourceDeckTopCard(
+        (PlayableCard) cardsLoader.getCardFromId(
+          gameInfo.getResourceDeckTopCardId()
+        )
+      );
+      localGameBoard.setGoldDeckTopCard(
+        (PlayableCard) cardsLoader.getCardFromId(
+          gameInfo.getGoldDeckTopCardId()
+        )
+      );
+
       view.postNotification(NotificationType.UPDATE, "The Game has started. ");
       clientContextContainer.set(ClientContext.GAME);
       if (localGameBoard.getCurrentPlayer().getSocketID().equals(socketId)) {
@@ -767,7 +779,9 @@ public class LocalModelContainer
     Integer drawnCardId,
     Integer newPairCardId,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     if (drawnCardId != null) {
       Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
@@ -813,7 +827,9 @@ public class LocalModelContainer
       playerIndex,
       isLastRound,
       availableSpots,
-      forbiddenSpots
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
     );
   }
 
@@ -827,7 +843,9 @@ public class LocalModelContainer
     Integer playerIndex,
     Boolean isLastRound,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     if (isLastRound) {
       view.postNotification(NotificationType.WARNING, "Last round of the game");
@@ -836,11 +854,21 @@ public class LocalModelContainer
     localGameBoard.setCurrentPlayerIndex(playerIndex);
     localGameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
     localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
+    localGameBoard.setResourceDeckTopCard(
+      (PlayableCard) cardsLoader.getCardFromId(resourceDeckTopCardId)
+    );
+    localGameBoard.setGoldDeckTopCard(
+      (PlayableCard) cardsLoader.getCardFromId(goldDeckTopCardId)
+    );
     if (
       localGameBoard.getCurrentPlayer().getSocketID().equals(this.getSocketID())
     ) {
       view.postNotification(NotificationType.UPDATE, "It's your turn. ");
       view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+      view.drawCardDecks(
+        localGameBoard.getResourceDeckTopCard(),
+        localGameBoard.getGoldDeckTopCard()
+      );
     } else {
       view.postNotification(
         NotificationType.UPDATE,
@@ -993,6 +1021,14 @@ public class LocalModelContainer
     view.postNotification(NotificationType.ERROR, "You already placed a card");
   }
 
+  @Override
+  public void cardNotPlaced() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Card not placed yet, place a card before drawing"
+    );
+  }
+
   public void handleInvalidActionException(InvalidActionException e) {
     switch (e.getCode()) {
       case PLAYER_NOT_ACTIVE -> this.playerNotActive();
@@ -1030,6 +1066,7 @@ public class LocalModelContainer
           )
         );
       case GAME_OVER -> this.gameOver();
+      case CARD_NOT_PLACED -> this.cardNotPlaced();
     }
   }
 

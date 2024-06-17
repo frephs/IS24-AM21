@@ -603,7 +603,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getDrawnCardId(),
       message.getNewPairCardId(),
       message.getAvailableSpots(),
-      message.getForbiddenSpots()
+      message.getForbiddenSpots(),
+      message.getResourceDeckTopCardId(),
+      message.getGoldDeckTopCardId()
     );
   }
 

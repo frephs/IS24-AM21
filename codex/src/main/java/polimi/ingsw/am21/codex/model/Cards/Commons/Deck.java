@@ -49,8 +49,6 @@ public class Deck<T> {
 
   /**
    * Returns the number of cards left in the deck
-   *
-   * @return the number of cards left in the deck
    */
   public int cardsLeft() {
     return this.cards.size();
@@ -63,5 +61,13 @@ public class Deck<T> {
    */
   public void insert(T card) {
     this.cards.addFirst(card);
+  }
+
+  /**
+   * Lets you peek the top card of the deck, without removing it
+   * @return The top card of the deck
+   */
+  public T peek() {
+    return this.cards.getLast();
   }
 }

@@ -520,3 +520,7 @@ Exception Dialog
 .highlighted .label {
   -fx-text-fill: #ffffff;
 }
+
+.allow-draw .card {
+  -fx-cursor: hand;
+}

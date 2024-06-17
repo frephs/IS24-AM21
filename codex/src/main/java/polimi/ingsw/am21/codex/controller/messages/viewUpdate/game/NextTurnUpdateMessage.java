@@ -20,6 +20,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
   private final Integer newPairCardId;
   private final Set<Position> availableSpots;
   private final Set<Position> forbiddenSpots;
+  private final Integer resourceDeckTopCardId;
+  private final Integer goldDeckTopCardId;
 
   public NextTurnUpdateMessage(
     String gameId,
@@ -30,7 +32,9 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     Integer cardId,
     Integer newPairCardId,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     this(
       MessageType.NEXT_TURN_UPDATE,
@@ -43,7 +47,9 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
       cardId,
       newPairCardId,
       availableSpots,
-      forbiddenSpots
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
     );
   }
 
@@ -52,7 +58,9 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     String nickname,
     Integer playerIndex,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     this(
       MessageType.NEXT_TURN_UPDATE,
@@ -65,7 +73,9 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
       null,
       null,
       availableSpots,
-      forbiddenSpots
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
     );
   }
 
@@ -83,7 +93,9 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     Integer drawnCardId,
     Integer newPairCardId,
     Set<Position> availableSpots,
-    Set<Position> forbiddenSpots
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
   ) {
     super(type);
     this.gameId = gameId;
@@ -96,6 +108,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     this.newPairCardId = newPairCardId;
     this.availableSpots = availableSpots;
     this.forbiddenSpots = forbiddenSpots;
+    this.resourceDeckTopCardId = resourceDeckTopCardId;
+    this.goldDeckTopCardId = goldDeckTopCardId;
   }
 
   public String getGameId() {
@@ -138,6 +152,14 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     return playerIndex;
   }
 
+  public Integer getResourceDeckTopCardId() {
+    return resourceDeckTopCardId;
+  }
+
+  public Integer getGoldDeckTopCardId() {
+    return goldDeckTopCardId;
+  }
+
   @Override
   public String toString() {
     return (
@@ -155,6 +177,12 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
       isLastRound +
       ", drawnCardId=" +
       drawnCardId +
+      ", newPairCardId=" +
+      newPairCardId +
+      ", resourceDeckTopCardId=" +
+      resourceDeckTopCardId +
+      ", goldDeckTopCardId=" +
+      goldDeckTopCardId +
       '}'
     );
   }
