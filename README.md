@@ -11,7 +11,7 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 
 
 ## Authors
-- 10769546 [Berardinelli](10769546@polimi.it)  ([@blueboop](https://github.com/blueboop))
+- 10769546 [Berardinelli](10769546@polimi.it)  ([@blueboop](https://github.com/blooplum))
 - 10765842 [Genovese](francesco1.genovese@mail.polimi.it) ([@frephs](https://github.com/frephs))
 - 10802488 [Grandi](federico1.grandi@mail.polimi.it) ([@endbug](https://github.com/endbug))
 - 10834404 [Haddou](hamza.haddou@mail.polimi.it) ([@litlatte](https://github.com/litlatte))
