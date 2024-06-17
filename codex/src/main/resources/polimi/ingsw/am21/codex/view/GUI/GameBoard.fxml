@@ -37,7 +37,7 @@
                   <String fx:value="container" />
                </styleClass>
             </VBox>
-            <VBox id="common-board-container">
+            <VBox id="common-board-container" alignment="CENTER">
                <children>
                   <HBox alignment="CENTER">
                      <children>
