@@ -26,6 +26,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenExcept
 import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
@@ -991,6 +992,9 @@ public class LocalModelContainer
     switch (e.getCode()) {
       case PLAYER_NOT_ACTIVE -> this.playerNotActive();
       case NOT_IN_GAME -> this.notInGame();
+      case GAME_ALREADY_EXISTS -> this.gameAlreadyExists(
+          ((GameAlreadyExistsException) e).getGameID()
+        );
       case GAME_ALREADY_STARTED -> this.gameAlreadyStarted();
       case INVALID_NEXT_TURN_CALL -> this.invalidNextTurnCall();
       case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.invalidGetObjectiveCardsCall();
