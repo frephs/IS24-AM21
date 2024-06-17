@@ -34,4 +34,5 @@ module polimi.ingsw.am21.codex {
   exports polimi.ingsw.am21.codex.model.Player;
   exports polimi.ingsw.am21.codex.connection.client;
   exports polimi.ingsw.am21.codex.model.Chat;
+  exports polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 }

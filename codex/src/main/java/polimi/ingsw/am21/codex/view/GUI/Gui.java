@@ -924,6 +924,7 @@ public class Gui extends Application implements View {
     // TODO
     hasPlacedCard = false;
     drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
+    drawGameBoard();
   }
 
   /**
@@ -1422,39 +1423,41 @@ public class Gui extends Application implements View {
    * */
   @Override
   public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
-    VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
-        "#gameboard-container"
-      )).getContent();
+    Platform.runLater(() -> {
+      VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
+          "#gameboard-container"
+        )).getContent();
 
-    HBox cardsContainer = (HBox) commonBoardContainer.lookup(
-      "#common-objective-cards"
-    );
+      HBox cardsContainer = (HBox) commonBoardContainer.lookup(
+        "#common-objective-cards"
+      );
 
-    cardsContainer.setPadding(new Insets(5));
+      cardsContainer.setPadding(new Insets(5));
 
-    cardsContainer.setAlignment(Pos.CENTER);
+      cardsContainer.setAlignment(Pos.CENTER);
 
-    cardsContainer.getChildren().clear();
+      cardsContainer.getChildren().clear();
 
-    List<ImageView> images = List.of(
-      loadCardImage(cardPair.getFirst(), CardSideType.FRONT),
-      loadCardImage(cardPair.getSecond(), CardSideType.FRONT)
-    );
+      List<ImageView> images = List.of(
+        loadCardImage(cardPair.getFirst(), CardSideType.FRONT),
+        loadCardImage(cardPair.getSecond(), CardSideType.FRONT)
+      );
 
-    images.forEach(image -> {
-      image.setPreserveRatio(true);
-      image.setFitWidth(150);
+      images.forEach(image -> {
+        image.setPreserveRatio(true);
+        image.setFitWidth(150);
+      });
+
+      Separator separator = new Separator();
+      //set a margin for the separator
+      HBox.setMargin(separator, new Insets(0, 10, 0, 10));
+
+      separator.setOrientation(Orientation.VERTICAL);
+
+      cardsContainer.getChildren().add(images.get(0));
+      cardsContainer.getChildren().add(separator);
+      cardsContainer.getChildren().add(images.get(1));
     });
-
-    Separator separator = new Separator();
-    //set a margin for the separator
-    HBox.setMargin(separator, new Insets(0, 10, 0, 10));
-
-    separator.setOrientation(Orientation.VERTICAL);
-
-    cardsContainer.getChildren().add(images.get(0));
-    cardsContainer.getChildren().add(separator);
-    cardsContainer.getChildren().add(images.get(1));
   }
 
   /**
