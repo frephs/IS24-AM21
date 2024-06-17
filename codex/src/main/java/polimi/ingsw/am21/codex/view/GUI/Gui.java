@@ -43,13 +43,7 @@ import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.view.GUI.utils.ExceptionLoader;
-import polimi.ingsw.am21.codex.view.GUI.utils.GridCell;
-import polimi.ingsw.am21.codex.view.GUI.utils.GridCellStatus;
-import polimi.ingsw.am21.codex.view.GUI.utils.GuiElement;
-import polimi.ingsw.am21.codex.view.GUI.utils.GuiUtils;
-import polimi.ingsw.am21.codex.view.GUI.utils.NotificationLoader;
-import polimi.ingsw.am21.codex.view.GUI.utils.ViewGridPosition;
+import polimi.ingsw.am21.codex.view.GUI.utils.*;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
@@ -227,6 +221,7 @@ public class Gui extends Application implements View {
   private static Stage primaryStage;
   private static NotificationLoader notificationLoader;
   private static ExceptionLoader exceptionLoader;
+  private static RulebookHandler rulebookHandler;
   private static Scene scene;
 
   @Override
@@ -247,6 +242,7 @@ public class Gui extends Application implements View {
 
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
+      rulebookHandler = new RulebookHandler(new Stage());
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
@@ -992,6 +988,15 @@ public class Gui extends Application implements View {
       ((Text) scene.lookup("#window-title")).setText(
           "Game " + localModel.getGameId()
         );
+      scene
+        .lookup("#instruction-manual-button")
+        .setOnMouseClicked((MouseEvent event) -> {
+          try {
+            rulebookHandler.loadRulebook();
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
