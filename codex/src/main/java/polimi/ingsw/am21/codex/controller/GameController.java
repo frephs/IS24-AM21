@@ -547,8 +547,6 @@ public class GameController {
     // the heartBeat function returns true if the connection has been restored
     // it also updates the last heartbeat value
 
-    System.out.println("Heartbeat from: " + socketID.toString());
-
     if (
       userContexts.containsKey(socketID) &&
       userContexts.get(socketID).heartBeat()
