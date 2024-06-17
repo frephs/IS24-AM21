@@ -14,8 +14,9 @@ import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
-import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
@@ -501,30 +502,67 @@ public class LocalModelContainer
   ) {
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
 
-    // Initialize hand
-    List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
-    LocalPlayer localPlayer = lobby.getPlayers().get(socketID);
-    localPlayer.setHand(hand);
-
-    Card starterCard = cardsLoader.getCardFromId(starterCardID);
-
     if (lobby.getPlayers().get(socketId) == null) lobby
       .getPlayers()
       .put(socketId, new LocalPlayer(socketId));
 
     LocalPlayer player = lobby.getPlayers().get(socketID);
 
-    player.setHand(hand);
     player.setNickname(nickname);
     player.setToken(color);
-    player
-      .getPlayedCards()
-      .put(new Position(), new Pair<>(starterCard, starterSide));
     player.setConnectionStatus(
       GameController.UserGameContext.ConnectionStatus.CONNECTED
     );
 
-    localGameBoard.getPlayers().add(lobby.getPlayers().get(socketID));
+    // Initialize hand
+    List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
+    player.setHand(hand);
+
+    // Initialize played cards
+    PlayableCard starterCard = (PlayableCard) cardsLoader.getCardFromId(
+      starterCardID
+    );
+    player
+      .getPlayedCards()
+      .put(new Position(), new Pair<>(starterCard, starterSide));
+
+    // Initialize resource and object counts ...
+    starterCard.setPlayedSideType(starterSide);
+
+    // ... counting the ones in the corners ...
+    starterCard
+      .getPlayedSide()
+      .ifPresent(side ->
+        side
+          .getCorners()
+          .values()
+          .forEach(corner ->
+            corner
+              .getContent()
+              .ifPresent(content -> {
+                if (ResourceType.has(content)) player.addResource(
+                  (ResourceType) content,
+                  1
+                );
+                else if (ObjectType.has(content)) player.addObjects(
+                  (ObjectType) content,
+                  1
+                );
+              })));
+
+    // ... and the permanent resources in the back (if the back side is played)
+    if (starterSide == CardSideType.BACK) {
+      starterCard
+        .getPlayedSide()
+        .ifPresent(
+          side ->
+            ((PlayableBackSide) side).getPermanentResources()
+              .forEach(resource -> player.addResource(resource, 1))
+        );
+    }
+
+    // Add the player to the game board
+    localGameBoard.getPlayers().add(player);
 
     view.postNotification(
       NotificationType.UPDATE,
