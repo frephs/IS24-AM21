@@ -1330,9 +1330,16 @@ public class Gui extends Application implements View {
       "#chat-recipient"
     );
 
-    players.forEach(
-      player -> recipientChoiceBox.getItems().add(player.getNickname())
-    );
+    players
+      .stream()
+      .filter(player -> {
+        return !player
+          .getNickname()
+          .equals(localModel.getLocalGameBoard().getPlayerNickname());
+      })
+      .forEach(
+        player -> recipientChoiceBox.getItems().add(player.getNickname())
+      );
 
     recipientChoiceBox.getItems().addFirst("Broadcast");
 
