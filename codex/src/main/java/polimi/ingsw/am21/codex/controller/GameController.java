@@ -1036,6 +1036,18 @@ public class GameController {
 
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, connectionID);
+
+    // If the player has not placed a card yet, throw an exception
+    game
+      .getPlayers()
+      .stream()
+      .filter(
+        player ->
+          player.getSocketId().equals(connectionID) && player.getCardPlaced()
+      )
+      .findFirst()
+      .orElseThrow(CardNotPlacedException::new);
+
     game.nextTurn(
       drawingSource,
       deckType,

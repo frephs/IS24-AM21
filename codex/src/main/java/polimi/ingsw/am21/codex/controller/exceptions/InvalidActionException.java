@@ -26,6 +26,7 @@ public class InvalidActionException extends Exception {
     NICKNAME_ALREADY_TAKEN,
     INVALID_TOKEN_COLOR,
     TOKEN_ALREADY_TAKEN,
+    CARD_NOT_PLACED,
     GAME_OVER;
 
     public Integer getErrorCode() {
@@ -58,6 +59,7 @@ public class InvalidActionException extends Exception {
         case INVALID_TOKEN_COLOR -> "Invalid token color";
         case TOKEN_ALREADY_TAKEN -> "Token already taken";
         case GAME_OVER -> "Game over";
+        case CARD_NOT_PLACED -> "Card not placed yet, place a card before drawing";
       };
     }
   }

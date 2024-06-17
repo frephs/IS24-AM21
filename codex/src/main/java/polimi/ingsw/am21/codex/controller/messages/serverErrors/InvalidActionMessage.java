@@ -78,6 +78,7 @@ public class InvalidActionMessage extends ErrorMessage {
         notes
       );
       case GAME_OVER -> new GameOverException();
+      case CARD_NOT_PLACED -> new CardNotPlacedException();
     };
   }
 }

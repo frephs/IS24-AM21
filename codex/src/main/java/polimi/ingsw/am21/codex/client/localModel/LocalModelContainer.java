@@ -1015,6 +1015,14 @@ public class LocalModelContainer
     view.postNotification(NotificationType.ERROR, "You already placed a card");
   }
 
+  @Override
+  public void cardNotPlaced() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Card not placed yet, place a card before drawing"
+    );
+  }
+
   public void handleInvalidActionException(InvalidActionException e) {
     switch (e.getCode()) {
       case PLAYER_NOT_ACTIVE -> this.playerNotActive();
@@ -1049,6 +1057,7 @@ public class LocalModelContainer
           )
         );
       case GAME_OVER -> this.gameOver();
+      case CARD_NOT_PLACED -> this.cardNotPlaced();
     }
   }
 

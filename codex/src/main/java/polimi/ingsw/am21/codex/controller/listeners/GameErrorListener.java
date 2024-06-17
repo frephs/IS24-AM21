@@ -28,4 +28,5 @@ public interface GameErrorListener {
   void illegalCardSideChoice();
   void invalidTokenColor();
   void alreadyPlacedCard();
+  void cardNotPlaced();
 }
