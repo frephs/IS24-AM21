@@ -221,7 +221,6 @@ public class Player {
     playedCard = board.getHand().get(cardIndex);
 
     board.placeCard(playedCard, side, position);
-    board.getHand().remove(cardIndex);
     this.points += playedCard.getEvaluator().apply(board);
     cardPlaced = true;
     return playedCard;
