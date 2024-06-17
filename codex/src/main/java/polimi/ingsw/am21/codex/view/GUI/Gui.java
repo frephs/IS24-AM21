@@ -561,6 +561,13 @@ public class Gui extends Application implements View {
   public void drawLobby(Map<UUID, LocalPlayer> players) {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyPlayers.fxml", "#side-content");
+
+      scene
+        .lookup("#back-to-menu-button-lobby")
+        .setOnMouseClicked((MouseEvent event) -> {
+          client.listGames();
+        });
+
       GridPane playerGrid =
         ((GridPane) scene.lookup("#lobby-player-container"));
       for (int i = 0; i < players.size(); i++) {
@@ -988,6 +995,7 @@ public class Gui extends Application implements View {
       ((Text) scene.lookup("#window-title")).setText(
           "Game " + localModel.getGameId()
         );
+
       scene
         .lookup("#instruction-manual-button")
         .setOnMouseClicked((MouseEvent event) -> {
@@ -1009,7 +1017,10 @@ public class Gui extends Application implements View {
       localModel.getLocalGameBoard().getResourceCards(),
       localModel.getLocalGameBoard().getGoldCards()
     );
+
     //TODO draw decks
+    //drawCardDecks();
+
     drawCommonObjectiveCards(
       localModel.getLocalGameBoard().getCommonObjectives()
     );
