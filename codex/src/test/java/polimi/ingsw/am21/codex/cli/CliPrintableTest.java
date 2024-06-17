@@ -1,20 +1,11 @@
 package polimi.ingsw.am21.codex.cli;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.Deck;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameBoard.GameBoard;
 
 class CliPrintableTest {
 

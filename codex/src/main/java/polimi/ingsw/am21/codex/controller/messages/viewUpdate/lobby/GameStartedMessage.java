@@ -1,52 +1,27 @@
 package polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 
 public class GameStartedMessage extends ViewUpdatingMessage {
 
-  private final String gameId;
-  private final List<String> playerIds;
-  Pair<Integer, Integer> goldCardPairIds;
-  Pair<Integer, Integer> resourceCardPairIds;
-  Pair<Integer, Integer> commonObjectivesIds;
+  private final GameInfo gameInfo;
 
-  public GameStartedMessage(
-    String gameId,
-    List<String> playerIds,
-    Pair<Integer, Integer> goldCardPairIds,
-    Pair<Integer, Integer> resourceCardPairIds,
-    Pair<Integer, Integer> commonObjectivesIds
-  ) {
+  public GameStartedMessage(GameInfo gameInfo) {
     super(MessageType.GAME_STARTED);
-    this.gameId = gameId;
-    this.playerIds = playerIds != null ? new ArrayList<>(playerIds) : List.of();
-    this.goldCardPairIds = goldCardPairIds;
-    this.resourceCardPairIds = resourceCardPairIds;
-    this.commonObjectivesIds = commonObjectivesIds;
+    this.gameInfo = gameInfo;
+  }
+
+  public GameInfo getGameInfo() {
+    return gameInfo;
   }
 
   public String getGameId() {
-    return gameId;
-  }
-
-  public List<String> getPlayerIds() {
-    return playerIds;
-  }
-
-  public Pair<Integer, Integer> getGoldCardPairIds() {
-    return goldCardPairIds;
-  }
-
-  public Pair<Integer, Integer> getResourceCardPairIds() {
-    return resourceCardPairIds;
-  }
-
-  public Pair<Integer, Integer> getCommonObjectivesIds() {
-    return commonObjectivesIds;
+    return gameInfo.getGameId();
   }
 
   @Override
@@ -55,15 +30,9 @@ public class GameStartedMessage extends ViewUpdatingMessage {
       getType() +
       "{" +
       "gameId='" +
-      gameId +
+      gameInfo +
       "', players=" +
-      playerIds +
-      ", goldCardPairIds=" +
-      goldCardPairIds +
-      ", resourceCardPairIds=" +
-      resourceCardPairIds +
-      ", commonObjectivesIds=" +
-      commonObjectivesIds +
+      Arrays.toString(gameInfo.getUsers().toArray()) +
       '}'
     );
   }

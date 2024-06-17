@@ -4,7 +4,10 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
@@ -50,9 +53,13 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void playerSetToken(String gameId, UUID socketID, TokenColor token)
-    throws RemoteException {
-    listener.playerSetToken(gameId, socketID, token);
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) throws RemoteException {
+    listener.playerSetToken(gameId, socketID, nickname, token);
   }
 
   @Override
@@ -92,47 +99,55 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void gameStarted(
+  public void gameStarted(String gameId, GameInfo gameInfo)
+    throws RemoteException {
+    listener.gameStarted(gameId, gameInfo);
+  }
+
+  @Override
+  public void changeTurn(
     String gameId,
-    List<String> players,
-    Pair<Integer, Integer> goldCardPairIds,
-    Pair<Integer, Integer> resourceCardPairIds,
-    Pair<Integer, Integer> commonObjectivesIds
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    DrawingCardSource source,
+    DrawingDeckType deck,
+    Integer cardId,
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) throws RemoteException {
-    listener.gameStarted(
+    listener.changeTurn(
       gameId,
-      players,
-      goldCardPairIds,
-      resourceCardPairIds,
-      commonObjectivesIds
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      source,
+      deck,
+      cardId,
+      newPairCardId,
+      availableSpots,
+      forbiddenSpots
     );
   }
 
   @Override
   public void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
-    DrawingCardSource source,
-    DrawingDeckType deck,
-    Integer cardId,
-    Integer newPairCardId
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) throws RemoteException {
     listener.changeTurn(
       gameId,
-      playerId,
+      playerNickname,
+      playerIndex,
       isLastRound,
-      source,
-      deck,
-      cardId,
-      newPairCardId
+      availableSpots,
+      forbiddenSpots
     );
-  }
-
-  @Override
-  public void changeTurn(String gameId, String playerId, Boolean isLastRound)
-    throws RemoteException {
-    listener.changeTurn(gameId, playerId, isLastRound);
   }
 
   @Override
@@ -176,8 +191,9 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void remainingTurns(int remainingTurns) throws RemoteException {
-    listener.remainingTurns(remainingTurns);
+  public void remainingRounds(String gameID, int remainingRounds)
+    throws RemoteException {
+    listener.remainingRounds(gameID, remainingRounds);
   }
 
   @Override
@@ -186,8 +202,22 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void chatMessageSent(String gameId, ChatMessage message)
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) throws RemoteException {
+    listener.playerConnectionChanged(socketID, nickname, status);
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException {
+    listener.lobbyInfo(usersInfo);
+  }
+
+  @Override
+  public void chatMessage(String gameID, ChatMessage message)
     throws RemoteException {
-    listener.chatMessageSent(gameId, message);
+    listener.chatMessage(gameID, message);
   }
 }

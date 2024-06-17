@@ -1,15 +1,25 @@
 package polimi.ingsw.am21.codex.model.Lobby.exceptions;
 
-public class NicknameAlreadyTakenException extends Exception {
+import java.util.List;
+import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 
-  String nickname;
+public class NicknameAlreadyTakenException extends InvalidActionException {
 
   public NicknameAlreadyTakenException(String nickname) {
-    super("The nickname " + nickname + " is already taken");
-    this.nickname = nickname;
+    super(InvalidActionCode.NICKNAME_ALREADY_TAKEN, List.of(nickname));
   }
 
   public String getNickname() {
-    return this.nickname;
+    return this.getNotes().get(0);
+  }
+
+  public String getFullMessage() {
+    return "Nickname " + this.getNickname() + " is already taken";
+  }
+
+  public static NicknameAlreadyTakenException fromExceptionNotes(
+    List<String> notes
+  ) {
+    return new NicknameAlreadyTakenException(notes.get(0));
   }
 }

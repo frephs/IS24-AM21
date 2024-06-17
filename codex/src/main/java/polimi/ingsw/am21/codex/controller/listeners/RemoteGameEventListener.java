@@ -2,11 +2,13 @@ package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -26,8 +28,12 @@ public interface RemoteGameEventListener extends Remote {
 
   void playerLeftLobby(String gameId, UUID socketID) throws RemoteException;
 
-  void playerSetToken(String gameId, UUID socketID, TokenColor token)
-    throws RemoteException;
+  void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) throws RemoteException;
 
   void playerSetNickname(String gameId, UUID socketID, String nickname)
     throws RemoteException;
@@ -45,32 +51,44 @@ public interface RemoteGameEventListener extends Remote {
     CardSideType starterSide
   ) throws RemoteException;
 
-  void gameStarted(
-    String gameId,
-    List<String> players,
-    Pair<Integer, Integer> goldCardPairIds,
-    Pair<Integer, Integer> resourceCardPairIds,
-    Pair<Integer, Integer> commonObjectivesIds
-  ) throws RemoteException;
+  void gameStarted(String gameId, GameInfo gameInfo) throws RemoteException;
 
   /**
-   * @param playerId The player that has just finished their turn
+   * This method is used to change the turn in the game.
+   *
+   * @param gameId The unique identifier of the game that has just ended.
+   * @param playerNickname The nickname of the player that has just finished their turn. This can be null if the game ended because of a disconnection.
+   * @param playerIndex The index of the player that has just finished their turn in the list of players.
+   * @param isLastRound A boolean indicating if this is the last round of the game.
+   * @param source The source from which the card was drawn.
+   * @param deck The type of deck from which the card was drawn.
+   * @param cardId The unique identifier of the card that was drawn. (null if the receiving client is not the one who drew the card)
+   * @param newPairCardId The unique identifier of the new pair card that was drawn.
+   * @param availableSpots A set of positions that are available for the next player to place a card.
+   * @param forbiddenSpots A set of positions that are forbidden for the next player to place a card.
+   * @throws RemoteException If a remote or network error occurs.
    */
   void changeTurn(
     String gameId,
-    String playerId,
+    String playerNickname,
+    Integer playerIndex,
     Boolean isLastRound,
     DrawingCardSource source,
     DrawingDeckType deck,
     Integer cardId,
-    Integer newPairCardId
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
   ) throws RemoteException;
 
-  /**
-   * @param playerId The player that has just finished their turn
-   */
-  void changeTurn(String gameId, String playerId, Boolean isLastRound)
-    throws RemoteException;
+  void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) throws RemoteException;
 
   /* current player placed a card */
   void cardPlaced(
@@ -92,10 +110,18 @@ public interface RemoteGameEventListener extends Remote {
   void playerScoresUpdate(Map<String, Integer> newScores)
     throws RemoteException;
 
-  void remainingTurns(int remainingTurns) throws RemoteException;
+  void remainingRounds(String gameID, int remainingRounds)
+    throws RemoteException;
 
   void winningPlayer(String nickname) throws RemoteException;
 
-  void chatMessageSent(String gameId, ChatMessage message)
-    throws RemoteException;
+  void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) throws RemoteException;
+
+  void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException;
+
+  void chatMessage(String gameID, ChatMessage message) throws RemoteException;
 }

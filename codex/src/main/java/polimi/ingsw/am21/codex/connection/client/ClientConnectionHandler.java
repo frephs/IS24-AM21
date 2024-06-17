@@ -1,7 +1,11 @@
 package polimi.ingsw.am21.codex.connection.client;
 
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -10,6 +14,7 @@ import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
+import polimi.ingsw.am21.codex.view.TUI.CliClient;
 import polimi.ingsw.am21.codex.view.View;
 
 public abstract class ClientConnectionHandler {
@@ -17,10 +22,11 @@ public abstract class ClientConnectionHandler {
   protected LocalModelContainer localModel;
   protected UUID socketID;
 
-  protected Boolean connected = false;
-
   protected final String host;
   protected final Integer port;
+  private GameController.UserGameContext.ConnectionStatus connectionStatus =
+    GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
+  private Integer consecutiveFailedHeartBeats = 0;
 
   public ClientConnectionHandler(
     String host,
@@ -31,6 +37,11 @@ public abstract class ClientConnectionHandler {
     this.port = port;
     this.localModel = localModel;
     this.socketID = UUID.randomUUID();
+    this.localModel.setSocketId(socketID);
+  }
+
+  protected UUID getSocketID() {
+    return localModel.getSocketID();
   }
 
   View getView() {
@@ -142,6 +153,11 @@ public abstract class ClientConnectionHandler {
    */
   public abstract void nextTurn();
 
+  /**
+   * Sends a heart beat to the server
+   */
+  public abstract void heartBeat(Runnable successful, Runnable failed);
+
   public abstract void sendChatMessage(ChatMessage message);
 
   /*
@@ -154,8 +170,27 @@ public abstract class ClientConnectionHandler {
 
   public abstract void disconnect();
 
+  private void disconnected() {
+    connectionStatus =
+      GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
+  }
+
   public Boolean isConnected() {
-    return connected;
+    return (
+      this.connectionStatus ==
+      GameController.UserGameContext.ConnectionStatus.CONNECTED
+    );
+  }
+
+  public Boolean isLosing() {
+    return (
+      this.connectionStatus ==
+      GameController.UserGameContext.ConnectionStatus.LOSING
+    );
+  }
+
+  public Boolean isConnectedOrLosing() {
+    return this.isConnected() || this.isLosing();
   }
 
   public void messageNotSent() {
@@ -163,14 +198,69 @@ public abstract class ClientConnectionHandler {
   }
 
   public void connectionFailed(Exception e) {
-    this.connected = false;
+    this.connectionStatus =
+      GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_FAILED);
     this.getView().displayException(e);
+    this.getView()
+      .postNotification(
+        NotificationType.WARNING,
+        "Try reconnecting using: reconnect [host port]"
+      );
+  }
+
+  private void failedHeartBeat() {
+    this.consecutiveFailedHeartBeats++;
+    if (this.consecutiveFailedHeartBeats >= 10) {
+      this.disconnected();
+      this.getView().postNotification(Notification.CONNECTION_FAILED);
+    } else if (this.consecutiveFailedHeartBeats >= 2) {
+      this.connectionStatus =
+        GameController.UserGameContext.ConnectionStatus.LOSING;
+      this.getView()
+        .postNotification(
+          NotificationType.WARNING,
+          "Connection lost, trying to reconnect"
+        );
+    }
   }
 
   public void connectionEstablished() {
-    this.connected = true;
+    this.listGames();
+    this.connectionStatus =
+      GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
+    System.out.println("Your ID is: " + this.getSocketID());
+    Runnable heartBeatRunnable = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          if (isConnectedOrLosing()) heartBeat(
+            () -> {
+              connectionStatus =
+                GameController.UserGameContext.ConnectionStatus.CONNECTED;
+            },
+            () -> failedHeartBeat()
+          );
+        } catch (Exception e) {
+          failedHeartBeat();
+        }
+      }
+    };
+
+    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    executor.scheduleAtFixedRate(
+      heartBeatRunnable,
+      0,
+      1,
+      java.util.concurrent.TimeUnit.SECONDS
+    );
+  }
+
+  public void getObjectivesIfNull() {
+    if (localModel.getAvailableObjectives() == null) {
+      getObjectiveCards();
+    }
   }
 
   /**

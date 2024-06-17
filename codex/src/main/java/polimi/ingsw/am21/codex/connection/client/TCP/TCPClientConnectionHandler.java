@@ -5,14 +5,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.localModel.LocalLobby;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
+import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.NextTurnActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.PlaceCardMessage;
@@ -22,16 +27,13 @@ import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetObject
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetStarterCardSideMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.lobby.LobbyStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.ActionNotAllowedMessage;
+import polimi.ingsw.am21.codex.controller.messages.serverErrors.InvalidActionMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.GameAlreadyStartedMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.game.InvalidCardPlacementMessage;
-import polimi.ingsw.am21.codex.controller.messages.serverErrors.lobby.*;
-import polimi.ingsw.am21.codex.controller.messages.viewUpdate.SocketIdMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -67,6 +69,15 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     this.incomingMessages = new ArrayDeque<>();
   }
 
+  private Optional<String> getGameIDWithMessage() {
+    if (this.localModel.getGameId().isEmpty()) {
+      this.localModel.notInGame();
+      return Optional.empty();
+    }
+    String gameID = this.localModel.getGameId().get();
+    return Optional.of(gameID);
+  }
+
   /**
    * Runs a thread that synchronously loads incoming messages from
    * inputStream to incomingMessages
@@ -92,7 +103,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           getView()
             .postNotification(
               NotificationType.ERROR,
-              "IOException caught when parsing message from server at " +
+              "IOException caught when parsing message from " +
               socket.getInetAddress() +
               ". Parser is exiting.\n"
             );
@@ -142,7 +153,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     });
   }
 
-  private void send(ClientMessage message) {
+  private void send(
+    ClientMessage message,
+    Runnable successful,
+    Runnable failed
+  ) {
     synchronized (outputStream) {
       if (!waiting) {
         try {
@@ -155,24 +170,24 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               getView()
                 .postNotification(
                   NotificationType.WARNING,
-                  "Fetching resources \n(" +
-                  message
-                    .getType()
-                    .toString()
-                    .toLowerCase()
-                    .replace("get_", "")
-                    .replace("_", " ") +
-                  "). "
+                  "Sending request. "
                 );
             }
           }
         } catch (IOException e) {
           connectionFailed(e);
+          failed.run();
+          return;
         }
       } else {
         this.getView().postNotification(Notification.ALREADY_WAITING);
       }
     }
+    successful.run();
+  }
+
+  private void send(ClientMessage message) {
+    this.send(message, () -> {}, () -> {});
   }
 
   private View getView() {
@@ -181,17 +196,19 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void connect() {
-    while (!connected) {
+    boolean connected = false;
+    int attempts = 0;
+    while (!connected && attempts++ < 10) {
       try {
         this.socket = new Socket(host, port);
         this.socket.setTcpNoDelay(true);
         connected = true;
-        connectionEstablished();
       } catch (IOException e) {
         getView().displayException(e);
         connectionFailed(e);
       }
     }
+    if (!connected) return;
     try {
       assert socket != null;
       this.outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -199,6 +216,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
       this.startMessageParser();
       this.startMessageHandler();
+      this.localModel.setSocketId(this.getSocketID());
+      this.send(new ConnectMessage(this.getSocketID()));
+      connectionEstablished();
     } catch (IOException e) {
       connectionFailed(e);
     }
@@ -211,33 +231,35 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void listGames() {
-    this.send(new GetAvailableGameLobbiesMessage());
+    this.send(new GetAvailableGameLobbiesMessage(this.getSocketID()));
   }
 
   @Override
   public void createGame(String gameId, int players) {
-    this.send(new CreateGameMessage(gameId, players));
+    this.send(new CreateGameMessage(this.getSocketID(), gameId, players));
   }
 
   @Override
   public void connectToGame(String gameId) {
-    this.send(new JoinLobbyMessage(gameId));
+    this.send(new JoinLobbyMessage(this.getSocketID(), gameId));
   }
 
   @Override
   public void leaveGameLobby() {
-    this.send(new LeaveLobbyMessage());
+    this.send(new LeaveLobbyMessage(this.getSocketID()));
   }
 
   @Override
   public void createAndConnectToGame(String gameId, int players) {
-    this.send(new CreateGameMessage(gameId, players));
-    this.send(new JoinLobbyMessage(gameId));
+    this.send(new CreateGameMessage(this.getSocketID(), gameId, players));
+    this.send(new JoinLobbyMessage(this.getSocketID(), gameId));
   }
 
   @Override
   public void lobbySetToken(TokenColor color) {
-    this.send(new SetTokenColorMessage(color, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SetTokenColorMessage(this.getSocketID(), color, gameID));
   }
 
   @Override
@@ -247,36 +269,37 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void lobbySetNickname(String nickname) {
-    this.send(new SetNicknameMessage(nickname, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SetNicknameMessage(this.getSocketID(), nickname, gameID));
   }
 
   @Override
   public void getObjectiveCards() {
-    this.send(new GetObjectiveCardsMessage(localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new GetObjectiveCardsMessage(this.getSocketID(), gameID));
   }
 
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
-    LocalLobby lobby = localModel.getLocalLobby();
-    lobby
-      .getPlayers()
-      .get(localModel.getSocketID())
-      .setObjectiveCard(
-        first
-          ? lobby.getAvailableObjectives().getFirst()
-          : lobby.getAvailableObjectives().getSecond()
-      );
-    this.send(new SelectObjectiveMessage(first, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SelectObjectiveMessage(this.getSocketID(), first, gameID));
   }
 
   @Override
   public void getStarterCard() {
-    this.send(new GetStarterCardSideMessage(localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new GetStarterCardSideMessage(this.getSocketID(), gameID));
   }
 
   @Override
   public void lobbyJoinGame(CardSideType cardSide) {
-    this.send(new SelectCardSideMessage(cardSide, localModel.getGameId()));
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
+    this.send(new SelectCardSideMessage(this.getSocketID(), cardSide, gameID));
   }
 
   @Override
@@ -285,10 +308,12 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     CardSideType side,
     Position position
   ) {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     this.send(
-        //TODO: maybe change these messages so a basic authentication is implemented
         new PlaceCardMessage(
-          localModel.getGameId(),
+          this.getSocketID(),
+          gameID,
           localModel.getLocalGameBoard().getPlayerNickname(),
           playerHandCardNumber,
           side,
@@ -299,7 +324,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void leaveLobby() {
-    this.send(new LeaveLobbyMessage());
+    this.send(new LeaveLobbyMessage(this.getSocketID()));
   }
 
   @Override
@@ -307,9 +332,12 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     DrawingCardSource drawingSource,
     DrawingDeckType deckType
   ) {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     this.send(
         new NextTurnActionMessage(
-          this.localModel.getGameId(),
+          this.getSocketID(),
+          gameID,
           this.localModel.getLocalGameBoard().getPlayerNickname(),
           drawingSource,
           deckType
@@ -319,17 +347,25 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void nextTurn() {
+    if (this.getGameIDWithMessage().isEmpty()) return;
+    String gameID = this.getGameIDWithMessage().get();
     this.send(
         new NextTurnActionMessage(
-          localModel.getGameId(),
+          this.getSocketID(),
+          gameID,
           localModel.getLocalGameBoard().getPlayerNickname()
         )
       );
   }
 
   @Override
+  public void heartBeat(Runnable successful, Runnable failed) {
+    send(new HeartBeatMessage(this.getSocketID()), successful, failed);
+  }
+
+  @Override
   public void sendChatMessage(ChatMessage message) {
-    this.send(new SendChatMessage(localModel.getGameId(), message));
+    this.send(new SendChatMessage(getSocketID(), message));
   }
 
   public GameState getGameState() {
@@ -351,10 +387,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     switch (message.getType()) {
       // Server Responses
       // Lobby
+      case LOBBY_INFO -> handleMessage((LobbyInfoMessage) message);
       case AVAILABLE_GAME_LOBBIES -> handleMessage(
         (AvailableGameLobbiesMessage) message
       );
-      case LOBBY_STATUS -> handleMessage((LobbyStatusMessage) message);
       case OBJECTIVE_CARDS -> handleMessage((ObjectiveCardsMessage) message);
       case STARTER_CARD_SIDES -> handleMessage(
         (StarterCardSidesMessage) message
@@ -362,34 +398,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       // Game
       case GAME_STATUS -> handleMessage((GameStatusMessage) message);
       // Server Errors
-      case GAME_ALREADY_EXISTS -> handleMessage(
-        (GameAlreadyExistsMessage) message
-      );
-      case GAME_ALREADY_STARTED -> handleMessage(
-        (GameAlreadyStartedMessage) message
-      );
-      case ACTION_NOT_ALLOWED -> handleMessage(
-        (ActionNotAllowedMessage) message
-      );
+
       case UNKNOWN_MESSAGE_TYPE -> handleMessage(
         (UnknownMessageTypeMessage) message
       );
       case NOT_A_CLIENT_MESSAGE -> handleMessage(
         (NotAClientMessageMessage) message
       );
-      // lobby
-      case GAME_FULL -> handleMessage((GameFullMessage) message);
-      case GAME_NOT_FOUND -> handleMessage((GameNotFoundMessage) message);
-      case NICKNAME_ALREADY_TAKEN -> handleMessage(
-        (NicknameAlreadyTakenMessage) message
-      );
-      case TOKEN_COLOR_ALREADY_TAKEN -> handleMessage(
-        (TokenColorAlreadyTakenMessage) message
-      );
-      // game
-      case INVALID_CARD_PLACEMENT -> handleMessage(
-        (InvalidCardPlacementMessage) message
-      );
+      case INVALID_ACTION -> handleMessage((InvalidActionMessage) message);
       // View Updating Messages
       // Lobby
       case GAME_CREATED -> handleMessage((GameCreatedMessage) message);
@@ -405,6 +421,13 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case PLAYER_SET_TOKEN_COLOR -> handleMessage(
         (PlayerSetTokenColorMessage) message
       );
+      case PLAYER_CHOSE_OBJECTIVE -> handleMessage(
+        (PlayerChoseObjectiveCardMessage) message
+      );
+      case SOCKET_ID -> {}
+      case PLAYER_CONNECTION_CHANGED -> handleMessage(
+        (PlayerConnectionChangedMessage) message
+      );
       // Game
       case CARD_PLACED -> handleMessage((CardPlacedMessage) message);
       case GAME_OVER -> handleMessage((GameOverMessage) message);
@@ -415,11 +438,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case PLAYER_SCORES_UPDATE -> handleMessage(
         (PlayerScoresUpdateMessage) message
       );
-      case REMAINING_TURNS -> handleMessage((RemainingTurnsMessage) message);
+      case REMAINING_ROUNDS -> handleMessage((RemainingRoundsMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
       case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
       // Init
-      case SOCKET_ID -> handleMessage((SocketIdMessage) message);
       default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
     }
   }
@@ -432,10 +454,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   public void handleMessage(GameStatusMessage message) {
     localModel.gameStatusUpdate(message.getState());
-  }
-
-  public void handleMessage(LobbyStatusMessage message) {
-    localModel.loadGameLobby(message.getPlayers());
   }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
@@ -461,38 +479,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    */
 
   //game
-  public void handleMessage(GameAlreadyExistsMessage message) {
-    localModel.gameAlreadyExists(message.getGameId());
-  }
 
-  public void handleMessage(InvalidCardPlacementMessage message) {
-    localModel.invalidCardPlacement(message.getReason());
-  }
-
-  public void handleMessage(GameAlreadyStartedMessage ignored) {
-    localModel.gameAlreadyStarted();
-  }
-
-  //lobby
-
-  public void handleMessage(GameFullMessage message) {
-    localModel.lobbyFull(message.getGameId());
-  }
-
-  public void handleMessage(GameNotFoundMessage message) {
-    localModel.gameNotFound(message.getGameId());
-  }
-
-  public void handleMessage(NicknameAlreadyTakenMessage message) {
-    localModel.nicknameTaken(message.getNickname());
-  }
-
-  public void handleMessage(TokenColorAlreadyTakenMessage message) {
-    localModel.tokenTaken(message.getToken());
-  }
-
-  public void handleMessage(ActionNotAllowedMessage message) {
-    localModel.actionNotAllowed(message.getReason());
+  public void handleMessage(InvalidActionMessage message) {
+    localModel.handleInvalidActionException(message.toException());
   }
 
   public void handleMessage(UnknownMessageTypeMessage ignored) {
@@ -518,6 +507,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    */
 
   // LOBBY
+  public void handleMessage(LobbyInfoMessage message) {
+    localModel.lobbyInfo(message.getLobbyUsersInfo());
+  }
+
   public void handleMessage(GameCreatedMessage message) {
     localModel.gameCreated(
       message.getGameId(),
@@ -536,13 +529,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(GameStartedMessage message) {
-    localModel.gameStarted(
-      message.getGameId(),
-      message.getPlayerIds(),
-      message.getResourceCardPairIds(),
-      message.getGoldCardPairIds(),
-      message.getCommonObjectivesIds()
-    );
+    localModel.gameStarted(message.getGameId(), message.getGameInfo());
   }
 
   public void handleMessage(PlayerJoinedLobbyMessage message) {
@@ -565,7 +552,24 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.playerSetToken(
       message.getGameId(),
       message.getSocketId(),
+      message.getNickname(),
       message.getColor()
+    );
+  }
+
+  public void handleMessage(PlayerChoseObjectiveCardMessage message) {
+    localModel.playerChoseObjectiveCard(
+      message.getGameId(),
+      message.getSocketId(),
+      message.getNickname()
+    );
+  }
+
+  public void handleMessage(PlayerConnectionChangedMessage message) {
+    localModel.playerConnectionChanged(
+      message.getConnectionID(),
+      message.getNickname(),
+      message.getStatus()
     );
   }
 
@@ -595,11 +599,14 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.changeTurn(
       message.getGameId(),
       message.getNickname(),
+      message.getPlayerIndex(),
       message.isLastRound(),
       message.getCardSource(),
       message.getDeck(),
       message.getDrawnCardId(),
-      message.getNewPairCardId()
+      message.getNewPairCardId(),
+      message.getAvailableSpots(),
+      message.getForbiddenSpots()
     );
   }
 
@@ -619,19 +626,15 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     localModel.playerScoresUpdate(message.getNewScores());
   }
 
-  public void handleMessage(RemainingTurnsMessage message) {
-    localModel.remainingTurns(message.getTurns());
+  public void handleMessage(RemainingRoundsMessage message) {
+    localModel.remainingRounds(message.getGameID(), message.getRounds());
   }
 
   public void handleMessage(WinningPlayerMessage message) {
     localModel.winningPlayer(message.getWinnerNickname());
   }
 
-  public void handleMessage(SocketIdMessage message) {
-    localModel.setSocketId(message.getSocketId());
-  }
-
-  public void handleMessage(SendChatMessage message) {
-    localModel.chatMessageSent(message.getGameId(), message.getMessage());
+  public void handleMessage(ChatMessageMessage message) {
+    localModel.chatMessage(message.getGameID(), message.getMessage());
   }
 }

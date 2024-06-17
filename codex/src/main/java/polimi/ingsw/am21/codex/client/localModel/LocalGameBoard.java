@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Chat.Chat;
 
 public class LocalGameBoard {
@@ -13,39 +13,30 @@ public class LocalGameBoard {
 
   private CardPair<Card> goldCards;
   private CardPair<Card> resourceCards;
-  private CardPair<Card> commonObjectives;
+  private CardPair<Card> objectiveCards;
 
   private Card secretObjective;
   private Chat chat = new Chat();
 
-  /**
-   * Number of players the game contains
-   * */
-  private final int playerNumber;
+  private Integer currentPlayerIndex;
 
-  private String currentPlayer;
+  private Integer remainingRounds;
+  private Integer maxPlayers;
 
-  /**
-   * Index of the player associated with the client
-   */
-  private String playerNickname;
+  private Integer playerIndex;
 
-  public LocalGameBoard(String gameId, int players) {
+  public LocalGameBoard(String gameId, Integer maxPlayers) {
     this.gameId = gameId;
-    this.playerNumber = players;
-    this.players = new ArrayList<>(players);
+    this.maxPlayers = maxPlayers;
+    this.players = new ArrayList<>(maxPlayers);
   }
 
   public LocalPlayer getCurrentPlayer() {
-    return players
-      .stream()
-      .filter(player -> player.getNickname().equals(currentPlayer))
-      .findFirst()
-      .orElse(null);
+    return players.get(currentPlayerIndex);
   }
 
-  public void setCurrentPlayer(String currentPlayer) {
-    this.currentPlayer = currentPlayer;
+  public void setCurrentPlayerIndex(Integer currentPlayerIndex) {
+    this.currentPlayerIndex = currentPlayerIndex;
   }
 
   private final List<LocalPlayer> players;
@@ -58,25 +49,15 @@ public class LocalGameBoard {
    * Gets the local player associated with the client
    */
   public LocalPlayer getPlayer() {
-    return players
-      .stream()
-      .filter(player -> player.getNickname().equals(playerNickname))
-      .collect(Collectors.toList())
-      .getFirst();
-  }
-
-  public LocalPlayer getNextPlayer() {
-    return players.get(
-      (players.indexOf(getCurrentPlayer()) + 1) % playerNumber
-    );
+    return players.get(playerIndex);
   }
 
   public String getPlayerNickname() {
-    return playerNickname;
+    return getPlayer().getNickname();
   }
 
-  public void setPlayerNickname(String playerNickname) {
-    this.playerNickname = playerNickname;
+  public void setPlayerIndex(int playerIndex) {
+    this.playerIndex = playerIndex;
   }
 
   public Card getSecretObjective() {
@@ -95,6 +76,14 @@ public class LocalGameBoard {
     this.resourceCards = resourceCards;
   }
 
+  public CardPair<Card> getObjectiveCards() {
+    return objectiveCards;
+  }
+
+  public void setObjectiveCards(CardPair<Card> objectiveCards) {
+    this.objectiveCards = objectiveCards;
+  }
+
   public CardPair<Card> getGoldCards() {
     return goldCards;
   }
@@ -107,15 +96,19 @@ public class LocalGameBoard {
     return players;
   }
 
+  public void setRemainingRounds(Integer remainingRounds) {
+    this.remainingRounds = remainingRounds;
+  }
+
+  public int getRemainingRounds() {
+    return remainingRounds;
+  }
+
   public Chat getChat() {
     return chat;
   }
 
-  public void setCommonObjectives(CardPair<Card> objectiveCardPair) {
-    this.commonObjectives = objectiveCardPair;
-  }
-
-  public CardPair<Card> getCommonObjectives() {
-    return commonObjectives;
+  public LocalPlayer getNextPlayer() {
+    return players.get((currentPlayerIndex + 1) % players.size());
   }
 }

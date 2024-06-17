@@ -1,8 +1,8 @@
 package polimi.ingsw.am21.codex.controller.exceptions;
 
-public class GameAlreadyStartedException extends Exception {
+public class GameAlreadyStartedException extends InvalidActionException {
 
   public GameAlreadyStartedException() {
-    super("The game has already started.");
+    super(InvalidActionCode.GAME_ALREADY_STARTED);
   }
 }

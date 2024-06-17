@@ -1,20 +1,17 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
-import polimi.ingsw.am21.codex.client.localModel.state.ClientContext;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
+import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -29,15 +26,17 @@ import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class CliClient extends ViewClient {
 
-  //TODO move context out of here into viewClient. It's not a concern of the cli
-
   Scanner scanner;
   Cli cli;
 
   public CliClient() {
-    cli = Cli.getInstance();
-    localModel = new LocalModelContainer(cli);
+    super(new LocalModelContainer(Cli.getInstance()));
+    cli = (Cli) localModel.getView();
     scanner = new Scanner(System.in);
+  }
+
+  private LocalModelContainer.ClientContextContainer getClientContextContainer() {
+    return localModel.getClientContextContainer();
   }
 
   @Override
@@ -59,47 +58,53 @@ public class CliClient extends ViewClient {
 
         Set<CommandHandler> matchingCommands = commandHandlers
           .stream()
-          .filter(
-            commandHandler ->
-              commandHandler.getUsage().split(" ")[0].equals(command[0])
-          )
-          .collect(Collectors.toSet());
-        if (!matchingCommands.isEmpty()) {
-          Set<CommandHandler> matchingContext = matchingCommands
-            .stream()
-            .filter(
-              commandHandler ->
-                commandHandler.getContext() == ClientContext.MENU ||
-                commandHandler.getContext() == localModel.getState()
-            )
-            .collect(Collectors.toSet());
-          if (!matchingContext.isEmpty()) {
-            Set<CommandHandler> matchingUsages = matchingContext
-              .stream()
-              .filter(commandHandler -> commandHandler.matchUsageString(line))
-              .collect(Collectors.toSet());
-
-            if (matchingUsages.isEmpty() && !line.isEmpty()) {
-              matchingContext.forEach(
-                commandHandler ->
-                  cli.postNotification(
-                    NotificationType.WARNING,
-                    "Invalid command. You maybe looking for: " +
-                    commandHandler.getUsage()
-                  )
-              );
-            } else if (!line.isEmpty()) {
-              try {
-                matchingUsages.forEach(
-                  commandHandler -> commandHandler.handle(line.split(" "))
-                );
-              } catch (Exception e) {
-                cli.postNotification(
-                  NotificationType.ERROR,
-                  "An error occurred while executing the command. \n"
-                );
-                cli.displayException(e);
+          .filter(commandHandler -> {
+            String usage = commandHandler.getUsage();
+            String[] commandParts = usage
+              .replaceAll("<[a-zA-Z0-9 ]+>", "<>")
+              .split(" ");
+            if (commandParts.length != command.length) {
+              return false;
+            }
+            for (int i = 0; i < commandParts.length; ++i) {
+              if (
+                commandParts[i].startsWith("<") && commandParts[i].endsWith(">")
+              ) {
+                continue;
               }
+              if (!commandParts[i].equals(command[i])) {
+                return false;
+              }
+            }
+            return true;
+          })
+          .collect(Collectors.toSet());
+
+        if (!matchingCommands.isEmpty()) {
+          Set<CommandHandler> matchingUsages = matchingCommands
+            .stream()
+            .filter(commandHandlers -> commandHandlers.matchUsageString(line))
+            .collect(Collectors.toSet());
+          if (matchingUsages.isEmpty() && !line.isEmpty()) {
+            matchingCommands.forEach(
+              commandHandler ->
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Invalid command. You maybe looking for: " +
+                  commandHandler.getUsage()
+                )
+            );
+          } else if (!line.isEmpty()) {
+            try {
+              matchingCommands.forEach(
+                commandHandlers -> commandHandlers.handle(line.split(" "))
+              );
+            } catch (Exception e) {
+              cli.postNotification(
+                NotificationType.ERROR,
+                "An error occurred while executing the command. \n"
+              );
+              cli.displayException(e);
             }
           } else {
             cli.postNotification(
@@ -139,6 +144,10 @@ public class CliClient extends ViewClient {
       this.context = context;
     }
 
+    public CommandHandler(String usage, String description) {
+      this(usage, description, null);
+    }
+
     public boolean matchUsageString(String input) {
       // TODO fix this regex
       String regex = usage
@@ -162,8 +171,8 @@ public class CliClient extends ViewClient {
       return description;
     }
 
-    public ClientContext getContext() {
-      return context;
+    public Optional<ClientContext> getContext() {
+      return Optional.ofNullable(context);
     }
   }
 
@@ -171,6 +180,9 @@ public class CliClient extends ViewClient {
 
   private void initializeCommandHandlers() {
     // TODO add optional arguments to usages
+
+    final LocalModelContainer.ClientContextContainer currentContext =
+      this.getClientContextContainer();
 
     commandHandlers.add(
       new CommandHandler("exit", "Exit the program", ClientContext.MENU) {
@@ -187,11 +199,12 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "reconnect",
         "Connect to the server",
-        ClientContext.MENU
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
           client.connect();
+          currentContext.set(null);
         }
       }
     );
@@ -200,18 +213,39 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "help",
         "Display available commands",
-        ClientContext.MENU
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
           ArrayList<String> usages = new ArrayList<>();
           ArrayList<String> contexts = new ArrayList<>();
           ArrayList<String> descriptions = new ArrayList<>();
-          commandHandlers.forEach(commandHandler -> {
-            usages.add(commandHandler.getUsage());
-            contexts.add(commandHandler.getContext().toString().toLowerCase());
-            descriptions.add(commandHandler.getDescription());
-          });
+          commandHandlers
+            .stream()
+            .filter(
+              commandHandler ->
+                currentContext
+                  .get()
+                  .map(
+                    currentContextVal ->
+                      commandHandler
+                        .getContext()
+                        .map(
+                          context ->
+                            context == ClientContext.ALL ||
+                            context.equals(currentContextVal)
+                        )
+                        .orElse(true)
+                  )
+                  .orElse(true)
+            )
+            .forEach(commandHandler -> {
+              usages.add(commandHandler.getUsage());
+              contexts.add(
+                commandHandler.getContext().toString().toLowerCase()
+              );
+              descriptions.add(commandHandler.getDescription());
+            });
           cli.postNotification(
             NotificationType.RESPONSE,
             CliUtils.getTable(
@@ -242,12 +276,11 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "join-game <game-id>",
         "Join a game",
-        ClientContext.LIST
+        ClientContext.MENU
       ) {
         @Override
         public void handle(String[] command) {
           client.connectToGame(command[1]);
-          // TODO printed lobby is outdated
         }
       }
     );
@@ -269,7 +302,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "leave-game",
         "Leave the current game",
-        ClientContext.MENU
+        ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -282,11 +315,18 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "create-game <game-id> <number-of-players>",
         "Create a new game",
-        ClientContext.LIST
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
-          client.createGame(command[1], Integer.parseInt(command[2]));
+          try {
+            client.createGame(command[1], Integer.parseInt(command[2]));
+          } catch (NumberFormatException e) {
+            cli.postNotification(
+              NotificationType.ERROR,
+              "Invalid number of players"
+            );
+          }
         }
       }
     );
@@ -295,14 +335,21 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "create-game-join <game-id> <number-of-players>",
         "Create a new game and join it.",
-        ClientContext.LIST
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
-          client.createAndConnectToGame(
-            command[1],
-            Integer.parseInt(command[2])
-          );
+          try {
+            client.createAndConnectToGame(
+              command[1],
+              Integer.parseInt(command[2])
+            );
+          } catch (NumberFormatException e) {
+            cli.postNotification(
+              NotificationType.ERROR,
+              "Invalid number of players"
+            );
+          }
         }
       }
     );
@@ -371,7 +418,7 @@ public class CliClient extends ViewClient {
             // TODO Handle invalid command
             return;
           }
-
+          client.getObjectivesIfNull();
           client.lobbyChooseObjectiveCard(command[1].equals("1"));
         }
       }
@@ -399,7 +446,9 @@ public class CliClient extends ViewClient {
         @Override
         public void handle(String[] command) {
           if (!List.of("front", "back").contains(command[1])) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(NotificationType.ERROR, "Invalid side");
             return;
           }
 
@@ -420,10 +469,13 @@ public class CliClient extends ViewClient {
         public void handle(String[] command) {
           cli.postNotification(
             NotificationType.RESPONSE,
-            (localModel.getState() != ClientContext.LIST)
-              ? "You are now in the " +
-              localModel.getState().toString().toLowerCase()
-              : "You have not joined any lobby or game yet"
+            currentContext
+              .get()
+              .map(
+                context ->
+                  "You are now in the " + context.toString().toLowerCase()
+              )
+              .orElse("You have not joined any lobby or game yet")
           );
         }
       }
@@ -433,7 +485,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "chat <message>",
         "Broadcast a message",
-        ClientContext.MENU
+        ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
@@ -495,7 +547,10 @@ public class CliClient extends ViewClient {
               try {
                 cardId = Integer.parseInt(command[2]);
               } catch (NumberFormatException e) {
-                // TODO Handle invalid command
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Invalid card id"
+                );
                 return;
               }
 
@@ -556,11 +611,13 @@ public class CliClient extends ViewClient {
           if (
             command.length < 5 ||
             !Stream.of(command[1], command[2], command[3]).allMatch(
-              s -> s.matches("\\d+")
+              s -> s.matches("-?\\d+")
             ) ||
             !List.of("front", "back").contains(command[4])
           ) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(NotificationType.ERROR, "Invalid place call");
             return;
           }
           int handIndex;
@@ -572,7 +629,12 @@ public class CliClient extends ViewClient {
               Integer.parseInt(command[3])
             );
           } catch (NumberFormatException e) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(
+                NotificationType.WARNING,
+                "Invalid number format"
+              );
             return;
           }
           client.placeCard(
@@ -586,32 +648,59 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "draw <deck|resource1|resource2|gold1|gold2>",
+        "draw deck <resource|gold>",
         "Draw a card",
         ClientContext.GAME
       ) {
         @Override
         public void handle(String[] command) {
           if (
-            command.length < 2 ||
-            !List.of(
-              "deck",
-              "resource1",
-              "resource2",
-              "gold1",
-              "gold2"
-            ).contains(command[1])
+            command.length < 3 ||
+            !List.of("draw", "deck", "resource", "gold").contains(command[1])
           ) {
-            // TODO Handle invalid command
+            localModel
+              .getView()
+              .postNotification(NotificationType.WARNING, "Invalid command");
             return;
           }
 
-          DrawingCardSource source = command[1].equals("deck")
-            ? DrawingCardSource.Deck
-            : (command[1].endsWith("1")
-                ? DrawingCardSource.CardPairFirstCard
-                : DrawingCardSource.CardPairSecondCard);
-          DrawingDeckType type = command[1].startsWith("resource")
+          DrawingCardSource source = DrawingCardSource.Deck;
+          DrawingDeckType type = command[2].equals("resource")
+            ? DrawingDeckType.RESOURCE
+            : DrawingDeckType.GOLD;
+          client.nextTurn(source, type);
+        }
+      }
+    );
+    commandHandlers.add(
+      new CommandHandler(
+        "draw pair <resource1|resource2|gold1|gold2>",
+        "Draw a card",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          if (
+            command.length < 3 ||
+            !List.of(
+              "draw",
+              "deck",
+              "resource1",
+              "gold1",
+              "resource2",
+              "gold2"
+            ).contains(command[1])
+          ) {
+            localModel
+              .getView()
+              .postNotification(NotificationType.WARNING, "Invalid command");
+            return;
+          }
+
+          DrawingCardSource source = command[2].endsWith("1")
+            ? DrawingCardSource.CardPairFirstCard
+            : DrawingCardSource.CardPairSecondCard;
+          DrawingDeckType type = command[2].equals("resource")
             ? DrawingDeckType.RESOURCE
             : DrawingDeckType.GOLD;
           client.nextTurn(source, type);
@@ -641,12 +730,19 @@ public class CliClient extends ViewClient {
     CliClient cliClient = new CliClient();
 
     // TODO add defaults from config file
-    cliClient.start(
-      Objects.equals(args[0], "--TCP")
+    try {
+      ConnectionType connectionType = Objects.equals(args[0], "--TCP")
         ? ConnectionType.TCP
-        : ConnectionType.RMI,
-      args[1] != null ? args[1] : "localhost",
-      args[2] != null ? Integer.parseInt(args[2]) : 12345
-    );
+        : ConnectionType.RMI;
+      cliClient.start(
+        connectionType,
+        args[1] != null ? args[1] : "localhost",
+        args[2] != null
+          ? Integer.parseInt(args[2])
+          : connectionType.getDefaultPort()
+      );
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Invalid port number");
+    }
   }
 }
