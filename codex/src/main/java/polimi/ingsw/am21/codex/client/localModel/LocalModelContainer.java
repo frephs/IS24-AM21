@@ -442,11 +442,6 @@ public class LocalModelContainer
       Optional.ofNullable(nickname).orElse(socketID.toString()) +
       " chose an objective card."
     );
-    if (this.socketId.equals(socketID)) {
-      view.drawStarterCardSides(
-        cardsLoader.getCardFromId(lobby.getStarterCardId())
-      );
-    }
   }
 
   public CardPair<Card> getAvailableObjectives() {
@@ -535,8 +530,6 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       "Player " + nickname + " joined game " + gameId + ". "
     );
-
-    view.drawLeaderBoard(localGameBoard.getPlayers());
   }
 
   @Override
@@ -590,7 +583,7 @@ public class LocalModelContainer
       clientContextContainer.set(ClientContext.GAME);
       if (localGameBoard.getCurrentPlayer().getSocketID().equals(socketId)) {
         view.postNotification(NotificationType.UPDATE, "It's your turn. ");
-        view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+        view.drawGame(localGameBoard.getPlayers());
       } else {
         view.postNotification(
           NotificationType.UPDATE,
@@ -617,7 +610,17 @@ public class LocalModelContainer
     Set<Position> forbiddenPositions
   ) {
     Card card = cardsLoader.getCardFromId(cardId);
-    localGameBoard.getCurrentPlayer().addPlayedCards(card, side, position);
+    LocalPlayer localPlayer = localGameBoard.getCurrentPlayer();
+
+    localPlayer.addPlayedCards(card, side, position);
+
+    List<Card> nextHand = new ArrayList<>();
+    for (int i = 0; i < localPlayer.getHand().size(); i++) {
+      if (i != playerHandCardNumber) {
+        nextHand.add(localPlayer.getHand().get(i));
+      }
+    }
+    localPlayer.setHand(nextHand);
 
     view.postNotification(
       NotificationType.UPDATE,
@@ -640,7 +643,7 @@ public class LocalModelContainer
       resourceType ->
         diffMessage(
           updatedResources.get(resourceType) -
-          localGameBoard.getCurrentPlayer().getResources().get(resourceType),
+          localPlayer.getResources().get(resourceType),
           resourceType
         )
     );
@@ -649,17 +652,20 @@ public class LocalModelContainer
       objectType ->
         diffMessage(
           updatedObjects.get(objectType) -
-          localGameBoard.getCurrentPlayer().getObjects().get(objectType),
+          localPlayer.getObjects().get(objectType),
           objectType
         )
     );
 
-    localGameBoard.getCurrentPlayer().getResources().putAll(updatedResources);
-    localGameBoard.getCurrentPlayer().getObjects().putAll(updatedObjects);
+    localPlayer.getResources().putAll(updatedResources);
+    localPlayer.getObjects().putAll(updatedObjects);
 
-    localGameBoard.getCurrentPlayer().setAvailableSpots(availablePositions);
-    localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenPositions);
-    //    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
+    localPlayer.setAvailableSpots(availablePositions);
+    localPlayer.setForbiddenSpots(forbiddenPositions);
+
+    // TODO this actually makes drawCardPlacement redundant
+    view.drawPlayerBoard(localPlayer);
+    view.drawHand(localPlayer.getHand());
   }
 
   void diffMessage(int diff, String attributeName) {

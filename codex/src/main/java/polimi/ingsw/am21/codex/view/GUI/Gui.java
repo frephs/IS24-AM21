@@ -695,7 +695,7 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Draw the scene for the player to chose a nickname
+   * Draw the scene for the player to choose a nickname
    * */
   @Override
   public void drawNicknameChoice() {
@@ -712,9 +712,6 @@ public class Gui extends Application implements View {
     });
   }
 
-  /**
-   * Draw the scene of the game's playerboard playerBoard and
-   * */
   @Override
   public void drawPlayerBoards(List<LocalPlayer> players) {
     // TODO handle other players (switch button etc)
@@ -753,6 +750,9 @@ public class Gui extends Application implements View {
         .findFirst()
         .ifPresent(this::drawPlayerBoard);
     });
+
+    // Draw the default player board
+    drawPlayerBoard(localModel.getLocalGameBoard().getPlayer());
 
     players
       .stream()
@@ -925,6 +925,7 @@ public class Gui extends Application implements View {
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
     hasPlacedCard = false;
+    drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
   }
 
   /**
@@ -1001,6 +1002,7 @@ public class Gui extends Application implements View {
       drawChat(players);
       drawGameBoard();
       drawPlayerBoards(players);
+      drawLeaderBoard(players);
       ((Text) scene.lookup("#window-title")).setText(
           "Game " + localModel.getGameId()
         );
