@@ -226,6 +226,7 @@ public abstract class ClientConnectionHandler {
   }
 
   public void connectionEstablished() {
+    this.listGames();
     this.connectionStatus =
       GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);

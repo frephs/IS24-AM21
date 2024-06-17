@@ -32,7 +32,6 @@ public class GuiClient extends ViewClient {
     super.start(connectionType, address, port);
     gui.setClient(client);
     gui.setLocalModel(localModel);
-    client.listGames();
   }
 
   public static void main(String[] args) {

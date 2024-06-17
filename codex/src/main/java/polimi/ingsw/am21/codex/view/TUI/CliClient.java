@@ -28,7 +28,6 @@ public class CliClient extends ViewClient {
 
   Scanner scanner;
   Cli cli;
-  ClientConnectionHandler client;
 
   public CliClient() {
     super(new LocalModelContainer(Cli.getInstance()));

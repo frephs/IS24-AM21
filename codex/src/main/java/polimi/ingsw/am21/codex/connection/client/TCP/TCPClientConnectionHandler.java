@@ -67,8 +67,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   ) {
     super(host, port, localModel);
     this.incomingMessages = new ArrayDeque<>();
-
-    this.connect();
   }
 
   private Optional<String> getGameIDWithMessage() {
@@ -221,7 +219,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       this.localModel.setSocketId(this.getSocketID());
       this.send(new ConnectMessage(this.getSocketID()));
       connectionEstablished();
-      this.listGames();
     } catch (IOException e) {
       connectionFailed(e);
     }

@@ -40,7 +40,6 @@ public class RMIClientConnectionHandler
     LocalModelContainer localModel
   ) {
     super(host, port, localModel);
-    this.connect();
   }
 
   @Override
@@ -55,7 +54,6 @@ public class RMIClientConnectionHandler
           this.localModel.getRemoteListener()
         );
       this.connectionEstablished();
-      this.listGames();
     } catch (Exception e) {
       this.connectionFailed(e);
     }
