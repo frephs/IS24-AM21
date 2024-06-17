@@ -1444,7 +1444,6 @@ public class Gui extends Application implements View {
     images.forEach(image -> {
       image.setPreserveRatio(true);
       image.setFitWidth(150);
-      image.setStyle("-fx-cursor: hand");
     });
 
     Separator separator = new Separator();
