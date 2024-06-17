@@ -623,6 +623,14 @@ public class Gui extends Application implements View {
         points.getStyleClass().add("leaderboard-entry");
 
         HBox nicknameAndToken = new HBox(token, nickname);
+        if (
+          Objects.equals(
+            player.getNickname(),
+            localModel.getLocalGameBoard().getCurrentPlayer().getNickname()
+          )
+        ) {
+          nicknameAndToken.getStyleClass().add("highlighted");
+        }
         nicknameAndToken.setAlignment(Pos.CENTER);
 
         container.addRow(i, nicknameAndToken, points);

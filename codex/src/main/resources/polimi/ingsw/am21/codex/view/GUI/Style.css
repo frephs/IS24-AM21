@@ -509,3 +509,14 @@ Exception Dialog
 .scroll-pane {
   -fx-background-color: transparent;
 }
+
+.highlighted {
+  -fx-background-color: rgba(158, 140, 11, 0.8);
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
+}
+
+.highlighted,
+.highlighted .label {
+  -fx-text-fill: #ffffff;
+}
