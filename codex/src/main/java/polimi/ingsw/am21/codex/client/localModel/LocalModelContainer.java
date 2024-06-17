@@ -664,6 +664,7 @@ public class LocalModelContainer
       NotificationType.UPDATE,
       "Card " + cardId + " placed"
     );
+
     view.drawCardPlacement(
       card,
       side,
@@ -695,6 +696,8 @@ public class LocalModelContainer
         )
     );
 
+    localPlayer.setPoints(newPlayerScore);
+
     localPlayer.getResources().putAll(updatedResources);
     localPlayer.getObjects().putAll(updatedObjects);
 
@@ -703,6 +706,7 @@ public class LocalModelContainer
 
     // TODO this actually makes drawCardPlacement redundant
     view.drawPlayerBoard(localPlayer);
+    view.drawLeaderBoard(localGameBoard.getPlayers());
     view.drawHand(localPlayer.getHand());
   }
 
