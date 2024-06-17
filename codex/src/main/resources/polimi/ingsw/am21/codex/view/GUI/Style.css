@@ -509,3 +509,7 @@ Exception Dialog
 .scroll-pane {
   -fx-background-color: transparent;
 }
+
+.allow-draw .card {
+  -fx-cursor: hand;
+}

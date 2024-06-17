@@ -858,6 +858,20 @@ public class Gui extends Application implements View {
   }
 
   /**
+   * @return a boolean that determines whether the player can draw cards
+   */
+  private boolean canPlayerDrawCards() {
+    return (
+      this.hasPlacedCard &&
+      localModel
+        .getLocalGameBoard()
+        .getCurrentPlayer()
+        .getNickname()
+        .equals(localModel.getLocalGameBoard().getPlayer().getNickname())
+    );
+  }
+
+  /**
    * Toggle the hand side of the player: display the front or back of cards
    * */
   private void toggleHandSide() {
@@ -922,19 +936,21 @@ public class Gui extends Application implements View {
   @Override
   public void drawCardDrawn(DrawingDeckType deck, Card card) {
     // TODO
-    hasPlacedCard = false;
-    drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
-    drawGameBoard();
+    drawCardDrawn(deck);
   }
 
   /**
    * Draw the decks image after a card has been drawn from a player
-   * @param deck
+   * @param deck the deck from which the cards are drawn
    * */
   @Override
   public void drawCardDrawn(DrawingDeckType deck) {
     // TODO
     hasPlacedCard = false;
+    ((ScrollPane) scene.lookup("#gameboard-container")).getContent()
+      .getStyleClass()
+      .clear();
+
     drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
     drawGameBoard();
   }
@@ -956,6 +972,10 @@ public class Gui extends Application implements View {
     Set<Position> forbiddenPositions
   ) {
     hasPlacedCard = true;
+    ((ScrollPane) scene.lookup("#gameboard-container")).getContent()
+      .getStyleClass()
+      .add("allow-draw");
+
     Platform.runLater(() -> {
       ViewGridPosition viewPos = new ViewGridPosition(position);
       GridPane gridPane = (GridPane) scene.lookup("#playerboard-grid");
@@ -1157,45 +1177,41 @@ public class Gui extends Application implements View {
 
       images
         .get(0)
-        .setOnMouseClicked(
-          (MouseEvent event) ->
-            client.nextTurn(
-              DrawingCardSource.CardPairFirstCard,
-              DrawingDeckType.RESOURCE
-            )
-        );
+        .setOnMouseClicked((MouseEvent event) -> {
+          if (canPlayerDrawCards()) client.nextTurn(
+            DrawingCardSource.CardPairFirstCard,
+            DrawingDeckType.RESOURCE
+          );
+        });
       images
         .get(1)
-        .setOnMouseClicked(
-          (MouseEvent event) ->
-            client.nextTurn(
-              DrawingCardSource.CardPairSecondCard,
-              DrawingDeckType.RESOURCE
-            )
-        );
+        .setOnMouseClicked((MouseEvent event) -> {
+          if (canPlayerDrawCards()) client.nextTurn(
+            DrawingCardSource.CardPairSecondCard,
+            DrawingDeckType.RESOURCE
+          );
+        });
       images
         .get(2)
-        .setOnMouseClicked(
-          (MouseEvent event) ->
-            client.nextTurn(
-              DrawingCardSource.CardPairFirstCard,
-              DrawingDeckType.GOLD
-            )
-        );
+        .setOnMouseClicked((MouseEvent event) -> {
+          if (canPlayerDrawCards()) client.nextTurn(
+            DrawingCardSource.CardPairFirstCard,
+            DrawingDeckType.GOLD
+          );
+        });
       images
         .get(3)
-        .setOnMouseClicked(
-          (MouseEvent event) ->
-            client.nextTurn(
-              DrawingCardSource.CardPairSecondCard,
-              DrawingDeckType.GOLD
-            )
-        );
+        .setOnMouseClicked((MouseEvent event) -> {
+          if (canPlayerDrawCards()) client.nextTurn(
+            DrawingCardSource.CardPairSecondCard,
+            DrawingDeckType.GOLD
+          );
+        });
 
       images.forEach(image -> {
         image.setPreserveRatio(true);
         image.setFitWidth(150);
-        image.setStyle("-fx-cursor: hand");
+        image.getStyleClass().add("card");
       });
 
       Separator separator1 = new Separator();
@@ -1242,14 +1258,11 @@ public class Gui extends Application implements View {
         client.getStarterCard();
       });
 
-      first.setPreserveRatio(true);
-      second.setPreserveRatio(true);
-
-      first.setFitWidth(150);
-      second.setFitWidth(150);
-
-      first.setStyle("-fx-cursor: hand");
-      second.setStyle("-fx-cursor: hand");
+      List.of(first, second).forEach(image -> {
+        image.setPreserveRatio(true);
+        image.setFitWidth(150);
+        image.getStyleClass().add("card");
+      });
 
       Node objectiveContainer = scene.lookup("#objective-container");
       ((HBox) objectiveContainer).getChildren().add(wrapAndBorder(first));
@@ -1503,12 +1516,14 @@ public class Gui extends Application implements View {
         );
         resource.setPreserveRatio(true);
         resource.setFitWidth(150);
-        resource.setStyle("-fx-cursor: hand");
+        resource.getStyleClass().add("card");
 
-        resource.setOnMouseClicked(
-          (MouseEvent event) ->
-            client.nextTurn(DrawingCardSource.Deck, DrawingDeckType.RESOURCE)
-        );
+        resource.setOnMouseClicked((MouseEvent event) -> {
+          if (canPlayerDrawCards()) client.nextTurn(
+            DrawingCardSource.Deck,
+            DrawingDeckType.RESOURCE
+          );
+        });
 
         resourceCardsDeck.getChildren().add((resource));
       }
@@ -1518,12 +1533,14 @@ public class Gui extends Application implements View {
         ImageView gold = loadCardImage(firstGoldCard, CardSideType.BACK);
         gold.setPreserveRatio(true);
         gold.setFitWidth(150);
-        gold.setStyle("-fx-cursor: hand");
+        gold.getStyleClass().add("card");
 
-        gold.setOnMouseClicked(
-          (MouseEvent event) ->
-            client.nextTurn(DrawingCardSource.Deck, DrawingDeckType.GOLD)
-        );
+        gold.setOnMouseClicked((MouseEvent event) -> {
+          if (canPlayerDrawCards()) client.nextTurn(
+            DrawingCardSource.Deck,
+            DrawingDeckType.GOLD
+          );
+        });
 
         goldCardsDeck.getChildren().add((gold));
       }
