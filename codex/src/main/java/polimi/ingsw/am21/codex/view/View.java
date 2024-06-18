@@ -21,51 +21,118 @@ import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
-public abstract class View implements GameEventListener {
+public interface View extends GameEventListener {
+  public LocalModelContainer getLocalModel();
 
-  private LocalModelContainer localModel;
+  void postNotification(NotificationType notificationType, String message);
 
-  public View(LocalModelContainer localModel) {
-    this.localModel = localModel;
-  }
+  void postNotification(Notification notification);
 
-  public abstract void postNotification(
-    NotificationType notificationType,
-    String message
-  );
-
-  public abstract void postNotification(Notification notification);
-
-  public abstract void postNotification(
+  void postNotification(
     NotificationType notificationType,
     String[] messages,
     Colorable colorable,
     int colorableIndex
   );
 
-  public LocalModelContainer getLocalModel() {
-    return localModel;
+  void displayException(Exception e);
+
+  // lobby
+  void drawAvailableGames(List<GameEntry> games);
+
+  void drawAvailableTokenColors(Set<TokenColor> tokenColors);
+
+  void drawLobby(Map<UUID, LocalPlayer> players);
+
+  // game
+
+  void drawLeaderBoard(List<LocalPlayer> players);
+
+  void drawPlayerBoards(List<LocalPlayer> players);
+
+  void drawPlayerBoard(LocalPlayer player);
+
+  /**
+   * Displays that the client player has drawn a card from a deck
+   * @param deck The deck the card has been drawn from
+   * @param card The card that has been drawn
+   */
+  void drawCardDrawn(DrawingDeckType deck, Card card);
+
+  /**
+   * Displays that a card has been drawn from a deck
+   * @param deck The deck that the card has been drawn from
+   */
+  void drawCardDrawn(DrawingDeckType deck);
+
+  void drawCardPlacement(
+    Card card,
+    CardSideType side,
+    Position position,
+    Set<Position> availablePositions,
+    Set<Position> forbiddenPositions
+  );
+
+  void drawGame(List<LocalPlayer> players);
+
+  void drawGameOver(List<LocalPlayer> players);
+
+  void drawCard(Card card);
+
+  /**
+   * Displays the hand of the client player
+   */
+  void drawHand(List<Card> hand);
+
+  /**
+   * Displays the pairs the players can draw from
+   * @param resourceCards The resource cards pair
+   * @param goldCards The gold cards pair
+   */
+
+  void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
+
+  void drawObjectiveCardChoice(CardPair<Card> cardPair);
+  void drawStarterCardSides(Card card);
+
+  void drawWinner(String nickname);
+
+  void drawChatMessage(ChatMessage message);
+  void drawCommonObjectiveCards(CardPair<Card> cardPair);
+  void drawPlayerObjective(Card card);
+
+  /**
+   * Displays the cards decks to draw from
+   * @param firstResourceCard The first resource card (null if none)
+   * @param firstGoldCard The first gold card (null if none)
+   */
+  void drawCardDecks(
+    PlayableCard firstResourceCard,
+    PlayableCard firstGoldCard
+  );
+
+  void drawNicknameChoice();
+
+  // ---------------------------
+  // GAME EVENT LISTENER METHODS
+  // ---------------------------
+
+  @Override
+  default void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    postNotification(NotificationType.UPDATE, "Game " + gameId + " created");
   }
 
   @Override
-  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
-    localModel.gameCreated(gameId, currentPlayers, maxPlayers);
+  default void gameDeleted(String gameId) {
+    postNotification(NotificationType.UPDATE, "Game " + gameId + " deleted");
   }
 
   @Override
-  public void gameDeleted(String gameId) {
-    localModel.gameDeleted(gameId);
-    postNotification(
-      NotificationType.UPDATE,
-      "Game " + gameId + " has been deleted"
-    );
-  }
-
-  @Override
-  public void playerJoinedLobby(String gameId, UUID socketID) {
-    localModel.playerJoinedLobby(gameId, socketID);
+  default void playerJoinedLobby(String gameId, UUID socketID) {
     String message;
-    if (localModel.getGameId().equals(gameId)) {
+    if (getLocalModel().getSocketID().equals(socketID)) {
+      message = "You joined the game " + gameId;
+    } else if (getLocalModel().getLocalGameBoard().getGameId().equals(gameId)) {
       message = socketID.toString() + " joined your game";
     } else {
       message = socketID.toString() + " joined game " + gameId;
@@ -75,60 +142,71 @@ public abstract class View implements GameEventListener {
   }
 
   @Override
-  public void playerLeftLobby(String gameId, UUID socketID) {
-    localModel.playerLeftLobby(gameId, socketID);
+  default void playerLeftLobby(String gameId, UUID socketID) {
     String message;
 
-    if (localModel.getGameId().map(gameId::equals).orElse(false)) {
-      message = socketID + " left your game";
+    if (getLocalModel().getSocketID().equals(socketID)) {
+      message = "You left the lobby of the game " + gameId;
+    } else if (getLocalModel().getLocalGameBoard().getGameId().equals(gameId)) {
+      message = socketID.toString() + " left your game lobby";
     } else {
-      message = socketID + " left game " + gameId;
+      message = socketID.toString() + " left the game lobby " + gameId;
     }
 
     postNotification(NotificationType.UPDATE, message);
   }
 
   @Override
-  public void playerSetToken(
+  default void playerSetToken(
     String gameId,
     UUID socketID,
     String nickname,
     TokenColor token
   ) {
-    localModel.playerSetToken(gameId, socketID, nickname, token);
     postNotification(
       NotificationType.UPDATE,
-      "Player " +
-      nickname +
-      " has set their token to " +
-      token.toString().toLowerCase()
+      new String[] {
+        "A Player ",
+        nickname != null ? nickname : socketID.toString().substring(0, 6),
+        " has set their token to ",
+      },
+      token,
+      3
     );
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
-    localModel.playerSetNickname(gameId, socketID, nickname);
-    postNotification(
-      NotificationType.UPDATE,
-      "Player " + nickname + " has set their nickname"
-    );
-  }
-
-  @Override
-  public void playerChoseObjectiveCard(
+  default void playerSetNickname(
     String gameId,
     UUID socketID,
     String nickname
   ) {
-    localModel.playerChoseObjectiveCard(gameId, socketID, nickname);
+    String message;
+    if (getLocalModel().getSocketID().equals(socketID)) {
+      message = "You set your nickname to " + nickname;
+    } else {
+      message = socketID.toString().substring(0, 6) +
+      " set their nickname to " +
+      nickname;
+    }
+  }
+
+  @Override
+  default void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    String nickname
+  ) {
     postNotification(
       NotificationType.UPDATE,
-      "Player " + nickname + " has chosen their objective card"
+      "Player " +
+      (nickname != null ? nickname : socketID.toString().substring(0, 6)) +
+      " has chosen their secret objective card"
     );
   }
 
   @Override
-  public void playerJoinedGame(
+  default void playerJoinedGame(
     String gameId,
     UUID socketID,
     String nickname,
@@ -137,28 +215,14 @@ public abstract class View implements GameEventListener {
     Integer starterCardID,
     CardSideType starterSide
   ) {
-    localModel.playerJoinedGame(
-      gameId,
-      socketID,
-      nickname,
-      color,
-      handIDs,
-      starterCardID,
-      starterSide
-    );
     postNotification(
       NotificationType.UPDATE,
-      "Player " +
-      nickname +
-      " has joined the game with token " +
-      color.toString().toLowerCase()
+      "Player " + nickname + " has joined the game "
     );
   }
 
   @Override
-  public void gameStarted(String gameId, GameInfo gameInfo) {
-    getLocalModel().getClientContextContainer().set(ClientContext.GAME);
-    localModel.gameStarted(gameId, gameInfo);
+  default void gameStarted(String gameId, GameInfo gameInfo) {
     postNotification(
       NotificationType.UPDATE,
       "Game " + gameId + " has started"
@@ -166,7 +230,7 @@ public abstract class View implements GameEventListener {
   }
 
   @Override
-  public void changeTurn(
+  default void changeTurn(
     String gameId,
     String playerNickname,
     Integer playerIndex,
@@ -180,21 +244,6 @@ public abstract class View implements GameEventListener {
     Integer resourceDeckTopCardId,
     Integer goldDeckTopCardId
   ) {
-    localModel.changeTurn(
-      gameId,
-      playerNickname,
-      playerIndex,
-      isLastRound,
-      source,
-      deck,
-      cardId,
-      newPairCardId,
-      availableSpots,
-      forbiddenSpots,
-      resourceDeckTopCardId,
-      goldDeckTopCardId
-    );
-
     postNotification(
       NotificationType.UPDATE,
       "It's " +
@@ -205,7 +254,7 @@ public abstract class View implements GameEventListener {
   }
 
   @Override
-  public void changeTurn(
+  default void changeTurn(
     String gameId,
     String playerNickname,
     Integer playerIndex,
@@ -215,17 +264,6 @@ public abstract class View implements GameEventListener {
     Integer resourceDeckTopCardId,
     Integer goldDeckTopCardId
   ) {
-    localModel.changeTurn(
-      gameId,
-      playerNickname,
-      playerIndex,
-      isLastRound,
-      availableSpots,
-      forbiddenSpots,
-      resourceDeckTopCardId,
-      goldDeckTopCardId
-    );
-
     postNotification(
       NotificationType.UPDATE,
       "It's " +
@@ -236,7 +274,7 @@ public abstract class View implements GameEventListener {
   }
 
   @Override
-  public void cardPlaced(
+  default void cardPlaced(
     String gameId,
     String playerId,
     Integer playerHandCardNumber,
@@ -249,51 +287,38 @@ public abstract class View implements GameEventListener {
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots
   ) {
-    localModel.cardPlaced(
-      gameId,
-      playerId,
-      playerHandCardNumber,
-      cardId,
-      side,
-      position,
-      newPlayerScore,
-      updatedResources,
-      updatedObjects,
-      availableSpots,
-      forbiddenSpots
+    postNotification(
+      NotificationType.UPDATE,
+      "Player " + playerId + " placed card " + cardId + " on the board"
     );
   }
 
   @Override
-  public void gameOver() {
-    localModel.gameOver();
-    postNotification(NotificationType.UPDATE, "Game over");
+  default void gameOver() {
+    postNotification(NotificationType.UPDATE, "Game is over");
   }
 
   @Override
-  public void playerScoresUpdate(Map<String, Integer> newScores) {
-    localModel.playerScoresUpdate(newScores);
+  default void playerScoresUpdate(Map<String, Integer> newScores) {
+    postNotification(NotificationType.UPDATE, "Scores updated");
   }
 
   @Override
-  public void remainingRounds(String gameID, int remainingRounds) {
-    localModel.remainingRounds(gameID, remainingRounds);
+  default void remainingRounds(String gameID, int remainingRounds) {
     postNotification(NotificationType.UPDATE, remainingRounds + " rounds left");
   }
 
   @Override
-  public void winningPlayer(String nickname) {
-    localModel.winningPlayer(nickname);
+  default void winningPlayer(String nickname) {
     postNotification(NotificationType.UPDATE, nickname + " has won the game!");
   }
 
   @Override
-  public void playerConnectionChanged(
+  default void playerConnectionChanged(
     UUID socketID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {
-    localModel.playerConnectionChanged(socketID, nickname, status);
     postNotification(
       NotificationType.UPDATE,
       "Player " +
@@ -305,25 +330,13 @@ public abstract class View implements GameEventListener {
   }
 
   @Override
-  public void lobbyInfo(LobbyUsersInfo usersInfo) {
-    localModel.lobbyInfo(usersInfo);
-  }
+  void lobbyInfo(LobbyUsersInfo usersInfo);
 
   @Override
-  public void chatMessage(String gameID, ChatMessage message) {
-    localModel.chatMessage(gameID, message);
-  }
-
-  public void printPrompt() {
-    System.out.print("\r> ");
-  }
-
-  public void printUpdate(String string) {
-    System.out.println(
-      "\r" +
-      string +
-      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
+  default void chatMessage(String gameID, ChatMessage message) {
+    postNotification(
+      NotificationType.UPDATE,
+      "New chat message from " + message.getSender()
     );
-    printPrompt();
   }
 }
