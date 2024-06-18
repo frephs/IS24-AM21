@@ -23,9 +23,4 @@ public abstract class ViewClient {
     }
     client.connect();
   }
-
-  @Override
-  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
-    view.getLocalModel().gameCreated(gameId, currentPlayers, maxPlayers);
-  }
 }
