@@ -795,8 +795,7 @@ public class GameController {
             .forEach(entry -> {
               try {
                 String nickname = entry.getValue().getNickname().orElse(null);
-                Player player = null;
-                player = game.getPlayer(nickname);
+                Player player = game.getPlayer(nickname);
                 PlayerBoard playerBoard = player.getBoard();
                 users.add(
                   new GameInfo.GameInfoUser(
