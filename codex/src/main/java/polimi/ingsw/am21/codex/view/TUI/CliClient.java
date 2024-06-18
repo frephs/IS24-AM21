@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -29,14 +30,14 @@ public class CliClient extends ViewClient {
   Cli cli;
   ClientConnectionHandler client;
 
-  public CliClient(LocalModelContainer localModel) {
-    super(new Cli(new Cli.Options(true), localModel));
-    cli = (Cli) localModel.getView();
+  public CliClient(LocalModelContainer localModelContainer) {
+    super(new Cli(new Cli.Options(true), localModelContainer));
+    cli = (Cli) localModelContainer.getView();
     scanner = new Scanner(System.in);
   }
 
-  private AtomicReference<ClientContext> getClientContextContainer() {
-    return view.getLocalModel().getState();
+  private LocalModelContainer.ClientContextContainer getClientContextContainer() {
+    return view.getLocalModel().getClientContextContainer();
   }
 
   @Override
@@ -181,8 +182,8 @@ public class CliClient extends ViewClient {
   private void initializeCommandHandlers() {
     // TODO add optional arguments to usages
 
-    final AtomicReference<ClientContext> currentContext =
-      this.getClientContextContainer();
+    final LocalModelContainer.ClientContextContainer currentContext =
+      getClientContextContainer();
 
     commandHandlers.add(
       new CommandHandler("exit", "Exit the program", ClientContext.MENU) {
@@ -267,7 +268,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.listGames();
+          client.getGames();
         }
       }
     );

@@ -62,11 +62,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   private Optional<String> getGameIDWithMessage() {
-    if (this.localModel.getGameId().isEmpty()) {
-      this.localModel.notInGame();
+    if (this.gameEventHandler.getLocalModel().getGameId().isEmpty()) {
+      this.gameEventHandler.notInGame();
       return Optional.empty();
     }
-    String gameID = this.localModel.getGameId().get();
+    String gameID = this.gameEventHandler.getLocalModel().getGameId().get();
     return Optional.of(gameID);
   }
 
@@ -89,9 +89,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
           incomingMessages.notifyAll();
           incomingMessages.wait(1);
-        } catch (ClassNotFoundException e) {
-          getView().postNotification(Notification.UNKNOWN_MESSAGE);
-        } catch (IOException e) {
+        } catch (ClassNotFoundException e) {} catch (IOException e) {
           getView()
             .postNotification(
               NotificationType.ERROR,
@@ -183,7 +181,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   private View getView() {
-    return this.localModel.getView();
+    return gameEventHandler.getView();
   }
 
   @Override
@@ -208,7 +206,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
       this.startMessageParser();
       this.startMessageHandler();
-      this.localModel.setSocketId(this.getSocketID());
+      this.gameEventHandler.getLocalModel().setSocketId(this.getSocketID());
       this.send(new ConnectMessage(this.getSocketID()));
       connectionEstablished();
     } catch (IOException e) {
@@ -222,7 +220,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public void listGames() {
+  public void getGames() {
     this.send(new GetAvailableGameLobbiesMessage(this.getSocketID()));
   }
 
@@ -256,7 +254,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void showAvailableTokens() {
-    localModel.showAvailableTokens();
+    gameEventHandler.getLocalModel().showAvailableTokens();
   }
 
   @Override
@@ -306,7 +304,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         new PlaceCardMessage(
           this.getSocketID(),
           gameID,
-          localModel.getLocalGameBoard().getPlayerNickname(),
+          gameEventHandler
+            .getLocalModel()
+            .getLocalGameBoard()
+            .getPlayerNickname(),
           playerHandCardNumber,
           side,
           position
@@ -330,7 +331,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         new NextTurnActionMessage(
           this.getSocketID(),
           gameID,
-          this.localModel.getLocalGameBoard().getPlayerNickname(),
+          this.gameEventHandler.getLocalModel()
+            .getLocalGameBoard()
+            .getPlayerNickname(),
           drawingSource,
           deckType
         )
@@ -345,7 +348,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         new NextTurnActionMessage(
           this.getSocketID(),
           gameID,
-          localModel.getLocalGameBoard().getPlayerNickname()
+          gameEventHandler
+            .getLocalModel()
+            .getLocalGameBoard()
+            .getPlayerNickname()
         )
       );
   }
@@ -445,23 +451,27 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    * */
 
   public void handleMessage(GameStatusMessage message) {
-    localModel.gameStatusUpdate(message.getState());
+    gameEventHandler.getLocalModel().gameStatusUpdate(message.getState());
   }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
-    localModel.createGames(
-      message.getLobbyIds(),
-      message.getCurrentPlayers(),
-      message.getMaxPlayers()
-    );
+    gameEventHandler
+      .getLocalModel()
+      .createGames(
+        message.getLobbyIds(),
+        message.getCurrentPlayers(),
+        message.getMaxPlayers()
+      );
   }
 
   public void handleMessage(ObjectiveCardsMessage message) {
-    localModel.getObjectiveCards(message.getIdPair());
+    gameEventHandler.getLocalModel().getObjectiveCards(message.getIdPair());
   }
 
   public void handleMessage(StarterCardSidesMessage message) {
-    localModel.playerGetStarterCardSides(message.getCardId());
+    gameEventHandler
+      .getLocalModel()
+      .playerGetStarterCardSides(message.getCardId());
   }
 
   /*
@@ -473,7 +483,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   //game
 
   public void handleMessage(InvalidActionMessage message) {
-    localModel.handleInvalidActionException(message.toException());
+    gameEventHandler.handleInvalidActionException(message.toException());
   }
 
   public void handleMessage(UnknownMessageTypeMessage ignored) {
@@ -500,11 +510,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   // LOBBY
   public void handleMessage(LobbyInfoMessage message) {
-    localModel.lobbyInfo(message.getLobbyUsersInfo());
+    gameEventHandler.lobbyInfo(message.getLobbyUsersInfo());
   }
 
   public void handleMessage(GameCreatedMessage message) {
-    localModel.gameCreated(
+    gameEventHandler.gameCreated(
       message.getGameId(),
       message.getPlayers(),
       message.getMaxPlayers()
@@ -517,23 +527,29 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(GameDeletedMessage message) {
-    localModel.gameDeleted(message.getGameId());
+    gameEventHandler.gameDeleted(message.getGameId());
   }
 
   public void handleMessage(GameStartedMessage message) {
-    localModel.gameStarted(message.getGameId(), message.getGameInfo());
+    gameEventHandler.gameStarted(message.getGameId(), message.getGameInfo());
   }
 
   public void handleMessage(PlayerJoinedLobbyMessage message) {
-    localModel.playerJoinedLobby(message.getLobbyId(), message.getSocketId());
+    gameEventHandler.playerJoinedLobby(
+      message.getLobbyId(),
+      message.getSocketId()
+    );
   }
 
   public void handleMessage(PlayerLeftLobbyMessage message) {
-    localModel.playerLeftLobby(message.getLobbyId(), message.getSocketId());
+    gameEventHandler.playerLeftLobby(
+      message.getLobbyId(),
+      message.getSocketId()
+    );
   }
 
   public void handleMessage(PlayerSetNicknameMessage message) {
-    localModel.playerSetNickname(
+    gameEventHandler.playerSetNickname(
       message.getGameId(),
       message.getSocketId(),
       message.getNickname()
@@ -541,7 +557,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerSetTokenColorMessage message) {
-    localModel.playerSetToken(
+    gameEventHandler.playerSetToken(
       message.getGameId(),
       message.getSocketId(),
       message.getNickname(),
@@ -550,7 +566,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerChoseObjectiveCardMessage message) {
-    localModel.playerChoseObjectiveCard(
+    gameEventHandler.playerChoseObjectiveCard(
       message.getGameId(),
       message.getSocketId(),
       message.getNickname()
@@ -558,7 +574,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerConnectionChangedMessage message) {
-    localModel.playerConnectionChanged(
+    gameEventHandler.playerConnectionChanged(
       message.getConnectionID(),
       message.getNickname(),
       message.getStatus()
@@ -568,7 +584,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   // GAME
 
   public void handleMessage(CardPlacedMessage message) {
-    localModel.cardPlaced(
+    gameEventHandler.cardPlaced(
       message.getGameId(),
       message.getPlayerId(),
       message.getPlayerHandCardNumber(),
@@ -584,11 +600,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(GameOverMessage ignored) {
-    localModel.gameOver();
+    gameEventHandler.gameOver();
   }
 
   public void handleMessage(NextTurnUpdateMessage message) {
-    localModel.changeTurn(
+    gameEventHandler.changeTurn(
       message.getGameId(),
       message.getNickname(),
       message.getPlayerIndex(),
@@ -605,7 +621,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerJoinedGameMessage message) {
-    localModel.playerJoinedGame(
+    gameEventHandler.playerJoinedGame(
       message.getGameId(),
       message.getSocketId(),
       message.getNickname(),
@@ -617,18 +633,18 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(PlayerScoresUpdateMessage message) {
-    localModel.playerScoresUpdate(message.getNewScores());
+    gameEventHandler.playerScoresUpdate(message.getNewScores());
   }
 
   public void handleMessage(RemainingRoundsMessage message) {
-    localModel.remainingRounds(message.getGameID(), message.getRounds());
+    gameEventHandler.remainingRounds(message.getGameID(), message.getRounds());
   }
 
   public void handleMessage(WinningPlayerMessage message) {
-    localModel.winningPlayer(message.getWinnerNickname());
+    gameEventHandler.winningPlayer(message.getWinnerNickname());
   }
 
   public void handleMessage(ChatMessageMessage message) {
-    localModel.chatMessage(message.getGameID(), message.getMessage());
+    gameEventHandler.chatMessage(message.getGameID(), message.getMessage());
   }
 }

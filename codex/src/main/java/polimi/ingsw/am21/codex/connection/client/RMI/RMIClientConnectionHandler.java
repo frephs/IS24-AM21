@@ -38,7 +38,7 @@ public class RMIClientConnectionHandler
       );
       this.rmiConnectionHandler.connect(
           this.getSocketID(),
-          this.localModel.getRemoteListener()
+          this.gameEventHandler.getLocalModel().getRemoteListener()
         );
       this.connectionEstablished();
     } catch (Exception e) {
@@ -52,23 +52,30 @@ public class RMIClientConnectionHandler
   }
 
   private Optional<String> getGameIDWithMessage() {
-    if (this.localModel.getGameId().isEmpty()) {
-      this.localModel.notInGame();
+    if (this.gameEventHandler.getLocalModel().getGameId().isEmpty()) {
+      this.gameEventHandler.notInGame();
       return Optional.empty();
     }
-    String gameID = this.localModel.getGameId().get();
+    String gameID = this.gameEventHandler.getLocalModel().getGameId().get();
     return Optional.of(gameID);
   }
 
   @Override
-  public void listGames() {
+  public void getGames() {
     try {
       Set<String> games = rmiConnectionHandler.getGames();
       Map<String, Integer> currentPlayers =
         rmiConnectionHandler.getGamesCurrentPlayers();
       Map<String, Integer> maxPlayers =
         rmiConnectionHandler.getGamesMaxPlayers();
-      localModel.createGames(games, currentPlayers, maxPlayers);
+
+      games.forEach(game -> {
+        this.gameEventHandler.gameCreated(
+            game,
+            currentPlayers.get(game),
+            maxPlayers.get(game)
+          );
+      });
     } catch (RemoteException e) {
       this.messageNotSent();
     }
@@ -78,7 +85,7 @@ public class RMIClientConnectionHandler
   public void createGame(String gameId, int players) {
     try {
       rmiConnectionHandler.createGame(this.getSocketID(), gameId, players);
-      this.localModel.gameCreated(gameId, 0, players);
+      this.gameEventHandler.gameCreated(gameId, 0, players);
     } catch (RemoteException | EmptyDeckException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -87,7 +94,7 @@ public class RMIClientConnectionHandler
   }
 
   private void handleInvalidActionException(InvalidActionException e) {
-    this.localModel.handleInvalidActionException(e);
+    this.gameEventHandler.handleInvalidActionException(e);
   }
 
   @Override
@@ -141,7 +148,7 @@ public class RMIClientConnectionHandler
 
   @Override
   public void showAvailableTokens() {
-    this.localModel.showAvailableTokens();
+    this.gameEventHandler.getLocalModel().showAvailableTokens();
   }
 
   @Override
@@ -158,9 +165,11 @@ public class RMIClientConnectionHandler
   @Override
   public void getObjectiveCards() {
     try {
-      localModel.getObjectiveCards(
-        rmiConnectionHandler.getLobbyObjectiveCards(this.getSocketID())
-      );
+      gameEventHandler
+        .getLocalModel()
+        .getObjectiveCards(
+          rmiConnectionHandler.getLobbyObjectiveCards(this.getSocketID())
+        );
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -172,7 +181,7 @@ public class RMIClientConnectionHandler
   public void lobbyChooseObjectiveCard(Boolean first) {
     try {
       rmiConnectionHandler.lobbyChooseObjective(this.getSocketID(), first);
-      this.localModel.playerChoseObjectiveCard(first);
+      this.gameEventHandler.getLocalModel().playerChoseObjectiveCard(first);
       //TODO change to clientGameEventHandler
     } catch (RemoteException e) {
       this.messageNotSent();
@@ -184,9 +193,11 @@ public class RMIClientConnectionHandler
   @Override
   public void getStarterCard() {
     try {
-      localModel.playerGetStarterCardSides(
-        rmiConnectionHandler.getLobbyStarterCard(socketID)
-      );
+      gameEventHandler
+        .getLocalModel()
+        .playerGetStarterCardSides(
+          rmiConnectionHandler.getLobbyStarterCard(socketID)
+        );
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {

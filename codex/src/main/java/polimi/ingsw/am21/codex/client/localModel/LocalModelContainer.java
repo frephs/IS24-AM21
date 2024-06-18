@@ -622,4 +622,8 @@ public class LocalModelContainer implements GameEventListener {
       gameBoard.getChat().postMessage(message);
     }
   }
+
+  public void gameStatusUpdate(GameState state) {
+    //TODO
+  }
 }

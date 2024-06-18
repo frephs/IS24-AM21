@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view.GUI;
 
 import java.util.Objects;
 import javafx.application.Application;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;

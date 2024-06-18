@@ -62,7 +62,6 @@ public class DummyView implements View {
   @Override
   public void displayException(Exception e) {
     CliUtils.colorize(
-      options,
       "[" + id + "] " + e.getMessage(),
       NotificationType.ERROR.getColor(),
       ColorStyle.NORMAL
@@ -129,13 +128,9 @@ public class DummyView implements View {
   public void drawStarterCardSides(Card cardId) {}
 
   @Override
-  public void drawWinner(String nickname) {}
-
-  @Override
   public void drawChatMessage(ChatMessage message) {
     System.out.println(
       CliUtils.colorize(
-        options,
         "[" +
         id +
         "] received a message from: " +

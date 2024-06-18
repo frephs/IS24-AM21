@@ -383,13 +383,6 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawWinner(String nickname) {
-    printUpdate(
-      CliUtils.colorize("Winner: " + nickname, Color.GREEN, ColorStyle.BOLD)
-    );
-  }
-
-  @Override
   public void drawChatMessage(ChatMessage message) {
     printUpdate(
       CliUtils.colorize(
