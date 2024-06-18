@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
@@ -17,9 +18,11 @@ import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
-public class ClientGameEventHandler implements GameEventListener {
+public class ClientGameEventHandler
+  implements GameEventListener, GameErrorListener {
 
   protected LocalModelContainer localModel;
   private View view;
@@ -237,9 +240,164 @@ public class ClientGameEventHandler implements GameEventListener {
   }
 
   @Override
+  public void unknownResponse() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "An unknown error occurred. Please try again."
+    );
+  }
+
+  @Override
+  public void gameAlreadyExists(String gameId) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "A game called " + gameId + " already exists."
+    );
+  }
+
+  @Override
+  public void gameNotFound(String gameId) {
+    localModel.gameDeleted(gameId);
+    view.postNotification(
+      NotificationType.ERROR,
+      "Game " + gameId + " not found."
+    );
+  }
+
+  @Override
+  public void notInLobby() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "You are not in any lobby yet."
+    );
+  }
+
+  @Override
+  public void lobbyFull(String gameId) {
+    localModel.lobbyFull(gameId);
+    view.postNotification(
+      NotificationType.ERROR,
+      "The lobby for game " + gameId + " is full."
+    );
+  }
+
+  @Override
+  public void tokenTaken(TokenColor token) {
+    localModel.tokenTaken(token);
+    view.postNotification(
+      NotificationType.ERROR,
+      new String[] { "Token ", " is already taken." },
+      token,
+      1
+    );
+  }
+
+  @Override
+  public void nicknameTaken(String nickname) {
+    view.postNotification(
+      NotificationType.ERROR,
+      "The nickname " + nickname + " is already taken."
+    );
+  }
+
+  @Override
+  public void gameNotStarted() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "The game has not started yet."
+    );
+  }
+
+  @Override
+  public void notInGame() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "You are not in any game yet."
+    );
+  }
+
+  @Override
+  public void gameAlreadyStarted() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "The game has already started."
+    );
+  }
+
+  @Override
+  public void playerNotActive() {
+    view.postNotification(NotificationType.ERROR, "It's not your turn.");
+  }
+
+  @Override
+  public void invalidCardPlacement(String reason) {
+    view.postNotification(NotificationType.ERROR, reason);
+  }
+
+  @Override
+  public void invalidNextTurnCall() {
+    view.postNotification(NotificationType.ERROR, "Invalid next turn call.");
+  }
+
+  @Override
+  public void invalidGetObjectiveCardsCall() {
+    view.postNotification(
+      NotificationType.ERROR,
+      "Invalid get objective cards call."
+    );
+  }
+
+  @Override
+  public void gameNotReady() {
+    view.postNotification(NotificationType.ERROR, "The game is not ready yet.");
+  }
+
+  @Override
   public void gameOver() {
     localModel.gameOver();
     view.gameOver();
+  }
+
+  @Override
+  public void emptyDeck() {
+    view.postNotification(NotificationType.WARNING, "The deck is empty.");
+  }
+
+  @Override
+  public void playerNotFound() {
+    view.postNotification(NotificationType.ERROR, "Player not found.");
+  }
+
+  @Override
+  public void incompleteLobbyPlayer(String msg) {
+    view.postNotification(NotificationType.ERROR, msg);
+  }
+
+  @Override
+  public void illegalCardSideChoice() {
+    view.postNotification(
+      NotificationType.WARNING,
+      "Illegal card side choice."
+    );
+  }
+
+  @Override
+  public void invalidTokenColor() {
+    view.postNotification(NotificationType.ERROR, "Invalid token color.");
+  }
+
+  @Override
+  public void alreadyPlacedCard() {
+    view.postNotification(
+      NotificationType.WARNING,
+      "You have already placed a card this turn."
+    );
+  }
+
+  //TODO remove this
+  @Override
+  public void cardNotPlaced() {
+    view.postNotification(NotificationType.ERROR, "Card not placed.");
   }
 
   @Override
