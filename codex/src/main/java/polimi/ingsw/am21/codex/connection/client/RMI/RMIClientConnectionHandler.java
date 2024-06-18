@@ -166,6 +166,7 @@ public class RMIClientConnectionHandler
   public void lobbySetNickname(String nickname) {
     try {
       rmiConnectionHandler.lobbySetNickname(this.getSocketID(), nickname);
+      this.getObjectiveCards();
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {

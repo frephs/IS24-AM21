@@ -561,6 +561,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getSocketId(),
       message.getNickname()
     );
+    getObjectiveCards();
   }
 
   public void handleMessage(PlayerSetTokenColorMessage message) {
