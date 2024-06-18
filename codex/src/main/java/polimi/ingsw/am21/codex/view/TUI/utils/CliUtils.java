@@ -37,12 +37,11 @@ public class CliUtils {
   }
 
   public static <T extends Colorable> String colorize(
-    Cli.Options options,
     T colorable,
     ColorStyle style,
     int length
   ) {
-    if (options.isColored()) {
+    if (Cli.options.isColored()) {
       return (
         colorable.getColor().getCode(style) +
         colorable.toString().substring(0, length) +
@@ -54,47 +53,38 @@ public class CliUtils {
   }
 
   public static <T extends Colorable> String colorize(
-    Cli.Options options,
     T colorable,
     ColorStyle style
   ) {
-    return colorize(options, colorable, style, colorable.toString().length());
+    return colorize(colorable, style, colorable.toString().length());
   }
 
-  public static String colorize(
-    Cli.Options options,
-    String string,
-    Color color,
-    ColorStyle style
-  ) {
-    if (options.isColored()) {
+  public static String colorize(String string, Color color, ColorStyle style) {
+    if (Cli.options.isColored()) {
       return Color.colorize(string, color, style);
     }
     return string;
   }
 
   public static <T extends Colorable> String colorizeAndCenter(
-    Cli.Options options,
     List<T> colorables,
     int length,
     char padChar,
     ColorStyle style
   ) {
     StringBuilder sb = new StringBuilder();
-    if (options.isColored()) {
+    if (Cli.options.isColored()) {
       AtomicInteger ansiSize = new AtomicInteger();
       colorables.forEach(colorable -> {
         ansiSize.addAndGet(
           colorable.getColor().getCode(style).length() +
           Color.RESET.normal.length()
         );
-        sb.append(colorize(options, colorable, style, 1));
+        sb.append(colorize(colorable, style, 1));
       });
       return StringUtils.center(sb.toString(), length + ansiSize.get(), ' ');
     }
-    colorables.forEach(
-      colorable -> sb.append(colorize(options, colorable, style, 1))
-    );
+    colorables.forEach(colorable -> sb.append(colorize(colorable, style, 1)));
     return StringUtils.center(colorables.toString(), length, padChar);
   }
 
@@ -105,7 +95,7 @@ public class CliUtils {
     ColorStyle style
   ) {
     if (options.isColored()) {
-      return colorize(options, colorable, style, colorableSize).length();
+      return colorize(colorable, style, colorableSize).length();
     }
     return colorable.toString().length();
   }

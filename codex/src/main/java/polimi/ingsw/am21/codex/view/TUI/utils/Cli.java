@@ -23,10 +23,16 @@ public class Cli extends View {
     }
   }
 
-  Cli.Options options;
+  static Cli.Options options;
 
   public Cli(Cli.Options options, LocalModelContainer localModel) {
-    this.options = options;
+    Cli.options = options;
+    this.localModel = localModel;
+  }
+
+  @Override
+  public LocalModelContainer getLocalModel() {
+    return localModel;
   }
 
   public Boolean isColored() {
@@ -40,7 +46,6 @@ public class Cli extends View {
   ) {
     printUpdate(
       CliUtils.colorize(
-        options,
         message,
         notificationType.getColor(),
         notificationType == NotificationType.ERROR
@@ -70,17 +75,11 @@ public class Cli extends View {
       .limit(2)
       .map(
         e ->
-          CliUtils.colorize(
-            options,
-            e,
-            notificationType.getColor(),
-            ColorStyle.NORMAL
-          )
+          CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
       )
       .forEach(result::add);
     result.add(
       CliUtils.colorize(
-        options,
         colorable,
         colorableIndex == 0 ? ColorStyle.BOLD : ColorStyle.NORMAL
       )
@@ -89,12 +88,7 @@ public class Cli extends View {
       .skip(2)
       .map(
         e ->
-          CliUtils.colorize(
-            options,
-            e,
-            notificationType.getColor(),
-            ColorStyle.NORMAL
-          )
+          CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
       )
       .forEach(result::add);
     printUpdate(String.join("", result));

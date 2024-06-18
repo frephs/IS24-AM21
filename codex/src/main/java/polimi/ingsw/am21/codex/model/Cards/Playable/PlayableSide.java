@@ -65,10 +65,7 @@ public abstract class PlayableSide implements CliCard {
    * */
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // corners
     corners.forEach(
       (cornerPosition, corner) ->
@@ -78,17 +75,17 @@ public abstract class PlayableSide implements CliCard {
             content ->
               cardStringMap.put(
                 cornerPosition.getIndex(),
-                CliUtils.colorize(options, content, ColorStyle.BOLD, 1)
+                CliUtils.colorize(content, ColorStyle.BOLD, 1)
               ),
             () -> cardStringMap.put(cornerPosition.getIndex(), " ")
           )
     );
 
-    return CliCard.playableCardToAscii(options, cardStringMap);
+    return CliCard.playableCardToAscii(cardStringMap);
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     // TODO add cardToString implementation
     return "";
   }
