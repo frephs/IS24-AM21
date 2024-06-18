@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view;
 
 import java.util.*;
 import polimi.ingsw.am21.codex.client.ClientContext;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -22,7 +23,7 @@ import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
 public interface View extends GameEventListener {
-  public LocalModelContainer getLocalModel();
+  LocalModelContainer getLocalModel();
 
   void postNotification(NotificationType notificationType, String message);
 
@@ -39,8 +40,6 @@ public interface View extends GameEventListener {
 
   // lobby
   void drawAvailableGames(List<GameEntry> games);
-
-  void drawAvailableTokenColors(Set<TokenColor> tokenColors);
 
   void drawLobby(Map<UUID, LocalPlayer> players);
 
@@ -89,13 +88,12 @@ public interface View extends GameEventListener {
    * @param resourceCards The resource cards pair
    * @param goldCards The gold cards pair
    */
-
   void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
 
+  void drawAvailableTokenColors(Set<TokenColor> tokenColors);
   void drawObjectiveCardChoice(CardPair<Card> cardPair);
+  void drawNicknameChoice();
   void drawStarterCardSides(Card card);
-
-  void drawWinner(String nickname);
 
   void drawChatMessage(ChatMessage message);
   void drawCommonObjectiveCards(CardPair<Card> cardPair);
@@ -110,8 +108,6 @@ public interface View extends GameEventListener {
     PlayableCard firstResourceCard,
     PlayableCard firstGoldCard
   );
-
-  void drawNicknameChoice();
 
   // ---------------------------
   // GAME EVENT LISTENER METHODS
@@ -227,6 +223,23 @@ public interface View extends GameEventListener {
       NotificationType.UPDATE,
       "Game " + gameId + " has started"
     );
+
+    if (
+      getLocalModel()
+        .getLocalGameBoard()
+        .getCurrentPlayer()
+        .getSocketID()
+        .equals(getLocalModel().getSocketID())
+    ) {
+      postNotification(NotificationType.UPDATE, "It's your turn. ");
+    } else {
+      postNotification(
+        NotificationType.UPDATE,
+        "It's " +
+        getLocalModel().getLocalGameBoard().getCurrentPlayer().getNickname() +
+        "'s turn. "
+      );
+    }
   }
 
   @Override
@@ -246,9 +259,28 @@ public interface View extends GameEventListener {
   ) {
     postNotification(
       NotificationType.UPDATE,
-      "It's " +
       playerNickname +
-      "'s turn" +
+      " has drawn a card from the " +
+      source.toString().toLowerCase() +
+      " " +
+      deck.toString().toLowerCase() +
+      ". "
+    );
+
+    postNotification(
+      NotificationType.UPDATE,
+      "It's " +
+      (!Objects.equals(
+            playerNickname,
+            getLocalModel().getLocalGameBoard().getPlayer().getNickname()
+          )
+          ? "your "
+          : getLocalModel()
+            .getLocalGameBoard()
+            .getCurrentPlayer()
+            .getNickname() +
+          "'s ") +
+      "'turn" +
       (isLastRound ? " (last round)" : "")
     );
   }
@@ -305,7 +337,12 @@ public interface View extends GameEventListener {
 
   @Override
   default void remainingRounds(String gameID, int remainingRounds) {
-    postNotification(NotificationType.UPDATE, remainingRounds + " rounds left");
+    if (remainingRounds == 2 || remainingRounds == 1) postNotification(
+      NotificationType.UPDATE,
+      remainingRounds == 2
+        ? "The next round will be the last one. "
+        : "The last round has started."
+    );
   }
 
   @Override
@@ -330,7 +367,9 @@ public interface View extends GameEventListener {
   }
 
   @Override
-  void lobbyInfo(LobbyUsersInfo usersInfo);
+  default void lobbyInfo(LobbyUsersInfo usersInfo) {
+    drawLobby(getLocalModel().getLocalLobby().getPlayers());
+  }
 
   @Override
   default void chatMessage(String gameID, ChatMessage message) {
@@ -338,5 +377,13 @@ public interface View extends GameEventListener {
       NotificationType.UPDATE,
       "New chat message from " + message.getSender()
     );
+
+    if (
+      !message
+        .getSender()
+        .equals(getLocalModel().getLocalGameBoard().getPlayer().getNickname())
+    ) {
+      drawChatMessage(message);
+    }
   }
 }

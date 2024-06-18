@@ -27,6 +27,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -57,7 +58,7 @@ public class Gui extends Application implements View {
 
   public Gui(LocalModelContainer localModel) {
     gui = this;
-    this.localModel = localModel;
+    Gui.localModel = localModel;
   }
 
   public static Gui getInstance() {
@@ -586,7 +587,7 @@ public class Gui extends Application implements View {
       scene
         .lookup("#back-to-menu-button-lobby")
         .setOnMouseClicked((MouseEvent event) -> {
-          client.listGames();
+          client.getGames();
         });
 
       GridPane playerGrid =
@@ -1096,7 +1097,7 @@ public class Gui extends Application implements View {
       //draw the final leaderboard int the #side-content container and don't use drawLeaderBoard
       drawLeaderBoard(players);
       players.sort((p1, p2) -> p2.getPoints() - p1.getPoints());
-      drawWinner(players.getFirst().getNickname());
+      winningPlayer(players.getFirst().getNickname());
 
       VBox commonBoardContainer = (VBox) scene.lookup(
         "#common-board-container"
@@ -1337,20 +1338,6 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Draw the winner of the game
-   * */
-  @Override
-  public void drawWinner(String nickname) {
-    Platform.runLater(() -> {
-      loadSceneFXML("Winner.fxml", "#content");
-      ((Text) scene.lookup("#winner-container")).setText(nickname);
-      ((Button) scene.lookup("#back-to-menu-button")).setOnMouseClicked(
-          (MouseEvent event) -> client.listGames()
-        );
-    });
-  }
-
-  /**
    * Load the chat scene for chat messages to be drawn in.
    * @param players to whom a message can be sent.
    * */
@@ -1573,9 +1560,16 @@ public class Gui extends Application implements View {
     });
   }
 
+  //-------------------------------
+  // GAME EVENT HANDLERS
+  //-------------------------------
+
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
     View.super.gameCreated(gameId, currentPlayers, maxPlayers);
+    drawAvailableGames(
+      localModel.getLocalMenu().getGames().values().stream().toList()
+    );
   }
 
   @Override
@@ -1676,6 +1670,24 @@ public class Gui extends Application implements View {
       resourceDeckTopCardId,
       goldDeckTopCardId
     );
+
+    switch (source) {
+      case CardPairFirstCard:
+        drawCardDrawn(
+          deck,
+          localModel.getLocalGameBoard().getResourceCards().getFirst()
+        );
+        break;
+      case CardPairSecondCard:
+        drawCardDrawn(
+          deck,
+          localModel.getLocalGameBoard().getResourceCards().getSecond()
+        );
+        break;
+      case Deck:
+        drawCardDrawn(deck);
+        break;
+    }
   }
 
   @Override
@@ -1741,12 +1753,25 @@ public class Gui extends Application implements View {
       availableSpots,
       forbiddenSpots
     );
+
+    if (
+      ((ChoiceBox) scene.lookup("#player-board-choice")).getValue()
+        .toString()
+        .equals(playerId)
+    ) {
+      drawPlayerBoard(localModel.getLocalGameBoard().getCurrentPlayer());
+      drawResourcesAndObjects(
+        localModel.getLocalGameBoard().getCurrentPlayer()
+      );
+    }
+
+    drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
+    drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
   }
 
   @Override
   public void gameOver() {
     View.super.gameOver();
-    //check objective points are added
     drawGameOver(localModel.getLocalGameBoard().getPlayers());
   }
 
@@ -1764,7 +1789,13 @@ public class Gui extends Application implements View {
   @Override
   public void winningPlayer(String nickname) {
     View.super.winningPlayer(nickname);
-    drawWinner(nickname);
+    Platform.runLater(() -> {
+      loadSceneFXML("Winner.fxml", "#content");
+      ((Text) scene.lookup("#winner-container")).setText(nickname);
+      ((Button) scene.lookup("#back-to-menu-button")).setOnMouseClicked(
+          (MouseEvent event) -> client.getGames()
+        );
+    });
   }
 
   @Override
@@ -1774,15 +1805,24 @@ public class Gui extends Application implements View {
     GameController.UserGameContext.ConnectionStatus status
   ) {
     View.super.playerConnectionChanged(socketID, nickname, status);
+    //TODO make it visible in the leaderBoard
+    drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
   }
 
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) {
-    drawLobby(localModel.getLocalLobby().getPlayers());
+    View.super.lobbyInfo(usersInfo);
   }
 
   @Override
   public void chatMessage(String gameID, ChatMessage message) {
     View.super.chatMessage(gameID, message);
+    if (
+      !message
+        .getSender()
+        .equals(getLocalModel().getLocalGameBoard().getPlayer().getNickname())
+    ) {
+      drawChatMessage(message);
+    }
   }
 }
