@@ -18,7 +18,7 @@ import polimi.ingsw.am21.codex.view.View;
 
 public abstract class ClientConnectionHandler {
 
-  protected ClientGameEventHandler gameEventHandler;
+  protected final ClientGameEventHandler gameEventHandler;
   protected UUID socketID;
 
   protected final String host;
@@ -29,10 +29,16 @@ public abstract class ClientConnectionHandler {
 
   private View view;
 
-  public ClientConnectionHandler(String host, Integer port, View view) {
+  public ClientConnectionHandler(
+    String host,
+    Integer port,
+    View view,
+    ClientGameEventHandler gameEventHandler
+  ) {
     this.host = host;
     this.port = port;
     this.socketID = UUID.randomUUID();
+    this.gameEventHandler = gameEventHandler;
     this.gameEventHandler.getLocalModel().setSocketId(socketID);
     this.view = view;
   }

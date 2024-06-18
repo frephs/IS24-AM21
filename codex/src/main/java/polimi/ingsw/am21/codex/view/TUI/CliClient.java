@@ -1,14 +1,12 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
-import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -32,7 +30,7 @@ public class CliClient extends ViewClient {
 
   public CliClient(LocalModelContainer localModelContainer) {
     super(new Cli(new Cli.Options(true), localModelContainer));
-    cli = (Cli) localModelContainer.getView();
+    cli = (Cli) view;
     scanner = new Scanner(System.in);
   }
 
@@ -294,7 +292,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          localModel.listLobbyPlayers();
+          view.drawLobby(view.getLocalModel().getLocalLobby().getPlayers());
         }
       }
     );
@@ -447,9 +445,7 @@ public class CliClient extends ViewClient {
         @Override
         public void handle(String[] command) {
           if (!List.of("front", "back").contains(command[1])) {
-            localModel
-              .getView()
-              .postNotification(NotificationType.ERROR, "Invalid side");
+            view.postNotification(NotificationType.ERROR, "Invalid side");
             return;
           }
 
@@ -491,7 +487,7 @@ public class CliClient extends ViewClient {
         @Override
         public void handle(String[] command) {
           client.sendChatMessage(
-            new ChatMessage(localModel.getSocketID(), command[1])
+            new ChatMessage(view.getLocalModel().getSocketID(), command[1])
           );
         }
       }
@@ -507,7 +503,7 @@ public class CliClient extends ViewClient {
         public void handle(String[] command) {
           client.sendChatMessage(
             new ChatMessage(
-              localModel.getLocalGameBoard().getPlayerNickname(),
+              view.getLocalModel().getLocalGameBoard().getPlayerNickname(),
               command[1],
               command[2]
             )
@@ -528,17 +524,20 @@ public class CliClient extends ViewClient {
             case "playerboard":
               final String nickname = command[2];
               cli.drawPlayerBoard(
-                localModel
+                view
+                  .getLocalModel()
                   .getLocalGameBoard()
                   .getPlayers()
                   .stream()
                   .filter(player -> player.getNickname().equals(nickname))
                   .findFirst()
-                  .orElse(localModel.getLocalGameBoard().getPlayer())
+                  .orElse(view.getLocalModel().getLocalGameBoard().getPlayer())
               );
               break;
             case "leaderboard":
-              cli.drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
+              cli.drawLeaderBoard(
+                view.getLocalModel().getLocalGameBoard().getPlayers()
+              );
               break;
             case "card":
               // TODO right now, just go by id; in the future we can switch to something better
@@ -556,7 +555,8 @@ public class CliClient extends ViewClient {
               }
 
               // TODO find a way to display ANY possible card, not just the played/playable ones
-              Card card = localModel
+              Card card = view
+                .getLocalModel()
                 .getLocalGameBoard()
                 .getPlayers()
                 .stream()
@@ -582,16 +582,18 @@ public class CliClient extends ViewClient {
               break;
             case "hand":
               cli.drawHand(
-                localModel.getLocalGameBoard().getPlayer().getHand()
+                view.getLocalModel().getLocalGameBoard().getPlayer().getHand()
               );
               break;
             case "objective":
-              cli.drawCard(localModel.getLocalGameBoard().getSecretObjective());
+              cli.drawCard(
+                view.getLocalModel().getLocalGameBoard().getSecretObjective()
+              );
               break;
             case "pairs":
               cli.drawPairs(
-                localModel.getLocalGameBoard().getResourceCards(),
-                localModel.getLocalGameBoard().getGoldCards()
+                view.getLocalModel().getLocalGameBoard().getResourceCards(),
+                view.getLocalModel().getLocalGameBoard().getGoldCards()
               );
               break;
             default:
@@ -616,9 +618,7 @@ public class CliClient extends ViewClient {
             ) ||
             !List.of("front", "back").contains(command[4])
           ) {
-            localModel
-              .getView()
-              .postNotification(NotificationType.ERROR, "Invalid place call");
+            view.postNotification(NotificationType.ERROR, "Invalid place call");
             return;
           }
           int handIndex;
@@ -630,12 +630,10 @@ public class CliClient extends ViewClient {
               Integer.parseInt(command[3])
             );
           } catch (NumberFormatException e) {
-            localModel
-              .getView()
-              .postNotification(
-                NotificationType.WARNING,
-                "Invalid number format"
-              );
+            view.postNotification(
+              NotificationType.WARNING,
+              "Invalid number format"
+            );
             return;
           }
           client.placeCard(
@@ -659,9 +657,7 @@ public class CliClient extends ViewClient {
             command.length < 3 ||
             !List.of("draw", "deck", "resource", "gold").contains(command[1])
           ) {
-            localModel
-              .getView()
-              .postNotification(NotificationType.WARNING, "Invalid command");
+            view.postNotification(NotificationType.WARNING, "Invalid command");
             return;
           }
 
@@ -692,9 +688,7 @@ public class CliClient extends ViewClient {
               "gold2"
             ).contains(command[1])
           ) {
-            localModel
-              .getView()
-              .postNotification(NotificationType.WARNING, "Invalid command");
+            view.postNotification(NotificationType.WARNING, "Invalid command");
             return;
           }
 
@@ -728,7 +722,7 @@ public class CliClient extends ViewClient {
       "Usage: CliClient <connection-type> <address> <port>"
     );
 
-    CliClient cliClient = new CliClient();
+    CliClient cliClient = new CliClient(new LocalModelContainer());
 
     // TODO add defaults from config file
     try {

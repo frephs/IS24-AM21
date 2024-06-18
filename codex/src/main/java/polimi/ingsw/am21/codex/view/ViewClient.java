@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.view;
 
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
@@ -10,16 +11,31 @@ public abstract class ViewClient {
 
   protected ClientConnectionHandler client;
   protected View view;
+  ClientGameEventHandler gameEventHandler;
 
   public ViewClient(View view) {
     this.view = view;
+    this.gameEventHandler = new ClientGameEventHandler(
+      view,
+      view.getLocalModel()
+    );
   }
 
   public void start(ConnectionType connectionType, String address, int port) {
     if (connectionType == ConnectionType.TCP) {
-      client = new TCPClientConnectionHandler(address, port, view);
+      client = new TCPClientConnectionHandler(
+        address,
+        port,
+        view,
+        gameEventHandler
+      );
     } else {
-      client = new RMIClientConnectionHandler(address, port, view);
+      client = new RMIClientConnectionHandler(
+        address,
+        port,
+        view,
+        gameEventHandler
+      );
     }
     client.connect();
   }

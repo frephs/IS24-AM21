@@ -7,6 +7,7 @@ import java.rmi.registry.Registry;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
@@ -25,8 +26,13 @@ public class RMIClientConnectionHandler
 
   private RMIServerConnectionHandler rmiConnectionHandler;
 
-  public RMIClientConnectionHandler(String host, Integer port, View view) {
-    super(host, port, view);
+  public RMIClientConnectionHandler(
+    String host,
+    Integer port,
+    View view,
+    ClientGameEventHandler gameEventHandler
+  ) {
+    super(host, port, view, gameEventHandler);
   }
 
   @Override
