@@ -43,20 +43,18 @@ public class ObjectiveCard extends Card implements CliCard {
    * */
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     return (
       "Gain " +
       points +
       ((points > 1) ? " points" : " point") +
       " for each " +
-      objective.cardToString(options)
+      objective.cardToString()
     );
   }
 
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  @Override
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // TODO: Implement TUI method
     return "";
   }

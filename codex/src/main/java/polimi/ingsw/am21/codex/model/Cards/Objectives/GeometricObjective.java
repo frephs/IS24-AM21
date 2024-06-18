@@ -76,7 +76,7 @@ public class GeometricObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     return (
       "group of cards positioned as following: \n" +
       geometry
@@ -91,7 +91,6 @@ public class GeometricObjective extends Objective implements CliCard {
               .toLowerCase() +
             ": " +
             CliUtils.colorize(
-              options,
               adjacentPositionResourceTypeEntry.getValue(),
               ColorStyle.UNDERLINED
             )
@@ -101,10 +100,7 @@ public class GeometricObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     //TODO add cardToAscii implementation
     return "";
   }

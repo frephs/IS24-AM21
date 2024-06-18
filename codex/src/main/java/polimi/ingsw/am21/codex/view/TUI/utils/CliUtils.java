@@ -89,12 +89,11 @@ public class CliUtils {
   }
 
   public static int getColorableLength(
-    Cli.Options options,
     Colorable colorable,
     int colorableSize,
     ColorStyle style
   ) {
-    if (options.isColored()) {
+    if (Cli.options.isColored()) {
       return colorize(colorable, style, colorableSize).length();
     }
     return colorable.toString().length();

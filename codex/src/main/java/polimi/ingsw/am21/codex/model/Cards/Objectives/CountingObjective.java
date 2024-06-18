@@ -63,7 +63,7 @@ public class CountingObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     return (
       resources
         .entrySet()
@@ -76,7 +76,6 @@ public class CountingObjective extends Objective implements CliCard {
             resourceTypeIntegerEntry.getValue() +
             " " +
             CliUtils.colorize(
-              options,
               resourceTypeIntegerEntry.getKey(),
               ColorStyle.UNDERLINED
             ) +
@@ -95,7 +94,6 @@ public class CountingObjective extends Objective implements CliCard {
             objectTypeIntegerEntry.getValue() +
             " " +
             CliUtils.colorize(
-              options,
               objectTypeIntegerEntry.getKey(),
               ColorStyle.UNDERLINED
             ) +
@@ -110,10 +108,7 @@ public class CountingObjective extends Objective implements CliCard {
   }
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     //TODO add cardToString implementation
     return "";
   }

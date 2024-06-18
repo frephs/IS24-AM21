@@ -37,18 +37,15 @@ public class ResourceCardFrontSide
    * */
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     if (!cardStringMap.containsKey(5) && points > 0) {
       cardStringMap.put(5, StringUtils.center(String.valueOf(points), 5, ' '));
     }
-    return super.cardToAscii(options, cardStringMap);
+    return super.cardToAscii(cardStringMap);
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     // TODO: Implement TUI method
     return "";
   }

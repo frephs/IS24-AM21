@@ -15,16 +15,13 @@ public class StarterCardFrontSide extends PlayableFrontSide {
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     // TODO: Implement TUI method
     return "";
   }
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
-    return super.cardToAscii(options, cardStringMap);
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+    return super.cardToAscii(cardStringMap);
   }
 }

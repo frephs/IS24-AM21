@@ -109,10 +109,7 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
    * */
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     pointCondition.ifPresent(pointConditionType -> {
       if (pointConditionType == PointConditionType.OBJECTS) {
         pointConditionObject.ifPresent(
@@ -120,17 +117,11 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
             cardStringMap.put(
               5,
               StringUtils.center(
-                CliUtils.colorize(
-                  options,
-                  pointConditionObject,
-                  ColorStyle.BOLD,
-                  1
-                ) +
+                CliUtils.colorize(pointConditionObject, ColorStyle.BOLD, 1) +
                 "|" +
                 points,
                 4 +
                 CliUtils.getColorableLength(
-                  options,
                   pointConditionObject,
                   1,
                   ColorStyle.BOLD
@@ -147,18 +138,17 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
     cardStringMap.put(
       6,
       CliUtils.colorizeAndCenter(
-        options,
         placementCondition,
         5,
         ' ',
         ColorStyle.UNDERLINED
       )
     );
-    return super.cardToAscii(options, cardStringMap);
+    return super.cardToAscii(cardStringMap);
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     // TODO: Implement TUI method
     return "";
   }

@@ -43,29 +43,20 @@ public class PlayableBackSide extends PlayableSide implements CliCard {
    * */
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     final int BEGIN = 4;
     for (int i = 0; i < permanentResources.size(); i++) {
       ResourceType resource = permanentResources.get(i);
       cardStringMap.put(
         BEGIN + i,
-        CliUtils.colorizeAndCenter(
-          options,
-          List.of(resource),
-          5,
-          ' ',
-          ColorStyle.BOLD
-        )
+        CliUtils.colorizeAndCenter(List.of(resource), 5, ' ', ColorStyle.BOLD)
       );
     }
-    return super.cardToAscii(options, cardStringMap);
+    return super.cardToAscii(cardStringMap);
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     // TODO: Implement TUI method
     return "";
   }

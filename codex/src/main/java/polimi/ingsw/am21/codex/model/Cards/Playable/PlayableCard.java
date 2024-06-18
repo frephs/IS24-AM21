@@ -135,17 +135,14 @@ public class PlayableCard extends Card {
    * */
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
-    String frontSideString = frontSide.cardToAscii(options, cardStringMap);
-    String backSideString = backSide.cardToAscii(options, cardStringMap);
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
+    String frontSideString = frontSide.cardToAscii(cardStringMap);
+    String backSideString = backSide.cardToAscii(cardStringMap);
     return CliUtils.joinMinLines(frontSideString, backSideString);
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     // TODO: Implement TUI method
     return "";
   }
