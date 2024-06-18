@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
@@ -80,6 +81,14 @@ public class LocalModelContainer implements GameEventListener {
 
   public ClientContextContainer getClientContextContainer() {
     return clientContextContainer;
+  }
+
+  public Optional<String> getGameId() {
+    if (lobby != null) {
+      return Optional.ofNullable(lobby.getGameId());
+    } else {
+      return Optional.empty();
+    }
   }
 
   public LocalModelContainer() {
@@ -249,6 +258,10 @@ public class LocalModelContainer implements GameEventListener {
     lobby.getPlayers().get(socketId).setToken(token);
   }
 
+  public void tokenTaken(TokenColor token) {
+    lobby.getAvailableTokens().remove(token);
+  }
+
   @Override
   public void playerSetToken(
     String gameId,
@@ -275,10 +288,7 @@ public class LocalModelContainer implements GameEventListener {
   @Override
   public void playerSetNickname(String gameId, UUID socketId, String nickname) {
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
-
     lobby.getPlayers().get(socketId).setNickname(nickname);
-
-    view.drawLobby(lobby.getPlayers());
   }
 
   @Override
@@ -309,7 +319,6 @@ public class LocalModelContainer implements GameEventListener {
 
   public void playerGetStarterCardSides(int cardId) {
     lobby.setStarterCard(cardsLoader.getCardFromId(cardId));
-    getView().drawStarterCardSides(lobby.getStarterCard());
   }
 
   @Override
@@ -385,11 +394,6 @@ public class LocalModelContainer implements GameEventListener {
 
     // Add the player to the game board
     gameBoard.getPlayers().add(player);
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Player " + nickname + " joined game " + gameId + ". "
-    );
   }
 
   @Override
@@ -450,18 +454,6 @@ public class LocalModelContainer implements GameEventListener {
           gameInfo.getGoldDeckTopCardId()
         )
       );
-
-      view.postNotification(NotificationType.UPDATE, "The Game has started. ");
-      clientContextContainer.set(ClientContext.GAME);
-      if (gameBoard.getCurrentPlayer().getSocketID().equals(socketId)) {
-        view.postNotification(NotificationType.UPDATE, "It's your turn. ");
-        view.drawGame(gameBoard.getPlayers());
-      } else {
-        view.postNotification(
-          NotificationType.UPDATE,
-          "It's " + gameBoard.getCurrentPlayer().getNickname() + "'s turn. "
-        );
-      }
     }
   }
 
@@ -492,29 +484,6 @@ public class LocalModelContainer implements GameEventListener {
     }
     localPlayer.setHand(nextHand);
 
-    diffMessage(
-      newPlayerScore - gameBoard.getCurrentPlayer().getPoints(),
-      "point"
-    );
-
-    Arrays.stream(ResourceType.values()).forEach(
-      resourceType ->
-        diffMessage(
-          updatedResources.get(resourceType) -
-          localPlayer.getResources().get(resourceType),
-          resourceType
-        )
-    );
-
-    Arrays.stream(ObjectType.values()).forEach(
-      objectType ->
-        diffMessage(
-          updatedObjects.get(objectType) -
-          localPlayer.getObjects().get(objectType),
-          objectType
-        )
-    );
-
     localPlayer.setPoints(newPlayerScore);
 
     localPlayer.getResources().putAll(updatedResources);
@@ -522,48 +491,8 @@ public class LocalModelContainer implements GameEventListener {
 
     localPlayer.setAvailableSpots(availablePositions);
     localPlayer.setForbiddenSpots(forbiddenPositions);
-
     // TODO this actually makes drawCardPlacement redundant
-    view.drawPlayerBoard(localPlayer);
-    view.drawLeaderBoard(gameBoard.getPlayers());
-    view.drawHand(localPlayer.getHand());
-  }
 
-  void diffMessage(int diff, String attributeName) {
-    if (diff != 0) {
-      view.postNotification(
-        NotificationType.UPDATE,
-        gameBoard.getCurrentPlayer().getNickname() +
-        (diff > 0 ? "gained" : "lost" + diff) +
-        attributeName +
-        ((Math.abs(diff) != 1) ? "s" : "") +
-        ". "
-      );
-    }
-  }
-
-  void diffMessage(int diff, Colorable colorable) {
-    if (diff != 0) {
-      view.postNotification(
-        NotificationType.UPDATE,
-        new String[] {
-          gameBoard.getCurrentPlayer().getNickname(),
-          (diff > 0 ? " gained " : " lost " + diff),
-          ((Math.abs(diff) != 1) ? "s" : ""),
-          ". ",
-        },
-        colorable,
-        2
-      );
-    }
-  }
-
-  @Override
-  public void invalidCardPlacement(String reason) {
-    view.postNotification(
-      NotificationType.ERROR,
-      "Invalid card placement: " + reason
-    );
   }
 
   /**
@@ -589,8 +518,6 @@ public class LocalModelContainer implements GameEventListener {
       gameBoard.getCurrentPlayer().getHand().add(drawnCard);
     }
 
-    view.drawPlayerBoard(gameBoard.getCurrentPlayer());
-
     switch (source) {
       case CardPairFirstCard, CardPairSecondCard -> {
         Card newPairCard = cardsLoader.getCardFromId(newPairCardId);
@@ -606,21 +533,8 @@ public class LocalModelContainer implements GameEventListener {
             newPairCard
           );
         }
-
-        view.drawCardDrawn(deck, newPairCard);
       }
-      case Deck -> view.drawCardDrawn(deck);
     }
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      gameBoard.getCurrentPlayer().getNickname() +
-      " has drawn a card from the " +
-      source.toString().toLowerCase() +
-      " " +
-      deck.toString().toLowerCase() +
-      ". "
-    );
 
     changeTurn(
       gameId,
@@ -648,10 +562,6 @@ public class LocalModelContainer implements GameEventListener {
     Integer resourceDeckTopCardId,
     Integer goldDeckTopCardId
   ) {
-    if (isLastRound) {
-      view.postNotification(NotificationType.WARNING, "Last round of the game");
-    }
-
     gameBoard.setCurrentPlayerIndex(playerIndex);
     gameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
     gameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
@@ -661,59 +571,25 @@ public class LocalModelContainer implements GameEventListener {
     gameBoard.setGoldDeckTopCard(
       (PlayableCard) cardsLoader.getCardFromId(goldDeckTopCardId)
     );
-    if (gameBoard.getCurrentPlayer().getSocketID().equals(this.getSocketID())) {
-      view.postNotification(NotificationType.UPDATE, "It's your turn. ");
-      view.drawPlayerBoard(gameBoard.getCurrentPlayer());
-      view.drawCardDecks(
-        gameBoard.getResourceDeckTopCard(),
-        gameBoard.getGoldDeckTopCard()
-      );
-    } else {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "It's " + gameBoard.getCurrentPlayer().getNickname() + "'s turn. "
-      );
-    }
   }
 
   @Override
   public void gameOver() {
     clientContextContainer.set(ClientContext.GAME_OVER);
-    view.drawGameOver(gameBoard.getPlayers());
   }
 
   @Override
   public void playerScoresUpdate(Map<String, Integer> newScores) {
-    newScores.forEach((nickname, newScore) ->
-      gameBoard
-        .getPlayers()
-        .stream()
-        .filter(player -> player.getNickname().equals(nickname))
-        .forEach(player -> {
-          int diff = newScore - player.getPoints();
-          player.setPoints(newScore);
-          diffMessage(diff, "points");
-        }));
-    view.drawLeaderBoard(gameBoard.getPlayers());
+    gameBoard
+      .getPlayers()
+      .forEach(player -> player.setPoints(newScores.get(player.getNickname())));
   }
 
   @Override
   public void remainingRounds(String gameID, int remainingRounds) {
     if (Objects.equals(gameBoard.getGameId(), gameID)) {
-      if (remainingRounds == 2 || remainingRounds == 1) view.postNotification(
-        NotificationType.UPDATE,
-        remainingRounds == 2
-          ? "The next round will be the last one. "
-          : "The last round has started."
-      );
-
       this.gameBoard.setRemainingRounds(remainingRounds);
     }
-  }
-
-  public void gameStatusUpdate(GameState state) {
-    view.postNotification(NotificationType.UPDATE, "Game state: " + state);
-    //TODO switch on the game STATE
   }
 
   @Override
@@ -745,55 +621,5 @@ public class LocalModelContainer implements GameEventListener {
     if (Objects.equals(gameID, gameBoard.getGameId())) {
       gameBoard.getChat().postMessage(message);
     }
-  }
-
-  public void handleInvalidActionException(InvalidActionException e) {
-    switch (e.getCode()) {
-      case PLAYER_NOT_ACTIVE -> this.playerNotActive();
-      case NOT_IN_GAME -> this.notInGame();
-      case GAME_ALREADY_STARTED -> this.gameAlreadyStarted();
-      case INVALID_NEXT_TURN_CALL -> this.invalidNextTurnCall();
-      case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.invalidGetObjectiveCardsCall();
-      case GAME_NOT_READY -> this.gameNotReady();
-      case GAME_NOT_FOUND -> this.gameNotFound(
-          ((GameNotFoundException) e).getGameID()
-        );
-      case PLAYER_NOT_FOUND -> this.playerNotFound();
-      case INCOMPLETE_LOBBY_PLAYER -> this.incompleteLobbyPlayer(
-          e.getNotes().get(0)
-        );
-      case EMPTY_DECK -> this.emptyDeck();
-      case ALREADY_PLACED_CARD -> this.alreadyPlacedCard();
-      case ILLEGAL_PLACING_POSITION -> this.invalidCardPlacement(
-          ((IllegalPlacingPositionException) e).getReason()
-        );
-      case ILLEGAL_CARD_SIDE_CHOICE -> this.invalidCardPlacement(
-          e.getMessage()
-        );
-      case LOBBY_FULL -> this.lobbyFull(((LobbyFullException) e).getGameID());
-      case NICKNAME_ALREADY_TAKEN -> this.nicknameTaken(
-          ((NicknameAlreadyTakenException) e).getNickname()
-        );
-      case INVALID_TOKEN_COLOR -> this.invalidTokenColor();
-      case TOKEN_ALREADY_TAKEN -> this.tokenTaken(
-          TokenColor.fromString(
-            ((TokenAlreadyTakenException) e).getTokenColor()
-          )
-        );
-      case GAME_OVER -> this.gameOver();
-      case CARD_NOT_PLACED -> this.cardNotPlaced();
-    }
-  }
-
-  public Optional<String> getGameId() {
-    if (lobby != null) {
-      return Optional.ofNullable(lobby.getGameId());
-    } else {
-      return Optional.empty();
-    }
-  }
-
-  public ClientContextContainer getState() {
-    return state;
   }
 }
