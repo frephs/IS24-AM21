@@ -158,6 +158,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       if (!waiting || !message.getType().isClientRequest()) {
         try {
           if (socket.isConnected() && !socket.isClosed()) {
+            System.out.println("Sending " + message.getType());
             outputStream.writeObject(message);
             outputStream.flush();
             outputStream.reset();
