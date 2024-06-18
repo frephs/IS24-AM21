@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.view.TUI;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,8 +35,8 @@ public class CliClient extends ViewClient {
     scanner = new Scanner(System.in);
   }
 
-  private LocalModelContainer.ClientContextContainer getClientContextContainer() {
-    return view.getLocalModel().getClientContextContainer();
+  private AtomicReference<ClientContext> getClientContextContainer() {
+    return view.getLocalModel().getState();
   }
 
   @Override
@@ -180,7 +181,7 @@ public class CliClient extends ViewClient {
   private void initializeCommandHandlers() {
     // TODO add optional arguments to usages
 
-    final LocalModelContainer.ClientContextContainer currentContext =
+    final AtomicReference<ClientContext> currentContext =
       this.getClientContextContainer();
 
     commandHandlers.add(

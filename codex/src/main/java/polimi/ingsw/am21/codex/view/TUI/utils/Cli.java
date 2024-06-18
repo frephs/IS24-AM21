@@ -26,7 +26,6 @@ public class Cli extends View {
   Cli.Options options;
 
   public Cli(Cli.Options options, LocalModelContainer localModel) {
-    super(localModel);
     this.options = options;
   }
 
@@ -99,5 +98,18 @@ public class Cli extends View {
       )
       .forEach(result::add);
     printUpdate(String.join("", result));
+  }
+
+  public void printPrompt() {
+    System.out.print("\r> ");
+  }
+
+  public void printUpdate(String string) {
+    System.out.println(
+      "\r" +
+      string +
+      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
+    );
+    printPrompt();
   }
 }
