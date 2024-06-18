@@ -13,6 +13,7 @@ import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
@@ -158,7 +159,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       if (!waiting || !message.getType().isClientRequest()) {
         try {
           if (socket.isConnected() && !socket.isClosed()) {
-            System.out.println("Sending " + message.getType());
+            if (message.getType() != MessageType.HEART_BEAT) System.out.println(
+              "Sending " + message.getType()
+            );
             outputStream.writeObject(message);
             outputStream.flush();
             outputStream.reset();
@@ -388,6 +391,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
     }
+
+    System.out.println("Received " + message.getType());
 
     switch (message.getType()) {
       // Server Responses
