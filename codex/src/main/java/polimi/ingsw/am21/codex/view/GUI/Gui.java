@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -35,18 +34,14 @@ import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.GUI.utils.*;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
-import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
@@ -258,6 +253,12 @@ public class Gui extends Application implements View {
     }
   }
 
+  public boolean isInitialized() {
+    return (
+      scene != null && notificationLoader != null && exceptionLoader != null
+    );
+  }
+
   public static void main(String[] args) {
     launch(args);
   }
@@ -400,7 +401,20 @@ public class Gui extends Application implements View {
     Colorable colorable,
     int colorableIndex
   ) {
-    // TODO implement or remove from view and leave in cli.
+    // add colorable.toString in the right index of the messages array
+    String[] messagesWithColorable = new String[messages.length + 1];
+    System.arraycopy(messages, 0, messagesWithColorable, 0, messages.length);
+
+    Platform.runLater(() -> {
+      try {
+        notificationLoader.addNotification(
+          notificationType,
+          Arrays.stream(messagesWithColorable).collect(Collectors.joining(" "))
+        );
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   /**
