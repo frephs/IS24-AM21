@@ -33,10 +33,10 @@ class CliPrintableTest {
     Cli.Options options = new Cli.Options(true);
 
     try {
-      System.out.println(resourceDeck.draw().cardToAscii(options));
-      System.out.println(goldDeck.draw().cardToAscii(options));
-      System.out.println(starterDeck.draw().cardToAscii(options));
-      System.out.println(objectiveDeck.draw().cardToString(options));
+      System.out.println(resourceDeck.draw().cardToAscii());
+      System.out.println(goldDeck.draw().cardToAscii());
+      System.out.println(starterDeck.draw().cardToAscii());
+      System.out.println(objectiveDeck.draw().cardToString());
     } catch (EmptyDeckException e) {
       throw new RuntimeException(e);
     }

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -34,13 +35,18 @@ public class DummyView implements View {
     this.options = new Cli.Options(true);
   }
 
+  @Override
+  public LocalModelContainer getLocalModel() {
+    return null;
+  }
+
+  @Override
   public void postNotification(
     NotificationType notificationType,
     String message
   ) {
     System.out.println(
       CliUtils.colorize(
-        options,
         "[" + id + "] " + message,
         notificationType.getColor(),
         ColorStyle.NORMAL

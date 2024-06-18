@@ -19,20 +19,17 @@ public class ConcreteObjective extends Objective {
   }
 
   @Override
-  public String cardToString(Cli.Options options) {
+  public String cardToString() {
     return "";
   }
 
   @Override
-  public String cardToAscii(Cli.Options options) {
-    return super.cardToAscii(options);
+  public String cardToAscii() {
+    return super.cardToAscii();
   }
 
   @Override
-  public String cardToAscii(
-    Cli.Options options,
-    HashMap<Integer, String> cardStringMap
-  ) {
+  public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     return "";
   }
 }
