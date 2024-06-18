@@ -31,7 +31,10 @@ import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.model.Cards.Card;
+import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -1570,9 +1573,216 @@ public class Gui extends Application implements View {
     });
   }
 
-  public boolean isInitialized() {
-    return (
-      scene != null && notificationLoader != null && exceptionLoader != null
+  @Override
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    View.super.gameCreated(gameId, currentPlayers, maxPlayers);
+  }
+
+  @Override
+  public void gameDeleted(String gameId) {
+    View.super.gameDeleted(gameId);
+  }
+
+  @Override
+  public void playerJoinedLobby(String gameId, UUID socketID) {
+    View.super.playerJoinedLobby(gameId, socketID);
+  }
+
+  @Override
+  public void playerLeftLobby(String gameId, UUID socketID) {
+    View.super.playerLeftLobby(gameId, socketID);
+  }
+
+  @Override
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) {
+    View.super.playerSetToken(gameId, socketID, nickname, token);
+    client.getObjectiveCards();
+  }
+
+  @Override
+  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
+    View.super.playerSetNickname(gameId, socketID, nickname);
+    client.getStarterCard();
+    drawObjectiveCardChoice(localModel.getAvailableObjectives());
+  }
+
+  @Override
+  public void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    String nickname
+  ) {
+    View.super.playerChoseObjectiveCard(gameId, socketID, nickname);
+    drawStarterCardSides(localModel.getLocalLobby().getStarterCard());
+  }
+
+  @Override
+  public void playerJoinedGame(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor color,
+    List<Integer> handIDs,
+    Integer starterCardID,
+    CardSideType starterSide
+  ) {
+    View.super.playerJoinedGame(
+      gameId,
+      socketID,
+      nickname,
+      color,
+      handIDs,
+      starterCardID,
+      starterSide
     );
+  }
+
+  @Override
+  public void gameStarted(String gameId, GameInfo gameInfo) {
+    View.super.gameStarted(gameId, gameInfo);
+  }
+
+  @Override
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    DrawingCardSource source,
+    DrawingDeckType deck,
+    Integer cardId,
+    Integer newPairCardId,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
+  ) {
+    View.super.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      source,
+      deck,
+      cardId,
+      newPairCardId,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
+    );
+  }
+
+  @Override
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
+  ) {
+    View.super.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
+    );
+  }
+
+  @Override
+  public void cardPlaced(
+    String gameId,
+    String playerId,
+    Integer playerHandCardNumber,
+    Integer cardId,
+    CardSideType side,
+    Position position,
+    int newPlayerScore,
+    Map<ResourceType, Integer> updatedResources,
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) {
+    View.super.cardPlaced(
+      gameId,
+      playerId,
+      playerHandCardNumber,
+      cardId,
+      side,
+      position,
+      newPlayerScore,
+      updatedResources,
+      updatedObjects,
+      availableSpots,
+      forbiddenSpots
+    );
+
+    drawCardPlacement(
+      localModel
+        .getLocalGameBoard()
+        .getCurrentPlayer()
+        .getPlayedCards()
+        .get(position)
+        .getKey(),
+      side,
+      position,
+      availableSpots,
+      forbiddenSpots
+    );
+  }
+
+  @Override
+  public void gameOver() {
+    View.super.gameOver();
+    //check objective points are added
+    drawGameOver(localModel.getLocalGameBoard().getPlayers());
+  }
+
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    View.super.playerScoresUpdate(newScores);
+    drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
+  }
+
+  @Override
+  public void remainingRounds(String gameID, int remainingRounds) {
+    View.super.remainingRounds(gameID, remainingRounds);
+  }
+
+  @Override
+  public void winningPlayer(String nickname) {
+    View.super.winningPlayer(nickname);
+    drawWinner(nickname);
+  }
+
+  @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    View.super.playerConnectionChanged(socketID, nickname, status);
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    drawLobby(localModel.getLocalLobby().getPlayers());
+  }
+
+  @Override
+  public void chatMessage(String gameID, ChatMessage message) {
+    View.super.chatMessage(gameID, message);
   }
 }
