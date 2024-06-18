@@ -10,10 +10,10 @@ import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class GuiClient extends ViewClient {
 
-  private Gui gui;
+  private final Gui gui;
 
-  public GuiClient(LocalModelContainer localModel) {
-    super(new Gui(localModel));
+  public GuiClient() {
+    super(new Gui());
     gui = (Gui) view;
   }
 
@@ -38,7 +38,7 @@ public class GuiClient extends ViewClient {
       "Usage: GuiClient <connection-type> <address> <port>"
     );
 
-    GuiClient guiClient = new GuiClient(new LocalModelContainer());
+    GuiClient guiClient = new GuiClient();
 
     // TODO add defaults from config file
     guiClient.start(

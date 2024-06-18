@@ -56,9 +56,9 @@ public class Gui extends Application implements View {
   private static ClientConnectionHandler client;
   private static LocalModelContainer localModel;
 
-  public Gui(LocalModelContainer localModel) {
+  public Gui() {
     gui = this;
-    Gui.localModel = localModel;
+    localModel = new LocalModelContainer();
   }
 
   public static Gui getInstance() {

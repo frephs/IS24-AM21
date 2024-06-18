@@ -43,9 +43,9 @@ public class Cli implements View {
 
   static Cli.Options options;
 
-  public Cli(Cli.Options options, LocalModelContainer localModel) {
+  public Cli(Cli.Options options) {
     Cli.options = options;
-    this.localModel = localModel;
+    this.localModel = new LocalModelContainer();
   }
 
   @Override

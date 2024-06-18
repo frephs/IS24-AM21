@@ -28,8 +28,8 @@ public class CliClient extends ViewClient {
   Cli cli;
   ClientConnectionHandler client;
 
-  public CliClient(LocalModelContainer localModelContainer) {
-    super(new Cli(new Cli.Options(true), localModelContainer));
+  public CliClient() {
+    super(new Cli(new Cli.Options(true)));
     cli = (Cli) view;
     scanner = new Scanner(System.in);
   }
@@ -722,7 +722,7 @@ public class CliClient extends ViewClient {
       "Usage: CliClient <connection-type> <address> <port>"
     );
 
-    CliClient cliClient = new CliClient(new LocalModelContainer());
+    CliClient cliClient = new CliClient();
 
     // TODO add defaults from config file
     try {

@@ -82,11 +82,10 @@ public class Main {
     View view;
 
     ViewClient client;
-    LocalModelContainer localModel = new LocalModelContainer();
     if (clientType == ClientType.CLI) {
-      client = new CliClient(localModel);
+      client = new CliClient();
     } else {
-      client = new GuiClient(localModel);
+      client = new GuiClient();
     }
 
     client.start(connectionType, serverAddress, port);
