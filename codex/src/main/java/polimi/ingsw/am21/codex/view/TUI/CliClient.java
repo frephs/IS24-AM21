@@ -292,7 +292,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          view.drawLobby(view.getLocalModel().getLocalLobby().getPlayers());
+          view.drawLobby();
         }
       }
     );
@@ -523,21 +523,17 @@ public class CliClient extends ViewClient {
           switch (command[1]) {
             case "playerboard":
               final String nickname = command[2];
-              cli.drawPlayerBoard(
-                view
-                  .getLocalModel()
-                  .getLocalGameBoard()
-                  .getPlayers()
-                  .stream()
-                  .filter(player -> player.getNickname().equals(nickname))
-                  .findFirst()
-                  .orElse(view.getLocalModel().getLocalGameBoard().getPlayer())
-              );
+              view
+                .getLocalModel()
+                .getLocalGameBoard()
+                .getPlayerByNickname(nickname)
+                .ifPresentOrElse(
+                  player -> cli.drawPlayerBoard(nickname),
+                  () -> cli.drawPlayerBoard()
+                );
               break;
             case "leaderboard":
-              cli.drawLeaderBoard(
-                view.getLocalModel().getLocalGameBoard().getPlayers()
-              );
+              cli.drawLeaderBoard();
               break;
             case "card":
               // TODO right now, just go by id; in the future we can switch to something better
@@ -581,9 +577,7 @@ public class CliClient extends ViewClient {
               }
               break;
             case "hand":
-              cli.drawHand(
-                view.getLocalModel().getLocalGameBoard().getPlayer().getHand()
-              );
+              cli.drawHand();
               break;
             case "objective":
               cli.drawCard(
@@ -591,10 +585,7 @@ public class CliClient extends ViewClient {
               );
               break;
             case "pairs":
-              cli.drawPairs(
-                view.getLocalModel().getLocalGameBoard().getResourceCards(),
-                view.getLocalModel().getLocalGameBoard().getGoldCards()
-              );
+              cli.drawPairs();
               break;
             default:
             // TODO Handle invalid command

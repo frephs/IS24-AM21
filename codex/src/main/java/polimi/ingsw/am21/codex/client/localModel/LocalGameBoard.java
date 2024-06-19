@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -41,6 +42,13 @@ public class LocalGameBoard {
 
   public void setCurrentPlayerIndex(Integer currentPlayerIndex) {
     this.currentPlayerIndex = currentPlayerIndex;
+  }
+
+  public Optional<LocalPlayer> getPlayerByNickname(String nickname) {
+    return players
+      .stream()
+      .filter(player -> player.getNickname().equals(nickname))
+      .findFirst();
   }
 
   private final List<LocalPlayer> players;
