@@ -1,25 +1,16 @@
 package polimi.ingsw.am21.codex.view;
 
 import java.util.*;
-import polimi.ingsw.am21.codex.client.ClientContext;
-import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
-import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
-import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.*;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
-import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
-import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
 public interface View extends GameEventListener {
@@ -41,79 +32,57 @@ public interface View extends GameEventListener {
   void displayException(Exception e);
 
   // lobby
-  void drawAvailableGames(List<GameEntry> games);
+  void drawAvailableGames();
 
-  void drawLobby(Map<UUID, LocalPlayer> players);
+  void drawLobby();
 
   // game
 
-  void drawLeaderBoard(List<LocalPlayer> players);
+  void drawGameBoard();
 
-  void drawPlayerBoards(List<LocalPlayer> players);
+  void drawLeaderBoard();
 
-  void drawPlayerBoard(LocalPlayer player);
+  void drawPlayerBoards();
 
-  /**
-   * Displays that the client player has drawn a card from a deck
-   * @param deck The deck the card has been drawn from
-   * @param card The card that has been drawn
-   */
-  void drawCardDrawn(DrawingDeckType deck, Card card);
+  void drawPlayerBoard(String nickname);
 
-  /**
-   * Displays that a card has been drawn from a deck
-   * @param deck The deck that the card has been drawn from
-   */
-  void drawCardDrawn(DrawingDeckType deck);
+  default void drawPlayerBoard() {
+    drawPlayerBoard(
+      getLocalModel().getLocalGameBoard().getPlayer().getNickname()
+    );
+  }
 
-  void drawCardPlacement(
-    Card card,
-    CardSideType side,
-    Position position,
-    Set<Position> availablePositions,
-    Set<Position> forbiddenPositions
-  );
+  void drawGame();
 
-  void drawGame(List<LocalPlayer> players);
-
-  void drawGameOver(List<LocalPlayer> players);
+  void drawGameOver();
 
   void drawCard(Card card);
 
   /**
    * Displays the hand of the client player
    */
-  void drawHand(List<Card> hand);
+  void drawHand();
 
   /**
    * Displays the pairs the players can draw from
-   * @param resourceCards The resource cards pair
-   * @param goldCards The gold cards pair
    */
-  void drawPairs(CardPair<Card> resourceCards, CardPair<Card> goldCards);
+  void drawPairs();
 
-  void drawAvailableTokenColors(Set<TokenColor> tokenColors);
-  void drawObjectiveCardChoice(CardPair<Card> cardPair);
+  void drawAvailableTokenColors();
+  void drawObjectiveCardChoice();
   void drawNicknameChoice();
-  void drawStarterCardSides(Card card);
+  void drawStarterCardSides();
 
   void drawChatMessage(ChatMessage message);
-  void drawCommonObjectiveCards(CardPair<Card> cardPair);
-  void drawPlayerObjective(Card card);
+  void drawCommonObjectiveCards();
+  void drawPlayerObjective();
 
   /**
    * Displays the cards decks to draw from
-   * @param firstResourceCard The first resource card (null if none)
-   * @param firstGoldCard The first gold card (null if none)
    */
-  void drawCardDecks(
-    PlayableCard firstResourceCard,
-    PlayableCard firstGoldCard
-  );
+  void drawCardDecks();
 
-  // ---------------------------
-  // GAME EVENT LISTENER METHODS
-  // ---------------------------
+  // <editor-fold desc="Game Event Listener Methods">
 
   @Override
   default void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
@@ -179,14 +148,14 @@ public interface View extends GameEventListener {
     UUID socketID,
     String nickname
   ) {
-    String message;
-    if (getLocalModel().getSocketID().equals(socketID)) {
-      message = "You set your nickname to " + nickname;
-    } else {
-      message = socketID.toString().substring(0, 6) +
-      " set their nickname to " +
-      nickname;
-    }
+    postNotification(
+      NotificationType.UPDATE,
+      getLocalModel().getSocketID().equals(socketID)
+        ? "You set your nickname to " + nickname
+        : socketID.toString().substring(0, 6) +
+        " set their nickname to " +
+        nickname
+    );
   }
 
   @Override
@@ -285,6 +254,9 @@ public interface View extends GameEventListener {
       "'turn" +
       (isLastRound ? " (last round)" : "")
     );
+
+    drawHand();
+    drawGameBoard();
   }
 
   @Override
@@ -305,6 +277,9 @@ public interface View extends GameEventListener {
       "'s turn" +
       (isLastRound ? " (last round)" : "")
     );
+
+    drawLeaderBoard();
+    drawHand();
   }
 
   @Override
@@ -325,6 +300,9 @@ public interface View extends GameEventListener {
       NotificationType.UPDATE,
       "Player " + playerId + " placed card " + cardId + " on the board"
     );
+
+    drawHand();
+    drawPlayerBoard();
   }
 
   @Override
@@ -370,7 +348,7 @@ public interface View extends GameEventListener {
 
   @Override
   default void lobbyInfo(LobbyUsersInfo usersInfo) {
-    drawLobby(getLocalModel().getLocalLobby().getPlayers());
+    drawLobby();
   }
 
   @Override
@@ -388,4 +366,5 @@ public interface View extends GameEventListener {
       drawChatMessage(message);
     }
   }
+  // </editor-fold>
 }

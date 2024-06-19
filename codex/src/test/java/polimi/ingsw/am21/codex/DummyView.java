@@ -1,20 +1,8 @@
 package polimi.ingsw.am21.codex;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
-import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
-import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
@@ -80,61 +68,43 @@ public class DummyView implements View {
   }
 
   @Override
-  public void drawAvailableGames(List<GameEntry> games) {}
+  public void drawAvailableGames() {}
 
   @Override
-  public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {}
+  public void drawLobby() {}
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {}
+  public void drawGameBoard() {}
 
   @Override
-  public void drawLeaderBoard(List<LocalPlayer> players) {}
+  public void drawLeaderBoard() {}
 
   @Override
-  public void drawPlayerBoards(List<LocalPlayer> players) {}
+  public void drawPlayerBoards() {}
 
   @Override
-  public void drawPlayerBoard(LocalPlayer player) {}
+  public void drawPlayerBoard(String nickname) {}
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck, Card card) {}
+  public void drawGame() {}
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck) {}
-
-  @Override
-  public void drawCardPlacement(
-    Card card,
-    CardSideType side,
-    Position position,
-    Set<Position> availablePositions,
-    Set<Position> forbiddenPositions
-  ) {}
-
-  @Override
-  public void drawGame(List<LocalPlayer> players) {}
-
-  @Override
-  public void drawGameOver(List<LocalPlayer> players) {}
+  public void drawGameOver() {}
 
   @Override
   public void drawCard(Card card) {}
 
   @Override
-  public void drawHand(List<Card> hand) {}
+  public void drawHand() {}
 
   @Override
-  public void drawPairs(
-    CardPair<Card> resourceCards,
-    CardPair<Card> goldCards
-  ) {}
+  public void drawPairs() {}
 
   @Override
-  public void drawObjectiveCardChoice(CardPair<Card> cardPair) {}
+  public void drawAvailableTokenColors() {}
 
   @Override
-  public void drawStarterCardSides(Card cardId) {}
+  public void drawObjectiveCardChoice() {}
 
   @Override
   public void drawChatMessage(ChatMessage message) {
@@ -153,17 +123,17 @@ public class DummyView implements View {
   }
 
   @Override
-  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {}
+  public void drawCommonObjectiveCards() {}
 
   @Override
-  public void drawPlayerObjective(Card card) {}
+  public void drawPlayerObjective() {}
 
   @Override
-  public void drawCardDecks(
-    PlayableCard firstResourceCard,
-    PlayableCard firstGoldCard
-  ) {}
+  public void drawCardDecks() {}
 
   @Override
   public void drawNicknameChoice() {}
+
+  @Override
+  public void drawStarterCardSides() {}
 }
