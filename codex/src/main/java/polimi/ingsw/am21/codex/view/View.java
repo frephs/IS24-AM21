@@ -36,6 +36,8 @@ public interface View extends GameEventListener {
     int colorableIndex
   );
 
+  void connected();
+
   void displayException(Exception e);
 
   // lobby

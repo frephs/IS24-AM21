@@ -1563,6 +1563,11 @@ public class Gui extends Application implements View {
   //-------------------------------
   // GAME EVENT HANDLERS
   //-------------------------------
+  @Override
+  public void connected() {
+    drawGameWindow();
+    drawAvailableGames(List.of());
+  }
 
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {

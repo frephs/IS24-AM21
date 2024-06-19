@@ -13,6 +13,7 @@ import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
@@ -155,7 +156,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     Runnable failed
   ) {
     synchronized (outputStream) {
-      if (!waiting) {
+      if (!waiting || !message.getType().isClientRequest()) {
         try {
           if (socket.isConnected() && !socket.isClosed()) {
             outputStream.writeObject(message);
@@ -461,6 +462,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
+    gameEventHandler.connected();
+
     message
       .getLobbyIds()
       .forEach(
@@ -528,11 +531,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getPlayers(),
       message.getMaxPlayers()
     );
-    getView()
-      .postNotification(
-        NotificationType.RESPONSE,
-        "New game created: " + message.getGameId()
-      );
   }
 
   public void handleMessage(GameDeletedMessage message) {

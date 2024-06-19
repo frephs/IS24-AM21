@@ -125,6 +125,11 @@ public class Cli implements View {
     printPrompt();
   }
 
+  @Override
+  public void connected() {
+    postNotification(NotificationType.CONFIRM, "Successfully to the server");
+  }
+
   void diffMessage(int diff, String attributeName) {
     if (diff != 0) {
       postNotification(
