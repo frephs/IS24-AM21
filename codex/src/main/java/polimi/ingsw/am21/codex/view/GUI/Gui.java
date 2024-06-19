@@ -1668,6 +1668,7 @@ public class Gui extends Application implements View {
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
     View.super.gameStarted(gameId, gameInfo);
+    drawGame(localModel.getLocalGameBoard().getPlayers());
   }
 
   @Override
