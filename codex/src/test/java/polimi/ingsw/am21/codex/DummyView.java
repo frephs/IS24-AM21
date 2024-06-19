@@ -66,6 +66,9 @@ public class DummyView implements View {
   ) {}
 
   @Override
+  public void connected() {}
+
+  @Override
   public void displayException(Exception e) {
     CliUtils.colorize(
       "[" + id + "] " + e.getMessage(),

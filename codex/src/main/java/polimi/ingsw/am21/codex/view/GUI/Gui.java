@@ -722,7 +722,6 @@ public class Gui extends Application implements View {
             String nickname =
               ((TextField) (scene.lookup("#nickname-input"))).getText();
             client.lobbySetNickname(nickname);
-            client.getObjectiveCards();
           }
         );
     });
@@ -1274,12 +1273,10 @@ public class Gui extends Application implements View {
 
       first.setOnMouseClicked((MouseEvent event) -> {
         client.lobbyChooseObjectiveCard(true);
-        client.getStarterCard();
       });
 
       second.setOnMouseClicked((MouseEvent event) -> {
         client.lobbyChooseObjectiveCard(false);
-        client.getStarterCard();
       });
 
       List.of(first, second).forEach(image -> {
@@ -1296,17 +1293,17 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the sides of the starter card the player can choose from in the lobby
-   * @param cardId the card to choose the side from
+   * @param card the card to choose the side from
    * */
   @Override
-  public void drawStarterCardSides(Card cardId) {
+  public void drawStarterCardSides(Card card) {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyChooseStarterCardSide.fxml", "#content");
 
       ((Text) scene.lookup("#window-title")).setText("Lobby");
 
-      ImageView front = loadCardImage(cardId, CardSideType.FRONT);
-      ImageView back = loadCardImage(cardId, CardSideType.BACK);
+      ImageView front = loadCardImage(card, CardSideType.FRONT);
+      ImageView back = loadCardImage(card, CardSideType.BACK);
 
       front.setPreserveRatio(true);
       back.setPreserveRatio(true);
