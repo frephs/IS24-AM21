@@ -1,8 +1,6 @@
 package polimi.ingsw.am21.codex;
 
-import java.util.List;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
-import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -88,10 +86,10 @@ public class DummyView implements View {
   public void drawPlayerBoard(String nickname) {}
 
   @Override
-  public void drawGame(List<LocalPlayer> players) {}
+  public void drawGame() {}
 
   @Override
-  public void drawGameOver(List<LocalPlayer> players) {}
+  public void drawGameOver() {}
 
   @Override
   public void drawCard(Card card) {}

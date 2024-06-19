@@ -2,7 +2,6 @@ package polimi.ingsw.am21.codex.view;
 
 import java.util.*;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
-import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
@@ -53,9 +52,9 @@ public interface View extends GameEventListener {
     );
   }
 
-  void drawGame(List<LocalPlayer> players);
+  void drawGame();
 
-  void drawGameOver(List<LocalPlayer> players);
+  void drawGameOver();
 
   void drawCard(Card card);
 
@@ -83,9 +82,7 @@ public interface View extends GameEventListener {
    */
   void drawCardDecks();
 
-  // ---------------------------
-  // GAME EVENT LISTENER METHODS
-  // ---------------------------
+  // <editor-fold desc="Game Event Listener Methods">
 
   @Override
   default void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
@@ -369,4 +366,5 @@ public interface View extends GameEventListener {
       drawChatMessage(message);
     }
   }
+  // </editor-fold>
 }

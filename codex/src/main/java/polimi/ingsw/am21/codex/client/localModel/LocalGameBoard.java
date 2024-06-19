@@ -3,7 +3,6 @@ package polimi.ingsw.am21.codex.client.localModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
@@ -21,18 +20,16 @@ public class LocalGameBoard {
   private PlayableCard goldDeckTopCard;
 
   private Card secretObjective;
-  private Chat chat = new Chat();
+  private final Chat chat = new Chat();
 
   private Integer currentPlayerIndex;
 
   private Integer remainingRounds;
-  private Integer maxPlayers;
 
   private Integer playerIndex;
 
   public LocalGameBoard(String gameId, Integer maxPlayers) {
     this.gameId = gameId;
-    this.maxPlayers = maxPlayers;
     this.players = new ArrayList<>(maxPlayers);
   }
 

@@ -5,11 +5,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
-import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
-import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -19,15 +16,8 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameState;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.view.NotificationType;
-import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
-import polimi.ingsw.am21.codex.view.View;
 
 public class LocalModelContainer implements GameEventListener {
 
@@ -58,6 +48,12 @@ public class LocalModelContainer implements GameEventListener {
   private UUID socketId;
 
   private final RemoteGameEventListener listener;
+
+  /**
+   * A boolean that keeps track of whether the current player has place their card
+   * for their turn
+   */
+  private boolean currentPlayerHasPlacedCard = false;
 
   public class ClientContextContainer {
 
@@ -495,6 +491,8 @@ public class LocalModelContainer implements GameEventListener {
 
     localPlayer.setAvailableSpots(availablePositions);
     localPlayer.setForbiddenSpots(forbiddenPositions);
+
+    currentPlayerHasPlacedCard = true;
     // TODO this actually makes drawCardPlacement redundant
 
   }
@@ -575,6 +573,8 @@ public class LocalModelContainer implements GameEventListener {
     gameBoard.setGoldDeckTopCard(
       (PlayableCard) cardsLoader.getCardFromId(goldDeckTopCardId)
     );
+
+    currentPlayerHasPlacedCard = false;
   }
 
   @Override
@@ -629,5 +629,9 @@ public class LocalModelContainer implements GameEventListener {
 
   public void gameStatusUpdate(GameState state) {
     //TODO
+  }
+
+  public boolean currentPlayerHasPlacedCard() {
+    return currentPlayerHasPlacedCard;
   }
 }

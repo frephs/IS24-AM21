@@ -72,11 +72,6 @@ public class Gui extends Application implements View {
    * The index of the hand that is currently selected, null otherwise
    */
   private Integer selectedHandIndex = null;
-  /**
-   * A boolean that keeps track of whether the current player has place their card
-   * for their turn
-   */
-  private boolean hasPlacedCard = false;
 
   // TODO track what user is being displayed
 
@@ -450,9 +445,7 @@ public class Gui extends Application implements View {
 
       scene
         .lookup("#back-to-menu-button-lobby")
-        .setOnMouseClicked((MouseEvent event) -> {
-          client.getGames();
-        });
+        .setOnMouseClicked((MouseEvent event) -> client.getGames());
 
       GridPane playerGrid =
         ((GridPane) scene.lookup("#lobby-player-container"));
@@ -752,7 +745,7 @@ public class Gui extends Application implements View {
    * */
   private boolean canPlayerPlaceCards() {
     return (
-      !this.hasPlacedCard &&
+      !localModel.currentPlayerHasPlacedCard() &&
       localModel
         .getLocalGameBoard()
         .getCurrentPlayer()
@@ -767,7 +760,7 @@ public class Gui extends Application implements View {
    */
   private boolean canPlayerDrawCards() {
     return (
-      this.hasPlacedCard &&
+      localModel.currentPlayerHasPlacedCard() &&
       localModel
         .getLocalGameBoard()
         .getCurrentPlayer()
@@ -835,13 +828,12 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the playerboard and gameboard scenes after every player has finished in the lobby
-   * @param players the list of players of the current game
    * */
   @Override
-  public void drawGame(List<LocalPlayer> players) {
+  public void drawGame() {
     Platform.runLater(() -> {
       loadSceneFXML("GameBoard.fxml", "#side-content");
-      drawChat(players);
+      drawChat();
       drawGameBoard();
       drawPlayerBoards();
       drawLeaderBoard();
@@ -877,13 +869,20 @@ public class Gui extends Application implements View {
    * Display the game is over and the final leaderboard
    * */
   @Override
-  public void drawGameOver(List<LocalPlayer> players) {
+  public void drawGameOver() {
     Platform.runLater(() -> {
       ((Text) scene.lookup("#window-title")).setText("Game Over");
       //draw the final leaderboard int the #side-content container and don't use drawLeaderBoard
       drawLeaderBoard();
-      players.sort((p1, p2) -> p2.getPoints() - p1.getPoints());
-      winningPlayer(players.getFirst().getNickname());
+      winningPlayer(
+        localModel
+          .getLocalGameBoard()
+          .getPlayers()
+          .stream()
+          .min((p1, p2) -> p2.getPoints() - p1.getPoints())
+          .map(LocalPlayer::getNickname)
+          .orElseThrow()
+      );
 
       VBox commonBoardContainer = (VBox) scene.lookup(
         "#common-board-container"
@@ -1126,9 +1125,8 @@ public class Gui extends Application implements View {
 
   /**
    * Load the chat scene for chat messages to be drawn in.
-   * @param players to whom a message can be sent.
    * */
-  public void drawChat(List<LocalPlayer> players) {
+  public void drawChat() {
     loadSceneFXML("Chat.fxml", "#side-content-bottom");
     // add recipients to chat-recipient combo box
 
@@ -1136,9 +1134,12 @@ public class Gui extends Application implements View {
       "#chat-recipient"
     );
 
-    players.forEach(
-      player -> recipientChoiceBox.getItems().add(player.getNickname())
-    );
+    localModel
+      .getLocalGameBoard()
+      .getPlayers()
+      .forEach(
+        player -> recipientChoiceBox.getItems().add(player.getNickname())
+      );
 
     recipientChoiceBox.getItems().addFirst("Broadcast");
 
@@ -1441,13 +1442,13 @@ public class Gui extends Application implements View {
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
     View.super.gameStarted(gameId, gameInfo);
-    drawGame(localModel.getLocalGameBoard().getPlayers());
+    drawGame();
   }
 
   @Override
   public void gameOver() {
     View.super.gameOver();
-    drawGameOver(localModel.getLocalGameBoard().getPlayers());
+    drawGameOver();
   }
 
   @Override

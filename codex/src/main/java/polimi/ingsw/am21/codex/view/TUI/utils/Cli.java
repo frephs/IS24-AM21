@@ -52,10 +52,6 @@ public class Cli implements View {
     return localModel;
   }
 
-  public Boolean isColored() {
-    return options.isColored();
-  }
-
   @Override
   public void postNotification(
     NotificationType notificationType,
@@ -337,13 +333,26 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawGame(List<LocalPlayer> players) {
-    printUpdate("Game started with " + players.size() + " players");
+  public void drawGame() {
+    printUpdate(
+      "Game started with " +
+      localModel.getLocalGameBoard().getPlayers().size() +
+      " players"
+    );
   }
 
   @Override
-  public void drawGameOver(List<LocalPlayer> players) {
+  public void drawGameOver() {
     printUpdate("Game over");
+    winningPlayer(
+      localModel
+        .getLocalGameBoard()
+        .getPlayers()
+        .stream()
+        .min((p1, p2) -> p2.getPoints() - p1.getPoints())
+        .map(LocalPlayer::getNickname)
+        .orElseThrow()
+    );
   }
 
   @Override
