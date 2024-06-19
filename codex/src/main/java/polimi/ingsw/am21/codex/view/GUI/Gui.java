@@ -340,24 +340,26 @@ public class Gui extends Application implements View {
    * shown and the client is connected
    */
   private void drawGameWindow() {
-    try {
-      Parent root = FXMLLoader.load(
-        Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
-      );
+    Platform.runLater(() -> {
+      try {
+        Parent root = FXMLLoader.load(
+          Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
+        );
 
-      Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 
-      scene = new Scene(
-        root,
-        screenBounds.getWidth(),
-        screenBounds.getHeight()
-      );
+        scene = new Scene(
+          root,
+          screenBounds.getWidth(),
+          screenBounds.getHeight()
+        );
 
-      primaryStage.setScene(scene);
-      primaryStage.setMaximized(true);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+        primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   /**
@@ -462,8 +464,6 @@ public class Gui extends Application implements View {
   @Override
   public void drawAvailableGames(List<GameEntry> games) {
     Platform.runLater(() -> {
-      drawGameWindow();
-
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
 
@@ -1582,11 +1582,21 @@ public class Gui extends Application implements View {
   @Override
   public void playerJoinedLobby(String gameId, UUID socketID) {
     View.super.playerJoinedLobby(gameId, socketID);
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawAvailableTokenColors(
+          localModel.getLocalLobby().getAvailableTokens()
+        );
+      } else {
+        drawLobby(localModel.getLocalLobby().getPlayers());
+      }
+    }
   }
 
   @Override
   public void playerLeftLobby(String gameId, UUID socketID) {
     View.super.playerLeftLobby(gameId, socketID);
+    drawLobby(localModel.getLocalLobby().getPlayers());
   }
 
   @Override
@@ -1597,14 +1607,28 @@ public class Gui extends Application implements View {
     TokenColor token
   ) {
     View.super.playerSetToken(gameId, socketID, nickname, token);
-    client.getObjectiveCards();
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawNicknameChoice();
+        client.getObjectiveCards();
+      }
+      drawLobby(localModel.getLocalLobby().getPlayers());
+    }
   }
 
   @Override
   public void playerSetNickname(String gameId, UUID socketID, String nickname) {
     View.super.playerSetNickname(gameId, socketID, nickname);
-    client.getStarterCard();
-    drawObjectiveCardChoice(localModel.getAvailableObjectives());
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawObjectiveCardChoice(
+          localModel.getLocalLobby().getAvailableObjectives()
+        );
+        client.getStarterCard();
+      }
+
+      drawLobby(localModel.getLocalLobby().getPlayers());
+    }
   }
 
   @Override
@@ -1614,7 +1638,13 @@ public class Gui extends Application implements View {
     String nickname
   ) {
     View.super.playerChoseObjectiveCard(gameId, socketID, nickname);
-    drawStarterCardSides(localModel.getLocalLobby().getStarterCard());
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawStarterCardSides(localModel.getLocalLobby().getStarterCard());
+      } else {
+        drawLobby(localModel.getLocalLobby().getPlayers());
+      }
+    }
   }
 
   @Override
@@ -1808,7 +1838,11 @@ public class Gui extends Application implements View {
   ) {
     View.super.playerConnectionChanged(socketID, nickname, status);
     //TODO make it visible in the leaderBoard
-    drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
+    if (
+      localModel.getClientContextContainer().get().equals(ClientContext.GAME)
+    ) {
+      drawLeaderBoard(localModel.getLocalGameBoard().getPlayers());
+    }
   }
 
   @Override
