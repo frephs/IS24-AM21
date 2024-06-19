@@ -27,6 +27,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -54,7 +55,7 @@ public class Gui extends Application implements View {
   private static Gui gui;
 
   private static ClientConnectionHandler client;
-  private static LocalModelContainer localModel;
+  private LocalModelContainer localModel;
 
   public Gui() {
     gui = this;
@@ -67,10 +68,6 @@ public class Gui extends Application implements View {
 
   public void setClient(ClientConnectionHandler client) {
     Gui.client = client;
-  }
-
-  public void setLocalModel(LocalModelContainer localModel) {
-    Gui.localModel = localModel;
   }
 
   /** The side of the hand the player is currently looking at */

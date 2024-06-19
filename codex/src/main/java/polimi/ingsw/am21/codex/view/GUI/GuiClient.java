@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.view.GUI;
 
+import java.util.List;
 import java.util.Objects;
 import javafx.application.Application;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
@@ -31,6 +32,15 @@ public class GuiClient extends ViewClient {
     }
 
     super.start(connectionType, address, port);
+    gui.setClient(client);
+
+    while (!super.isInitialized()) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   public static void main(String[] args) {
