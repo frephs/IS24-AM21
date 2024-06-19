@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
+import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -25,6 +26,9 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class Cli implements View {
 
+  private static Cli cli;
+
+  private static ClientConnectionHandler client;
   private final LocalModelContainer localModel;
 
   public static class Options {
@@ -42,9 +46,19 @@ public class Cli implements View {
 
   static Cli.Options options;
 
+  @Override
+  public void setClient(ClientConnectionHandler client) {
+    Cli.client = client;
+  }
+
   public Cli(Cli.Options options) {
     Cli.options = options;
-    this.localModel = new LocalModelContainer();
+    cli = this;
+    localModel = new LocalModelContainer();
+  }
+
+  public static Cli getInstance() {
+    return cli;
   }
 
   @Override
