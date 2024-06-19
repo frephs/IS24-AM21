@@ -9,6 +9,8 @@ import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 
 public abstract class ViewClient {
 
+  private boolean initialized = false;
+
   protected ClientConnectionHandler client;
   protected View view;
   ClientGameEventHandler gameEventHandler;
@@ -38,5 +40,10 @@ public abstract class ViewClient {
       );
     }
     client.connect();
+    this.initialized = true;
+  }
+
+  protected boolean isInitialized() {
+    return initialized;
   }
 }
