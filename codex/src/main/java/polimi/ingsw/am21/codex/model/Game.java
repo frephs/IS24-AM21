@@ -25,7 +25,7 @@ import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class Game {
 
-  static final int WINNING_POINTS = 20;
+  static final int WINNING_POINTS = 4;
   private final List<Player> players;
   private final GameBoard gameBoard;
   private Lobby lobby;
@@ -283,6 +283,8 @@ public class Game {
       this.remainingRounds = 2;
       remainingRoundsChange.accept(this.remainingRounds);
       this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
+      //HERE
+
       throw e;
     }
     this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
