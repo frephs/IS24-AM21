@@ -21,14 +21,14 @@ public class ChatMessage implements Serializable {
     String content,
     Date timestamp
   ) {
-    this.recipient = recipient;
     this.sender = sender;
+    this.recipient = recipient;
     this.content = content;
     this.timestamp = timestamp;
   }
 
   public ChatMessage(String sender, String recipient, String content) {
-    this(recipient, sender, content, new Date());
+    this(sender, recipient, content, new Date());
   }
 
   /**

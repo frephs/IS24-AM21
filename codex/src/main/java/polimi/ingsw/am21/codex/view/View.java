@@ -358,13 +358,7 @@ public interface View extends GameEventListener {
       "New chat message from " + message.getSender()
     );
 
-    if (
-      !message
-        .getSender()
-        .equals(getLocalModel().getLocalGameBoard().getPlayer().getNickname())
-    ) {
-      drawChatMessage(message);
-    }
+    drawChatMessage(message);
   }
   // </editor-fold>
 }

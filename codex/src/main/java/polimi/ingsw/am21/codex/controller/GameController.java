@@ -1222,11 +1222,8 @@ public class GameController {
     }
   }
 
-  public void sendChatMessage(
-    UUID connectionID,
-    String recipientNickname,
-    String message
-  ) throws InvalidActionException {
+  public void sendChatMessage(UUID connectionID, ChatMessage chatMessage)
+    throws InvalidActionException {
     Optional<UserGameContext> userGameContext = Optional.ofNullable(
       userContexts.get(connectionID)
     );
@@ -1234,25 +1231,38 @@ public class GameController {
     if (userGameContext.isEmpty()) throw new PlayerNotFoundException(
       connectionID
     );
+
     String gameId = userGameContext
       .get()
       .getGameId()
       .orElseThrow(NotInGameException::new);
+
     Game game = this.getGame(gameId);
-    String nickname = userGameContext
-      .get()
-      .getNickname()
-      .orElseThrow(NotInGameException::new);
-    ChatMessage chatMessage = new ChatMessage(
-      nickname,
-      recipientNickname,
-      message
-    );
+
     game.getChat().postMessage(chatMessage);
 
     notifySameContextClients(connectionID, (listener, targetSocketID) -> {
+      //if there is a recipient in the message filter the listeners
+
       try {
-        listener.chatMessage(gameId, chatMessage);
+        if (
+          chatMessage
+            .getRecipient()
+            .map(
+              recipient ->
+                recipient.equals(
+                  userContexts.get(targetSocketID).getNickname().orElse(null)
+                )
+            )
+            .orElse(true) &&
+          !userContexts
+            .get(targetSocketID)
+            .getNickname()
+            .map(nickname -> nickname.equals(chatMessage.getSender()))
+            .orElse(false)
+        ) {
+          listener.chatMessage(gameId, chatMessage);
+        }
       } catch (RemoteException e) {
         if (userContexts.containsKey(targetSocketID)) {
           userContexts.get(targetSocketID).disconnected();

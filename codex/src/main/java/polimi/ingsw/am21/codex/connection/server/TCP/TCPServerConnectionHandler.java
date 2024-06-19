@@ -393,10 +393,8 @@ public class TCPServerConnectionHandler implements Runnable {
     try {
       controller.sendChatMessage(
         message.getConnectionID(),
-        message.getMessage().getRecipient().orElse(null),
-        message.getMessage().getContent()
+        message.getMessage()
       );
-      broadcast(message);
     } catch (InvalidActionException e) {
       send(InvalidActionMessage.fromException(e));
     }

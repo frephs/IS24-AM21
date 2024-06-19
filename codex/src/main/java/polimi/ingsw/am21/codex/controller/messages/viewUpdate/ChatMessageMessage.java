@@ -10,7 +10,7 @@ public class ChatMessageMessage extends ViewUpdatingMessage {
   private final ChatMessage chatMessage;
 
   public ChatMessageMessage(String gameID, ChatMessage chatMessage) {
-    super(MessageType.WINNING_PLAYER);
+    super(MessageType.CHAT_MESSAGE_MESSAGE);
     this.chatMessage = chatMessage;
     this.gameID = gameID;
   }

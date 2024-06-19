@@ -47,7 +47,8 @@ public enum MessageType implements Serializable {
   PLAYER_SET_NICKNAME(MessageTypeCategory.VIEW_UPDATE),
   PLAYER_SET_TOKEN_COLOR(MessageTypeCategory.VIEW_UPDATE),
   SOCKET_ID(MessageTypeCategory.VIEW_UPDATE),
-  PLAYER_CONNECTION_CHANGED(MessageTypeCategory.VIEW_UPDATE);
+  PLAYER_CONNECTION_CHANGED(MessageTypeCategory.VIEW_UPDATE),
+  CHAT_MESSAGE_MESSAGE(MessageTypeCategory.VIEW_UPDATE);
 
   private enum MessageTypeCategory implements Serializable {
     VIEW_UPDATE,

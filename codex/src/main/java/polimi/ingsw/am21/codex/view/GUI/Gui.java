@@ -1137,6 +1137,13 @@ public class Gui extends Application implements View {
     localModel
       .getLocalGameBoard()
       .getPlayers()
+      .stream()
+      .filter(
+        player ->
+          !player
+            .getNickname()
+            .equals(localModel.getLocalGameBoard().getPlayerNickname())
+      )
       .forEach(
         player -> recipientChoiceBox.getItems().add(player.getNickname())
       );
@@ -1155,8 +1162,8 @@ public class Gui extends Application implements View {
 
         if (!Objects.equals(recipient, "Broadcast")) {
           chatMessage = new ChatMessage(
-            recipient,
             localModel.getLocalGameBoard().getPlayerNickname(),
+            recipient,
             message
           );
         } else {
@@ -1181,7 +1188,6 @@ public class Gui extends Application implements View {
         )).getContent()
         .lookup("#chat-message-container-box");
 
-      // Load the chat message template from the FXML file
       FXMLLoader loader = new FXMLLoader(
         getClass().getResource("ChatMessage.fxml")
       );
@@ -1189,17 +1195,19 @@ public class Gui extends Application implements View {
       try {
         Node chatMessageTemplate = loader.load();
 
-        // Look up the elements in the template
         Label senderLabel = (Label) chatMessageTemplate.lookup("#sender");
         Label messageLabel = (Label) chatMessageTemplate.lookup("#message");
         ImageView senderTokenImage = (ImageView) chatMessageTemplate.lookup(
           "#sender-token"
         );
 
-        // Set the data from the ChatMessage object to the elements in the
-        // template
         senderLabel.setText(message.getSender());
         messageLabel.setText(message.getContent());
+
+        // whispering
+        if (message.getRecipient().isPresent()) {
+          messageLabel.setStyle("-fx-text-fill: #6b17b1");
+        }
 
         Image tokenImage = localModel
           .getLocalGameBoard()
@@ -1384,6 +1392,10 @@ public class Gui extends Application implements View {
       } else {
         drawLobby();
       }
+    } else if (
+      localModel.getClientContextContainer().get().equals(ClientContext.MENU)
+    ) {
+      drawAvailableGames();
     }
   }
 
@@ -1510,12 +1522,5 @@ public class Gui extends Application implements View {
   @Override
   public void chatMessage(String gameID, ChatMessage message) {
     View.super.chatMessage(gameID, message);
-    if (
-      !message
-        .getSender()
-        .equals(getLocalModel().getLocalGameBoard().getPlayer().getNickname())
-    ) {
-      drawChatMessage(message);
-    }
   }
 }

@@ -444,8 +444,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         (PlayerScoresUpdateMessage) message
       );
       case REMAINING_ROUNDS -> handleMessage((RemainingRoundsMessage) message);
+      case CHAT_MESSAGE_MESSAGE -> handleMessage((ChatMessageMessage) message);
       case WINNING_PLAYER -> handleMessage((WinningPlayerMessage) message);
-      case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
       // Init
       default -> getView().postNotification(Notification.UNKNOWN_MESSAGE);
     }
@@ -652,6 +652,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(ChatMessageMessage message) {
-    gameEventHandler.chatMessage(message.getGameID(), message.getMessage());
+    gameEventHandler.chatMessage(
+      gameEventHandler.getLocalModel().getGameId().orElse(""),
+      message.getMessage()
+    );
   }
 }

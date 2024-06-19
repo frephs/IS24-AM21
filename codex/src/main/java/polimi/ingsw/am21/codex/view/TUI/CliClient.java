@@ -505,7 +505,7 @@ public class CliClient extends ViewClient {
             new ChatMessage(
               view.getLocalModel().getLocalGameBoard().getPlayerNickname(),
               command[1],
-              command[2]
+              Arrays.stream(command).skip(2).collect(Collectors.joining(" "))
             )
           );
         }

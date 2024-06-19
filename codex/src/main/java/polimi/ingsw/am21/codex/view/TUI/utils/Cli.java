@@ -424,7 +424,7 @@ public class Cli implements View {
         Color.PURPLE,
         ColorStyle.BACKGROUND
       ) +
-      "said " +
+      message.getRecipient().map(recipient -> " whispered").orElse("said ") +
       message.getContent()
     );
   }
