@@ -187,6 +187,10 @@ public class LocalModelContainer implements GameEventListener {
     if (this.socketId.equals(socketId)) {
       clientContextContainer.set(ClientContext.LOBBY);
       lobby = new LocalLobby(gameId);
+      gameBoard = new LocalGameBoard(
+        gameId,
+        menu.getGames().get(gameId).getMaxPlayers()
+      );
       addToLobby(socketId);
     }
 
@@ -333,9 +337,9 @@ public class LocalModelContainer implements GameEventListener {
   ) {
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
 
-    if (lobby.getPlayers().get(socketId) == null) lobby
-      .getPlayers()
-      .put(socketId, new LocalPlayer(socketId));
+    if (lobby.getPlayers().get(socketId) == null) {
+      lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
+    }
 
     LocalPlayer player = lobby.getPlayers().get(socketID);
 
