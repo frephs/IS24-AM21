@@ -1405,6 +1405,15 @@ public class Gui extends Application implements View {
       if (socketID.equals(localModel.getSocketID())) {
         drawNicknameChoice();
         client.getObjectiveCards();
+      } else if (
+        localModel
+          .getLocalLobby()
+          .getPlayers()
+          .get(localModel.getSocketID())
+          .getToken() ==
+        null
+      ) {
+        drawAvailableTokenColors();
       }
       drawLobby();
     }
