@@ -24,6 +24,7 @@ import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
@@ -51,6 +52,9 @@ public class ClientGameEventHandler
       case PLAYER_NOT_ACTIVE -> this.playerNotActive();
       case NOT_IN_GAME -> this.notInGame();
       case GAME_ALREADY_STARTED -> this.gameAlreadyStarted();
+      case GAME_ALREADY_EXISTS -> this.gameAlreadyExists(
+          ((GameAlreadyExistsException) e).getGameID()
+        );
       case INVALID_NEXT_TURN_CALL -> this.invalidNextTurnCall();
       case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.invalidGetObjectiveCardsCall();
       case GAME_NOT_READY -> this.gameNotReady();
@@ -82,6 +86,10 @@ public class ClientGameEventHandler
       case GAME_OVER -> this.gameOver();
       case CARD_NOT_PLACED -> this.cardNotPlaced();
     }
+  }
+
+  public void connected() {
+    view.connected();
   }
 
   @Override
