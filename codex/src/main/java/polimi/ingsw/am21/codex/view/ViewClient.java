@@ -13,7 +13,7 @@ public abstract class ViewClient {
 
   protected ClientConnectionHandler client;
   protected View view;
-  ClientGameEventHandler gameEventHandler;
+  protected ClientGameEventHandler gameEventHandler;
 
   public ViewClient(View view) {
     this.view = view;

@@ -34,7 +34,7 @@ public class CliClient extends ViewClient {
   }
 
   private LocalModelContainer.ClientContextContainer getClientContextContainer() {
-    return view.getLocalModel().getClientContextContainer();
+    return gameEventHandler.getLocalModel().getClientContextContainer();
   }
 
   @Override
