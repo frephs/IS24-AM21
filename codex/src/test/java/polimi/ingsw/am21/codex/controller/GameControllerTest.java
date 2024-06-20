@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.controller.exceptions.*;
@@ -21,9 +22,7 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
 
@@ -166,6 +165,10 @@ class GameControllerTest {
 
     @Override
     public void chatMessage(String gameID, ChatMessage message)
+      throws RemoteException {}
+
+    @Override
+    public void getObjectiveCards(Pair<Integer, Integer> objectiveCards)
       throws RemoteException {}
   }
 

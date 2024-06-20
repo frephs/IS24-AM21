@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.view;
 
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -377,5 +378,8 @@ public interface View extends GameEventListener {
 
     drawChatMessage(message);
   }
+
+  @Override
+  void getObjectiveCards(Pair<Integer, Integer> objectiveCards);
   // </editor-fold>
 }

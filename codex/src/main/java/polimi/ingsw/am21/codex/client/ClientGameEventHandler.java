@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -521,5 +522,11 @@ public class ClientGameEventHandler
   public void chatMessage(String gameID, ChatMessage message) {
     localModel.chatMessage(gameID, message);
     view.chatMessage(gameID, message);
+  }
+
+  @Override
+  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
+    localModel.getObjectiveCards(objectiveCards);
+    view.getObjectiveCards(objectiveCards);
   }
 }

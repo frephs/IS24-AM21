@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.view.TUI.utils;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -415,8 +416,8 @@ public class Cli implements View {
   @Override
   public void drawObjectiveCardChoice() {
     CardPair<Card> cardPair = localModel
-      .getLocalGameBoard()
-      .getObjectiveCards();
+      .getLocalLobby()
+      .getAvailableObjectives();
 
     printUpdate(
       "Objective cards pair:\n" +
@@ -501,6 +502,11 @@ public class Cli implements View {
 
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) {}
+
+  @Override
+  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
+    drawObjectiveCardChoice();
+  }
 
   @Override
   public void drawNicknameChoice() {}

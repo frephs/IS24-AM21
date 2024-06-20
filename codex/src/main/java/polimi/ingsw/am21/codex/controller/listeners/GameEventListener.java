@@ -1,6 +1,7 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -127,4 +128,7 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   @Override
   void chatMessage(String gameID, ChatMessage message);
+
+  @Override
+  void getObjectiveCards(Pair<Integer, Integer> objectiveCards);
 }

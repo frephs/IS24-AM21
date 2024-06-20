@@ -25,6 +25,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -1560,5 +1561,10 @@ public class Gui extends Application implements View {
   @Override
   public void chatMessage(String gameID, ChatMessage message) {
     View.super.chatMessage(gameID, message);
+  }
+
+  @Override
+  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
+    // Don't display the response automatically, it's handled in a different section
   }
 }

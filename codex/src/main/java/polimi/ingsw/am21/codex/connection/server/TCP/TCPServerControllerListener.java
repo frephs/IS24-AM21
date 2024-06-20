@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.connection.server.TCP;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.function.Consumer;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
@@ -239,4 +240,7 @@ public class TCPServerControllerListener implements GameEventListener {
       )
     );
   }
+
+  @Override
+  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {}
 }

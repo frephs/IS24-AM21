@@ -237,4 +237,10 @@ public class LocalModelGameEventListener
     throws RemoteException {
     listener.chatMessage(gameID, message);
   }
+
+  @Override
+  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards)
+    throws RemoteException {
+    listener.getObjectiveCards(objectiveCards);
+  }
 }

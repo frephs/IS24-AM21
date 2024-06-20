@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex;
 
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
@@ -134,6 +135,9 @@ public class DummyView implements View {
 
   @Override
   public void drawCardDecks() {}
+
+  @Override
+  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {}
 
   @Override
   public void drawNicknameChoice() {}

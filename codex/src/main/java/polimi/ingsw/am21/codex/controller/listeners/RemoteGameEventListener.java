@@ -134,4 +134,7 @@ public interface RemoteGameEventListener extends Remote {
   void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException;
 
   void chatMessage(String gameID, ChatMessage message) throws RemoteException;
+
+  void getObjectiveCards(Pair<Integer, Integer> objectiveCards)
+    throws RemoteException;
 }

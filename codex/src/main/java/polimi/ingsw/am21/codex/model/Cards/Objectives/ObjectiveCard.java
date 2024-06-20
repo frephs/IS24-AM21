@@ -55,7 +55,6 @@ public class ObjectiveCard extends Card implements CliCard {
 
   @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
-    // TODO: Implement TUI method
-    return "";
+    return cardToString();
   }
 }
