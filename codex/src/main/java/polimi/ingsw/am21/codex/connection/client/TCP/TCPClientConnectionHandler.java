@@ -10,6 +10,7 @@ import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
@@ -64,6 +65,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     ClientGameEventHandler gameEventHandler
   ) {
     super(host, port, view, gameEventHandler);
+    this.connectionType = ConnectionType.TCP;
     this.incomingMessages = new ArrayDeque<>();
   }
 
