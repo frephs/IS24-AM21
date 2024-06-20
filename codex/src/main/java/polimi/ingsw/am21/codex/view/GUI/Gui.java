@@ -1510,6 +1510,13 @@ public class Gui extends Application implements View {
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
     View.super.gameStarted(gameId, gameInfo);
+    visibleUserNickname = gameInfo
+      .getUsers()
+      .stream()
+      .filter(user -> user.getSocketID().equals(localModel.getSocketID()))
+      .findFirst()
+      .map(GameInfo.GameInfoUser::getNickname)
+      .orElse(null);
     drawGame();
   }
 
