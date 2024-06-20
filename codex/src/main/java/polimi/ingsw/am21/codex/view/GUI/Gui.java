@@ -1460,7 +1460,7 @@ public class Gui extends Application implements View {
     TokenColor token
   ) {
     View.super.playerSetToken(gameId, socketID, nickname, token);
-    if (gameId.equals(localModel.getGameId().get())) {
+    if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawNicknameChoice();
         client.getObjectiveCards();
@@ -1564,6 +1564,14 @@ public class Gui extends Application implements View {
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) {
     View.super.lobbyInfo(usersInfo);
+    if (
+      localModel
+        .getLocalLobby()
+        .getPlayers()
+        .get(localModel.getSocketID())
+        .getToken() ==
+      null
+    ) drawAvailableTokenColors();
   }
 
   @Override

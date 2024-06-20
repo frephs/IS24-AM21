@@ -564,6 +564,7 @@ public class LocalModelContainer implements GameEventListener {
           .getTokenColor()
           .ifPresent(token -> setPlayerToken(uuid, token));
       });
+
     clientContextContainer.set(ClientContext.LOBBY);
   }
 
