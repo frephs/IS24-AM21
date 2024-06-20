@@ -31,6 +31,7 @@ class CliPrintableTest {
     );
 
     Cli.Options options = new Cli.Options(true);
+    new Cli(options);
 
     try {
       System.out.println(resourceDeck.draw().cardToAscii());
