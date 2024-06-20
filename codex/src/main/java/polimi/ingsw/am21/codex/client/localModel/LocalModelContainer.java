@@ -332,6 +332,10 @@ public class LocalModelContainer implements GameEventListener {
       lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
     }
 
+    if (socketID.equals(this.socketId)) {
+      clientContextContainer.set(ClientContext.GAME);
+    }
+
     LocalPlayer player = lobby.getPlayers().get(socketID);
 
     player.setNickname(nickname);
