@@ -811,7 +811,14 @@ public class GameController {
                       .collect(
                         Collectors.toMap(
                           Map.Entry::getKey,
-                          entry2 -> entry2.getValue().getId()
+                          entry2 ->
+                            new Pair<>(
+                              entry2.getValue().getId(),
+                              entry2
+                                .getValue()
+                                .getPlayedSideType()
+                                .orElseThrow()
+                            )
                         )
                       ),
                     playerBoard
@@ -825,7 +832,9 @@ public class GameController {
                       : null,
                     playerBoard.getAvailableSpots(),
                     playerBoard.getForbiddenSpots(),
-                    game.getPlayers().indexOf(player)
+                    game.getPlayers().indexOf(player),
+                    playerBoard.getResources(),
+                    playerBoard.getObjects()
                   )
                 );
               } catch (PlayerNotFoundGameException e) {

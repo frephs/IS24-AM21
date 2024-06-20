@@ -79,8 +79,10 @@ public class Gui extends Application implements View {
    * The index of the hand that is currently selected, null otherwise
    */
   private Integer selectedHandIndex = null;
-
-  // TODO track what user is being displayed
+  /**
+   * The nickname of the user whose playerboard is currently displayed
+   */
+  private String visibleUserNickname;
 
   private static Stage primaryStage;
   private static NotificationLoader notificationLoader;
@@ -656,8 +658,8 @@ public class Gui extends Application implements View {
     );
 
     playerBoardChoiceBox.setOnAction(event -> {
-      String selectedPlayerNickname = playerBoardChoiceBox.getValue();
-      drawPlayerBoard(selectedPlayerNickname);
+      visibleUserNickname = playerBoardChoiceBox.getValue();
+      drawPlayerBoard(visibleUserNickname);
     });
 
     // Draw the default player board
@@ -774,9 +776,12 @@ public class Gui extends Application implements View {
         .getLocalGameBoard()
         .getCurrentPlayer()
         .getNickname()
-        .equals(localModel.getLocalGameBoard().getPlayer().getNickname())
+        .equals(localModel.getLocalGameBoard().getPlayer().getNickname()) &&
+      visibleUserNickname != null &&
+      visibleUserNickname.equals(
+        localModel.getLocalGameBoard().getPlayer().getNickname()
+      )
     );
-    // TODO && displayedUser == player
   }
 
   /**

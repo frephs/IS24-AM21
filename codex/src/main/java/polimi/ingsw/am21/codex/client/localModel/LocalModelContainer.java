@@ -326,73 +326,7 @@ public class LocalModelContainer implements GameEventListener {
     Integer starterCardID,
     CardSideType starterSide
   ) {
-    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
-
-    if (lobby.getPlayers().get(socketId) == null) {
-      lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
-    }
-
-    if (socketID.equals(this.socketId)) {
-      clientContextContainer.set(ClientContext.GAME);
-    }
-
-    LocalPlayer player = lobby.getPlayers().get(socketID);
-
-    player.setNickname(nickname);
-    player.setToken(color);
-    player.setConnectionStatus(
-      GameController.UserGameContext.ConnectionStatus.CONNECTED
-    );
-
-    // Initialize hand
-    List<Card> hand = cardsLoader.getCardsFromIds(handIDs);
-    player.setHand(hand);
-
-    // Initialize played cards
-    PlayableCard starterCard = (PlayableCard) cardsLoader.getCardFromId(
-      starterCardID
-    );
-    player
-      .getPlayedCards()
-      .put(new Position(), new Pair<>(starterCard, starterSide));
-
-    // Initialize resource and object counts ...
-    starterCard.setPlayedSideType(starterSide);
-
-    // ... counting the ones in the corners ...
-    starterCard
-      .getPlayedSide()
-      .ifPresent(side ->
-        side
-          .getCorners()
-          .values()
-          .forEach(corner ->
-            corner
-              .getContent()
-              .ifPresent(content -> {
-                if (ResourceType.has(content)) player.addResource(
-                  (ResourceType) content,
-                  1
-                );
-                else if (ObjectType.has(content)) player.addObjects(
-                  (ObjectType) content,
-                  1
-                );
-              })));
-
-    // ... and the permanent resources in the back (if the back side is played)
-    if (starterSide == CardSideType.BACK) {
-      starterCard
-        .getPlayedSide()
-        .ifPresent(
-          side ->
-            ((PlayableBackSide) side).getPermanentResources()
-              .forEach(resource -> player.addResource(resource, 1))
-        );
-    }
-
-    // Add the player to the game board
-    gameBoard.getPlayers().add(player);
+    // Players are initialized in gameStarted
   }
 
   @Override
@@ -400,37 +334,42 @@ public class LocalModelContainer implements GameEventListener {
     if (this.gameBoard.getGameId().equals(gameId)) {
       gameBoard.getPlayers().clear();
 
+        clientContextContainer.set(ClientContext.GAME);
+
       gameInfo
         .getUsers()
         .forEach((GameInfo.GameInfoUser player) -> {
           LocalPlayer localPlayer = lobby
             .getPlayers()
             .get(player.getSocketID());
+
+          // Initialize lobby info
           localPlayer.setNickname(player.getNickname());
           localPlayer.setToken(player.getTokenColor());
           localPlayer.setHand(cardsLoader.getCardsFromIds(player.getHandIDs()));
-          localPlayer.setPoints(player.getPoints());
           if (player.getSecretObjectiveCard().isPresent()) {
             localPlayer.setObjectiveCard(
               cardsLoader.getCardFromId(player.getSecretObjectiveCard().get())
             );
           }
+
           localPlayer.setPoints(localPlayer.getPoints());
+          localPlayer.setConnectionStatus(player.getConnectionStatus());
+
+          // Initialize played cards & player board info
+          player
+            .getPlayedCards()
+            .forEach((position, cardInfo) -> {
+              PlayableCard card = (PlayableCard) cardsLoader.getCardFromId(
+                cardInfo.getKey()
+              );
+              localPlayer.addPlayedCards(card, cardInfo.getValue(), position);
+            });
           localPlayer.setAvailableSpots(player.getAvailableSpots());
           localPlayer.setForbiddenSpots(player.getForbiddenSpots());
-          localPlayer.setConnectionStatus(player.getConnectionStatus());
-          gameBoard.setGoldCards(
-            CardPair.fromCardIndexPair(cardsLoader, gameInfo.getGoldCards())
-          );
-          gameBoard.setObjectiveCards(
-            CardPair.fromCardIndexPair(
-              cardsLoader,
-              gameInfo.getObjectiveCards()
-            )
-          );
-          gameBoard.setResourceCards(
-            CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
-          );
+          localPlayer.getResources().putAll(player.getResources());
+          localPlayer.getObjects().putAll(player.getObjects());
+
           gameBoard.getPlayers().add(localPlayer);
         });
 
@@ -442,6 +381,16 @@ public class LocalModelContainer implements GameEventListener {
           break;
         }
       }
+
+      gameBoard.setGoldCards(
+        CardPair.fromCardIndexPair(cardsLoader, gameInfo.getGoldCards())
+      );
+      gameBoard.setObjectiveCards(
+        CardPair.fromCardIndexPair(cardsLoader, gameInfo.getObjectiveCards())
+      );
+      gameBoard.setResourceCards(
+        CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
+      );
 
       gameBoard.setResourceDeckTopCard(
         (PlayableCard) cardsLoader.getCardFromId(

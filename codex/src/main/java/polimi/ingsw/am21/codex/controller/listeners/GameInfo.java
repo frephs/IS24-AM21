@@ -2,12 +2,16 @@ package polimi.ingsw.am21.codex.controller.listeners;
 
 import java.io.Serializable;
 import java.util.*;
+import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardIndexPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
+import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class GameInfo implements Serializable {
@@ -18,26 +22,30 @@ public class GameInfo implements Serializable {
     private final TokenColor tokenColor;
     private final UUID socketID;
     private final GameController.UserGameContext.ConnectionStatus connectionStatus;
-    private final Map<Position, Integer> playedCards;
+    private final Map<Position, Pair<Integer, CardSideType>> playedCards;
     private final List<Integer> handIDs;
     private final Integer points;
     private final Integer secretObjectiveCard;
     private final Set<Position> availableSpots;
     private final Set<Position> forbiddenSpots;
     private final Integer index;
+    private final Map<ResourceType, Integer> resources;
+    private final Map<ObjectType, Integer> objects;
 
     public GameInfoUser(
       String nickname,
       TokenColor tokenColor,
       UUID socketID,
       GameController.UserGameContext.ConnectionStatus connectionStatus,
-      Map<Position, Integer> playedCards,
+      Map<Position, Pair<Integer, CardSideType>> playedCards,
       List<Integer> handIDs,
       Integer points,
       Integer secretObjectiveCard,
       Set<Position> availableSpots,
       Set<Position> forbiddenSpots,
-      Integer index
+      Integer index,
+      Map<ResourceType, Integer> resources,
+      Map<ObjectType, Integer> objects
     ) {
       this.nickname = nickname;
       this.tokenColor = tokenColor;
@@ -50,6 +58,8 @@ public class GameInfo implements Serializable {
       this.availableSpots = availableSpots;
       this.forbiddenSpots = forbiddenSpots;
       this.index = index;
+      this.resources = resources;
+      this.objects = objects;
     }
 
     public String getNickname() {
@@ -68,7 +78,7 @@ public class GameInfo implements Serializable {
       return connectionStatus;
     }
 
-    public Map<Position, Integer> getPlayedCards() {
+    public Map<Position, Pair<Integer, CardSideType>> getPlayedCards() {
       return playedCards;
     }
 
@@ -94,6 +104,14 @@ public class GameInfo implements Serializable {
 
     public Integer getIndex() {
       return index;
+    }
+
+    public Map<ResourceType, Integer> getResources() {
+      return resources;
+    }
+
+    public Map<ObjectType, Integer> getObjects() {
+      return objects;
     }
   }
 
