@@ -103,17 +103,9 @@ public class Gui extends Application implements View {
       primaryStage.setX((screenBounds.getWidth() - 405) / 2);
       primaryStage.setY((screenBounds.getHeight() - 405) / 2);
 
-      //primary stage substages
-      Stage noticationStage = new Stage();
-      noticationStage.initOwner(primaryStage);
-      Stage exceptionStage = new Stage();
-      exceptionStage.initOwner(primaryStage);
-      Stage rulebookStage = new Stage();
-      rulebookStage.initOwner(primaryStage);
-
-      notificationLoader = new NotificationLoader(noticationStage);
-      exceptionLoader = new ExceptionLoader(exceptionStage);
-      rulebookHandler = new RulebookHandler(rulebookStage);
+      notificationLoader = new NotificationLoader(new Stage());
+      exceptionLoader = new ExceptionLoader(new Stage());
+      rulebookHandler = new RulebookHandler(new Stage());
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);

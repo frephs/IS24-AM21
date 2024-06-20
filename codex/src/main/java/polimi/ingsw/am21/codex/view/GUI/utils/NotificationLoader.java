@@ -40,6 +40,7 @@ public class NotificationLoader {
     notificationStage.setX(((screenBounds.getWidth() - 500) / 2));
     notificationStage.setY(130);
 
+    notificationStage.setAlwaysOnTop(true);
     notificationStage.initStyle(StageStyle.TRANSPARENT);
     notificationStage.initModality(Modality.NONE);
   }
@@ -70,6 +71,7 @@ public class NotificationLoader {
 
       notificationScene.setFill(Color.TRANSPARENT);
       notificationStage.setScene(notificationScene);
+      notificationStage.show();
 
       notification.startProgressBar(2000, true);
 
