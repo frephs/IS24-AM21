@@ -93,9 +93,7 @@ public class Main {
 
   public static void main(String[] args)
     throws MalformedURLException, NotBoundException, RemoteException {
-    //TODO: cli helper to handle all launching modes
-
-    //    printAsciiArt();
+    printAsciiArt();
 
     if (Arrays.asList(args).contains("--help")) {
       printHelp();
