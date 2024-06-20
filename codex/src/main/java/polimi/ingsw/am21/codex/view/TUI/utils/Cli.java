@@ -196,30 +196,36 @@ public class Cli implements View {
       .stream()
       .toList();
 
-    printUpdate(
-      CliUtils.getTable(
-        new String[] {
-          "GameId",
-          "Current number of players",
-          "Max number of players",
-        },
-        new ArrayList<>(
-          gameEntries.stream().map(GameEntry::getGameId).toList()
-        ),
-        new ArrayList<>(
-          gameEntries
-            .stream()
-            .map(gameEntry -> String.valueOf(gameEntry.getCurrentPlayers()))
-            .toList()
-        ),
-        new ArrayList<>(
-          gameEntries
-            .stream()
-            .map(gameEntry -> String.valueOf(gameEntry.getMaxPlayers()))
-            .toList()
+    if (!gameEntries.isEmpty()) {
+      printUpdate(
+        CliUtils.getTable(
+          new String[] {
+            "GameId",
+            "Current number of players",
+            "Max number of players",
+          },
+          new ArrayList<>(
+            gameEntries.stream().map(GameEntry::getGameId).toList()
+          ),
+          new ArrayList<>(
+            gameEntries
+              .stream()
+              .map(gameEntry -> String.valueOf(gameEntry.getCurrentPlayers()))
+              .toList()
+          ),
+          new ArrayList<>(
+            gameEntries
+              .stream()
+              .map(gameEntry -> String.valueOf(gameEntry.getMaxPlayers()))
+              .toList()
+          )
         )
-      )
-    );
+      );
+    } else {
+      printUpdate(
+        "No games available, create one with `create-game <name> <players>`"
+      );
+    }
   }
 
   @Override
