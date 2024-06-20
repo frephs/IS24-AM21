@@ -681,6 +681,8 @@ public class Gui extends Application implements View {
   @Override
   public void drawPlayerBoard(String nickname) {
     Platform.runLater(() -> {
+      updateGameBoardDrawAbility();
+
       ScrollPane scrollPane = (ScrollPane) scene.lookup(
         "#playerboard-scrollpane"
       );
@@ -887,6 +889,19 @@ public class Gui extends Application implements View {
   }
 
   /**
+   * Updates whether the style of the gameboard container, so that the player can
+   * see when they can draw cards
+   */
+  private void updateGameBoardDrawAbility() {
+    ScrollPane container = ((ScrollPane) scene.lookup("#gameboard-container"));
+    if (canPlayerDrawCards()) {
+      container.getContent().getStyleClass().add("allow-draw");
+    } else {
+      container.getContent().getStyleClass().clear();
+    }
+  }
+
+  /**
    * Display the game is over and the final leaderboard
    * */
   @Override
@@ -973,6 +988,8 @@ public class Gui extends Application implements View {
   @Override
   public void drawPairs() {
     Platform.runLater(() -> {
+      updateGameBoardDrawAbility();
+
       VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
           "#gameboard-container"
         )).getContent();
