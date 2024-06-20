@@ -209,11 +209,6 @@ public abstract class ClientConnectionHandler {
       GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_FAILED);
     this.getView().displayException(e);
-    this.getView()
-      .postNotification(
-        NotificationType.WARNING,
-        "Try reconnecting using: reconnect [host port]"
-      );
   }
 
   private void failedHeartBeat() {
