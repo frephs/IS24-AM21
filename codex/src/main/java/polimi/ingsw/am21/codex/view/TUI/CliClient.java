@@ -271,7 +271,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "list-games",
+        "show games",
         "List available games",
         ClientContext.MENU
       ) {
@@ -704,25 +704,12 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          if (
-            command.length < 3 ||
-            !List.of(
-              "draw",
-              "deck",
-              "resource1",
-              "gold1",
-              "resource2",
-              "gold2"
-            ).contains(command[1])
-          ) {
-            view.postNotification(NotificationType.WARNING, "Invalid command");
-            return;
-          }
-
           DrawingCardSource source = command[2].endsWith("1")
             ? DrawingCardSource.CardPairFirstCard
             : DrawingCardSource.CardPairSecondCard;
-          DrawingDeckType type = command[2].equals("resource")
+          DrawingDeckType type = command[2].split("1")[0].split("2")[0].equals(
+                "resource"
+              )
             ? DrawingDeckType.RESOURCE
             : DrawingDeckType.GOLD;
           client.nextTurn(source, type);
