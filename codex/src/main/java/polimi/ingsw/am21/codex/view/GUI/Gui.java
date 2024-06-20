@@ -114,6 +114,8 @@ public class Gui extends Application implements View {
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
 
+      primaryStage.getIcons().add(loadImage("icon.png").getImage());
+
       primaryStage.show();
     } catch (IOException e) {
       // TODO: Handle exception
