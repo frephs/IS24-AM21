@@ -325,7 +325,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "create-game <game-id> <number-of-players>",
         "Create a new game",
-        ClientContext.ALL
+        ClientContext.MENU
       ) {
         @Override
         public void handle(String[] command) {
@@ -345,7 +345,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "create-game-join <game-id> <number-of-players>",
         "Create a new game and join it.",
-        ClientContext.ALL
+        ClientContext.MENU
       ) {
         @Override
         public void handle(String[] command) {
@@ -436,7 +436,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "get-starter-card",
+        "get-starter",
         "Get the starter card to place",
         ClientContext.LOBBY
       ) {
@@ -471,7 +471,7 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "show context",
         "Show the client current context",
-        ClientContext.MENU
+        ClientContext.ALL
       ) {
         @Override
         public void handle(String[] command) {
@@ -525,7 +525,75 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "show <playerboard|leaderboard|card|hand|objective|pairs>",
+        "show playerboard <nickname>",
+        "Show the playerboard of the given player",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          view
+            .getLocalModel()
+            .getLocalGameBoard()
+            .getPlayerByNickname(command[2])
+            .ifPresentOrElse(
+              player -> cli.drawPlayerBoard(command[2]),
+              () ->
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Player not found"
+                )
+            );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "show card <id>",
+        "Show the card of the given id",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          // TODO right now, just go by id; in the future we can switch to something better
+
+          // Parse the card id
+          int cardId;
+          try {
+            cardId = Integer.parseInt(command[2]);
+          } catch (NumberFormatException e) {
+            cli.postNotification(NotificationType.WARNING, "Invalid card id");
+            return;
+          }
+
+          Card card = view
+            .getLocalModel()
+            .getLocalGameBoard()
+            .getPlayers()
+            .stream()
+            .flatMap(player ->
+              Stream.concat(
+                // Get cards from the player hands
+                player.getHand().stream(),
+                // Get cards from the player boards
+                player.getPlayedCards().values().stream().map(Pair::getKey)
+              ))
+            .filter(c -> c.getId() == cardId)
+            .findFirst()
+            .orElse(null);
+
+          if (card == null) {
+            cli.postNotification(NotificationType.WARNING, "Card not found");
+          } else {
+            cli.drawCard(card);
+          }
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "show <playerboard|leaderboard|hand|secret-objective|pairs>",
         "Show game information",
         ClientContext.GAME
       ) {
@@ -533,73 +601,27 @@ public class CliClient extends ViewClient {
         public void handle(String[] command) {
           switch (command[1]) {
             case "playerboard":
-              final String nickname = command[2];
-              view
-                .getLocalModel()
-                .getLocalGameBoard()
-                .getPlayerByNickname(nickname)
-                .ifPresentOrElse(
-                  player -> cli.drawPlayerBoard(nickname),
-                  () -> cli.drawPlayerBoard()
-                );
+              view.drawPlayerBoard(
+                view.getLocalModel().getLocalGameBoard().getPlayerNickname()
+              );
               break;
             case "leaderboard":
               cli.drawLeaderBoard();
               break;
-            case "card":
-              // TODO right now, just go by id; in the future we can switch to something better
-
-              // Parse the card id
-              int cardId;
-              try {
-                cardId = Integer.parseInt(command[2]);
-              } catch (NumberFormatException e) {
-                cli.postNotification(
-                  NotificationType.WARNING,
-                  "Invalid card id"
-                );
-                return;
-              }
-
-              // TODO find a way to display ANY possible card, not just the played/playable ones
-              Card card = view
-                .getLocalModel()
-                .getLocalGameBoard()
-                .getPlayers()
-                .stream()
-                .flatMap(player ->
-                  Stream.concat(
-                    // Get cards from the player hands
-                    player.getHand().stream(),
-                    // Get cards from the player boards
-                    player.getPlayedCards().values().stream().map(Pair::getKey)
-                  ))
-                .filter(c -> c.getId() == cardId)
-                .findFirst()
-                .orElse(null);
-
-              if (card == null) {
-                cli.postNotification(
-                  NotificationType.WARNING,
-                  "Card not found"
-                );
-              } else {
-                cli.drawCard(card);
-              }
-              break;
             case "hand":
               cli.drawHand();
               break;
-            case "objective":
+            case "secret-objective":
               cli.drawCard(
                 view.getLocalModel().getLocalGameBoard().getSecretObjective()
               );
               break;
+            //TODO decks, and common objectives
             case "pairs":
               cli.drawPairs();
               break;
             default:
-            // TODO Handle invalid command
+              break;
           }
         }
       }
@@ -620,7 +642,10 @@ public class CliClient extends ViewClient {
             ) ||
             !List.of("front", "back").contains(command[4])
           ) {
-            view.postNotification(NotificationType.ERROR, "Invalid place call");
+            view.postNotification(
+              NotificationType.ERROR,
+              "Invalid card place call"
+            );
             return;
           }
           int handIndex;
