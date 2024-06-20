@@ -56,58 +56,68 @@ public class CliClient extends ViewClient {
 
         Set<CommandHandler> matchingCommands = commandHandlers
           .stream()
-          .filter(commandHandler -> {
-            String usage = commandHandler.getUsage();
-            String[] commandParts = usage
-              .replaceAll("<[a-zA-Z0-9 ]+>", "<>")
-              .split(" ");
-            if (commandParts.length != command.length) {
-              return false;
-            }
-            for (int i = 0; i < commandParts.length; ++i) {
-              if (
-                commandParts[i].startsWith("<") && commandParts[i].endsWith(">")
-              ) {
-                continue;
-              }
-              if (!commandParts[i].equals(command[i])) {
-                return false;
-              }
-            }
-            return true;
-          })
+          .filter(
+            commandHandler ->
+              commandHandler.getUsage().split(" ")[0].equals(command[0])
+          )
           .collect(Collectors.toSet());
-
         if (!matchingCommands.isEmpty()) {
-          Set<CommandHandler> matchingUsages = matchingCommands
+          Set<CommandHandler> matchingContext = matchingCommands
             .stream()
-            .filter(commandHandlers -> commandHandlers.matchUsageString(line))
-            .collect(Collectors.toSet());
-          if (matchingUsages.isEmpty() && !line.isEmpty()) {
-            matchingCommands.forEach(
+            .filter(
               commandHandler ->
+                commandHandler
+                  .getContext()
+                  .map(
+                    commandContext ->
+                      commandContext == ClientContext.ALL ||
+                      commandContext.equals(
+                        getClientContextContainer().get().get()
+                      )
+                  )
+                  .orElse(false)
+            )
+            .collect(Collectors.toSet());
+          if (!matchingContext.isEmpty()) {
+            Set<CommandHandler> matchingUsages = matchingContext
+              .stream()
+              .filter(commandHandlers -> commandHandlers.matchUsageString(line))
+              .collect(Collectors.toSet());
+
+            if (matchingUsages.isEmpty() && !line.isEmpty()) {
+              matchingContext.forEach(
+                commandHandler ->
+                  cli.postNotification(
+                    NotificationType.WARNING,
+                    "Invalid usage. You may try with: " +
+                    commandHandler.getUsage()
+                  )
+              );
+            } else if (!line.isEmpty()) {
+              try {
+                matchingUsages.forEach(
+                  commandHandlers -> commandHandlers.handle(line.split(" "))
+                );
+              } catch (Exception e) {
                 cli.postNotification(
-                  NotificationType.WARNING,
-                  "Invalid command. You maybe looking for: " +
-                  commandHandler.getUsage()
-                )
-            );
-          } else if (!line.isEmpty()) {
-            try {
-              matchingCommands.forEach(
-                commandHandlers -> commandHandlers.handle(line.split(" "))
-              );
-            } catch (Exception e) {
-              cli.postNotification(
-                NotificationType.ERROR,
-                "An error occurred while executing the command. \n"
-              );
-              cli.displayException(e);
+                  NotificationType.ERROR,
+                  "An error occurred while executing the command. \n"
+                );
+                cli.displayException(e);
+              }
             }
           } else {
             cli.postNotification(
               NotificationType.WARNING,
-              "The command is not available in the current context"
+              "The command is not available in the current context (" +
+              getClientContextContainer().get().toString() +
+              "), you can use it only in " +
+              matchingCommands
+                .stream()
+                .map(
+                  commandHandler -> commandHandler.getContext().get().toString()
+                )
+                .collect(Collectors.joining(", "))
             );
           }
         } else {
