@@ -58,7 +58,7 @@ public class DummyView implements View {
   ) {}
 
   @Override
-  public void connected() {}
+  public void listGames() {}
 
   @Override
   public void displayException(Exception e) {

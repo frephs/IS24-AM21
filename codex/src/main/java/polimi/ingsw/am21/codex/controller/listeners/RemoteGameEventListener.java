@@ -22,6 +22,12 @@ public interface RemoteGameEventListener extends Remote {
   void gameCreated(String gameId, int currentPlayers, int maxPlayers)
     throws RemoteException;
 
+  void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) throws RemoteException;
+
   void gameDeleted(String gameId) throws RemoteException;
 
   void playerJoinedLobby(String gameId, UUID socketID) throws RemoteException;

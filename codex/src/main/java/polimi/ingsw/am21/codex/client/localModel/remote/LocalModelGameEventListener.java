@@ -36,6 +36,15 @@ public class LocalModelGameEventListener
   }
 
   @Override
+  public void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) throws RemoteException {
+    listener.refreshLobbies(lobbyIds, currentPlayers, maxPlayers);
+  }
+
+  @Override
   public void gameDeleted(String gameId) throws RemoteException {
     listener.gameDeleted(gameId);
   }
