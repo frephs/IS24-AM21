@@ -133,9 +133,13 @@ public interface View extends GameEventListener {
     postNotification(
       NotificationType.UPDATE,
       new String[] {
-        "A Player ",
-        nickname != null ? nickname : socketID.toString().substring(0, 6),
-        " has set their token to ",
+        getLocalModel().getSocketID().equals(socketID)
+          ? "You"
+          : ("The player " +
+            (nickname != null
+                ? nickname
+                : socketID.toString().substring(0, 6))),
+        " set their token to ",
       },
       token,
       3
