@@ -613,7 +613,11 @@ public class CliClient extends ViewClient {
               break;
             case "secret-objective":
               cli.drawCard(
-                view.getLocalModel().getLocalGameBoard().getSecretObjective()
+                view
+                  .getLocalModel()
+                  .getLocalGameBoard()
+                  .getPlayer()
+                  .getObjectiveCard()
               );
               break;
             case "pairs":
