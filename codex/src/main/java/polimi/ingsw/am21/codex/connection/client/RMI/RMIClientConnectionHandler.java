@@ -158,7 +158,7 @@ public class RMIClientConnectionHandler
 
   @Override
   public void showAvailableTokens() {
-    this.gameEventHandler.getLocalModel().showAvailableTokens();
+    this.gameEventHandler.drawAvailableTokenColors();
   }
 
   @Override

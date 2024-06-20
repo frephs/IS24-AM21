@@ -264,7 +264,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   @Override
   public void showAvailableTokens() {
-    gameEventHandler.getLocalModel().showAvailableTokens();
+    gameEventHandler.drawAvailableTokenColors();
   }
 
   @Override

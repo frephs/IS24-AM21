@@ -530,8 +530,13 @@ public class ClientGameEventHandler
     view.getObjectiveCards(objectiveCards);
   }
 
+  @Override
   public void getStarterCard(Integer cardId) {
     localModel.getStarterCard(cardId);
     view.getStarterCard(cardId);
+  }
+
+  public void drawAvailableTokenColors() {
+    view.drawAvailableTokenColors();
   }
 }
