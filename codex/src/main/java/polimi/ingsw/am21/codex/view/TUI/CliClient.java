@@ -252,7 +252,7 @@ public class CliClient extends ViewClient {
             .forEach(commandHandler -> {
               usages.add(commandHandler.getUsage());
               contexts.add(
-                commandHandler.getContext().toString().toLowerCase()
+                commandHandler.getContext().get().toString().toLowerCase()
               );
               descriptions.add(commandHandler.getDescription());
             });
