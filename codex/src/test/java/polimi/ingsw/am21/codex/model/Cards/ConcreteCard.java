@@ -20,12 +20,10 @@ class ConcreteCard extends Card {
 
   @Override
   public String cardToString() {
-    // TODO: Implement TUI method
     return "";
   }
 
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
-    // TODO: Implement TUI method
     return "";
   }
 }

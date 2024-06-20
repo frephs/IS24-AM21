@@ -143,7 +143,8 @@ public class PlayableCard extends Card {
 
   @Override
   public String cardToString() {
-    // TODO: Implement TUI method
-    return "";
+    String frontSideString = frontSide.cardToString();
+    String backSideString = backSide.cardToString();
+    return CliUtils.joinMinLines(frontSideString, backSideString);
   }
 }

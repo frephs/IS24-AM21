@@ -83,10 +83,4 @@ public abstract class PlayableSide implements CliCard {
 
     return CliCard.playableCardToAscii(cardStringMap);
   }
-
-  @Override
-  public String cardToString() {
-    // TODO add cardToString implementation
-    return "";
-  }
 }

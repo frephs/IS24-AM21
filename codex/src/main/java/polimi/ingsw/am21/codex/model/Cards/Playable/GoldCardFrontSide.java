@@ -102,12 +102,6 @@ public class GoldCardFrontSide extends ResourceCardFrontSide {
     };
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     pointCondition.ifPresent(pointConditionType -> {
