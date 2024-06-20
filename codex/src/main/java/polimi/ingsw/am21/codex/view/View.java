@@ -296,8 +296,9 @@ public interface View extends GameEventListener {
       (isLastRound ? " (last round)" : "")
     );
 
-    drawLeaderBoard();
     drawHand();
+    drawLeaderBoard();
+    drawPlayerBoard();
   }
 
   @Override
@@ -320,6 +321,7 @@ public interface View extends GameEventListener {
     );
 
     drawHand();
+    //drawLeaderBoard();
     drawPlayerBoard();
   }
 
