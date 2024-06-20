@@ -43,7 +43,7 @@
                </HBox.margin>
             </ChoiceBox>
             <TextField id="chat-input" prefHeight="39.0" prefWidth="363.0" promptText="Your chat message" />
-            <Button id="chat-send-button" mnemonicParsing="false" prefHeight="0.0" prefWidth="98.0" stylesheets="@Style.css" text="Send">
+            <Button id="chat-send-button" mnemonicParsing="false" prefHeight="39.0" prefWidth="162.0" stylesheets="@Style.css" text="Send">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
