@@ -156,7 +156,7 @@ public class CliClient extends ViewClient {
       // TODO fix this regex
       String regex = usage
         .replaceAll("<[^>]+>", "\\\\S+")
-        .replaceAll("\\[([^\\]]+)\\]", "(?:$1)?")
+        .replaceAll("\\[([^]]+)]", "(?:$1)?")
         .replaceAll("\\|", "|")
         .replaceAll(" ", "\\\\s+"); // Allow optional spaces
 
