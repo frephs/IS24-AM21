@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="AM21_linux">
+  <artifact type="jar" name="AM21_linux">
     <output-path>$PROJECT_DIR$/out/artifacts/AM21_linux</output-path>
     <root id="archive" name="AM21_linux.jar">
       <element id="module-output" name="AM21" />
