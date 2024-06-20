@@ -23,6 +23,7 @@ public class DummyView implements View {
     super();
     this.id = id;
     this.options = new Cli.Options(true);
+    new Cli(options);
   }
 
   @Override
