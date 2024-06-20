@@ -857,6 +857,12 @@ public class Gui extends Application implements View {
   public void drawGame() {
     Platform.runLater(() -> {
       loadSceneFXML("GameBoard.fxml", "#side-content");
+      primaryStage.setTitle(
+        primaryStage.getTitle() +
+        " [" +
+        localModel.getLocalGameBoard().getPlayer().getNickname() +
+        "]"
+      );
       drawChat();
       drawGameBoard();
       drawPlayerBoards();
