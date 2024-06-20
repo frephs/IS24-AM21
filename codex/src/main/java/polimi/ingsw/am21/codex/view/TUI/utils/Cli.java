@@ -135,8 +135,12 @@ public class Cli implements View {
   }
 
   @Override
-  public void connected() {
-    postNotification(NotificationType.CONFIRM, "Successfully to the server");
+  public void listGames() {
+    postNotification(
+      NotificationType.CONFIRM,
+      "Successfully sent to the server"
+    );
+    drawAvailableGames();
   }
 
   void diffMessage(int diff, String attributeName) {

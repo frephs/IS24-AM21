@@ -168,6 +168,13 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
+  public void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {}
+
+  @Override
   public void gameDeleted(String gameId) {
     broadcast.accept(new GameDeletedMessage(gameId));
   }

@@ -13,6 +13,13 @@ public interface GameEventListener extends RemoteGameEventListener {
   void gameCreated(String gameId, int currentPlayers, int maxPlayers);
 
   @Override
+  void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  );
+
+  @Override
   void gameDeleted(String gameId);
 
   @Override

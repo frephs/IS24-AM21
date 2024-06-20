@@ -78,7 +78,7 @@ public class RMIClientConnectionHandler
       Map<String, Integer> maxPlayers =
         rmiConnectionHandler.getGamesMaxPlayers();
 
-      gameEventHandler.connected();
+      gameEventHandler.listGames();
 
       games.forEach(game -> {
         this.gameEventHandler.gameCreated(
@@ -166,6 +166,7 @@ public class RMIClientConnectionHandler
   public void lobbySetNickname(String nickname) {
     try {
       rmiConnectionHandler.lobbySetNickname(this.getSocketID(), nickname);
+      this.getObjectiveCards();
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {

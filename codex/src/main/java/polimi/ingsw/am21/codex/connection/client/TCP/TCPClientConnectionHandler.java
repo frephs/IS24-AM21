@@ -13,6 +13,7 @@ import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.messages.ClientMessage;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
@@ -158,6 +159,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       if (!waiting || !message.getType().isClientRequest()) {
         try {
           if (socket.isConnected() && !socket.isClosed()) {
+            if (message.getType() != MessageType.HEART_BEAT) System.out.println(
+              "Sending " + message.getType()
+            );
             outputStream.writeObject(message);
             outputStream.flush();
             outputStream.reset();
@@ -388,6 +392,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       this.waiting = false;
     }
 
+    System.out.println("Received " + message.getType());
+
     switch (message.getType()) {
       // Server Responses
       // Lobby
@@ -461,18 +467,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
-    gameEventHandler.connected();
-
-    message
-      .getLobbyIds()
-      .forEach(
-        id ->
-          gameEventHandler.gameCreated(
-            id,
-            message.getCurrentPlayers().get(id),
-            message.getMaxPlayers().get(id)
-          )
-      );
+    gameEventHandler.refreshLobbies(
+      message.getLobbyIds(),
+      message.getCurrentPlayers(),
+      message.getMaxPlayers()
+    );
   }
 
   public void handleMessage(ObjectiveCardsMessage message) {
@@ -560,6 +559,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getSocketId(),
       message.getNickname()
     );
+    if (message.getSocketId().equals(this.getSocketID())) getObjectiveCards();
   }
 
   public void handleMessage(PlayerSetTokenColorMessage message) {

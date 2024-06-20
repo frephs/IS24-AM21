@@ -101,14 +101,24 @@ public class ClientGameEventHandler
     }
   }
 
-  public void connected() {
-    view.connected();
+  public void listGames() {
+    view.listGames();
   }
 
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
     localModel.gameCreated(gameId, currentPlayers, maxPlayers);
     view.gameCreated(gameId, currentPlayers, maxPlayers);
+  }
+
+  @Override
+  public void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
+    localModel.refreshLobbies(lobbyIds, currentPlayers, maxPlayers);
+    view.refreshLobbies(lobbyIds, currentPlayers, maxPlayers);
   }
 
   @Override

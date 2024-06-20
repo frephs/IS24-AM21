@@ -17,6 +17,7 @@ import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
+import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.ConnectMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
@@ -205,6 +206,9 @@ public class TCPServerConnectionHandler implements Runnable {
   /** Determines the message type and calls the appropriate method based on that */
   private void handleMessage(Message message)
     throws NotAClientMessageException {
+    if (message.getType() != MessageType.HEART_BEAT) System.out.println(
+      "Received " + message.getType() + " from " + socket.getInetAddress()
+    );
     switch (message.getType()) {
       case CONNECT -> handleMessage((ConnectMessage) message);
       case HEART_BEAT -> handleMessage((HeartBeatMessage) message);

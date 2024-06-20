@@ -43,6 +43,13 @@ class GameControllerTest {
       throws RemoteException {}
 
     @Override
+    public void refreshLobbies(
+      Set<String> lobbyIds,
+      Map<String, Integer> currentPlayers,
+      Map<String, Integer> maxPlayers
+    ) throws RemoteException {}
+
+    @Override
     public void gameDeleted(String gameId) throws RemoteException {}
 
     @Override

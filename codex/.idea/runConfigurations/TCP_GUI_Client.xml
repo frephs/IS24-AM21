@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="TCP GUI Client" type="Application" factoryName="Application" folderName="Client TCP" singleton="true">
+  <configuration default="false" name="TCP GUI Client" type="Application" factoryName="Application" folderName="Client TCP" singleton="false">
     <option name="MAIN_CLASS_NAME" value="polimi.ingsw.am21.codex.Main" />
     <module name="AM21" />
     <option name="PROGRAM_PARAMETERS" value="--gui " />
