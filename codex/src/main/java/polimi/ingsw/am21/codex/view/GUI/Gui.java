@@ -270,8 +270,15 @@ public class Gui extends Application implements View {
     int colorableIndex
   ) {
     // add colorable.toString in the right index of the messages array
-    String[] messagesWithColorable = new String[messages.length + 1];
-    System.arraycopy(messages, 0, messagesWithColorable, 0, messages.length);
+    List<String> messagesWithColorable = new ArrayList<>(
+      Arrays.stream(messages).toList()
+    );
+    try {
+      messagesWithColorable.add(colorableIndex, colorable.toString());
+    } catch (IndexOutOfBoundsException e) {
+      messagesWithColorable.add(colorable.toString());
+    }
+    postNotification(notificationType, String.join(" ", messagesWithColorable));
 
     Platform.runLater(() -> {
       try {
