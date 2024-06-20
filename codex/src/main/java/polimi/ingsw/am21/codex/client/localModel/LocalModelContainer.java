@@ -3,13 +3,10 @@ package polimi.ingsw.am21.codex.client.localModel;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
-import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -19,23 +16,10 @@ import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.GameState;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.LobbyFullException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Player.IllegalCardSideChoiceException;
-import polimi.ingsw.am21.codex.model.Player.IllegalPlacingPositionException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
-import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
-import polimi.ingsw.am21.codex.view.Notification;
-import polimi.ingsw.am21.codex.view.NotificationType;
-import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
-import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
-import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
-import polimi.ingsw.am21.codex.view.View;
 
-public class LocalModelContainer
-  implements GameEventListener, GameErrorListener {
+public class LocalModelContainer implements GameEventListener {
 
   /**
    * State of the local model
@@ -57,15 +41,17 @@ public class LocalModelContainer
   /**
    * Contains all the players in the game and the gameboard
    * */
-  private LocalGameBoard localGameBoard;
-
-  private final View view;
+  private LocalGameBoard gameBoard;
 
   private final CardsLoader cardsLoader = new CardsLoader();
 
   private UUID socketId;
 
-  private final RemoteGameEventListener listener;
+  /**
+   * A boolean that keeps track of whether the current player has place their card
+   * for their turn
+   */
+  private boolean currentPlayerHasPlacedCard = false;
 
   public class ClientContextContainer {
 
@@ -91,96 +77,36 @@ public class LocalModelContainer
     return clientContextContainer;
   }
 
-  public LocalModelContainer(View view) {
-    this.view = view;
-
-    cardsLoader.loadCards();
-
-    try {
-      listener = new LocalModelGameEventListener(this);
-    } catch (RemoteException e) {
-      // TODO: handle this
-      throw new RuntimeException("Failed creating client", e);
+  public Optional<String> getGameId() {
+    if (lobby != null) {
+      return Optional.ofNullable(lobby.getGameId());
+    } else {
+      return Optional.empty();
     }
+  }
+
+  public LocalModelContainer() {
+    cardsLoader.loadCards();
   }
 
   public void setSocketId(UUID socketId) {
     this.socketId = socketId;
   }
 
-  public RemoteGameEventListener getRemoteListener() {
-    // TODO implement this in TCP or change location.
-    return listener;
-  }
-
   public UUID getSocketID() {
     return socketId;
   }
 
-  public LocalGameBoard getLocalGameBoard() {
-    return localGameBoard;
+  public LocalMenu getLocalMenu() {
+    return menu;
   }
 
   public LocalLobby getLocalLobby() {
     return lobby;
   }
 
-  @Override
-  public void unknownResponse() {
-    // TODO use this
-    view.postNotification(Notification.UNKNOWN_RESPONSE);
-  }
-
-  @Override
-  public void gameAlreadyExists(String gameId) {
-    view.postNotification(
-      NotificationType.ERROR,
-      "Game '" + gameId + "' already exists"
-    );
-    listGames();
-  }
-
-  @Override
-  public void gameAlreadyStarted() {
-    view.postNotification(NotificationType.ERROR, "Game has already started");
-  }
-
-  @Override
-  public void gameNotStarted() {
-    view.postNotification(NotificationType.ERROR, "Game not started");
-  }
-
-  public void createGames(
-    Set<String> gameIds,
-    Map<String, Integer> currentPlayers,
-    Map<String, Integer> maxPlayers
-  ) {
-    // TODO make the server return or send gameEntries?
-    if (gameIds.isEmpty()) {
-      view.postNotification(NotificationType.WARNING, "No games available");
-    } else {
-      gameIds.forEach(
-        gameId ->
-          menu
-            .getGames()
-            .put(
-              gameId,
-              new GameEntry(
-                gameId,
-                currentPlayers.get(gameId),
-                maxPlayers.get(gameId)
-              )
-            )
-      );
-    }
-    listGames();
-  }
-
-  public void listGames() {
-    //TODO make listGames use GameEntries
-    if (state.get().equals(ClientContext.MENU)) {
-      view.drawAvailableGames(menu.getGames().values().stream().toList());
-    }
+  public LocalGameBoard getLocalGameBoard() {
+    return gameBoard;
   }
 
   @Override
@@ -188,7 +114,6 @@ public class LocalModelContainer
     menu
       .getGames()
       .put(gameId, new GameEntry(gameId, currentPlayers, maxPlayers));
-    listGames();
   }
 
   @Override
@@ -198,53 +123,28 @@ public class LocalModelContainer
 
     if (lobby != null && lobby.getGameId().equals(gameId)) {
       lobby = null;
-      localGameBoard = null;
+      gameBoard = null;
     }
-
-    view.postNotification(
-      NotificationType.ERROR,
-      "Game " + gameId + " deleted. "
-    );
-
-    listGames();
   }
 
-  @Override
   public void lobbyFull(String gameId) {
-    view.postNotification(
-      NotificationType.ERROR,
-      "The game lobby of " + gameId + " is full. "
-    );
-  }
-
-  @Override
-  public void gameNotFound(String gameId) {
-    menu.getGames().remove(gameId);
-    view.postNotification(
-      NotificationType.ERROR,
-      "Game " + gameId + " not found. "
-    );
-  }
-
-  @Override
-  public void notInLobby() {
-    view.postNotification(NotificationType.ERROR, "You are not in any lobby. ");
+    menu
+      .getGames()
+      .get(gameId)
+      .setCurrentPlayers(menu.getGames().get(gameId).getMaxPlayers());
   }
 
   public void showAvailableTokens() {
-    getView()
-      .postNotification(
-        NotificationType.RESPONSE,
-        "Available tokens: " +
-        this.lobby.getAvailableTokens()
-          .stream()
-          .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
-          .collect(Collectors.joining(" "))
-      );
-  }
-
-  public void listLobbyPlayers() {
-    view.drawLobby(lobby.getPlayers());
+    //TODO: H: move this inside view
+    //    getView()
+    //      .postNotification(
+    //        NotificationType.RESPONSE,
+    //        "Available tokens: " +
+    //        this.lobby.getAvailableTokens()
+    //          .stream()
+    //          .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
+    //          .collect(Collectors.joining(" "))
+    //      );
   }
 
   /**
@@ -256,63 +156,62 @@ public class LocalModelContainer
    * */
   @Override
   public void playerJoinedLobby(String gameId, UUID socketId) {
+    // update menu
     menu
       .getGames()
       .computeIfPresent(gameId, (gameID, gameEntry) -> {
         gameEntry.setCurrentPlayers(gameEntry.getCurrentPlayers() + 1);
         return gameEntry;
       });
+    //TOdo what if it's not present?
 
-    // Do not draw the lobby in this method, let it be drawn by lobbyInfo
-    // This way we prevent an outdated lobby from being drawn
-
-    if (lobby != null && lobby.getGameId().equals(gameId)) {
-      addToLobby(socketId);
-      view.postNotification(
-        NotificationType.UPDATE,
-        "Player " + socketId + " joined your game " + gameId
-      );
-      lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
-    } else if (socketId.equals(this.socketId)) {
-      state.set(ClientContext.LOBBY);
-      getView()
-        .postNotification(
-          NotificationType.RESPONSE,
-          "You joined the lobby of the game: " + gameId
-        );
-
+    // if it's you, create a new lobby
+    if (this.socketId.equals(socketId)) {
+      clientContextContainer.set(ClientContext.LOBBY);
       lobby = new LocalLobby(gameId);
-      if (!menu.getGames().containsKey(gameId)) this.listGames();
-      localGameBoard = new LocalGameBoard(
+      gameBoard = new LocalGameBoard(
         gameId,
         menu.getGames().get(gameId).getMaxPlayers()
       );
-
       addToLobby(socketId);
-      this.getClientContextContainer().set(ClientContext.GAME);
-      view.postNotification(
-        NotificationType.RESPONSE,
-        "You joined the lobby of the game: " + gameId
-      );
+    }
 
-      getView().drawAvailableTokenColors(lobby.getAvailableTokens());
-    } else {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "Player " + socketId + " joined game " + gameId
-      );
+    // if it's not you, update lobby if you have one,
+    if (lobby != null && lobby.getGameId().equals(gameId)) {
+      addToLobby(socketId);
     }
   }
 
   /**
-   *
+   * Internal utility to add a player to the current lobby
    */
   private void addToLobby(UUID socketId) {
     lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
   }
 
-  public void playerLeftLobby() {
-    playerLeftLobby(lobby.getGameId(), this.socketId);
+  @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    if (lobby != null) {
+      lobby
+        .getPlayers()
+        .computeIfPresent(socketID, (uuid, player) -> {
+          player.setConnectionStatus(status);
+          return player;
+        });
+    }
+
+    if (gameBoard != null) {
+      gameBoard
+        .getPlayers()
+        .stream()
+        .filter(player -> player.getSocketID().equals(socketID))
+        .forEach(player -> player.setConnectionStatus(status));
+    }
+    //TODO check this out
   }
 
   @Override
@@ -324,36 +223,29 @@ public class LocalModelContainer
         return gameEntry;
       });
 
+    if (lobby.getGameId().equals(gameId)) {
+      lobby.getPlayers().remove(socketID);
+    }
+
     if (socketID.equals(this.socketId)) {
       lobby = null;
-      localGameBoard = null;
+      gameBoard = null;
+    }
 
-      view.postNotification(
-        NotificationType.RESPONSE,
-        "You left the lobby of the game " + gameId + ". "
-      );
-    } else {
+    if (lobby != null && lobby.getGameId().equals(gameId)) {
       lobby.getPlayers().remove(socketID);
-      view.postNotification(
-        NotificationType.UPDATE,
-        "Player" + socketID + " left the game lobby " + gameId + ". "
-      );
-
-      lobby.getPlayers().remove(socketID);
-      if (state.get().equals(ClientContext.LOBBY)) {
-        view.drawLobby(lobby.getPlayers());
-      }
     }
   }
 
   /**
-   * Internal utility to set the token, without displaying anything in the view
-   */
+   * Internal utility to set the token color in the current lobby
+   * */
   private void setPlayerToken(UUID socketId, TokenColor token) {
-    Set<TokenColor> availableTokens = lobby.getAvailableTokens();
-    availableTokens.remove(token);
-
     lobby.getPlayers().get(socketId).setToken(token);
+  }
+
+  public void tokenTaken(TokenColor token) {
+    lobby.getAvailableTokens().remove(token);
   }
 
   @Override
@@ -363,55 +255,17 @@ public class LocalModelContainer
     String nickname,
     TokenColor token
   ) {
+    // return if you're not in a lobby
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
 
-    setPlayerToken(socketId, token);
+    Set<TokenColor> availableTokens = lobby.getAvailableTokens();
+    availableTokens.remove(token);
 
-    if (socketId.equals(this.socketId)) {
-      getView()
-        .postNotification(
-          NotificationType.UPDATE,
-          new String[] { "You chose the ", " token. " },
-          token,
-          2
-        );
-      getView().drawNicknameChoice();
-    } else {
-      getView()
-        .postNotification(
-          NotificationType.UPDATE,
-          new String[] {
-            Optional.ofNullable(nickname).orElse(socketId.toString()),
-            " chose the ",
-            " token. ",
-          },
-          token,
-          2
-        );
-    }
-
-    if (lobby.getPlayers().get(this.socketId).getToken() == null) {
-      view.drawAvailableTokenColors(lobby.getAvailableTokens());
-    }
-
-    view.drawLobby(lobby.getPlayers());
-  }
-
-  @Override
-  public void tokenTaken(TokenColor token) {
-    lobby.getAvailableTokens().remove(token);
-    view.postNotification(
-      NotificationType.ERROR,
-      new String[] { "The ", " token is already taken" },
-      token,
-      2
-    );
-    // TODO only do this if you're in the lobby
-    view.drawAvailableTokenColors(lobby.getAvailableTokens());
+    lobby.getPlayers().get(socketId).setToken(token);
   }
 
   /**
-   * Internal utility to set the nickname, without displaying anything in the view
+   * Internal utility to set the nickname of a player in the current lobby
    */
   private void setPlayerNickname(UUID socketId, String nickname) {
     lobby.getPlayers().get(socketId).setNickname(nickname);
@@ -420,21 +274,7 @@ public class LocalModelContainer
   @Override
   public void playerSetNickname(String gameId, UUID socketId, String nickname) {
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
-
-    setPlayerNickname(socketId, nickname);
-
-    if (this.socketId.equals(socketId)) {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "You chose the nickname \"" + nickname + "\""
-      );
-    } else {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "Player " + socketId + " chose the nickname \"" + nickname + "\""
-      );
-    }
-    view.drawLobby(lobby.getPlayers());
+    lobby.getPlayers().get(socketId).setNickname(nickname);
   }
 
   @Override
@@ -442,58 +282,29 @@ public class LocalModelContainer
     String gameId,
     UUID socketID,
     String nickname
-  ) {
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Player " +
-      Optional.ofNullable(nickname).orElse(socketID.toString()) +
-      " chose an objective card."
-    );
-  }
+  ) {}
 
   public CardPair<Card> getAvailableObjectives() {
     return lobby.getAvailableObjectives();
   }
 
   public void playerChoseObjectiveCard(Boolean isFirst) {
-    this.localGameBoard.setSecretObjective(
+    this.gameBoard.setSecretObjective(
         isFirst
           ? this.lobby.getAvailableObjectives().getFirst()
           : this.lobby.getAvailableObjectives().getSecond()
       );
-    this.view.postNotification(
-        NotificationType.RESPONSE,
-        "Secret objective chosen. "
-      );
   }
 
-  @Override
-  public void nicknameTaken(String nickname) {
-    view.postNotification(
-      NotificationType.ERROR,
-      "The nickname " + nickname + " is already taken."
-    );
-  }
-
-  public void listObjectiveCards(Pair<Integer, Integer> cardIdPair) {
+  public void getObjectiveCards(Pair<Integer, Integer> cardIdPair) {
     lobby.setAvailableObjectives(
       cardsLoader.getCardFromId(cardIdPair.getKey()),
       cardsLoader.getCardFromId(cardIdPair.getValue())
     );
-    getView().drawObjectiveCardChoice(lobby.getAvailableObjectives());
   }
 
   public void playerGetStarterCardSides(int cardId) {
-    lobby.setStarterCardId(cardId);
-    getView()
-      .drawStarterCardSides(
-        cardsLoader.getCardFromId(lobby.getStarterCardId())
-      );
-  }
-
-  @Override
-  public void notInGame() {
-    view.postNotification(NotificationType.ERROR, "You are not in any game. ");
+    lobby.setStarterCard(cardsLoader.getCardFromId(cardId));
   }
 
   @Override
@@ -508,9 +319,9 @@ public class LocalModelContainer
   ) {
     if (lobby == null || !lobby.getGameId().equals(gameId)) return;
 
-    if (lobby.getPlayers().get(socketId) == null) lobby
-      .getPlayers()
-      .put(socketId, new LocalPlayer(socketId));
+    if (lobby.getPlayers().get(socketId) == null) {
+      lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
+    }
 
     LocalPlayer player = lobby.getPlayers().get(socketID);
 
@@ -568,18 +379,13 @@ public class LocalModelContainer
     }
 
     // Add the player to the game board
-    localGameBoard.getPlayers().add(player);
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Player " + nickname + " joined game " + gameId + ". "
-    );
+    gameBoard.getPlayers().add(player);
   }
 
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
-    if (this.localGameBoard.getGameId().equals(gameId)) {
-      localGameBoard.getPlayers().clear();
+    if (this.gameBoard.getGameId().equals(gameId)) {
+      gameBoard.getPlayers().clear();
 
       gameInfo
         .getUsers()
@@ -600,54 +406,40 @@ public class LocalModelContainer
           localPlayer.setAvailableSpots(player.getAvailableSpots());
           localPlayer.setForbiddenSpots(player.getForbiddenSpots());
           localPlayer.setConnectionStatus(player.getConnectionStatus());
-          localGameBoard.setGoldCards(
+          gameBoard.setGoldCards(
             CardPair.fromCardIndexPair(cardsLoader, gameInfo.getGoldCards())
           );
-          localGameBoard.setObjectiveCards(
+          gameBoard.setObjectiveCards(
             CardPair.fromCardIndexPair(
               cardsLoader,
               gameInfo.getObjectiveCards()
             )
           );
-          localGameBoard.setResourceCards(
+          gameBoard.setResourceCards(
             CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
           );
-          localGameBoard.getPlayers().add(localPlayer);
+          gameBoard.getPlayers().add(localPlayer);
         });
 
-      localGameBoard.setCurrentPlayerIndex(gameInfo.getCurrentUserIndex());
+      gameBoard.setCurrentPlayerIndex(gameInfo.getCurrentUserIndex());
       for (int i = 0; i < gameInfo.getUsers().size(); ++i) {
         UUID userSocketID = gameInfo.getUsers().get(i).getSocketID();
         if (userSocketID.equals(socketId)) {
-          localGameBoard.setPlayerIndex(i);
+          gameBoard.setPlayerIndex(i);
           break;
         }
       }
 
-      localGameBoard.setResourceDeckTopCard(
+      gameBoard.setResourceDeckTopCard(
         (PlayableCard) cardsLoader.getCardFromId(
           gameInfo.getResourceDeckTopCardId()
         )
       );
-      localGameBoard.setGoldDeckTopCard(
+      gameBoard.setGoldDeckTopCard(
         (PlayableCard) cardsLoader.getCardFromId(
           gameInfo.getGoldDeckTopCardId()
         )
       );
-
-      view.postNotification(NotificationType.UPDATE, "The Game has started. ");
-      clientContextContainer.set(ClientContext.GAME);
-      if (localGameBoard.getCurrentPlayer().getSocketID().equals(socketId)) {
-        view.postNotification(NotificationType.UPDATE, "It's your turn. ");
-        view.drawGame(localGameBoard.getPlayers());
-      } else {
-        view.postNotification(
-          NotificationType.UPDATE,
-          "It's " +
-          localGameBoard.getCurrentPlayer().getNickname() +
-          "'s turn. "
-        );
-      }
     }
   }
 
@@ -666,7 +458,7 @@ public class LocalModelContainer
     Set<Position> forbiddenPositions
   ) {
     Card card = cardsLoader.getCardFromId(cardId);
-    LocalPlayer localPlayer = localGameBoard.getCurrentPlayer();
+    LocalPlayer localPlayer = gameBoard.getCurrentPlayer();
 
     localPlayer.addPlayedCards(card, side, position);
 
@@ -678,42 +470,6 @@ public class LocalModelContainer
     }
     localPlayer.setHand(nextHand);
 
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Card " + cardId + " placed"
-    );
-
-    view.drawCardPlacement(
-      card,
-      side,
-      position,
-      availablePositions,
-      forbiddenPositions
-    );
-
-    diffMessage(
-      newPlayerScore - localGameBoard.getCurrentPlayer().getPoints(),
-      "point"
-    );
-
-    Arrays.stream(ResourceType.values()).forEach(
-      resourceType ->
-        diffMessage(
-          updatedResources.get(resourceType) -
-          localPlayer.getResources().get(resourceType),
-          resourceType
-        )
-    );
-
-    Arrays.stream(ObjectType.values()).forEach(
-      objectType ->
-        diffMessage(
-          updatedObjects.get(objectType) -
-          localPlayer.getObjects().get(objectType),
-          objectType
-        )
-    );
-
     localPlayer.setPoints(newPlayerScore);
 
     localPlayer.getResources().putAll(updatedResources);
@@ -722,47 +478,9 @@ public class LocalModelContainer
     localPlayer.setAvailableSpots(availablePositions);
     localPlayer.setForbiddenSpots(forbiddenPositions);
 
+    currentPlayerHasPlacedCard = true;
     // TODO this actually makes drawCardPlacement redundant
-    view.drawPlayerBoard(localPlayer);
-    view.drawLeaderBoard(localGameBoard.getPlayers());
-    view.drawHand(localPlayer.getHand());
-  }
 
-  void diffMessage(int diff, String attributeName) {
-    if (diff != 0) {
-      view.postNotification(
-        NotificationType.UPDATE,
-        localGameBoard.getCurrentPlayer().getNickname() +
-        (diff > 0 ? "gained" : "lost" + diff) +
-        attributeName +
-        ((Math.abs(diff) != 1) ? "s" : "") +
-        ". "
-      );
-    }
-  }
-
-  void diffMessage(int diff, Colorable colorable) {
-    if (diff != 0) {
-      view.postNotification(
-        NotificationType.UPDATE,
-        new String[] {
-          localGameBoard.getCurrentPlayer().getNickname(),
-          (diff > 0 ? " gained " : " lost " + diff),
-          ((Math.abs(diff) != 1) ? "s" : ""),
-          ". ",
-        },
-        colorable,
-        2
-      );
-    }
-  }
-
-  @Override
-  public void invalidCardPlacement(String reason) {
-    view.postNotification(
-      NotificationType.ERROR,
-      "Invalid card placement: " + reason
-    );
   }
 
   /**
@@ -785,18 +503,16 @@ public class LocalModelContainer
   ) {
     if (drawnCardId != null) {
       Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
-      localGameBoard.getCurrentPlayer().getHand().add(drawnCard);
+      gameBoard.getCurrentPlayer().getHand().add(drawnCard);
     }
-
-    view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
 
     switch (source) {
       case CardPairFirstCard, CardPairSecondCard -> {
         Card newPairCard = cardsLoader.getCardFromId(newPairCardId);
         CardPair<Card> cardPairToUpdate =
           switch (deck) {
-            case GOLD -> localGameBoard.getGoldCards();
-            case RESOURCE -> localGameBoard.getResourceCards();
+            case GOLD -> gameBoard.getGoldCards();
+            case RESOURCE -> gameBoard.getResourceCards();
           };
 
         switch (source) {
@@ -805,21 +521,8 @@ public class LocalModelContainer
             newPairCard
           );
         }
-
-        view.drawCardDrawn(deck, newPairCard);
       }
-      case Deck -> view.drawCardDrawn(deck);
     }
-
-    view.postNotification(
-      NotificationType.UPDATE,
-      localGameBoard.getCurrentPlayer().getNickname() +
-      " has drawn a card from the " +
-      source.toString().toLowerCase() +
-      " " +
-      deck.toString().toLowerCase() +
-      ". "
-    );
 
     changeTurn(
       gameId,
@@ -847,98 +550,42 @@ public class LocalModelContainer
     Integer resourceDeckTopCardId,
     Integer goldDeckTopCardId
   ) {
-    if (isLastRound) {
-      view.postNotification(NotificationType.WARNING, "Last round of the game");
-    }
-
-    localGameBoard.setCurrentPlayerIndex(playerIndex);
-    localGameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
-    localGameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
-    localGameBoard.setResourceDeckTopCard(
+    gameBoard.setCurrentPlayerIndex(playerIndex);
+    gameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
+    gameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
+    gameBoard.setResourceDeckTopCard(
       (PlayableCard) cardsLoader.getCardFromId(resourceDeckTopCardId)
     );
-    localGameBoard.setGoldDeckTopCard(
+    gameBoard.setGoldDeckTopCard(
       (PlayableCard) cardsLoader.getCardFromId(goldDeckTopCardId)
     );
-    if (
-      localGameBoard.getCurrentPlayer().getSocketID().equals(this.getSocketID())
-    ) {
-      view.postNotification(NotificationType.UPDATE, "It's your turn. ");
-      view.drawPlayerBoard(localGameBoard.getCurrentPlayer());
-      view.drawCardDecks(
-        localGameBoard.getResourceDeckTopCard(),
-        localGameBoard.getGoldDeckTopCard()
-      );
-    } else {
-      view.postNotification(
-        NotificationType.UPDATE,
-        "It's " + localGameBoard.getCurrentPlayer().getNickname() + "'s turn. "
-      );
-    }
+
+    currentPlayerHasPlacedCard = false;
   }
 
   @Override
   public void gameOver() {
-    state.set(ClientContext.GAME_OVER);
-    view.drawGameOver(localGameBoard.getPlayers());
+    clientContextContainer.set(ClientContext.GAME_OVER);
   }
 
   @Override
   public void playerScoresUpdate(Map<String, Integer> newScores) {
-    newScores.forEach((nickname, newScore) ->
-      localGameBoard
-        .getPlayers()
-        .stream()
-        .filter(player -> player.getNickname().equals(nickname))
-        .forEach(player -> {
-          int diff = newScore - player.getPoints();
-          player.setPoints(newScore);
-          diffMessage(diff, "points");
-        }));
-    view.drawLeaderBoard(localGameBoard.getPlayers());
+    gameBoard
+      .getPlayers()
+      .forEach(player -> player.setPoints(newScores.get(player.getNickname())));
   }
 
   @Override
   public void remainingRounds(String gameID, int remainingRounds) {
-    if (Objects.equals(localGameBoard.getGameId(), gameID)) {
-      if (remainingRounds == 2 || remainingRounds == 1) view.postNotification(
-        NotificationType.UPDATE,
-        remainingRounds == 2
-          ? "The next round will be the last one. "
-          : "The last round has started."
-      );
-
-      this.localGameBoard.setRemainingRounds(remainingRounds);
+    if (Objects.equals(gameBoard.getGameId(), gameID)) {
+      this.gameBoard.setRemainingRounds(remainingRounds);
     }
-  }
-
-  public void gameStatusUpdate(GameState state) {
-    view.postNotification(NotificationType.UPDATE, "Game state: " + state);
-    //TODO switch on the game STATE
   }
 
   @Override
   public void winningPlayer(String nickname) {
-    view.drawWinner(nickname);
-    //TODO Back to lobby
     lobby = null;
-    localGameBoard = null;
-    listGames();
-  }
-
-  @Override
-  public void playerConnectionChanged(
-    UUID socketID,
-    String nickname,
-    GameController.UserGameContext.ConnectionStatus status
-  ) {
-    view.postNotification(
-      NotificationType.UPDATE,
-      "Player " +
-      Optional.ofNullable(nickname).orElse(socketID.toString()) +
-      " is now " +
-      status
-    );
+    gameBoard = null;
   }
 
   @Override
@@ -955,134 +602,22 @@ public class LocalModelContainer
           .getTokenColor()
           .ifPresent(token -> setPlayerToken(uuid, token));
       });
-    this.clientContextContainer.set(ClientContext.LOBBY);
+    clientContextContainer.set(ClientContext.LOBBY);
+    //TODO what if the player has already joined the game?
   }
 
   @Override
   public void chatMessage(String gameID, ChatMessage message) {
-    if (Objects.equals(gameID, localGameBoard.getGameId())) {
-      if (!message.getSender().equals(localGameBoard.getPlayerNickname())) {
-        localGameBoard.getChat().postMessage(message);
-        view.drawChatMessage(message);
-      }
+    if (Objects.equals(gameID, gameBoard.getGameId())) {
+      gameBoard.getChat().postMessage(message);
     }
   }
 
-  @Override
-  public void playerNotActive() {
-    view.postNotification(NotificationType.ERROR, "It's not your turn. ");
+  public void gameStatusUpdate(GameState state) {
+    //TODO
   }
 
-  @Override
-  public void invalidNextTurnCall() {
-    view.postNotification(NotificationType.ERROR, "Invalid next turn call. ");
-  }
-
-  @Override
-  public void invalidGetObjectiveCardsCall() {
-    view.postNotification(
-      NotificationType.ERROR,
-      "Invalid get objective cards call. "
-    );
-  }
-
-  @Override
-  public void gameNotReady() {
-    view.postNotification(NotificationType.ERROR, "Game not ready. ");
-  }
-
-  @Override
-  public void emptyDeck() {
-    view.postNotification(NotificationType.ERROR, "Deck is empty. ");
-  }
-
-  @Override
-  public void playerNotFound() {
-    view.postNotification(NotificationType.ERROR, "Player not found. ");
-  }
-
-  @Override
-  public void incompleteLobbyPlayer(String msg) {
-    view.postNotification(NotificationType.ERROR, msg);
-  }
-
-  @Override
-  public void illegalCardSideChoice() {
-    view.postNotification(NotificationType.ERROR, "Illegal card side choice. ");
-  }
-
-  @Override
-  public void invalidTokenColor() {
-    view.postNotification(NotificationType.ERROR, "Invalid token color");
-  }
-
-  @Override
-  public void alreadyPlacedCard() {
-    view.postNotification(NotificationType.ERROR, "You already placed a card");
-  }
-
-  @Override
-  public void cardNotPlaced() {
-    view.postNotification(
-      NotificationType.ERROR,
-      "Card not placed yet, place a card before drawing"
-    );
-  }
-
-  public void handleInvalidActionException(InvalidActionException e) {
-    switch (e.getCode()) {
-      case PLAYER_NOT_ACTIVE -> this.playerNotActive();
-      case NOT_IN_GAME -> this.notInGame();
-      case GAME_ALREADY_EXISTS -> this.gameAlreadyExists(
-          ((GameAlreadyExistsException) e).getGameID()
-        );
-      case GAME_ALREADY_STARTED -> this.gameAlreadyStarted();
-      case INVALID_NEXT_TURN_CALL -> this.invalidNextTurnCall();
-      case INVALID_GET_OBJECTIVE_CARDS_CALL -> this.invalidGetObjectiveCardsCall();
-      case GAME_NOT_READY -> this.gameNotReady();
-      case GAME_NOT_FOUND -> this.gameNotFound(
-          ((GameNotFoundException) e).getGameID()
-        );
-      case PLAYER_NOT_FOUND -> this.playerNotFound();
-      case INCOMPLETE_LOBBY_PLAYER -> this.incompleteLobbyPlayer(
-          e.getNotes().get(0)
-        );
-      case EMPTY_DECK -> this.emptyDeck();
-      case ALREADY_PLACED_CARD -> this.alreadyPlacedCard();
-      case ILLEGAL_PLACING_POSITION -> this.invalidCardPlacement(
-          ((IllegalPlacingPositionException) e).getReason()
-        );
-      case ILLEGAL_CARD_SIDE_CHOICE -> this.invalidCardPlacement(
-          e.getMessage()
-        );
-      case LOBBY_FULL -> this.lobbyFull(((LobbyFullException) e).getGameID());
-      case NICKNAME_ALREADY_TAKEN -> this.nicknameTaken(
-          ((NicknameAlreadyTakenException) e).getNickname()
-        );
-      case INVALID_TOKEN_COLOR -> this.invalidTokenColor();
-      case TOKEN_ALREADY_TAKEN -> this.tokenTaken(
-          TokenColor.fromString(
-            ((TokenAlreadyTakenException) e).getTokenColor()
-          )
-        );
-      case GAME_OVER -> this.gameOver();
-      case CARD_NOT_PLACED -> this.cardNotPlaced();
-    }
-  }
-
-  public View getView() {
-    return this.view;
-  }
-
-  public Optional<String> getGameId() {
-    if (lobby != null) {
-      return Optional.ofNullable(lobby.getGameId());
-    } else {
-      return Optional.empty();
-    }
-  }
-
-  public ClientContext getState() {
-    return state.get();
+  public boolean currentPlayerHasPlacedCard() {
+    return currentPlayerHasPlacedCard;
   }
 }

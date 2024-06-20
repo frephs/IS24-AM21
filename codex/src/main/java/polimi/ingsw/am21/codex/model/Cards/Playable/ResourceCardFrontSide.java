@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliCard;
 
 public class ResourceCardFrontSide

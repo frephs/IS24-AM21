@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.model.Cards.Objectives;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;

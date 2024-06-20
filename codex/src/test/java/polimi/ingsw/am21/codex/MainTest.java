@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -31,6 +32,7 @@ import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.view.View;
 
 class MainTest {
 
@@ -66,22 +68,26 @@ class MainTest {
       });
 
       executor.execute(() -> {
+        View view = new DummyView("client1");
         client1.set(
           new TCPClientConnectionHandler(
             "localhost",
             ConnectionType.TCP.getDefaultPort(),
-            new LocalModelContainer(new DummyView("client1"))
+            view,
+            new ClientGameEventHandler(view, new LocalModelContainer())
           )
         );
         client1.get().connect();
         clientLatch.countDown();
       });
       executor.execute(() -> {
+        View view = new DummyView("client2");
         client2.set(
           new TCPClientConnectionHandler(
             "localhost",
             ConnectionType.TCP.getDefaultPort(),
-            new LocalModelContainer(new DummyView("client2"))
+            view,
+            new ClientGameEventHandler(view, new LocalModelContainer())
           )
         );
         client2.get().connect();

@@ -21,7 +21,7 @@
                            <children>
                               <HBox alignment="CENTER">
                                  <children>
-                                    <Label alignment="CENTER" prefHeight="48.0" prefWidth="522.0" styleClass="subtitle" text="Instructions">
+                                    <Label alignment="CENTER" prefHeight="48.0" prefWidth="375.0" styleClass="subtitle" text="Instructions">
                                        <font>
                                           <Font size="18.0" />
                                        </font></Label>
@@ -33,7 +33,7 @@
                               </HBox>
                               <HBox fx:id="pageContainer" alignment="CENTER" prefHeight="290.0" prefWidth="521.0">
                                  <children>
-                                       <ImageView fx:id="page" fitHeight="383.0" fitWidth="575.0" pickOnBounds="true" preserveRatio="true" />
+                                       <ImageView fx:id="page" fitHeight="383.0" fitWidth="422.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" prefHeight="109.0" prefWidth="835.0">

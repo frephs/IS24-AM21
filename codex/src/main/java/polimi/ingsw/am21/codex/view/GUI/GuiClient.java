@@ -1,19 +1,21 @@
 package polimi.ingsw.am21.codex.view.GUI;
 
+import java.util.List;
 import java.util.Objects;
 import javafx.application.Application;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.ViewClient;
 
 public class GuiClient extends ViewClient {
 
-  Gui gui;
+  private final Gui gui;
 
   public GuiClient() {
-    super(new LocalModelContainer(new Gui()));
-    gui = (Gui) localModel.getView();
-    localModel = new LocalModelContainer(gui);
+    super(new Gui());
+    gui = (Gui) view;
   }
 
   @Override
@@ -31,7 +33,14 @@ public class GuiClient extends ViewClient {
 
     super.start(connectionType, address, port);
     gui.setClient(client);
-    gui.setLocalModel(localModel);
+
+    while (!super.isInitialized()) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   public static void main(String[] args) {

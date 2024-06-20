@@ -4,14 +4,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
+import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
+import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
-import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
@@ -22,46 +26,44 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class Cli implements View {
 
-  private static final Cli instance = new Cli(true);
-  Boolean colored;
+  private static Cli cli;
 
-  private Cli(Boolean colored) {
-    this.colored = colored;
+  private static ClientConnectionHandler client;
+  private final LocalModelContainer localModel;
+
+  public static class Options {
+
+    private final Boolean colored;
+
+    public Options(Boolean colored) {
+      this.colored = colored;
+    }
+
+    public Boolean isColored() {
+      return colored;
+    }
+  }
+
+  static Cli.Options options;
+
+  @Override
+  public void setClient(ClientConnectionHandler client) {
+    Cli.client = client;
+  }
+
+  public Cli(Cli.Options options) {
+    Cli.options = options;
+    cli = this;
+    localModel = new LocalModelContainer();
   }
 
   public static Cli getInstance() {
-    return instance;
+    return cli;
   }
 
-  public Boolean isColored() {
-    return colored;
-  }
-
-  public void printPrompt() {
-    System.out.print("\r> ");
-  }
-
-  public void printUpdate(String string) {
-    System.out.println(
-      "\r" +
-      string +
-      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
-    );
-    printPrompt();
-  }
-
-  public void displayException(Exception e) {
-    printUpdate(
-      CliUtils.colorize(
-        e.getMessage() +
-        "\n " +
-        Stream.of(e.getStackTrace())
-          .map(StackTraceElement::toString)
-          .collect(Collectors.joining("\n")),
-        Color.RED,
-        ColorStyle.UNDERLINED
-      )
-    );
+  @Override
+  public LocalModelContainer getLocalModel() {
+    return localModel;
   }
 
   @Override
@@ -119,8 +121,76 @@ public class Cli implements View {
     printUpdate(String.join("", result));
   }
 
+  public void printPrompt() {
+    System.out.print("\r> ");
+  }
+
+  public void printUpdate(String string) {
+    System.out.println(
+      "\r" +
+      string +
+      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
+    );
+    printPrompt();
+  }
+
   @Override
-  public void drawAvailableGames(List<GameEntry> gameEntries) {
+  public void connected() {
+    postNotification(NotificationType.CONFIRM, "Successfully to the server");
+  }
+
+  void diffMessage(int diff, String attributeName) {
+    if (diff != 0) {
+      postNotification(
+        NotificationType.UPDATE,
+        getLocalModel().getLocalGameBoard().getCurrentPlayer().getNickname() +
+        (diff > 0 ? "gained" : "lost" + diff) +
+        attributeName +
+        ((Math.abs(diff) != 1) ? "s" : "") +
+        ". "
+      );
+    }
+  }
+
+  void diffMessage(int diff, Colorable colorable) {
+    if (diff != 0) {
+      postNotification(
+        NotificationType.UPDATE,
+        new String[] {
+          getLocalModel().getLocalGameBoard().getCurrentPlayer().getNickname() +
+          (diff > 0 ? " gained " : " lost " + diff),
+          ((Math.abs(diff) != 1) ? "s" : ""),
+          ". ",
+        },
+        colorable,
+        2
+      );
+    }
+  }
+
+  public void displayException(Exception e) {
+    printUpdate(
+      CliUtils.colorize(
+        e.getMessage() +
+        "\n " +
+        Stream.of(e.getStackTrace())
+          .map(StackTraceElement::toString)
+          .collect(Collectors.joining("\n")),
+        Color.RED,
+        ColorStyle.UNDERLINED
+      )
+    );
+  }
+
+  @Override
+  public void drawAvailableGames() {
+    List<GameEntry> gameEntries = getLocalModel()
+      .getLocalMenu()
+      .getGames()
+      .values()
+      .stream()
+      .toList();
+
     printUpdate(
       CliUtils.getTable(
         new String[] {
@@ -148,10 +218,12 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
+  public void drawAvailableTokenColors() {
     printUpdate(
       "The available token colors are: " +
-      tokenColors
+      localModel
+        .getLocalLobby()
+        .getAvailableTokens()
         .stream()
         .map(token -> CliUtils.colorize(token, ColorStyle.NORMAL))
         .collect(Collectors.joining(" "))
@@ -159,10 +231,12 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {
+  public void drawLobby() {
     printUpdate(
       "Lobby: " +
-      players
+      localModel
+        .getLocalLobby()
+        .getPlayers()
         .values()
         .stream()
         .map(localPlayer -> {
@@ -181,10 +255,18 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawLeaderBoard(List<LocalPlayer> players) {
+  public void drawGameBoard() {
+    // TODO
+  }
+
+  @Override
+  public void drawLeaderBoard() {
     printUpdate(
       "Leaderboard:\n" +
-      players
+      localModel
+        .getLocalLobby()
+        .getPlayers()
+        .values()
         .stream()
         .sorted((a, b) -> b.getPoints() - a.getPoints())
         .map(player -> {
@@ -209,23 +291,32 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawPlayerBoards(List<LocalPlayer> players) {
-    players.forEach(player -> {
-      printUpdate(
-        "Player " +
-        CliUtils.colorize(
-          player.getNickname(),
-          player.getToken().getColor(),
-          ColorStyle.NORMAL
-        ) +
-        ":"
-      );
-      drawPlayerBoard(player);
-    });
+  public void drawPlayerBoards() {
+    localModel
+      .getLocalLobby()
+      .getPlayers()
+      .values()
+      .forEach(player -> {
+        printUpdate(
+          "Player " +
+          CliUtils.colorize(
+            player.getNickname(),
+            player.getToken().getColor(),
+            ColorStyle.NORMAL
+          ) +
+          ":"
+        );
+        drawPlayerBoard(player.getNickname());
+      });
   }
 
   @Override
-  public void drawPlayerBoard(LocalPlayer player) {
+  public void drawPlayerBoard(String nickname) {
+    LocalPlayer player = localModel
+      .getLocalGameBoard()
+      .getPlayerByNickname(nickname)
+      .orElseThrow();
+
     player
       .getPlayedCards()
       .forEach(
@@ -256,36 +347,26 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawCardDrawn(DrawingDeckType deck, Card card) {
-    printUpdate("Card drawn from deck " + deck + ":\n" + card.cardToAscii());
-  }
-
-  @Override
-  public void drawCardDrawn(DrawingDeckType deck) {
-    printUpdate("Card drawn from deck " + deck);
-  }
-
-  @Override
-  public void drawCardPlacement(
-    Card card,
-    CardSideType side,
-    Position position,
-    Set<Position> availablePositions,
-    Set<Position> forbiddenPositions
-  ) {
+  public void drawGame() {
     printUpdate(
-      "Card " + card.getId() + " placed at " + position + " on side " + side
+      "Game started with " +
+      localModel.getLocalGameBoard().getPlayers().size() +
+      " players"
     );
   }
 
   @Override
-  public void drawGame(List<LocalPlayer> players) {
-    printUpdate("Game started with " + players.size() + " players");
-  }
-
-  @Override
-  public void drawGameOver(List<LocalPlayer> players) {
+  public void drawGameOver() {
     printUpdate("Game over");
+    winningPlayer(
+      localModel
+        .getLocalGameBoard()
+        .getPlayers()
+        .stream()
+        .min((p1, p2) -> p2.getPoints() - p1.getPoints())
+        .map(LocalPlayer::getNickname)
+        .orElseThrow()
+    );
   }
 
   @Override
@@ -294,18 +375,26 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawHand(List<Card> hand) {
+  public void drawHand() {
     printUpdate(
       "Hand:\n" +
-      hand.stream().map(Card::cardToAscii).collect(Collectors.joining("\n"))
+      localModel
+        .getLocalGameBoard()
+        .getPlayer()
+        .getHand()
+        .stream()
+        .map(Card::cardToAscii)
+        .collect(Collectors.joining("\n"))
     );
   }
 
   @Override
-  public void drawPairs(
-    CardPair<Card> resourceCards,
-    CardPair<Card> goldCards
-  ) {
+  public void drawPairs() {
+    CardPair<Card> resourceCards = localModel
+      .getLocalGameBoard()
+      .getResourceCards();
+    CardPair<Card> goldCards = localModel.getLocalGameBoard().getGoldCards();
+
     printUpdate(
       "Resource cards pair:\n" +
       resourceCards.getFirst().cardToAscii() +
@@ -320,7 +409,11 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
+  public void drawObjectiveCardChoice() {
+    CardPair<Card> cardPair = localModel
+      .getLocalGameBoard()
+      .getObjectiveCards();
+
     printUpdate(
       "Objective cards pair:\n" +
       cardPair.getFirst().cardToAscii() +
@@ -330,14 +423,10 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawStarterCardSides(Card cardId) {
-    printUpdate("Starter card sides:\n" + cardId.cardToAscii());
-  }
-
-  @Override
-  public void drawWinner(String nickname) {
+  public void drawStarterCardSides() {
     printUpdate(
-      CliUtils.colorize("Winner: " + nickname, Color.GREEN, ColorStyle.BOLD)
+      "Starter card sides:\n" +
+      localModel.getLocalLobby().getStarterCard().cardToAscii()
     );
   }
 
@@ -349,13 +438,17 @@ public class Cli implements View {
         Color.PURPLE,
         ColorStyle.BACKGROUND
       ) +
-      "said " +
+      message.getRecipient().map(recipient -> " whispered").orElse("said ") +
       message.getContent()
     );
   }
 
   @Override
-  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
+  public void drawCommonObjectiveCards() {
+    CardPair<Card> cardPair = localModel
+      .getLocalGameBoard()
+      .getObjectiveCards();
+
     printUpdate(
       "Common objective cardPair:\n" +
       cardPair.getFirst().cardToAscii() +
@@ -365,15 +458,26 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawPlayerObjective(Card card) {
-    // TODO
+  public void drawPlayerObjective() {
+    printUpdate(
+      "Player objective card:\n" +
+      localModel
+        .getLocalGameBoard()
+        .getPlayer()
+        .getObjectiveCard()
+        .cardToAscii()
+    );
   }
 
   @Override
-  public void drawCardDecks(
-    PlayableCard firstResourceCard,
-    PlayableCard firstGoldCard
-  ) {
+  public void drawCardDecks() {
+    PlayableCard firstResourceCard = localModel
+      .getLocalGameBoard()
+      .getResourceDeckTopCard();
+    PlayableCard firstGoldCard = localModel
+      .getLocalGameBoard()
+      .getGoldDeckTopCard();
+
     if (firstResourceCard != null) {
       printUpdate(
         "Resource cards deck:\n" +
@@ -392,5 +496,85 @@ public class Cli implements View {
   }
 
   @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {}
+
+  @Override
   public void drawNicknameChoice() {}
+
+  @Override
+  public void cardPlaced(
+    String gameId,
+    String playerId,
+    Integer playerHandCardNumber,
+    Integer cardId,
+    CardSideType side,
+    Position position,
+    int newPlayerScore,
+    Map<ResourceType, Integer> updatedResources,
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) {
+    View.super.cardPlaced(
+      gameId,
+      playerId,
+      playerHandCardNumber,
+      cardId,
+      side,
+      position,
+      newPlayerScore,
+      updatedResources,
+      updatedObjects,
+      availableSpots,
+      forbiddenSpots
+    );
+
+    diffMessage(
+      newPlayerScore -
+      getLocalModel().getLocalGameBoard().getCurrentPlayer().getPoints(),
+      "point"
+    );
+
+    Arrays.stream(ResourceType.values()).forEach(
+      resourceType ->
+        diffMessage(
+          updatedResources.get(resourceType) -
+          getLocalModel()
+            .getLocalGameBoard()
+            .getCurrentPlayer()
+            .getResources()
+            .get(resourceType),
+          resourceType
+        )
+    );
+
+    Arrays.stream(ObjectType.values()).forEach(
+      objectType ->
+        diffMessage(
+          updatedObjects.get(objectType) -
+          getLocalModel()
+            .getLocalGameBoard()
+            .getCurrentPlayer()
+            .getObjects()
+            .get(objectType),
+          objectType
+        )
+    );
+  }
+
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    View.super.playerScoresUpdate(newScores);
+    newScores.forEach((nickname, newScore) ->
+      getLocalModel()
+        .getLocalGameBoard()
+        .getPlayers()
+        .stream()
+        .filter(player -> player.getNickname().equals(nickname))
+        .forEach(player -> {
+          int diff = newScore - player.getPoints();
+          player.setPoints(newScore);
+          diffMessage(diff, "points");
+        }));
+  }
 }

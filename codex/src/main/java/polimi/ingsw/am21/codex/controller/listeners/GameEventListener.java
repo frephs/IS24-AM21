@@ -1,6 +1,5 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
-import java.rmi.RemoteException;
 import java.util.*;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -50,9 +49,6 @@ public interface GameEventListener extends RemoteGameEventListener {
   @Override
   void gameStarted(String gameId, GameInfo gameInfo);
 
-  /**
-   * @param playerId The player that has just finished their turn
-   */
   @Override
   void changeTurn(
     String gameId,

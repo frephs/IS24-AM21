@@ -9,6 +9,7 @@ import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 

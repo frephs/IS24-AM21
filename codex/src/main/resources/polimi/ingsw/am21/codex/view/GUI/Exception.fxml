@@ -9,40 +9,50 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="exceptionContainer" prefHeight="402.0" prefWidth="400.0" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" >
+<AnchorPane fx:id="exceptionContainer" maxHeight="1200.0" maxWidth="2000.0" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="15.83344123503255" layoutY="5.83337308659094" prefHeight="402.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="17.50011925977282" layoutY="8.333390123701342" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox alignment="CENTER">
+            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="713.0">
                <children>
-                  <Text id="exception-title" fx:id="exceptionTitle" fill="#870000" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Exception" textAlignment="CENTER" wrappingWidth="317.7986869812012" />
+                  <Text id="exception-title" fx:id="exceptionTitle" fill="#870000" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="Exception" textAlignment="CENTER" wrappingWidth="573.6337547302246" />
                </children>
                <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                  <Insets bottom="15.0" />
                </padding>
             </HBox>
-            <HBox prefHeight="328.0" prefWidth="392.0">
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" />
-               </padding>
+            <HBox alignment="CENTER" prefHeight="240.0" prefWidth="713.0">
                <children>
                   <HBox styleClass="exception-message">
                      <children>
-                        <ScrollPane prefHeight="308.0" prefWidth="419.0" styleClass="exception-message" stylesheets="@Style.css">
+                        <ScrollPane accessibleRole="TEXT_AREA" styleClass="exception-message" stylesheets="@Style.css">
                            <content>
-                              <VBox fx:id="exceptionMessageVBox" prefHeight="295.0" prefWidth="330.0">
+                              <VBox fx:id="exceptionMessageVBox" prefHeight="30.0" prefWidth="1173.0">
                                  <padding>
-                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding></VBox>
                            </content>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
                         </ScrollPane>
                      </children>
                   </HBox>
                </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="15.0" />
+               </padding>
             </HBox>
+            <HBox alignment="CENTER" />
          </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
       </VBox>
-      <Button fx:id="exceptionCloseButton" layoutX="335.0" layoutY="24.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="42.0" styleClass="close-button" text="x" />
+      <Button fx:id="exceptionCloseButton" layoutX="335.0" layoutY="24.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="42.0" styleClass="close-button" text="x" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
    </children>
    <styleClass>
       <String fx:value="window" />

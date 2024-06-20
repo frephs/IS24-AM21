@@ -3,10 +3,8 @@ package polimi.ingsw.am21.codex.view.GUI;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -15,7 +13,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -28,25 +25,24 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
-import polimi.ingsw.am21.codex.model.Cards.Card;
+import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
+import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
-import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.GUI.utils.*;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
-import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
@@ -55,16 +51,18 @@ public class Gui extends Application implements View {
   private static Gui gui;
 
   private static ClientConnectionHandler client;
-  private static LocalModelContainer localModel;
+  private final LocalModelContainer localModel;
 
   public Gui() {
     gui = this;
+    localModel = new LocalModelContainer();
   }
 
   public static Gui getInstance() {
     return gui;
   }
 
+  @Override
   public void setClient(ClientConnectionHandler client) {
     Gui.client = client;
     Platform.runLater(() -> {
@@ -74,154 +72,14 @@ public class Gui extends Application implements View {
     });
   }
 
-  public void setLocalModel(LocalModelContainer localModel) {
-    Gui.localModel = localModel;
-  }
-
   /** The side of the hand the player is currently looking at */
   private CardSideType visibleHandSide = CardSideType.FRONT;
-  /** The last hand that has been displayed, used to re-render it when flipped */
-  private List<Card> lastHand = new ArrayList<>();
   /**
    * The index of the hand that is currently selected, null otherwise
    */
   private Integer selectedHandIndex = null;
-  /**
-   * A boolean that keeps track of whether the current player has place their card
-   * for their turn
-   */
-  private boolean hasPlacedCard = false;
 
   // TODO track what user is being displayed
-
-  public void testLobby() {
-    this.postNotification(NotificationType.CONFIRM, "Attento");
-    this.postNotification(NotificationType.WARNING, "Attento");
-    this.postNotification(NotificationType.ERROR, "Attento");
-    this.postNotification(NotificationType.UPDATE, "Attento");
-    this.postNotification(NotificationType.RESPONSE, "Attento");
-
-    displayException(new RuntimeException("Test exception"));
-
-    this.drawAvailableGames(
-        new ArrayList<>(
-          Collections.nCopies(
-            52,
-            new GameEntry(UUID.randomUUID().toString().substring(0, 3), 2, 4)
-          )
-        )
-      );
-
-    LocalPlayer p1 = new LocalPlayer(UUID.randomUUID());
-    LocalPlayer p2 = new LocalPlayer(UUID.randomUUID());
-    LocalPlayer p3 = new LocalPlayer(UUID.randomUUID());
-    LocalPlayer p4 = new LocalPlayer(UUID.randomUUID());
-
-    p1.setNickname("Player 1");
-    p2.setNickname("Player 2");
-    p3.setNickname("Player 3");
-
-    p1.setToken(TokenColor.RED);
-    p2.setToken(TokenColor.BLUE);
-    p4.setToken(TokenColor.YELLOW);
-
-    this.drawAvailableTokenColors(
-        Arrays.stream(TokenColor.values()).collect(Collectors.toSet())
-      );
-
-    this.drawLobby(
-        Map.of(
-          UUID.randomUUID(),
-          p1,
-          UUID.randomUUID(),
-          p2,
-          UUID.randomUUID(),
-          p3,
-          UUID.randomUUID(),
-          p4
-        )
-      );
-    CardsLoader cards = new CardsLoader();
-
-    Card cardFromId = cards.getCardFromId(96);
-    this.drawObjectiveCardChoice(
-        new CardPair<>(cardFromId, cards.getCardFromId(101))
-      );
-    this.drawStarterCardSides(cards.getCardFromId(32));
-  }
-
-  public void testGame() {
-    drawGameWindow();
-
-    LocalPlayer p1 = new LocalPlayer(UUID.randomUUID());
-    LocalPlayer p2 = new LocalPlayer(UUID.randomUUID());
-    LocalPlayer p3 = new LocalPlayer(UUID.randomUUID());
-    LocalPlayer p4 = new LocalPlayer(UUID.randomUUID());
-
-    p1.setNickname("Player 1");
-    p2.setNickname("Player 2");
-    p3.setNickname("Player 3");
-    p4.setNickname("Player 4");
-
-    p1.setToken(TokenColor.RED);
-    p2.setToken(TokenColor.BLUE);
-    p3.setToken(TokenColor.GREEN);
-    p4.setToken(TokenColor.YELLOW);
-
-    p1.setPoints(10);
-    p2.setPoints(40);
-    p3.setPoints(30);
-    p4.setPoints(20);
-
-    p1.addResource(ResourceType.ANIMAL, 2);
-    p2.addResource(ResourceType.INSECT, 2);
-    p3.addResource(ResourceType.PLANT, 2);
-    p4.addResource(ResourceType.FUNGI, 2);
-
-    //    this.drawGame(List.of(p1, p2, p3, p4));
-    //    this.drawLeaderBoard(List.of(p1, p2, p3, p4));
-
-    CardsLoader cards = new CardsLoader();
-    //    this.drawPairs(
-    //        new CardPair<>(cards.getCardFromId(7), cards.getCardFromId(17)),
-    //        new CardPair<>(cards.getCardFromId(66), cards.getCardFromId(80))
-    //      );
-    //
-    //    this.drawCardDecks(
-    //        (PlayableCard) cards.getCardFromId(1),
-    //        (PlayableCard) cards.getCardFromId(41)
-    //      );
-    //    this.drawComonObjectiveCards(
-    //        new CardPair<>(cards.getCardFromId(90), cards.getCardFromId(91))
-    //      );
-
-    p1.setAvailableSpots(new HashSet<>(List.of(new Position(0, 1))));
-
-    this.drawPlayerBoards(List.of(p1));
-    this.drawPlayerBoard(p1);
-    this.drawCardPlacement(
-        cards.getCardFromId(81),
-        CardSideType.BACK,
-        new Position(0, 0),
-        p1.getAvailableSpots().orElse(new HashSet<>()),
-        p1.getForbiddenSpots().orElse(new HashSet<>())
-      );
-    this.drawCardPlacement(
-        cards.getCardFromId(1),
-        CardSideType.BACK,
-        new Position(1, 0),
-        p1.getAvailableSpots().orElse(new HashSet<>()),
-        p1.getForbiddenSpots().orElse(new HashSet<>())
-      );
-    this.drawHand(
-        List.of(
-          cards.getCardFromId(1),
-          cards.getCardFromId(81),
-          cards.getCardFromId(2)
-        )
-      );
-    this.drawPlayerObjective(cards.getCardFromId(100));
-  }
 
   private static Stage primaryStage;
   private static NotificationLoader notificationLoader;
@@ -245,20 +103,32 @@ public class Gui extends Application implements View {
       primaryStage.setX((screenBounds.getWidth() - 405) / 2);
       primaryStage.setY((screenBounds.getHeight() - 405) / 2);
 
-      notificationLoader = new NotificationLoader(new Stage());
-      exceptionLoader = new ExceptionLoader(new Stage());
-      rulebookHandler = new RulebookHandler(new Stage());
+      //primary stage substages
+      Stage noticationStage = new Stage();
+      noticationStage.initOwner(primaryStage);
+      Stage exceptionStage = new Stage();
+      exceptionStage.initOwner(primaryStage);
+      Stage rulebookStage = new Stage();
+      rulebookStage.initOwner(primaryStage);
+
+      notificationLoader = new NotificationLoader(noticationStage);
+      exceptionLoader = new ExceptionLoader(exceptionStage);
+      rulebookHandler = new RulebookHandler(rulebookStage);
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
 
       primaryStage.show();
-      //drawAvailableGames(new ArrayList<>());
-      //testLobby();
-      //      testGame();
     } catch (IOException e) {
-      Cli.getInstance().displayException(e);
+      // TODO: Handle exception
+      System.err.println(e);
     }
+  }
+
+  public boolean isInitialized() {
+    return (
+      scene != null && notificationLoader != null && exceptionLoader != null
+    );
   }
 
   public static void main(String[] args) {
@@ -341,24 +211,26 @@ public class Gui extends Application implements View {
    * shown and the client is connected
    */
   private void drawGameWindow() {
-    try {
-      Parent root = FXMLLoader.load(
-        Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
-      );
+    Platform.runLater(() -> {
+      try {
+        Parent root = FXMLLoader.load(
+          Objects.requireNonNull(Gui.class.getResource("WindowScene.fxml"))
+        );
 
-      Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 
-      scene = new Scene(
-        root,
-        screenBounds.getWidth(),
-        screenBounds.getHeight()
-      );
+        scene = new Scene(
+          root,
+          screenBounds.getWidth(),
+          screenBounds.getHeight()
+        );
 
-      primaryStage.setScene(scene);
-      primaryStage.setMaximized(true);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+        primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   /**
@@ -403,7 +275,27 @@ public class Gui extends Application implements View {
     Colorable colorable,
     int colorableIndex
   ) {
-    // TODO implement or remove from view and leave in cli.
+    // add colorable.toString in the right index of the messages array
+    List<String> messagesWithColorable = new ArrayList<>(
+      Arrays.stream(messages).toList()
+    );
+    try {
+      messagesWithColorable.add(colorableIndex, colorable.toString());
+    } catch (IndexOutOfBoundsException e) {
+      messagesWithColorable.add(colorable.toString());
+    }
+    postNotification(notificationType, String.join(" ", messagesWithColorable));
+
+    Platform.runLater(() -> {
+      try {
+        notificationLoader.addNotification(
+          notificationType,
+          String.join(" ", messagesWithColorable)
+        );
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   /**
@@ -414,9 +306,11 @@ public class Gui extends Application implements View {
   public void displayException(Exception exception) {
     try {
       exceptionLoader.loadException(exception);
-      Cli.getInstance().displayException(exception);
+      // TODO: Handle exception
+      System.err.println(exception);
     } catch (IOException e) {
-      Cli.getInstance().displayException(e);
+      // TODO: Handle exception
+      System.err.println(exception);
     }
   }
 
@@ -443,13 +337,10 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the available games in the lobby menu
-   * @param games the list of games to display
-   * */
+   */
   @Override
-  public void drawAvailableGames(List<GameEntry> games) {
+  public void drawAvailableGames() {
     Platform.runLater(() -> {
-      drawGameWindow();
-
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
 
@@ -497,6 +388,12 @@ public class Gui extends Application implements View {
             )
         );
 
+      List<GameEntry> games = localModel
+        .getLocalMenu()
+        .getGames()
+        .values()
+        .stream()
+        .toList();
       for (int i = 0; i < games.size(); i++) {
         GameEntry game = games.get(i);
         try {
@@ -518,10 +415,9 @@ public class Gui extends Application implements View {
 
   /**
    * Draw a list of available token colors for the player to choose from
-   * @param tokenColors the list of token colors to display
    * */
   @Override
-  public void drawAvailableTokenColors(Set<TokenColor> tokenColors) {
+  public void drawAvailableTokenColors() {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyToken.fxml", "#content");
 
@@ -534,7 +430,9 @@ public class Gui extends Application implements View {
 
       ((HBox) tokenContainer).getChildren()
         .addAll(
-          tokenColors
+          localModel
+            .getLocalLobby()
+            .getAvailableTokens()
             .stream()
             .map(tokenColor -> {
               ImageView tokenColorImage = loadImage(tokenColor);
@@ -560,23 +458,27 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the current status of the lobby and its connected players alongside the lobby window
-   * @param players the list of players to display
-   * */
+   */
   @Override
-  public void drawLobby(Map<UUID, LocalPlayer> players) {
+  public void drawLobby() {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyPlayers.fxml", "#side-content");
 
       scene
         .lookup("#back-to-menu-button-lobby")
-        .setOnMouseClicked((MouseEvent event) -> {
-          client.listGames();
-        });
+        .setOnMouseClicked((MouseEvent event) -> client.getGames());
 
       GridPane playerGrid =
         ((GridPane) scene.lookup("#lobby-player-container"));
+
+      List<LocalPlayer> players = localModel
+        .getLocalLobby()
+        .getPlayers()
+        .values()
+        .stream()
+        .toList();
       for (int i = 0; i < players.size(); i++) {
-        LocalPlayer player = (LocalPlayer) players.values().toArray()[i];
+        LocalPlayer player = players.get(i);
 
         ImageView token = loadImage(player.getToken());
         token.setPreserveRatio(true);
@@ -597,15 +499,16 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the leaderboard of the game, display the players and their points
-   * @param players the list of players to display
    * */
   @Override
-  public void drawLeaderBoard(List<LocalPlayer> players) {
+  public void drawLeaderBoard() {
     Platform.runLater(() -> {
       GridPane container = (GridPane) scene.lookup("#leaderboard-grid");
       container.getChildren().clear();
 
-      List<LocalPlayer> sortedPlayers = players
+      List<LocalPlayer> sortedPlayers = localModel
+        .getLocalGameBoard()
+        .getPlayers()
         .stream()
         .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
         .toList();
@@ -711,21 +614,28 @@ public class Gui extends Application implements View {
   public void drawNicknameChoice() {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyNickname.fxml", "#content");
-      ((Button) scene.lookup("#nickname-submit-button")).setOnMouseClicked(
-          (MouseEvent event) -> {
-            String nickname =
-              ((TextField) (scene.lookup("#nickname-input"))).getText();
-            client.lobbySetNickname(nickname);
-            client.getObjectiveCards();
-          }
-        );
+      scene
+        .lookup("#nickname-submit-button")
+        .setOnMouseClicked((MouseEvent event) -> {
+          String nickname =
+            ((TextField) (scene.lookup("#nickname-input"))).getText();
+          client.lobbySetNickname(nickname);
+        });
     });
   }
 
   @Override
-  public void drawPlayerBoards(List<LocalPlayer> players) {
+  public LocalModelContainer getLocalModel() {
+    return localModel;
+  }
+
+  @Override
+  public void drawPlayerBoards() {
     // TODO handle other players (switch button etc)
     loadSceneFXML("PlayerBoard.fxml", "#content");
+
+    List<LocalPlayer> players = localModel.getLocalGameBoard().getPlayers();
+
     players
       .stream()
       .filter(
@@ -736,8 +646,8 @@ public class Gui extends Application implements View {
       )
       .findFirst()
       .ifPresent(player -> {
-        drawHand(player.getHand());
-        drawPlayerObjective(player.getObjectiveCard());
+        drawHand();
+        drawPlayerObjective();
       });
 
     ChoiceBox<String> playerBoardChoiceBox = (ChoiceBox<String>) scene.lookup(
@@ -754,15 +664,11 @@ public class Gui extends Application implements View {
 
     playerBoardChoiceBox.setOnAction(event -> {
       String selectedPlayerNickname = playerBoardChoiceBox.getValue();
-      players
-        .stream()
-        .filter(player -> player.getNickname().equals(selectedPlayerNickname))
-        .findFirst()
-        .ifPresent(this::drawPlayerBoard);
+      drawPlayerBoard(selectedPlayerNickname);
     });
 
     // Draw the default player board
-    drawPlayerBoard(localModel.getLocalGameBoard().getPlayer());
+    drawPlayerBoard();
 
     players
       .stream()
@@ -773,21 +679,29 @@ public class Gui extends Application implements View {
             .equals(localModel.getLocalGameBoard().getPlayerNickname())
       )
       .findFirst()
-      .ifPresent(player -> drawHand(player.getHand()));
+      .ifPresent(player -> drawHand());
   }
 
   /**
    * Draw the placed cards of the given player
-   * @param player the player whose playerboard is to be drawn
+   * @param nickname The nickname of the player whose playerboard is to be drawn
    * */
   @Override
-  public void drawPlayerBoard(LocalPlayer player) {
+  public void drawPlayerBoard(String nickname) {
     Platform.runLater(() -> {
       ScrollPane scrollPane = (ScrollPane) scene.lookup(
         "#playerboard-scrollpane"
       );
       GridPane gridPane = new GridPane();
       gridPane.setId("playerboard-grid");
+
+      LocalPlayer player = localModel
+        .getLocalGameBoard()
+        .getPlayers()
+        .stream()
+        .filter(p -> p.getNickname().equals(nickname))
+        .findFirst()
+        .orElseThrow();
 
       for (int row = 0; row < ViewGridPosition.gridSize; row++) {
         RowConstraints rowConstraint = new RowConstraints();
@@ -860,7 +774,7 @@ public class Gui extends Application implements View {
    * */
   private boolean canPlayerPlaceCards() {
     return (
-      !this.hasPlacedCard &&
+      !localModel.currentPlayerHasPlacedCard() &&
       localModel
         .getLocalGameBoard()
         .getCurrentPlayer()
@@ -875,7 +789,7 @@ public class Gui extends Application implements View {
    */
   private boolean canPlayerDrawCards() {
     return (
-      this.hasPlacedCard &&
+      localModel.currentPlayerHasPlacedCard() &&
       localModel
         .getLocalGameBoard()
         .getCurrentPlayer()
@@ -894,7 +808,7 @@ public class Gui extends Application implements View {
       visibleHandSide = CardSideType.FRONT;
     }
     selectedHandIndex = null;
-    drawHand(lastHand);
+    drawHand();
   }
 
   /**
@@ -942,101 +856,16 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Update the decks images after a card has been drawn from a player
-   * @param card the pair of cards to choose from
-   * @param deck the deck from which the cards are drawn
-   * */
-  @Override
-  public void drawCardDrawn(DrawingDeckType deck, Card card) {
-    // TODO
-    drawCardDrawn(deck);
-  }
-
-  /**
-   * Draw the decks image after a card has been drawn from a player
-   * @param deck the deck from which the cards are drawn
-   * */
-  @Override
-  public void drawCardDrawn(DrawingDeckType deck) {
-    // TODO
-    hasPlacedCard = false;
-    ((ScrollPane) scene.lookup("#gameboard-container")).getContent()
-      .getStyleClass()
-      .clear();
-
-    drawHand(localModel.getLocalGameBoard().getPlayer().getHand());
-    drawGameBoard();
-  }
-
-  /**
-   * Draw a card in the playerboard
-   * @param card the card to draw
-   * @param side the side of the card placed
-   * @param position the position in which the card is placed
-   * @param availablePositions the set of available positions in which the next cards can be placed
-   * @param forbiddenPositions the set of forbidden positions in which the next cards cannot be placed
-   * */
-  @Override
-  public void drawCardPlacement(
-    Card card,
-    CardSideType side,
-    Position position,
-    Set<Position> availablePositions,
-    Set<Position> forbiddenPositions
-  ) {
-    hasPlacedCard = true;
-    ((ScrollPane) scene.lookup("#gameboard-container")).getContent()
-      .getStyleClass()
-      .add("allow-draw");
-
-    Platform.runLater(() -> {
-      ViewGridPosition viewPos = new ViewGridPosition(position);
-      GridPane gridPane = (GridPane) scene.lookup("#playerboard-grid");
-
-      gridPane
-        .getChildren()
-        .stream()
-        .filter(
-          child ->
-            GridPane.getRowIndex(child) == viewPos.getRow() &&
-            GridPane.getColumnIndex(child) == viewPos.getCol()
-        )
-        .findFirst()
-        .ifPresentOrElse(
-          current -> {
-            GridCell cell = (GridCell) current;
-            cell.placeCard(loadCardImage(card, side));
-          },
-          () -> {
-            GridCell cell = new GridCell(
-              getCellClickHandler(position),
-              getCellPlacementActive()
-            );
-
-            cell.placeCard(loadCardImage(card, side));
-
-            gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
-          }
-        );
-
-      drawAvailablePositions(availablePositions, gridPane);
-      drawForbiddenPositions(forbiddenPositions, gridPane);
-      //TODO draw resources and objects
-    });
-  }
-
-  /**
    * Draw the playerboard and gameboard scenes after every player has finished in the lobby
-   * @param players the list of players of the current game
    * */
   @Override
-  public void drawGame(List<LocalPlayer> players) {
+  public void drawGame() {
     Platform.runLater(() -> {
       loadSceneFXML("GameBoard.fxml", "#side-content");
-      drawChat(players);
+      drawChat();
       drawGameBoard();
-      drawPlayerBoards(players);
-      drawLeaderBoard(players);
+      drawPlayerBoards();
+      drawLeaderBoard();
       ((Text) scene.lookup("#window-title")).setText(
           "Game " + localModel.getGameId().get()
         );
@@ -1056,34 +885,33 @@ public class Gui extends Application implements View {
   /**
    * Draw the gameboard contents.
    * */
-  //TODO maybe implement this into the cli
+  @Override
   public void drawGameBoard() {
-    drawPairs(
-      localModel.getLocalGameBoard().getResourceCards(),
-      localModel.getLocalGameBoard().getGoldCards()
-    );
+    drawPairs();
 
-    drawCardDecks(
-      localModel.getLocalGameBoard().getResourceDeckTopCard(),
-      localModel.getLocalGameBoard().getGoldDeckTopCard()
-    );
+    drawCardDecks();
 
-    drawCommonObjectiveCards(
-      localModel.getLocalGameBoard().getObjectiveCards()
-    );
+    drawCommonObjectiveCards();
   }
 
   /**
    * Display the game is over and the final leaderboard
    * */
   @Override
-  public void drawGameOver(List<LocalPlayer> players) {
+  public void drawGameOver() {
     Platform.runLater(() -> {
       ((Text) scene.lookup("#window-title")).setText("Game Over");
       //draw the final leaderboard int the #side-content container and don't use drawLeaderBoard
-      drawLeaderBoard(players);
-      players.sort((p1, p2) -> p2.getPoints() - p1.getPoints());
-      drawWinner(players.getFirst().getNickname());
+      drawLeaderBoard();
+      winningPlayer(
+        localModel
+          .getLocalGameBoard()
+          .getPlayers()
+          .stream()
+          .min((p1, p2) -> p2.getPoints() - p1.getPoints())
+          .map(LocalPlayer::getNickname)
+          .orElseThrow()
+      );
 
       VBox commonBoardContainer = (VBox) scene.lookup(
         "#common-board-container"
@@ -1101,13 +929,12 @@ public class Gui extends Application implements View {
 
   /**
    * Draws the hand of the player
-   * @param hand the hand of the player
    * */
   @Override
-  public void drawHand(List<Card> hand) {
+  public void drawHand() {
     Platform.runLater(() -> {
       // Save the hand in case we need to flip it
-      lastHand = hand;
+      List<Card> hand = localModel.getLocalGameBoard().getPlayer().getHand();
 
       scene
         .lookup("#flip-hand-button")
@@ -1150,14 +977,9 @@ public class Gui extends Application implements View {
 
   /**
    * Draws the pairs of resource and gold cards which the player can draw from
-   * @param resourceCards the pair of resource cards
-   * @param goldCards the pair of gold cards
    * */
   @Override
-  public void drawPairs(
-    CardPair<Card> resourceCards,
-    CardPair<Card> goldCards
-  ) {
+  public void drawPairs() {
     Platform.runLater(() -> {
       VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
           "#gameboard-container"
@@ -1179,6 +1001,11 @@ public class Gui extends Application implements View {
 
       resourceCardContainer.getChildren().clear();
       goldCardContainer.getChildren().clear();
+
+      CardPair<Card> resourceCards = localModel
+        .getLocalGameBoard()
+        .getResourceCards();
+      CardPair<Card> goldCards = localModel.getLocalGameBoard().getGoldCards();
 
       // TODO how do we want to display two sides?
       List<ImageView> images = List.of(
@@ -1249,27 +1076,28 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the two objective cards the player can choose from in the lobby
-   * @param cardPair the pair of cards to choose from
    * */
   @Override
-  public void drawObjectiveCardChoice(CardPair<Card> cardPair) {
+  public void drawObjectiveCardChoice() {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyChooseObjective.fxml", "#content");
 
       ((Text) scene.lookup("#window-title")).setText("Lobby");
 
+      CardPair<Card> cardPair = localModel
+        .getLocalLobby()
+        .getAvailableObjectives();
+
       ImageView first = loadImage(cardPair.getFirst());
       ImageView second = loadImage(cardPair.getSecond());
 
-      first.setOnMouseClicked((MouseEvent event) -> {
-        client.lobbyChooseObjectiveCard(true);
-        client.getStarterCard();
-      });
+      first.setOnMouseClicked(
+        (MouseEvent event) -> client.lobbyChooseObjectiveCard(true)
+      );
 
-      second.setOnMouseClicked((MouseEvent event) -> {
-        client.lobbyChooseObjectiveCard(false);
-        client.getStarterCard();
-      });
+      second.setOnMouseClicked(
+        (MouseEvent event) -> client.lobbyChooseObjectiveCard(false)
+      );
 
       List.of(first, second).forEach(image -> {
         image.setPreserveRatio(true);
@@ -1285,17 +1113,18 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the sides of the starter card the player can choose from in the lobby
-   * @param cardId the card to choose the side from
    * */
   @Override
-  public void drawStarterCardSides(Card cardId) {
+  public void drawStarterCardSides() {
     Platform.runLater(() -> {
       loadSceneFXML("LobbyChooseStarterCardSide.fxml", "#content");
 
       ((Text) scene.lookup("#window-title")).setText("Lobby");
 
-      ImageView front = loadCardImage(cardId, CardSideType.FRONT);
-      ImageView back = loadCardImage(cardId, CardSideType.BACK);
+      Card card = localModel.getLocalLobby().getStarterCard();
+
+      ImageView front = loadCardImage(card, CardSideType.FRONT);
+      ImageView back = loadCardImage(card, CardSideType.BACK);
 
       front.setPreserveRatio(true);
       back.setPreserveRatio(true);
@@ -1324,24 +1153,9 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Draw the winner of the game
-   * */
-  @Override
-  public void drawWinner(String nickname) {
-    Platform.runLater(() -> {
-      loadSceneFXML("Winner.fxml", "#content");
-      ((Text) scene.lookup("#winner-container")).setText(nickname);
-      ((Button) scene.lookup("#back-to-menu-button")).setOnMouseClicked(
-          (MouseEvent event) -> client.listGames()
-        );
-    });
-  }
-
-  /**
    * Load the chat scene for chat messages to be drawn in.
-   * @param players to whom a message can be sent.
    * */
-  public void drawChat(List<LocalPlayer> players) {
+  public void drawChat() {
     loadSceneFXML("Chat.fxml", "#side-content-bottom");
     // add recipients to chat-recipient combo box
 
@@ -1349,13 +1163,16 @@ public class Gui extends Application implements View {
       "#chat-recipient"
     );
 
-    players
+    localModel
+      .getLocalGameBoard()
+      .getPlayers()
       .stream()
-      .filter(player -> {
-        return !player
-          .getNickname()
-          .equals(localModel.getLocalGameBoard().getPlayerNickname());
-      })
+      .filter(
+        player ->
+          !player
+            .getNickname()
+            .equals(localModel.getLocalGameBoard().getPlayerNickname())
+      )
       .forEach(
         player -> recipientChoiceBox.getItems().add(player.getNickname())
       );
@@ -1364,29 +1181,29 @@ public class Gui extends Application implements View {
 
     recipientChoiceBox.setValue("Broadcast");
 
-    ((Button) scene.lookup("#chat-send-button")).setOnMouseClicked(
-        (MouseEvent event) -> {
-          String recipient =
-            ((ChoiceBox<String>) scene.lookup("#chat-recipient")).getValue();
-          String message = ((TextField) scene.lookup("#chat-input")).getText();
-          ChatMessage chatMessage;
+    scene
+      .lookup("#chat-send-button")
+      .setOnMouseClicked((MouseEvent event) -> {
+        String recipient =
+          ((ChoiceBox<String>) scene.lookup("#chat-recipient")).getValue();
+        String message = ((TextField) scene.lookup("#chat-input")).getText();
+        ChatMessage chatMessage;
 
-          if (!Objects.equals(recipient, "Broadcast")) {
-            chatMessage = new ChatMessage(
-              recipient,
-              localModel.getLocalGameBoard().getPlayerNickname(),
-              message
-            );
-          } else {
-            chatMessage = new ChatMessage(
-              localModel.getLocalGameBoard().getPlayerNickname(),
-              message
-            );
-          }
-          client.sendChatMessage(chatMessage);
-          drawChatMessage(chatMessage);
+        if (!Objects.equals(recipient, "Broadcast")) {
+          chatMessage = new ChatMessage(
+            localModel.getLocalGameBoard().getPlayerNickname(),
+            recipient,
+            message
+          );
+        } else {
+          chatMessage = new ChatMessage(
+            localModel.getLocalGameBoard().getPlayerNickname(),
+            message
+          );
         }
-      );
+        client.sendChatMessage(chatMessage);
+        drawChatMessage(chatMessage);
+      });
   }
 
   /**
@@ -1400,7 +1217,6 @@ public class Gui extends Application implements View {
         )).getContent()
         .lookup("#chat-message-container-box");
 
-      // Load the chat message template from the FXML file
       FXMLLoader loader = new FXMLLoader(
         getClass().getResource("ChatMessage.fxml")
       );
@@ -1408,17 +1224,19 @@ public class Gui extends Application implements View {
       try {
         Node chatMessageTemplate = loader.load();
 
-        // Look up the elements in the template
         Label senderLabel = (Label) chatMessageTemplate.lookup("#sender");
         Label messageLabel = (Label) chatMessageTemplate.lookup("#message");
         ImageView senderTokenImage = (ImageView) chatMessageTemplate.lookup(
           "#sender-token"
         );
 
-        // Set the data from the ChatMessage object to the elements in the
-        // template
         senderLabel.setText(message.getSender());
         messageLabel.setText(message.getContent());
+
+        // whispering
+        if (message.getRecipient().isPresent()) {
+          messageLabel.setStyle("-fx-text-fill: #6b17b1");
+        }
 
         Image tokenImage = localModel
           .getLocalGameBoard()
@@ -1456,10 +1274,9 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the common objective cards in the gameboard
-   * @param cardPair the pair of cards to draw
    * */
   @Override
-  public void drawCommonObjectiveCards(CardPair<Card> cardPair) {
+  public void drawCommonObjectiveCards() {
     Platform.runLater(() -> {
       VBox commonBoardContainer = (VBox) ((ScrollPane) scene.lookup(
           "#gameboard-container"
@@ -1474,6 +1291,10 @@ public class Gui extends Application implements View {
       cardsContainer.setAlignment(Pos.CENTER);
 
       cardsContainer.getChildren().clear();
+
+      CardPair<Card> cardPair = localModel
+        .getLocalGameBoard()
+        .getObjectiveCards();
 
       List<ImageView> images = List.of(
         loadCardImage(cardPair.getFirst(), CardSideType.FRONT),
@@ -1499,14 +1320,16 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the player objective card in its player board along side its hand
-   * @param card the objective card to draw
    * */
   @Override
-  public void drawPlayerObjective(Card card) {
+  public void drawPlayerObjective() {
     VBox vbox = (VBox) scene.lookup("#player-objective-card");
     vbox.getChildren().clear();
 
-    ImageView image = loadCardImage(card, CardSideType.FRONT);
+    ImageView image = loadCardImage(
+      localModel.getLocalGameBoard().getPlayer().getObjectiveCard(),
+      CardSideType.FRONT
+    );
     image.setPreserveRatio(true);
     image.setFitWidth(150);
 
@@ -1515,18 +1338,20 @@ public class Gui extends Application implements View {
 
   /**
    * Draw the card decks in the gameboard
-   * @param firstResourceCard the first resource card to draw
-   * @param firstGoldCard the first gold card to draw
    * */
   @Override
-  public void drawCardDecks(
-    PlayableCard firstResourceCard,
-    PlayableCard firstGoldCard
-  ) {
+  public void drawCardDecks() {
     Platform.runLater(() -> {
       //TODO put this in drawGameBoard
       HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
       HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
+
+      PlayableCard firstResourceCard = localModel
+        .getLocalGameBoard()
+        .getResourceDeckTopCard();
+      PlayableCard firstGoldCard = localModel
+        .getLocalGameBoard()
+        .getGoldDeckTopCard();
 
       resourceCardsDeck.getChildren().clear();
       if (firstResourceCard != null) {
@@ -1567,9 +1392,164 @@ public class Gui extends Application implements View {
     });
   }
 
-  public boolean isInitialized() {
-    return (
-      scene != null && notificationLoader != null && exceptionLoader != null
-    );
+  //-------------------------------
+  // GAME EVENT HANDLERS
+  //-------------------------------
+  @Override
+  public void connected() {
+    drawGameWindow();
+    drawAvailableGames();
+  }
+
+  @Override
+  public void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
+    View.super.gameCreated(gameId, currentPlayers, maxPlayers);
+    drawAvailableGames();
+  }
+
+  @Override
+  public void gameDeleted(String gameId) {
+    View.super.gameDeleted(gameId);
+  }
+
+  @Override
+  public void playerJoinedLobby(String gameId, UUID socketID) {
+    View.super.playerJoinedLobby(gameId, socketID);
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawAvailableTokenColors();
+      } else {
+        drawLobby();
+      }
+    } else if (
+      localModel.getClientContextContainer().get().equals(ClientContext.MENU)
+    ) {
+      drawAvailableGames();
+    }
+  }
+
+  @Override
+  public void playerLeftLobby(String gameId, UUID socketID) {
+    View.super.playerLeftLobby(gameId, socketID);
+    drawLobby();
+  }
+
+  @Override
+  public void playerSetToken(
+    String gameId,
+    UUID socketID,
+    String nickname,
+    TokenColor token
+  ) {
+    View.super.playerSetToken(gameId, socketID, nickname, token);
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawNicknameChoice();
+        client.getObjectiveCards();
+      } else if (
+        localModel
+          .getLocalLobby()
+          .getPlayers()
+          .get(localModel.getSocketID())
+          .getToken() ==
+        null
+      ) {
+        drawAvailableTokenColors();
+      }
+      drawLobby();
+    }
+  }
+
+  @Override
+  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
+    View.super.playerSetNickname(gameId, socketID, nickname);
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawObjectiveCardChoice();
+        client.getStarterCard();
+      }
+
+      drawLobby();
+    }
+  }
+
+  @Override
+  public void playerChoseObjectiveCard(
+    String gameId,
+    UUID socketID,
+    String nickname
+  ) {
+    View.super.playerChoseObjectiveCard(gameId, socketID, nickname);
+    if (gameId.equals(localModel.getGameId().get())) {
+      if (socketID.equals(localModel.getSocketID())) {
+        drawStarterCardSides();
+      } else {
+        drawLobby();
+      }
+    }
+  }
+
+  @Override
+  public void gameStarted(String gameId, GameInfo gameInfo) {
+    View.super.gameStarted(gameId, gameInfo);
+    drawGame();
+  }
+
+  @Override
+  public void gameOver() {
+    View.super.gameOver();
+    drawGameOver();
+  }
+
+  @Override
+  public void playerScoresUpdate(Map<String, Integer> newScores) {
+    View.super.playerScoresUpdate(newScores);
+    drawLeaderBoard();
+  }
+
+  @Override
+  public void remainingRounds(String gameID, int remainingRounds) {
+    View.super.remainingRounds(gameID, remainingRounds);
+  }
+
+  @Override
+  public void winningPlayer(String nickname) {
+    View.super.winningPlayer(nickname);
+    Platform.runLater(() -> {
+      loadSceneFXML("Winner.fxml", "#content");
+      ((Text) scene.lookup("#winner-container")).setText(nickname);
+      scene
+        .lookup("#back-to-menu-button")
+        .setOnMouseClicked((MouseEvent event) -> client.getGames());
+    });
+  }
+
+  @Override
+  public void playerConnectionChanged(
+    UUID socketID,
+    String nickname,
+    GameController.UserGameContext.ConnectionStatus status
+  ) {
+    View.super.playerConnectionChanged(socketID, nickname, status);
+    //TODO make it visible in the leaderBoard
+    if (
+      localModel
+        .getClientContextContainer()
+        .get()
+        .map(context -> context.equals(ClientContext.GAME))
+        .orElse(false)
+    ) {
+      drawLeaderBoard();
+    }
+  }
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    View.super.lobbyInfo(usersInfo);
+  }
+
+  @Override
+  public void chatMessage(String gameID, ChatMessage message) {
+    View.super.chatMessage(gameID, message);
   }
 }

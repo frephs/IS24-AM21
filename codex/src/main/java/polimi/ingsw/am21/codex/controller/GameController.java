@@ -27,6 +27,7 @@ import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.AlreadyPlacedCardGameException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
+import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
 import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class GameController {
@@ -990,15 +991,36 @@ public class GameController {
 
     Game game = this.getGame(gameId);
     this.checkIfCurrentPlayer(game, connectionID);
-    game.nextTurn(
-      () -> this.nextTurnEvent(connectionID, gameId, game),
-      remainingRounds ->
-        this.notifySameContextClients(
-            connectionID,
-            (listener, targetSocketID) ->
-              listener.remainingRounds(gameId, remainingRounds)
-          )
-    );
+    try {
+      game.nextTurn(
+        () -> this.nextTurnEvent(connectionID, gameId, game),
+        remainingRounds ->
+          this.notifySameContextClients(
+              connectionID,
+              (listener, targetSocketID) ->
+                listener.remainingRounds(gameId, remainingRounds)
+            )
+      );
+    } catch (GameOverException e) {
+      evaluateObjectives(game, connectionID);
+      throw e;
+    }
+  }
+
+  private void evaluateObjectives(Game game, UUID connectionID) {
+    game
+      .getPlayers()
+      .forEach(player -> {
+        player.evaluateSecretObjective();
+        player.evaluate(game.getGameBoard().getObjectiveCards().getFirst());
+        player.evaluate(game.getGameBoard().getObjectiveCards().getSecond());
+      });
+
+    this.notifySameContextClients(
+        connectionID,
+        (listener, targetSocketID) ->
+          listener.playerScoresUpdate(game.getScoreBoard())
+      );
   }
 
   private void nextTurnEvent(UUID connectionID, String gameID, Game game) {
@@ -1046,37 +1068,41 @@ public class GameController {
       )
       .findFirst()
       .orElseThrow(CardNotPlacedException::new);
-
-    game.nextTurn(
-      drawingSource,
-      deckType,
-      (playerCardId, pairCardId) ->
-        this.notifySameContextClients(
-            connectionID,
-            (listener, targetSocketID) ->
-              listener.changeTurn(
-                gameId,
-                game.getCurrentPlayer().getNickname(),
-                game.getCurrentPlayerIndex(),
-                game.isLastRound(),
-                drawingSource,
-                deckType,
-                targetSocketID.equals(connectionID) ? playerCardId : null,
-                pairCardId,
-                game.getCurrentPlayer().getBoard().getAvailableSpots(),
-                game.getCurrentPlayer().getBoard().getForbiddenSpots(),
-                game.getGameBoard().peekResourceCardFromDeck().getId(),
-                game.getGameBoard().peekGoldCardFromDeck().getId()
-              )
-          ),
-      () -> this.nextTurnEvent(connectionID, gameId, game),
-      remainingRounds ->
-        this.notifySameContextClients(
-            connectionID,
-            (listener, targetSocketID) ->
-              listener.remainingRounds(gameId, remainingRounds)
-          )
-    );
+    try {
+      game.nextTurn(
+        drawingSource,
+        deckType,
+        (playerCardId, pairCardId) ->
+          this.notifySameContextClients(
+              connectionID,
+              (listener, targetSocketID) ->
+                listener.changeTurn(
+                  gameId,
+                  game.getCurrentPlayer().getNickname(),
+                  game.getCurrentPlayerIndex(),
+                  game.isLastRound(),
+                  drawingSource,
+                  deckType,
+                  targetSocketID.equals(connectionID) ? playerCardId : null,
+                  pairCardId,
+                  game.getCurrentPlayer().getBoard().getAvailableSpots(),
+                  game.getCurrentPlayer().getBoard().getForbiddenSpots(),
+                  game.getGameBoard().peekResourceCardFromDeck().getId(),
+                  game.getGameBoard().peekGoldCardFromDeck().getId()
+                )
+            ),
+        () -> this.nextTurnEvent(connectionID, gameId, game),
+        remainingRounds ->
+          this.notifySameContextClients(
+              connectionID,
+              (listener, targetSocketID) ->
+                listener.remainingRounds(gameId, remainingRounds)
+            )
+      );
+    } catch (GameOverException e) {
+      evaluateObjectives(game, connectionID);
+      throw e;
+    }
   }
 
   public void connect(UUID socketID, RemoteGameEventListener listener) {
@@ -1195,11 +1221,8 @@ public class GameController {
     }
   }
 
-  public void sendChatMessage(
-    UUID connectionID,
-    String recipientNickname,
-    String message
-  ) throws InvalidActionException {
+  public void sendChatMessage(UUID connectionID, ChatMessage chatMessage)
+    throws InvalidActionException {
     Optional<UserGameContext> userGameContext = Optional.ofNullable(
       userContexts.get(connectionID)
     );
@@ -1207,25 +1230,38 @@ public class GameController {
     if (userGameContext.isEmpty()) throw new PlayerNotFoundException(
       connectionID
     );
+
     String gameId = userGameContext
       .get()
       .getGameId()
       .orElseThrow(NotInGameException::new);
+
     Game game = this.getGame(gameId);
-    String nickname = userGameContext
-      .get()
-      .getNickname()
-      .orElseThrow(NotInGameException::new);
-    ChatMessage chatMessage = new ChatMessage(
-      nickname,
-      recipientNickname,
-      message
-    );
+
     game.getChat().postMessage(chatMessage);
 
     notifySameContextClients(connectionID, (listener, targetSocketID) -> {
+      //if there is a recipient in the message filter the listeners
+
       try {
-        listener.chatMessage(gameId, chatMessage);
+        if (
+          chatMessage
+            .getRecipient()
+            .map(
+              recipient ->
+                recipient.equals(
+                  userContexts.get(targetSocketID).getNickname().orElse(null)
+                )
+            )
+            .orElse(true) &&
+          !userContexts
+            .get(targetSocketID)
+            .getNickname()
+            .map(nickname -> nickname.equals(chatMessage.getSender()))
+            .orElse(false)
+        ) {
+          listener.chatMessage(gameId, chatMessage);
+        }
       } catch (RemoteException e) {
         if (userContexts.containsKey(targetSocketID)) {
           userContexts.get(targetSocketID).disconnected();

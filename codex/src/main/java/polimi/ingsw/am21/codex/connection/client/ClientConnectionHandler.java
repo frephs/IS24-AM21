@@ -3,7 +3,7 @@ package polimi.ingsw.am21.codex.connection.client;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import polimi.ingsw.am21.codex.client.ClientContext;
+import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -15,12 +15,11 @@ import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.Notification;
 import polimi.ingsw.am21.codex.view.NotificationType;
-import polimi.ingsw.am21.codex.view.TUI.CliClient;
 import polimi.ingsw.am21.codex.view.View;
 
 public abstract class ClientConnectionHandler {
 
-  protected LocalModelContainer localModel;
+  protected final ClientGameEventHandler gameEventHandler;
   protected UUID socketID;
 
   protected final String host;
@@ -30,24 +29,32 @@ public abstract class ClientConnectionHandler {
   private Integer consecutiveFailedHeartBeats = 0;
   protected ConnectionType connectionType;
 
+  private View view;
+
   public ClientConnectionHandler(
     String host,
     Integer port,
-    LocalModelContainer localModel
+    View view,
+    ClientGameEventHandler gameEventHandler
   ) {
     this.host = host;
     this.port = port;
-    this.localModel = localModel;
     this.socketID = UUID.randomUUID();
-    this.localModel.setSocketId(socketID);
+    this.gameEventHandler = gameEventHandler;
+    this.gameEventHandler.getLocalModel().setSocketId(socketID);
+    this.view = view;
   }
 
   protected UUID getSocketID() {
-    return localModel.getSocketID();
+    return gameEventHandler.getLocalModel().getSocketID();
   }
 
   View getView() {
-    return localModel.getView();
+    return view;
+  }
+
+  ClientGameEventHandler getLocalModelContainer() {
+    return this.gameEventHandler;
   }
 
   public ConnectionType getConnectionType() {
@@ -63,7 +70,7 @@ public abstract class ClientConnectionHandler {
   /**
    * Retrieves the list of available games and displays them in the view
    */
-  public abstract void listGames();
+  public abstract void getGames();
 
   /**
    * @param gameId the id of the game to create
@@ -208,11 +215,6 @@ public abstract class ClientConnectionHandler {
       GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_FAILED);
     this.getView().displayException(e);
-    this.getView()
-      .postNotification(
-        NotificationType.WARNING,
-        "Try reconnecting using: reconnect [host port]"
-      );
   }
 
   private void failedHeartBeat() {
@@ -232,7 +234,7 @@ public abstract class ClientConnectionHandler {
   }
 
   public void connectionEstablished() {
-    this.listGames();
+    this.getGames();
     this.connectionStatus =
       GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
@@ -264,7 +266,7 @@ public abstract class ClientConnectionHandler {
   }
 
   public void getObjectivesIfNull() {
-    if (localModel.getAvailableObjectives() == null) {
+    if (gameEventHandler.getLocalModel().getAvailableObjectives() == null) {
       getObjectiveCards();
     }
   }
@@ -273,6 +275,6 @@ public abstract class ClientConnectionHandler {
    * @return local model for testing purposes
    * */
   LocalModelContainer getLocalModel() {
-    return localModel;
+    return gameEventHandler.getLocalModel();
   }
 }

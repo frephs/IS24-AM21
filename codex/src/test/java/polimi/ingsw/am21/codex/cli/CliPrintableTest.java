@@ -6,6 +6,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.Deck;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 
 class CliPrintableTest {
 
@@ -28,6 +29,8 @@ class CliPrintableTest {
     Deck<ObjectiveCard> objectiveDeck = new Deck<ObjectiveCard>(
       cardsLoader.loadObjectiveCards()
     );
+
+    Cli.Options options = new Cli.Options(true);
 
     try {
       System.out.println(resourceDeck.draw().cardToAscii());

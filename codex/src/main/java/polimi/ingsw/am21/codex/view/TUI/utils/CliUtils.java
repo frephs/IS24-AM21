@@ -41,7 +41,7 @@ public class CliUtils {
     ColorStyle style,
     int length
   ) {
-    if (Cli.getInstance().isColored()) {
+    if (Cli.options.isColored()) {
       return (
         colorable.getColor().getCode(style) +
         colorable.toString().substring(0, length) +
@@ -60,7 +60,7 @@ public class CliUtils {
   }
 
   public static String colorize(String string, Color color, ColorStyle style) {
-    if (Cli.getInstance().isColored()) {
+    if (Cli.options.isColored()) {
       return Color.colorize(string, color, style);
     }
     return string;
@@ -73,7 +73,7 @@ public class CliUtils {
     ColorStyle style
   ) {
     StringBuilder sb = new StringBuilder();
-    if (Cli.getInstance().isColored()) {
+    if (Cli.options.isColored()) {
       AtomicInteger ansiSize = new AtomicInteger();
       colorables.forEach(colorable -> {
         ansiSize.addAndGet(
@@ -93,7 +93,7 @@ public class CliUtils {
     int colorableSize,
     ColorStyle style
   ) {
-    if (Cli.getInstance().isColored()) {
+    if (Cli.options.isColored()) {
       return colorize(colorable, style, colorableSize).length();
     }
     return colorable.toString().length();

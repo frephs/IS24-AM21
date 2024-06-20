@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import polimi.ingsw.am21.codex.client.ClientType;
+import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.Server;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;

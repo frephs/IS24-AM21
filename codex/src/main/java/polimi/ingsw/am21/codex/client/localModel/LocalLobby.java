@@ -10,7 +10,7 @@ public class LocalLobby {
 
   private CardPair<Card> availableObjectives;
 
-  private Integer starterCardId;
+  private Card starterCard;
 
   /**
    * Players of the lobby you chose.
@@ -50,12 +50,12 @@ public class LocalLobby {
     this.availableObjectives = new CardPair<>(first, second);
   }
 
-  public Integer getStarterCardId() {
-    return starterCardId;
+  public Card getStarterCard() {
+    return starterCard;
   }
 
-  public void setStarterCardId(Integer starterCardId) {
-    this.starterCardId = starterCardId;
+  public void setStarterCard(Card starterCard) {
+    this.starterCard = starterCard;
   }
 
   public Map<UUID, LocalPlayer> getPlayers() {

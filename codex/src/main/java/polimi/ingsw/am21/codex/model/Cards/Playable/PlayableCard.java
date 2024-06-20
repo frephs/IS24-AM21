@@ -7,6 +7,7 @@ import java.util.function.Function;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.PlayerBoard;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.TUI.utils.CliUtils;
 
 public class PlayableCard extends Card {
@@ -140,6 +141,7 @@ public class PlayableCard extends Card {
     return CliUtils.joinMinLines(frontSideString, backSideString);
   }
 
+  @Override
   public String cardToString() {
     // TODO: Implement TUI method
     return "";
