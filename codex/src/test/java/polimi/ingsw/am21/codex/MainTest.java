@@ -141,7 +141,7 @@ class MainTest {
 
     //making a private getter available to see whose turn is it
 
-    Method localModelGetter = null;
+    Method localModelGetter;
     try {
       localModelGetter = ClientConnectionHandler.class.getDeclaredMethod(
           "getLocalModel"
@@ -155,7 +155,7 @@ class MainTest {
     LocalModelContainer localModel;
     try {
       localModel = ((LocalModelContainer) localModelGetter.invoke(
-          (ClientConnectionHandler) client1.get()
+          client1.get()
         ));
       assertNotNull(localModel);
     } catch (IllegalAccessException | InvocationTargetException e) {

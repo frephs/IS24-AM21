@@ -4,13 +4,11 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import javafx.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Builder.CardBuilder;
 import polimi.ingsw.am21.codex.model.Cards.Builder.CardType;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.PointConditionType;
@@ -21,10 +19,10 @@ public final class CardsLoader {
 
   private final JSONArray cards;
   private boolean loaded = false;
-  private List<PlayableCard> starterCardsList = new ArrayList<>();
-  private List<PlayableCard> resourceCardsList = new ArrayList<>();
-  private List<PlayableCard> goldCardsList = new ArrayList<>();
-  private List<ObjectiveCard> objectiveCardsList = new ArrayList<>();
+  private final List<PlayableCard> starterCardsList = new ArrayList<>();
+  private final List<PlayableCard> resourceCardsList = new ArrayList<>();
+  private final List<PlayableCard> goldCardsList = new ArrayList<>();
+  private final List<ObjectiveCard> objectiveCardsList = new ArrayList<>();
 
   private List<Card> cardList = null;
 
@@ -110,7 +108,11 @@ public final class CardsLoader {
       cardList.addAll(starterCardsList);
       cardList.addAll(objectiveCardsList);
     }
-    return cardList.stream().filter(c -> c.getId() == id).findFirst().get();
+    return cardList
+      .stream()
+      .filter(c -> c.getId() == id)
+      .findFirst()
+      .orElseThrow();
   }
 
   public List<PlayableCard> loadStarterCards() {
@@ -295,14 +297,5 @@ public final class CardsLoader {
         }
       }
     }
-  }
-
-  public CardPair<Card> getCardPairFromIds(
-    Pair<Integer, Integer> resourceCardPairIds
-  ) {
-    return new CardPair<>(
-      getCardFromId(resourceCardPairIds.getKey()),
-      getCardFromId(resourceCardPairIds.getValue())
-    );
   }
 }

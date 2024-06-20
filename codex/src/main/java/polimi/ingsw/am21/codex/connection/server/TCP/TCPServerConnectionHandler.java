@@ -42,9 +42,6 @@ public class TCPServerConnectionHandler implements Runnable {
    */
   private final Socket socket;
   /**
-   * A UUID associated with the socket
-   */
-  /**
    * The Game controller
    */
   private final GameController controller;

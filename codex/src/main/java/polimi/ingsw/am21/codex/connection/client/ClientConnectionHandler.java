@@ -29,7 +29,7 @@ public abstract class ClientConnectionHandler {
   private Integer consecutiveFailedHeartBeats = 0;
   protected ConnectionType connectionType;
 
-  private View view;
+  private final View view;
 
   public ClientConnectionHandler(
     String host,
@@ -51,10 +51,6 @@ public abstract class ClientConnectionHandler {
 
   View getView() {
     return view;
-  }
-
-  ClientGameEventHandler getLocalModelContainer() {
-    return this.gameEventHandler;
   }
 
   public ConnectionType getConnectionType() {

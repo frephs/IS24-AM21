@@ -72,11 +72,11 @@ public interface RMIServerConnectionHandler extends Remote {
   Set<TokenColor> getAvailableTokens(String gameId)
     throws RemoteException, InvalidActionException;
 
-  public void sendChatMessage(UUID connectionID, ChatMessage message)
+  void sendChatMessage(UUID connectionID, ChatMessage message)
     throws RemoteException, InvalidActionException;
 
-  public void connect(UUID connectionID, RemoteGameEventListener listener)
+  void connect(UUID connectionID, RemoteGameEventListener listener)
     throws RemoteException;
 
-  public void heartBeat(UUID connectionID) throws RemoteException;
+  void heartBeat(UUID connectionID) throws RemoteException;
 }

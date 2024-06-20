@@ -34,7 +34,7 @@ public class ClientGameEventHandler
   private final RemoteGameEventListener listener;
 
   protected LocalModelContainer localModel;
-  private View view;
+  private final View view;
 
   public View getView() {
     return view;
@@ -534,9 +534,5 @@ public class ClientGameEventHandler
   public void getStarterCard(Integer cardId) {
     localModel.getStarterCard(cardId);
     view.getStarterCard(cardId);
-  }
-
-  public void drawAvailableTokenColors() {
-    view.drawAvailableTokenColors();
   }
 }

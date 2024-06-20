@@ -24,11 +24,6 @@ public class ConcreteObjective extends Objective {
   }
 
   @Override
-  public String cardToAscii() {
-    return super.cardToAscii();
-  }
-
-  @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     return "";
   }

@@ -9,21 +9,21 @@ class CornerTest {
 
   @Test
   void isEmpty() {
-    Corner corner = new Corner<>();
-    assertEquals(corner.isEmpty(), true);
+    Corner<CornerContentType> corner = new Corner<>();
+    assertTrue(corner.isEmpty());
   }
 
   @Test
   void getContent() {
-    Corner corner = new Corner<>();
+    Corner<CornerContentType> corner = new Corner<>();
     assertEquals(corner.getContent(), Optional.empty());
   }
 
   @Test
   void cover() {
-    Corner corner = new Corner<>();
-    assertEquals(corner.isCovered(), false);
+    Corner<CornerContentType> corner = new Corner<>();
+    assertFalse(corner.isCovered());
     corner.cover();
-    assertEquals(corner.isCovered(), true);
+    assertTrue(corner.isCovered());
   }
 }

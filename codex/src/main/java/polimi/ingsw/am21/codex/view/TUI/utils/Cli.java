@@ -27,9 +27,6 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class Cli implements View {
 
-  private static Cli cli;
-
-  private static ClientConnectionHandler client;
   private final LocalModelContainer localModel;
 
   public static class Options {
@@ -49,17 +46,12 @@ public class Cli implements View {
 
   @Override
   public void setClient(ClientConnectionHandler client) {
-    Cli.client = client;
+    // Not used in CLI
   }
 
   public Cli(Cli.Options options) {
     Cli.options = options;
-    cli = this;
     localModel = new LocalModelContainer();
-  }
-
-  public static Cli getInstance() {
-    return cli;
   }
 
   @Override

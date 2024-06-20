@@ -118,9 +118,9 @@ public class PlayerBoardTest {
   void mapUpdateTest()
     throws IllegalAccessException, InvocationTargetException {
     card.setPlayedSideType(CardSideType.BACK);
-    Corner corner = card
+    Corner<CornerContentType> corner = card
       .getPlayedSide()
-      .get()
+      .orElseThrow()
       .getCorners()
       .get(CornerPosition.BOTTOM_LEFT);
 
@@ -144,7 +144,7 @@ public class PlayerBoardTest {
 
   @Test
   void testEquals() {
-    Object o = (Object) ResourceType.ANIMAL;
+    Object o = ResourceType.ANIMAL;
     Optional<Object> oo = Optional.of(o);
     ResourceType r = ResourceType.ANIMAL;
     assertEquals(r, oo.get());

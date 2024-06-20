@@ -17,11 +17,11 @@ public class CountingObjective extends Objective implements CliCard {
   /**
    * The map of which resources and how many to complete the objective
    */
-  private Map<ResourceType, Integer> resources;
+  private final Map<ResourceType, Integer> resources;
   /**
    * The map of which object and how many to complete the objective
    */
-  private Map<ObjectType, Integer> objects;
+  private final Map<ObjectType, Integer> objects;
 
   public CountingObjective(
     Map<ResourceType, Integer> resources,

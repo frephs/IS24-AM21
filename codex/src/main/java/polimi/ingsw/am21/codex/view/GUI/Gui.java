@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view.GUI;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.function.Supplier;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -13,10 +14,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -66,11 +66,12 @@ public class Gui extends Application implements View {
   @Override
   public void setClient(ClientConnectionHandler client) {
     Gui.client = client;
-    Platform.runLater(() -> {
-      primaryStage.setTitle(
-        primaryStage.getTitle() + " [" + client.getConnectionType() + "]"
-      );
-    });
+    Platform.runLater(
+      () ->
+        primaryStage.setTitle(
+          primaryStage.getTitle() + " [" + client.getConnectionType() + "]"
+        )
+    );
   }
 
   /** The side of the hand the player is currently looking at */
@@ -873,7 +874,7 @@ public class Gui extends Application implements View {
       drawPlayerBoards();
       drawLeaderBoard();
       ((Text) scene.lookup("#window-title")).setText(
-          "Game " + localModel.getGameId().get()
+          "Game" + localModel.getGameId().map(id -> " " + id).orElse("")
         );
 
       scene
@@ -1203,8 +1204,7 @@ public class Gui extends Application implements View {
     scene
       .lookup("#chat-send-button")
       .setOnMouseClicked((MouseEvent event) -> {
-        String recipient =
-          ((ChoiceBox<String>) scene.lookup("#chat-recipient")).getValue();
+        String recipient = recipientChoiceBox.getValue();
 
         TextField textInput = ((TextField) scene.lookup("#chat-input"));
         String message = textInput.getText();
@@ -1268,7 +1268,7 @@ public class Gui extends Application implements View {
           .filter(player -> player.getNickname().equals(message.getSender()))
           .map(player -> loadImage(player.getToken()))
           .findFirst()
-          .get()
+          .orElseThrow()
           .getImage();
 
         senderTokenImage.setImage(tokenImage);
@@ -1342,7 +1342,7 @@ public class Gui extends Application implements View {
   }
 
   /**
-   * Draw the player objective card in its player board along side its hand
+   * Draw the player objective card in its player board alongside its hand
    * */
   @Override
   public void drawPlayerObjective() {
@@ -1437,14 +1437,16 @@ public class Gui extends Application implements View {
   @Override
   public void playerJoinedLobby(String gameId, UUID socketID) {
     View.super.playerJoinedLobby(gameId, socketID);
-    if (gameId.equals(localModel.getGameId().get())) {
+    if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawAvailableTokenColors();
       } else {
         drawLobby();
       }
     } else if (
-      localModel.getClientContextContainer().get().equals(ClientContext.MENU)
+      ClientContext.MENU.equals(
+        localModel.getClientContextContainer().get().orElse(null)
+      )
     ) {
       drawAvailableGames();
     }
@@ -1485,7 +1487,7 @@ public class Gui extends Application implements View {
   @Override
   public void playerSetNickname(String gameId, UUID socketID, String nickname) {
     View.super.playerSetNickname(gameId, socketID, nickname);
-    if (gameId.equals(localModel.getGameId().get())) {
+    if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawObjectiveCardChoice();
         client.getStarterCard();
@@ -1502,7 +1504,7 @@ public class Gui extends Application implements View {
     String nickname
   ) {
     View.super.playerChoseObjectiveCard(gameId, socketID, nickname);
-    if (gameId.equals(localModel.getGameId().get())) {
+    if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawStarterCardSides();
       } else {

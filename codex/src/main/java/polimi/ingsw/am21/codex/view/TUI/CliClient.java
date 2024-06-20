@@ -9,7 +9,6 @@ import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
-import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -141,10 +140,6 @@ public class CliClient extends ViewClient {
       this.usage = usage;
       this.description = description;
       this.context = context;
-    }
-
-    public CommandHandler(String usage, String description) {
-      this(usage, description, null);
     }
 
     public boolean matchUsageString(String input) {

@@ -239,7 +239,7 @@ class LobbyTest {
     } catch (PlayerNotFoundGameException e) {
       fail("Wrongfully thrown PlayerNotFoundGameException");
     }
-    Optional<TokenColor> playerTokenColor = null;
+    Optional<TokenColor> playerTokenColor = Optional.empty();
     try {
       playerTokenColor = this.lobby.getPlayerTokenColor(socketID);
     } catch (PlayerNotFoundGameException e) {

@@ -35,7 +35,7 @@ class GameControllerTest {
     this.controller = new GameController();
   }
 
-  class DummyRemoteGameEventListener implements RemoteGameEventListener {
+  static class DummyRemoteGameEventListener implements RemoteGameEventListener {
 
     @Override
     public void gameCreated(String gameId, int currentPlayers, int maxPlayers)
@@ -269,7 +269,7 @@ class GameControllerTest {
   void removePlayerFromLobby() {
     final String gameId = "test";
 
-    Integer maxPlayers = 4;
+    int maxPlayers = 4;
 
     List<UUID> connectionIDs = createGame(gameId, maxPlayers, 1);
     assertEquals(1, controller.getCurrentSlots().get(gameId));

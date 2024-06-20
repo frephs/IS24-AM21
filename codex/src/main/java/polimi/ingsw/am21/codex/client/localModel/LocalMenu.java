@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class LocalMenu {
 
-  private Map<String, GameEntry> games = new HashMap<>();
+  private final Map<String, GameEntry> games = new HashMap<>();
 
   LocalMenu() {}
 

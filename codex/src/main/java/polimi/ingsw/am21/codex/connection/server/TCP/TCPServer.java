@@ -50,16 +50,6 @@ public class TCPServer {
             "Client connected from " + connectionSocket.getInetAddress()
           );
 
-          // TODO: Alternative listener handling: multiple listeners for each client
-          //          controller.registerListener(
-          //            socketId,
-          //            new TCPServerControllerListener(message -> {
-          //              for (TCPServerConnectionHandler handler : activeHandlers.values()) {
-          //                handler.send(message);
-          //              }
-          //            })
-          //          );
-
           TCPServerConnectionHandler handler = new TCPServerConnectionHandler(
             connectionSocket,
             controller

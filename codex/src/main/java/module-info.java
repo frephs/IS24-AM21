@@ -8,6 +8,7 @@
   requires java.rmi;
   requires annotations;
   requires org.apache.commons.lang3;
+  requires java.desktop;
 
   opens polimi.ingsw.am21.codex to javafx.fxml, javafx.graphics;
   opens polimi.ingsw.am21.codex.view.GUI to javafx.fxml, javafx.graphics;
@@ -37,4 +38,8 @@
   exports polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
   exports polimi.ingsw.am21.codex.client;
   exports polimi.ingsw.am21.codex.controller;
+  exports polimi.ingsw.am21.codex.model.Cards.Objectives;
+  exports polimi.ingsw.am21.codex.controller.exceptions;
+  exports polimi.ingsw.am21.codex.model.Lobby;
+  exports polimi.ingsw.am21.codex.model.exceptions;
 }

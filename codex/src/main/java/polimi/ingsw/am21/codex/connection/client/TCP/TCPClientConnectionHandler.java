@@ -97,7 +97,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
           incomingMessages.notifyAll();
           incomingMessages.wait(1);
-        } catch (ClassNotFoundException e) {} catch (IOException e) {
+        } catch (ClassNotFoundException ignored) {} catch (IOException e) {
           getView()
             .postNotification(
               NotificationType.ERROR,

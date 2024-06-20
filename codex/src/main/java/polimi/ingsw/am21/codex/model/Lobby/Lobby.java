@@ -76,7 +76,7 @@ public class Lobby {
    * Adds a player to the lobby.
    *
    * @param socketId the socket ID of the player to add
-   * @throws LobbyFullException if the lobby is full and cannot accept more
+   * @throws LobbyFullException.LobbyFullInternalException if the lobby is full and cannot accept more
    *                            players
    */
   public void addPlayer(

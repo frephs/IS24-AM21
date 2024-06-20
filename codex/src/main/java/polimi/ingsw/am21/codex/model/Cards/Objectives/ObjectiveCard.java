@@ -13,11 +13,11 @@ public class ObjectiveCard extends Card implements CliCard {
   /**
    * The points that the objective can give
    */
-  private int points;
+  private final int points;
   /**
    * The objective of the card
    */
-  private Objective objective;
+  private final Objective objective;
 
   public ObjectiveCard(int id, int points, Objective objective) {
     super(id);

@@ -19,7 +19,7 @@ public class RMIServer {
   }
 
   public void start() throws MalformedURLException, RemoteException {
-    Integer port = ConnectionType.RMI.getDefaultPort();
+    int port = ConnectionType.RMI.getDefaultPort();
     try { //special exception handler for registry creation
       Registry registry = LocateRegistry.createRegistry(port);
       System.out.println("java RMI registry created.");

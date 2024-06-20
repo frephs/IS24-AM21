@@ -1,7 +1,6 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -10,21 +9,12 @@ import polimi.ingsw.am21.codex.model.Cards.*;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableBackSide;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
-import polimi.ingsw.am21.codex.model.GameState;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class LocalModelContainer implements GameEventListener {
-
-  /**
-   * State of the local model
-   * */
-  AtomicReference<ClientContext> state = new AtomicReference<>(
-    ClientContext.MENU
-  );
 
   /**
    * Contains the game entries
@@ -51,7 +41,7 @@ public class LocalModelContainer implements GameEventListener {
    */
   private boolean currentPlayerHasPlacedCard = false;
 
-  public class ClientContextContainer {
+  public static class ClientContextContainer {
 
     private ClientContext context;
 
@@ -334,7 +324,7 @@ public class LocalModelContainer implements GameEventListener {
     if (this.gameBoard.getGameId().equals(gameId)) {
       gameBoard.getPlayers().clear();
 
-        clientContextContainer.set(ClientContext.GAME);
+      clientContextContainer.set(ClientContext.GAME);
 
       gameInfo
         .getUsers()

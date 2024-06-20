@@ -28,7 +28,7 @@ public class Game {
   static final int WINNING_POINTS = 4;
   private final List<Player> players;
   private final GameBoard gameBoard;
-  private Lobby lobby;
+  private final Lobby lobby;
   private GameState state;
   private Integer remainingRounds = null;
   Integer currentPlayer;
@@ -161,13 +161,6 @@ public class Game {
   }
 
   /**
-   * Gets the nicknames of the players in the game.
-   */
-  public List<String> getPlayerIds() {
-    return this.players.stream().map(Player::getNickname).toList();
-  }
-
-  /**
    * Gets the index of current player.
    *
    * @return The index of current player.
@@ -209,33 +202,6 @@ public class Game {
   public Optional<Integer> getRemainingRounds() {
     if (this.remainingRounds == null) return Optional.empty();
     return Optional.of(this.remainingRounds);
-  }
-
-  /**
-   * Checks if the resource deck is empty.
-   *
-   * @return True if the resource deck is empty, otherwise false.
-   */
-  public Boolean isResourceDeckEmpty() {
-    return this.gameBoard.resourceCardsLeft() == 0;
-  }
-
-  /**
-   * Checks if the gold deck is empty.
-   *
-   * @return True if the gold deck is empty, otherwise false.
-   */
-  public Boolean isGoldDeckEmpty() {
-    return this.gameBoard.goldCardsLeft() == 0;
-  }
-
-  /**
-   * Checks if one of the decks is empty
-   *
-   * @return True if one of the decks is empty
-   */
-  public Boolean areDecksEmpty() {
-    return this.isResourceDeckEmpty() || this.isGoldDeckEmpty();
   }
 
   /**

@@ -606,7 +606,7 @@ public class GameController {
   public void removePlayerFromLobby(Game game, UUID socketID)
     throws InvalidActionException {
     Lobby lobby = game.getLobby();
-    Pair<CardPair<ObjectiveCard>, PlayableCard> oldPlayerCards = null;
+    Pair<CardPair<ObjectiveCard>, PlayableCard> oldPlayerCards;
     try {
       oldPlayerCards = lobby.removePlayer(socketID);
     } catch (PlayerNotFoundGameException e) {
