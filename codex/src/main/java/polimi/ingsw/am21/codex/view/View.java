@@ -321,7 +321,7 @@ public interface View extends GameEventListener {
     );
 
     drawHand();
-    //drawLeaderBoard();
+    drawLeaderBoard();
     drawPlayerBoard();
   }
 
