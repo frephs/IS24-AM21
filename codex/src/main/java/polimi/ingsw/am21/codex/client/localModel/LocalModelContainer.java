@@ -46,7 +46,7 @@ public class LocalModelContainer implements GameEventListener {
     private ClientContext context;
 
     ClientContextContainer() {
-      context = null;
+      context = ClientContext.MENU;
     }
 
     public Optional<ClientContext> get() {
