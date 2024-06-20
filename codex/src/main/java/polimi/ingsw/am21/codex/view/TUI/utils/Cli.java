@@ -589,4 +589,12 @@ public class Cli implements View {
           diffMessage(diff, "points");
         }));
   }
+
+  @Override
+  public void playerJoinedLobby(String gameId, UUID socketID) {
+    View.super.playerJoinedLobby(gameId, socketID);
+    if (socketID.equals(localModel.getSocketID())) {
+      drawAvailableTokenColors();
+    }
+  }
 }
