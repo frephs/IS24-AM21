@@ -1205,7 +1205,9 @@ public class Gui extends Application implements View {
       .setOnMouseClicked((MouseEvent event) -> {
         String recipient =
           ((ChoiceBox<String>) scene.lookup("#chat-recipient")).getValue();
-        String message = ((TextField) scene.lookup("#chat-input")).getText();
+
+        TextField textInput = ((TextField) scene.lookup("#chat-input"));
+        String message = textInput.getText();
         ChatMessage chatMessage;
 
         if (!Objects.equals(recipient, "Broadcast")) {
@@ -1221,6 +1223,8 @@ public class Gui extends Application implements View {
           );
         }
         client.sendChatMessage(chatMessage);
+        textInput.clear();
+
         drawChatMessage(chatMessage);
       });
   }
