@@ -593,7 +593,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "show <playerboard|leaderboard|hand|secret-objective|pairs>",
+        "show <playerboard|leaderboard|hand|secret-objective|common-objectives|pairs|decks>",
         "Show game information",
         ClientContext.GAME
       ) {
@@ -616,11 +616,17 @@ public class CliClient extends ViewClient {
                 view.getLocalModel().getLocalGameBoard().getSecretObjective()
               );
               break;
-            //TODO decks, and common objectives
             case "pairs":
               cli.drawPairs();
               break;
+            case "decks":
+              cli.drawCardDecks();
+              break;
+            case "common-objectives":
+              cli.drawCommonObjectiveCards();
+              break;
             default:
+              cli.postNotification(NotificationType.WARNING, "Invalid command");
               break;
           }
         }
