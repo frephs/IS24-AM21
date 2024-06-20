@@ -243,6 +243,12 @@ public class CliClient extends ViewClient {
                   )
                   .orElse(true)
             )
+            .sorted(
+              Comparator.comparing(
+                commandHandler ->
+                  commandHandler.getContext().orElse(ClientContext.ALL)
+              )
+            )
             .forEach(commandHandler -> {
               usages.add(commandHandler.getUsage());
               contexts.add(
