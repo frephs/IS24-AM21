@@ -23,7 +23,6 @@ import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetStarterCardSideMessage;
-import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
@@ -263,11 +262,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   @Override
-  public void showAvailableTokens() {
-    gameEventHandler.getLocalModel().showAvailableTokens();
-  }
-
-  @Override
   public void lobbySetNickname(String nickname) {
     if (this.getGameIDWithMessage().isEmpty()) return;
     String gameID = this.getGameIDWithMessage().get();
@@ -405,8 +399,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case STARTER_CARD_SIDES -> handleMessage(
         (StarterCardSidesMessage) message
       );
-      // Game
-      case GAME_STATUS -> handleMessage((GameStatusMessage) message);
       // Server Errors
 
       case UNKNOWN_MESSAGE_TYPE -> handleMessage(
@@ -461,10 +453,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    * SERVER RESPONSES HANDLERS
    * -------------------------
    * */
-
-  public void handleMessage(GameStatusMessage message) {
-    gameEventHandler.getLocalModel().gameStatusUpdate(message.getState());
-  }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
     gameEventHandler.refreshLobbies(

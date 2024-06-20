@@ -23,9 +23,7 @@ import polimi.ingsw.am21.codex.controller.messages.clientActions.HeartBeatMessag
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.*;
-import polimi.ingsw.am21.codex.controller.messages.clientRequest.game.*;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.*;
-import polimi.ingsw.am21.codex.controller.messages.server.game.GameStatusMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.AvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.ObjectiveCardsMessage;
 import polimi.ingsw.am21.codex.controller.messages.server.lobby.StarterCardSidesMessage;
@@ -220,7 +218,6 @@ public class TCPServerConnectionHandler implements Runnable {
       case SELECT_OBJECTIVE -> handleMessage((SelectObjectiveMessage) message);
       case SET_NICKNAME -> handleMessage((SetNicknameMessage) message);
       case SET_TOKEN_COLOR -> handleMessage((SetTokenColorMessage) message);
-      case GET_GAME_STATUS -> handleMessage((GetGameStatusMessage) message);
       case GET_AVAILABLE_GAME_LOBBIES -> handleMessage(
         (GetAvailableGameLobbiesMessage) message
       );
@@ -329,15 +326,6 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getConnectionID(),
         message.getColor()
       );
-    } catch (InvalidActionException e) {
-      send(InvalidActionMessage.fromException(e));
-    }
-  }
-
-  private void handleMessage(GetGameStatusMessage message) {
-    try {
-      Game game = controller.getGame(message.getGameId());
-      send(new GameStatusMessage(game.getState()));
     } catch (InvalidActionException e) {
       send(InvalidActionMessage.fromException(e));
     }

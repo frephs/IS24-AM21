@@ -157,11 +157,6 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public void showAvailableTokens() {
-    this.gameEventHandler.getLocalModel().showAvailableTokens();
-  }
-
-  @Override
   public void lobbySetNickname(String nickname) {
     try {
       rmiConnectionHandler.lobbySetNickname(this.getSocketID(), nickname);

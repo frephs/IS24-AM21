@@ -361,7 +361,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.showAvailableTokens();
+          cli.drawAvailableTokenColors();
         }
       }
     );

@@ -154,19 +154,6 @@ public class LocalModelContainer implements GameEventListener {
       .setCurrentPlayers(menu.getGames().get(gameId).getMaxPlayers());
   }
 
-  public void showAvailableTokens() {
-    //TODO: H: move this inside view
-    //    getView()
-    //      .postNotification(
-    //        NotificationType.RESPONSE,
-    //        "Available tokens: " +
-    //        this.lobby.getAvailableTokens()
-    //          .stream()
-    //          .map(color -> CliUtils.colorize(color, ColorStyle.NORMAL))
-    //          .collect(Collectors.joining(" "))
-    //      );
-  }
-
   /**
    * Removes a player slot from the game entry in the menu.
    * Adds the player to your lobby if you have one.
@@ -625,7 +612,6 @@ public class LocalModelContainer implements GameEventListener {
           .ifPresent(token -> setPlayerToken(uuid, token));
       });
     clientContextContainer.set(ClientContext.LOBBY);
-    //TODO what if the player has already joined the game?
   }
 
   @Override
@@ -633,10 +619,6 @@ public class LocalModelContainer implements GameEventListener {
     if (Objects.equals(gameID, gameBoard.getGameId())) {
       gameBoard.getChat().postMessage(message);
     }
-  }
-
-  public void gameStatusUpdate(GameState state) {
-    //TODO
   }
 
   public boolean currentPlayerHasPlacedCard() {

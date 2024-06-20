@@ -99,11 +99,6 @@ public abstract class ClientConnectionHandler {
   public abstract void lobbySetToken(TokenColor color);
 
   /**
-   * Shows the available tokens in the view
-   */
-  public abstract void showAvailableTokens();
-
-  /**
    * @param nickname the nickname of the lobby player
    */
   public abstract void lobbySetNickname(String nickname);
