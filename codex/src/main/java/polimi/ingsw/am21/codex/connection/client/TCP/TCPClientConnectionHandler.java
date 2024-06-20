@@ -467,18 +467,11 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(AvailableGameLobbiesMessage message) {
-    gameEventHandler.connected();
-
-    message
-      .getLobbyIds()
-      .forEach(
-        id ->
-          gameEventHandler.gameCreated(
-            id,
-            message.getCurrentPlayers().get(id),
-            message.getMaxPlayers().get(id)
-          )
-      );
+    gameEventHandler.refreshLobbies(
+      message.getLobbyIds(),
+      message.getCurrentPlayers(),
+      message.getMaxPlayers()
+    );
   }
 
   public void handleMessage(ObjectiveCardsMessage message) {

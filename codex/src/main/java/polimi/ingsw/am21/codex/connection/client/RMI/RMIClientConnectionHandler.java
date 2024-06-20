@@ -78,7 +78,7 @@ public class RMIClientConnectionHandler
       Map<String, Integer> maxPlayers =
         rmiConnectionHandler.getGamesMaxPlayers();
 
-      gameEventHandler.connected();
+      gameEventHandler.listGames();
 
       games.forEach(game -> {
         this.gameEventHandler.gameCreated(

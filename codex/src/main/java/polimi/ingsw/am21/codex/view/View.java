@@ -30,7 +30,7 @@ public interface View extends GameEventListener {
     int colorableIndex
   );
 
-  void connected();
+  void listGames();
 
   void displayException(Exception e);
 
@@ -90,6 +90,16 @@ public interface View extends GameEventListener {
   @Override
   default void gameCreated(String gameId, int currentPlayers, int maxPlayers) {
     postNotification(NotificationType.UPDATE, "Game " + gameId + " created");
+  }
+
+  @Override
+  default void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
+    // We don't want to show any notification by default
+    listGames();
   }
 
   @Override

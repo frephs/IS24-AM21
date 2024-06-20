@@ -117,6 +117,28 @@ public class LocalModelContainer implements GameEventListener {
   }
 
   @Override
+  public void refreshLobbies(
+    Set<String> lobbyIds,
+    Map<String, Integer> currentPlayers,
+    Map<String, Integer> maxPlayers
+  ) {
+    menu.getGames().clear();
+    lobbyIds.forEach(
+      lobbyId ->
+        menu
+          .getGames()
+          .put(
+            lobbyId,
+            new GameEntry(
+              lobbyId,
+              currentPlayers.get(lobbyId),
+              maxPlayers.get(lobbyId)
+            )
+          )
+    );
+  }
+
+  @Override
   public void gameDeleted(String gameId) {
     // TODO delete game on gameOver
     menu.getGames().remove(gameId);
