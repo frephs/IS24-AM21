@@ -509,6 +509,11 @@ public class Cli implements View {
   }
 
   @Override
+  public void getStarterCard(Integer cardId) {
+    drawStarterCardSides();
+  }
+
+  @Override
   public void drawNicknameChoice() {}
 
   @Override

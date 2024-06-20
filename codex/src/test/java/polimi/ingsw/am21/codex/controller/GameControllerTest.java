@@ -170,6 +170,9 @@ class GameControllerTest {
     @Override
     public void getObjectiveCards(Pair<Integer, Integer> objectiveCards)
       throws RemoteException {}
+
+    @Override
+    public void getStarterCard(Integer cardId) throws RemoteException {}
   }
 
   private List<UUID> createGame(String gameId, int maxPlayers, int players) {

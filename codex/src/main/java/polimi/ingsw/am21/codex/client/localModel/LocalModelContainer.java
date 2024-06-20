@@ -1,11 +1,9 @@
 package polimi.ingsw.am21.codex.client.localModel;
 
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.ClientContext;
-import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -318,6 +316,7 @@ public class LocalModelContainer implements GameEventListener {
       );
   }
 
+  @Override
   public void getObjectiveCards(Pair<Integer, Integer> cardIdPair) {
     lobby.setAvailableObjectives(
       cardsLoader.getCardFromId(cardIdPair.getKey()),
@@ -325,7 +324,8 @@ public class LocalModelContainer implements GameEventListener {
     );
   }
 
-  public void playerGetStarterCardSides(int cardId) {
+  @Override
+  public void getStarterCard(Integer cardId) {
     lobby.setStarterCard(cardsLoader.getCardFromId(cardId));
   }
 

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
-import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
@@ -207,9 +206,7 @@ public class RMIClientConnectionHandler
     try {
       gameEventHandler
         .getLocalModel()
-        .playerGetStarterCardSides(
-          rmiConnectionHandler.getLobbyStarterCard(socketID)
-        );
+        .getStarterCard(rmiConnectionHandler.getLobbyStarterCard(socketID));
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {

@@ -140,6 +140,9 @@ public class DummyView implements View {
   public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {}
 
   @Override
+  public void getStarterCard(Integer cardId) {}
+
+  @Override
   public void drawNicknameChoice() {}
 
   @Override

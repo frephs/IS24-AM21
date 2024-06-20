@@ -479,9 +479,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   }
 
   public void handleMessage(StarterCardSidesMessage message) {
-    gameEventHandler
-      .getLocalModel()
-      .playerGetStarterCardSides(message.getCardId());
+    gameEventHandler.getStarterCard(message.getCardId());
   }
 
   /*

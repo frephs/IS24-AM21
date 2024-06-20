@@ -529,4 +529,9 @@ public class ClientGameEventHandler
     localModel.getObjectiveCards(objectiveCards);
     view.getObjectiveCards(objectiveCards);
   }
+
+  public void getStarterCard(Integer cardId) {
+    localModel.getStarterCard(cardId);
+    view.getStarterCard(cardId);
+  }
 }

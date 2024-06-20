@@ -131,4 +131,7 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   @Override
   void getObjectiveCards(Pair<Integer, Integer> objectiveCards);
+
+  @Override
+  void getStarterCard(Integer cardId);
 }

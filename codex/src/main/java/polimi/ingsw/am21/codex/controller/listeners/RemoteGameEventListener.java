@@ -137,4 +137,6 @@ public interface RemoteGameEventListener extends Remote {
 
   void getObjectiveCards(Pair<Integer, Integer> objectiveCards)
     throws RemoteException;
+
+  void getStarterCard(Integer cardId) throws RemoteException;
 }

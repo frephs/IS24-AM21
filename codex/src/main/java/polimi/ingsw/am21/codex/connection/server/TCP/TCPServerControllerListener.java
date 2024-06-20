@@ -243,4 +243,7 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {}
+
+  @Override
+  public void getStarterCard(Integer cardId) {}
 }

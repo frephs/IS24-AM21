@@ -243,4 +243,9 @@ public class LocalModelGameEventListener
     throws RemoteException {
     listener.getObjectiveCards(objectiveCards);
   }
+
+  @Override
+  public void getStarterCard(Integer cardId) throws RemoteException {
+    listener.getStarterCard(cardId);
+  }
 }

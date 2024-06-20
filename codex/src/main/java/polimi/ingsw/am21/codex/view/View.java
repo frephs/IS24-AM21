@@ -381,5 +381,8 @@ public interface View extends GameEventListener {
 
   @Override
   void getObjectiveCards(Pair<Integer, Integer> objectiveCards);
+
+  @Override
+  void getStarterCard(Integer cardId);
   // </editor-fold>
 }
