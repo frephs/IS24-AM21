@@ -1,17 +1,16 @@
 package polimi.ingsw.am21.codex.client;
 
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
-import polimi.ingsw.am21.codex.controller.listeners.GameErrorListener;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
-import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
-import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
+import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -31,6 +30,8 @@ import polimi.ingsw.am21.codex.view.View;
 public class ClientGameEventHandler
   implements GameEventListener, GameErrorListener {
 
+  private final RemoteGameEventListener listener;
+
   protected LocalModelContainer localModel;
   private View view;
 
@@ -40,7 +41,19 @@ public class ClientGameEventHandler
 
   public ClientGameEventHandler(View view, LocalModelContainer localModel) {
     this.localModel = localModel;
+
+    try {
+      listener = new LocalModelGameEventListener(this);
+    } catch (RemoteException e) {
+      throw new RuntimeException("Failed creating client", e);
+    }
+
     this.view = view;
+  }
+
+  public RemoteGameEventListener getRemoteListener() {
+    // TODO implement this in TCP or change location.
+    return listener;
   }
 
   public LocalModelContainer getLocalModel() {

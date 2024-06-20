@@ -47,8 +47,6 @@ public class LocalModelContainer implements GameEventListener {
 
   private UUID socketId;
 
-  private final RemoteGameEventListener listener;
-
   /**
    * A boolean that keeps track of whether the current player has place their card
    * for their turn
@@ -89,22 +87,10 @@ public class LocalModelContainer implements GameEventListener {
 
   public LocalModelContainer() {
     cardsLoader.loadCards();
-
-    try {
-      listener = new LocalModelGameEventListener(this);
-    } catch (RemoteException e) {
-      // TODO: handle this
-      throw new RuntimeException("Failed creating client", e);
-    }
   }
 
   public void setSocketId(UUID socketId) {
     this.socketId = socketId;
-  }
-
-  public RemoteGameEventListener getRemoteListener() {
-    // TODO implement this in TCP or change location.
-    return listener;
   }
 
   public UUID getSocketID() {

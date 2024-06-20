@@ -44,7 +44,7 @@ public class RMIClientConnectionHandler
       );
       this.rmiConnectionHandler.connect(
           this.getSocketID(),
-          this.gameEventHandler.getLocalModel().getRemoteListener()
+          this.gameEventHandler.getRemoteListener()
         );
       this.connectionEstablished();
     } catch (Exception e) {
