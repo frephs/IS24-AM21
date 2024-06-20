@@ -265,10 +265,9 @@ public class Cli implements View {
     );
   }
 
+  /** Don't use this in CLI, just draw the individual components when needed */
   @Override
-  public void drawGameBoard() {
-    // TODO
-  }
+  public void drawGameBoard() {}
 
   @Override
   public void drawLeaderBoard() {

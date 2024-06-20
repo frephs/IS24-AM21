@@ -889,9 +889,7 @@ public class Gui extends Application implements View {
   @Override
   public void drawGameBoard() {
     drawPairs();
-
     drawCardDecks();
-
     drawCommonObjectiveCards();
   }
 
@@ -1358,7 +1356,6 @@ public class Gui extends Application implements View {
   @Override
   public void drawCardDecks() {
     Platform.runLater(() -> {
-      //TODO put this in drawGameBoard
       HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
       HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
 
