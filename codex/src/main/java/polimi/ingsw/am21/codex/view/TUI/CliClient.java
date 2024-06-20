@@ -402,7 +402,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "choose-objective <1|2>",
+        "set-objective <1|2>",
         "Choose the objective card",
         ClientContext.LOBBY
       ) {
@@ -433,7 +433,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "choose-starter-card-side <front|back>",
+        "set-starter <front|back>",
         "Choose the starter card side",
         ClientContext.LOBBY
       ) {
