@@ -26,7 +26,6 @@ public class CliClient extends ViewClient {
 
   Scanner scanner;
   Cli cli;
-  ClientConnectionHandler client;
 
   public CliClient() {
     super(new Cli(new Cli.Options(true)));
@@ -41,6 +40,7 @@ public class CliClient extends ViewClient {
   @Override
   public void start(ConnectionType connectionType, String address, int port) {
     super.start(connectionType, address, port);
+    cli.setClient(client);
 
     cli.postNotification(
       NotificationType.CONFIRM,

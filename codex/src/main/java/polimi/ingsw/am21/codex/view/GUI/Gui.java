@@ -62,6 +62,7 @@ public class Gui extends Application implements View {
     return gui;
   }
 
+  @Override
   public void setClient(ClientConnectionHandler client) {
     Gui.client = client;
   }

@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view;
 
 import java.util.*;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
+import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
@@ -14,6 +15,8 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 
 public interface View extends GameEventListener {
+  void setClient(ClientConnectionHandler client);
+
   LocalModelContainer getLocalModel();
 
   void postNotification(NotificationType notificationType, String message);
