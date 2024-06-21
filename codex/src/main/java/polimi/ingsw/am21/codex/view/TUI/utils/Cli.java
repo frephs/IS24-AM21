@@ -141,7 +141,11 @@ public class Cli implements View {
     if (diff != 0) {
       postNotification(
         NotificationType.UPDATE,
-        getLocalModel().getLocalGameBoard().getCurrentPlayer().getNickname() +
+        getLocalModel()
+          .getLocalGameBoard()
+          .orElseThrow()
+          .getCurrentPlayer()
+          .getNickname() +
         (diff > 0 ? "gained" : "lost" + diff) +
         attributeName +
         ((Math.abs(diff) != 1) ? "s" : "") +
@@ -155,7 +159,11 @@ public class Cli implements View {
       postNotification(
         NotificationType.UPDATE,
         new String[] {
-          getLocalModel().getLocalGameBoard().getCurrentPlayer().getNickname() +
+          getLocalModel()
+            .getLocalGameBoard()
+            .orElseThrow()
+            .getCurrentPlayer()
+            .getNickname() +
           (diff > 0 ? " gained " : " lost " + diff),
           ((Math.abs(diff) != 1) ? "s" : ""),
           ". ",
@@ -227,6 +235,7 @@ public class Cli implements View {
       "The available token colors are: " +
       localModel
         .getLocalLobby()
+        .orElseThrow()
         .getAvailableTokens()
         .stream()
         .map(token -> CliUtils.colorize(token, ColorStyle.NORMAL))
@@ -240,6 +249,7 @@ public class Cli implements View {
       "Lobby: " +
       localModel
         .getLocalLobby()
+        .orElseThrow()
         .getPlayers()
         .values()
         .stream()
@@ -268,6 +278,7 @@ public class Cli implements View {
       "Leaderboard:\n" +
       localModel
         .getLocalLobby()
+        .orElseThrow()
         .getPlayers()
         .values()
         .stream()
@@ -297,6 +308,7 @@ public class Cli implements View {
   public void drawPlayerBoards() {
     localModel
       .getLocalLobby()
+      .orElseThrow()
       .getPlayers()
       .values()
       .forEach(player -> {
@@ -317,6 +329,7 @@ public class Cli implements View {
   public void drawPlayerBoard(String nickname) {
     LocalPlayer player = localModel
       .getLocalGameBoard()
+      .orElseThrow()
       .getPlayerByNickname(nickname)
       .orElseThrow();
 
@@ -353,7 +366,7 @@ public class Cli implements View {
   public void drawGame() {
     printUpdate(
       "Game started with " +
-      localModel.getLocalGameBoard().getPlayers().size() +
+      localModel.getLocalGameBoard().orElseThrow().getPlayers().size() +
       " players"
     );
   }
@@ -364,6 +377,7 @@ public class Cli implements View {
     winningPlayer(
       localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getPlayers()
         .stream()
         .min((p1, p2) -> p2.getPoints() - p1.getPoints())
@@ -383,6 +397,7 @@ public class Cli implements View {
       "Hand:\n" +
       localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getPlayer()
         .getHand()
         .stream()
@@ -395,8 +410,12 @@ public class Cli implements View {
   public void drawPairs() {
     CardPair<Card> resourceCards = localModel
       .getLocalGameBoard()
+      .orElseThrow()
       .getResourceCards();
-    CardPair<Card> goldCards = localModel.getLocalGameBoard().getGoldCards();
+    CardPair<Card> goldCards = localModel
+      .getLocalGameBoard()
+      .orElseThrow()
+      .getGoldCards();
 
     printUpdate(
       "Resource cards pair:\n" +
@@ -415,6 +434,7 @@ public class Cli implements View {
   public void drawObjectiveCardChoice() {
     CardPair<Card> cardPair = localModel
       .getLocalLobby()
+      .orElseThrow()
       .getAvailableObjectives();
 
     printUpdate(
@@ -429,7 +449,7 @@ public class Cli implements View {
   public void drawStarterCardSides() {
     printUpdate(
       "Starter card sides:\n" +
-      localModel.getLocalLobby().getStarterCard().cardToAscii()
+      localModel.getLocalLobby().orElseThrow().getStarterCard().cardToAscii()
     );
   }
 
@@ -450,6 +470,7 @@ public class Cli implements View {
   public void drawCommonObjectiveCards() {
     CardPair<Card> cardPair = localModel
       .getLocalGameBoard()
+      .orElseThrow()
       .getObjectiveCards();
 
     printUpdate(
@@ -466,6 +487,7 @@ public class Cli implements View {
       "Player objective card:\n" +
       localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getPlayer()
         .getObjectiveCard()
         .cardToAscii()
@@ -476,9 +498,11 @@ public class Cli implements View {
   public void drawCardDecks() {
     PlayableCard firstResourceCard = localModel
       .getLocalGameBoard()
+      .orElseThrow()
       .getResourceDeckTopCard();
     PlayableCard firstGoldCard = localModel
       .getLocalGameBoard()
+      .orElseThrow()
       .getGoldDeckTopCard();
 
     if (firstResourceCard != null) {
@@ -544,7 +568,11 @@ public class Cli implements View {
 
     diffMessage(
       newPlayerScore -
-      getLocalModel().getLocalGameBoard().getCurrentPlayer().getPoints(),
+      getLocalModel()
+        .getLocalGameBoard()
+        .orElseThrow()
+        .getCurrentPlayer()
+        .getPoints(),
       "point"
     );
 
@@ -554,6 +582,7 @@ public class Cli implements View {
           updatedResources.get(resourceType) -
           getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getCurrentPlayer()
             .getResources()
             .get(resourceType),
@@ -567,6 +596,7 @@ public class Cli implements View {
           updatedObjects.get(objectType) -
           getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getCurrentPlayer()
             .getObjects()
             .get(objectType),
@@ -581,6 +611,7 @@ public class Cli implements View {
     newScores.forEach((nickname, newScore) ->
       getLocalModel()
         .getLocalGameBoard()
+        .orElseThrow()
         .getPlayers()
         .stream()
         .filter(player -> player.getNickname().equals(nickname))

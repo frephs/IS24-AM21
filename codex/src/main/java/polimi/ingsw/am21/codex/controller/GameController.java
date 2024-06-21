@@ -677,27 +677,26 @@ public class GameController {
       userContexts.put(socketID, new UserGameContext(gameId));
     }
 
-    this.notifySameContextClients(
-        socketID,
-        (listener, targetSocketID) ->
-          listener.playerJoinedLobby(gameId, socketID)
-      );
-
-    //    if (userContexts.get(socketID).getListener() != null) {
-    this.notifySameContextClients(
-        socketID,
-        (listener, targetSocketID) ->
-          listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game))
-      );
-    //      try {
-    //        userContexts
-    //          .get(socketID)
-    //          .getListener()
-    //          .lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game));
-    //      } catch (RemoteException e) {
-    //        this.notifyDisconnections(List.of(socketID));
-    //      }
-    //    }
+    notifyClients(
+      userContexts
+        .entrySet()
+        .stream()
+        .filter(
+          entry ->
+            entry.getValue().getStatus().equals(UserGameContextStatus.MENU) ||
+            entry
+              .getValue()
+              .getGameId()
+              .map(g -> g.equals(gameId))
+              .orElse(false)
+        )
+        .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList()),
+      ((listener, connectionID) -> {
+          listener.playerJoinedLobby(gameId, socketID);
+          listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game));
+        })
+    );
   }
 
   public void lobbySetTokenColor(UUID connectionID, TokenColor color)

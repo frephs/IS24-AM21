@@ -514,7 +514,11 @@ public class CliClient extends ViewClient {
         public void handle(String[] command) {
           client.sendChatMessage(
             new ChatMessage(
-              view.getLocalModel().getLocalGameBoard().getPlayerNickname(),
+              view
+                .getLocalModel()
+                .getLocalGameBoard()
+                .orElseThrow()
+                .getPlayerNickname(),
               command[1],
               Arrays.stream(command).skip(2).collect(Collectors.joining(" "))
             )
@@ -534,6 +538,7 @@ public class CliClient extends ViewClient {
           view
             .getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayerByNickname(command[2])
             .ifPresentOrElse(
               player -> cli.drawPlayerBoard(command[2]),
@@ -569,6 +574,7 @@ public class CliClient extends ViewClient {
           Card card = view
             .getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayers()
             .stream()
             .flatMap(player ->
@@ -602,7 +608,11 @@ public class CliClient extends ViewClient {
           switch (command[1]) {
             case "playerboard":
               view.drawPlayerBoard(
-                view.getLocalModel().getLocalGameBoard().getPlayerNickname()
+                view
+                  .getLocalModel()
+                  .getLocalGameBoard()
+                  .orElseThrow()
+                  .getPlayerNickname()
               );
               break;
             case "leaderboard":
@@ -616,6 +626,7 @@ public class CliClient extends ViewClient {
                 view
                   .getLocalModel()
                   .getLocalGameBoard()
+                  .orElseThrow()
                   .getPlayer()
                   .getObjectiveCard()
               );
