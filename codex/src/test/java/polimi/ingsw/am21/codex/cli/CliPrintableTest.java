@@ -30,8 +30,7 @@ class CliPrintableTest {
       cardsLoader.loadObjectiveCards()
     );
 
-    Cli.Options options = new Cli.Options(true);
-    new Cli(options);
+    new Cli.Options(true);
 
     try {
       System.out.println(resourceDeck.draw().cardToAscii());
