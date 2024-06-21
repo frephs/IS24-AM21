@@ -8,12 +8,10 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
@@ -393,7 +391,9 @@ public class TCPServerConnectionHandler implements Runnable {
   public void send(Message message) {
     try {
       if (socket.isConnected() && !socket.isClosed()) {
-        System.out.println("Sending " + message.getType());
+        if (Main.Options.isDebug()) {
+          System.out.println("Sending " + message.getType());
+        }
         synchronized (outputStream) {
           outputStream.writeObject(message);
           outputStream.flush();

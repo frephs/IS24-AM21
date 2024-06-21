@@ -6,12 +6,11 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import polimi.ingsw.am21.codex.client.ClientType;
-import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.Server;
-import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.view.GUI.GuiClient;
 import polimi.ingsw.am21.codex.view.TUI.CliClient;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.View;
 import polimi.ingsw.am21.codex.view.ViewClient;
 
@@ -100,6 +99,19 @@ public class Main {
       return;
     }
 
+    if (Arrays.asList(args).contains("--debug")) {
+      new Options(true);
+      //TODO log RMI calls too
+    } else {
+      new Options(false);
+    }
+
+    if (Arrays.asList(args).contains("--no-color")) {
+      new Cli.Options(false);
+    } else {
+      new Cli.Options(true);
+    }
+
     if (Arrays.asList(args).contains("--server")) {
       AtomicReference<Integer> tcpPort = new AtomicReference<>(
         ConnectionType.TCP.getDefaultPort()
@@ -168,5 +180,18 @@ public class Main {
       " \\______  /\\____/\\____ |\\___  >__/\\_ \\ \n" +
       "        \\/            \\/    \\/      \\/ "
     );
+  }
+
+  public static class Options {
+
+    private static Boolean debugMode;
+
+    public Options(Boolean debugMode) {
+      Main.Options.debugMode = debugMode;
+    }
+
+    public static Boolean isDebug() {
+      return debugMode;
+    }
   }
 }

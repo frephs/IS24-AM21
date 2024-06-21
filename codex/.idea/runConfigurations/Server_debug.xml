@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server Debug" type="Application" factoryName="Application" folderName="Debug">
+    <option name="MAIN_CLASS_NAME" value="polimi.ingsw.am21.codex.Main" />
+    <module name="AM21" />
+    <option name="PROGRAM_PARAMETERS" value="--server --debug" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

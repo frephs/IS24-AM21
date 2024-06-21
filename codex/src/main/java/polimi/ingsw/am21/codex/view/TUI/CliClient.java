@@ -27,7 +27,7 @@ public class CliClient extends ViewClient {
   Cli cli;
 
   public CliClient() {
-    super(new Cli(new Cli.Options(true)));
+    super(new Cli());
     cli = (Cli) view;
     scanner = new Scanner(System.in);
   }

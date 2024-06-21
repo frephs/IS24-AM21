@@ -5,7 +5,6 @@ import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 
 public abstract class ViewClient {
 

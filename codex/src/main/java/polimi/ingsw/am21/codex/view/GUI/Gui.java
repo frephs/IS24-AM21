@@ -26,6 +26,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
@@ -300,13 +301,15 @@ public class Gui extends Application implements View {
    * */
   @Override
   public void displayException(Exception exception) {
-    try {
-      exceptionLoader.loadException(exception);
-      // TODO: Handle exception
-      System.err.println(exception);
-    } catch (IOException e) {
-      // TODO: Handle exception
-      System.err.println(exception);
+    if (Main.Options.isDebug()) {
+      try {
+        exceptionLoader.loadException(exception);
+        // TODO: Handle exception
+        System.err.println(exception);
+      } catch (IOException e) {
+        // TODO: Handle exception
+        System.err.println(exception);
+      }
     }
   }
 

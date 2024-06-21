@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -160,19 +161,22 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       if (!waiting || !message.getType().isClientRequest()) {
         try {
           if (socket.isConnected() && !socket.isClosed()) {
-            if (message.getType() != MessageType.HEART_BEAT) System.out.println(
-              "Sending " + message.getType()
-            );
+            if (
+              message.getType() != MessageType.HEART_BEAT &&
+              Main.Options.isDebug()
+            ) System.out.println("Sending " + message.getType());
             outputStream.writeObject(message);
             outputStream.flush();
             outputStream.reset();
             if (message.getType().isClientRequest()) {
               this.waiting = true;
-              getView()
-                .postNotification(
-                  NotificationType.WARNING,
-                  "Sending request. "
-                );
+              if (Main.Options.isDebug()) {
+                getView()
+                  .postNotification(
+                    NotificationType.WARNING,
+                    "Sending request. "
+                  );
+              }
             }
           }
         } catch (IOException e) {
@@ -388,7 +392,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       this.waiting = false;
     }
 
-    System.out.println("Received " + message.getType());
+    if (Main.Options.isDebug()) {
+      System.out.println("Received " + message.getType());
+    }
 
     switch (message.getType()) {
       // Server Responses

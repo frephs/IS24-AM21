@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -31,13 +32,14 @@ public class Cli implements View {
 
   public static class Options {
 
-    private final Boolean colored;
+    private static Boolean colored;
 
     public Options(Boolean colored) {
-      this.colored = colored;
+      Options.colored = colored;
+      //TODO remove color from prompt since it's still colored, at least outside of the jar
     }
 
-    public Boolean isColored() {
+    public static Boolean isColored() {
       return colored;
     }
   }
@@ -49,8 +51,7 @@ public class Cli implements View {
     // Not used in CLI
   }
 
-  public Cli(Cli.Options options) {
-    Cli.options = options;
+  public Cli() {
     localModel = new LocalModelContainer();
   }
 
