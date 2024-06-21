@@ -199,7 +199,9 @@ public class TCPServerConnectionHandler implements Runnable {
   /** Determines the message type and calls the appropriate method based on that */
   private void handleMessage(Message message)
     throws NotAClientMessageException {
-    if (message.getType() != MessageType.HEART_BEAT) System.out.println(
+    if (
+      Main.Options.isDebug() && message.getType() != MessageType.HEART_BEAT
+    ) System.out.println(
       "Received " + message.getType() + " from " + socket.getInetAddress()
     );
     switch (message.getType()) {

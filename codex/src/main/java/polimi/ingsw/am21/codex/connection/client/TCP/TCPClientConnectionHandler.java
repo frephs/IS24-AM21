@@ -106,7 +106,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               socket.getInetAddress() +
               ". Parser is exiting.\n"
             );
-          getView().displayException(e);
+          if (Main.Options.isDebug()) {
+            getView().displayException(e);
+          }
           break;
         } catch (InterruptedException e) {
           getView()
@@ -116,7 +118,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
               socket.getInetAddress() +
               "interrupted, exiting."
             );
-          getView().displayException(e);
+          if (Main.Options.isDebug()) {
+            getView().displayException(e);
+          }
           break;
         }
       }
@@ -209,7 +213,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         this.socket.setTcpNoDelay(true);
         connected = true;
       } catch (IOException e) {
-        getView().displayException(e);
+        if (Main.Options.isDebug()) {
+          getView().displayException(e);
+        }
         connectionFailed(e);
       }
     }
