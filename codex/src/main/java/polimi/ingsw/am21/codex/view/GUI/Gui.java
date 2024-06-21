@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.view.GUI;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -55,6 +56,9 @@ public class Gui extends Application implements View {
 
   private static ClientConnectionHandler client;
   private final LocalModelContainer localModel;
+  private static final CountDownLatch isInitializedLatch = new CountDownLatch(
+    1
+  );
 
   public Gui() {
     gui = this;
@@ -112,6 +116,7 @@ public class Gui extends Application implements View {
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
       rulebookHandler = new RulebookHandler(new Stage());
+      isInitializedLatch.countDown();
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
@@ -123,10 +128,8 @@ public class Gui extends Application implements View {
     }
   }
 
-  public boolean isInitialized() {
-    return (
-      scene != null && notificationLoader != null && exceptionLoader != null
-    );
+  public CountDownLatch getIsInitializedLatch() {
+    return isInitializedLatch;
   }
 
   public static void main(String[] args) {
