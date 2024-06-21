@@ -628,6 +628,26 @@ public class GameController {
 
     Game game = this.getGame(gameId);
     this.removePlayerFromLobby(game, socketID);
+
+    notifyClients(
+      userContexts
+        .entrySet()
+        .stream()
+        .filter(
+          entry ->
+            entry.getValue().getStatus().equals(UserGameContextStatus.MENU) ||
+            entry
+              .getValue()
+              .getGameId()
+              .map(g -> g.equals(gameId))
+              .orElse(false)
+        )
+        .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList()),
+      ((listener, connectionID) -> {
+          listener.playerLeftLobby(gameId, socketID);
+        })
+    );
   }
 
   public void joinLobby(UUID socketID, String gameId)

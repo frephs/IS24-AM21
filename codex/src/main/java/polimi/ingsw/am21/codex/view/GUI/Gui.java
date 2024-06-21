@@ -305,7 +305,7 @@ public class Gui extends Application implements View {
       try {
         exceptionLoader.loadException(exception);
         // TODO: Handle exception
-        System.err.println(exception);
+        exception.printStackTrace();
       } catch (IOException e) {
         // TODO: Handle exception
         System.err.println(exception);
@@ -465,7 +465,7 @@ public class Gui extends Application implements View {
 
       scene
         .lookup("#back-to-menu-button-lobby")
-        .setOnMouseClicked((MouseEvent event) -> client.getGames());
+        .setOnMouseClicked((MouseEvent event) -> client.leaveGameLobby());
 
       GridPane playerGrid =
         ((GridPane) scene.lookup("#lobby-player-container"));

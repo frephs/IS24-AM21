@@ -310,9 +310,9 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "leave-game",
-        "Leave the current game",
-        ClientContext.GAME
+        "leave-lobby",
+        "Leave the current lobby",
+        ClientContext.LOBBY
       ) {
         @Override
         public void handle(String[] command) {

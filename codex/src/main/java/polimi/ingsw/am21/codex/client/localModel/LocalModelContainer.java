@@ -227,10 +227,7 @@ public class LocalModelContainer implements GameEventListener {
     if (socketID.equals(this.socketId)) {
       lobby = null;
       gameBoard = null;
-    }
-
-    if (lobby != null && lobby.getGameId().equals(gameId)) {
-      lobby.getPlayers().remove(socketID);
+      clientContextContainer.set(ClientContext.MENU);
     }
   }
 
