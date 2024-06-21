@@ -42,4 +42,5 @@
   exports polimi.ingsw.am21.codex.controller.exceptions;
   exports polimi.ingsw.am21.codex.model.Lobby;
   exports polimi.ingsw.am21.codex.model.exceptions;
+  exports polimi.ingsw.am21.codex.connection.server;
 }

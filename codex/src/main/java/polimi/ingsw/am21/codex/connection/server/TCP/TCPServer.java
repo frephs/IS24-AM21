@@ -10,27 +10,15 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import polimi.ingsw.am21.codex.connection.server.AbstractServer;
 import polimi.ingsw.am21.codex.controller.GameController;
 
-public class TCPServer {
-
-  /**
-   * The port to run the TCP server on
-   */
-  private final Integer port;
-  /**
-   * The Game controller to use
-   */
-  private final GameController controller;
+public class TCPServer extends AbstractServer {
 
   private ServerSocket serverSocket;
-  private final CountDownLatch serverReadyLatch;
 
   public TCPServer(Integer port, GameController controller) {
-    this.port = port;
-    this.controller = controller;
-
-    this.serverReadyLatch = new CountDownLatch(1);
+    super(port, controller);
   }
 
   public void start() throws PortUnreachableException {
@@ -74,9 +62,5 @@ public class TCPServer {
     try {
       serverSocket.close();
     } catch (IOException ignored) {}
-  }
-
-  public CountDownLatch getServerReadyLatch() {
-    return serverReadyLatch;
   }
 }
