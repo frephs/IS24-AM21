@@ -121,6 +121,19 @@ public class Gui extends Application implements View {
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
 
+      primaryStage.setOnCloseRequest(event -> {
+        if (Main.Options.isDebug()) {
+          try {
+            exceptionLoader.loadException(new RuntimeException("Closing"));
+          } catch (IOException e) {
+            // TODO: Handle exception
+            System.err.println(e);
+          }
+        }
+
+        System.exit(0);
+      });
+
       primaryStage.show();
     } catch (IOException e) {
       // TODO: Handle exception
