@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.connection.client;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -203,9 +204,11 @@ public abstract class ClientConnectionHandler {
 
   public void connectionFailed(Exception e) {
     this.connectionStatus =
-      GameController.UserGameContext.ConnectionStatus.CONNECTED;
+      GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
     this.getView().postNotification(Notification.CONNECTION_FAILED);
-    this.getView().displayException(e);
+    if (Main.Options.isDebug()) {
+      this.getView().displayException(e);
+    }
   }
 
   private void failedHeartBeat() {

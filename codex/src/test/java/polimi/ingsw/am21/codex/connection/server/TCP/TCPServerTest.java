@@ -13,8 +13,10 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
@@ -25,8 +27,15 @@ import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetNickna
 import polimi.ingsw.am21.codex.controller.messages.clientActions.lobby.SetTokenColorMessage;
 import polimi.ingsw.am21.codex.controller.messages.clientRequest.lobby.GetAvailableGameLobbiesMessage;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 
 class TCPServerTest {
+
+  @BeforeEach
+  void setUp() {
+    new Main.Options(true);
+    new Cli.Options(true);
+  }
 
   boolean isCI() {
     return Objects.equals(System.getenv("CI"), "true");

@@ -1,15 +1,15 @@
 package polimi.ingsw.am21.codex.view;
 
+import java.util.concurrent.CountDownLatch;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 
 public abstract class ViewClient {
 
-  private boolean initialized = false;
+  private final CountDownLatch isInitializedLatch = new CountDownLatch(1);
 
   protected ClientConnectionHandler client;
   protected View view;
@@ -40,10 +40,10 @@ public abstract class ViewClient {
       );
     }
     client.connect();
-    this.initialized = true;
+    isInitializedLatch.countDown();
   }
 
-  protected boolean isInitialized() {
-    return initialized;
+  protected CountDownLatch getIsInitializedLatch() {
+    return isInitializedLatch;
   }
 }

@@ -60,7 +60,7 @@ public class CliUtils {
   }
 
   public static String colorize(String string, Color color, ColorStyle style) {
-    if (Cli.options.isColored()) {
+    if (Cli.Options.isColored()) {
       return Color.colorize(string, color, style);
     }
     return string;

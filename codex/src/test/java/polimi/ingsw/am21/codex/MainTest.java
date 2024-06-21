@@ -6,31 +6,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
+import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.Server;
-import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
-import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.view.View;
 
@@ -168,6 +164,7 @@ class MainTest {
       if (
         localModel
           .getLocalGameBoard()
+          .orElseThrow()
           .getCurrentPlayer()
           .getNickname()
           .equals("Player 1")
@@ -193,33 +190,33 @@ class MainTest {
           .placeCard(2, CardSideType.FRONT, new Position(0, 1))
     );
 
-    actions.add(
-      () ->
-        assertTrue(
-          (client1.get() == playingClient.get() &&
-            localModel
-              .getLocalGameBoard()
-              .getPlayer()
-              .getPlayedCards()
-              .containsKey(new Position(0, 1)) &&
-            !localModel
-              .getLocalGameBoard()
-              .getNextPlayer()
-              .getPlayedCards()
-              .containsKey(new Position(0, 1))) ||
-          (client2.get() == playingClient.get() &&
-            localModel
-              .getLocalGameBoard()
-              .getCurrentPlayer()
-              .getPlayedCards()
-              .containsKey(new Position(0, 1)) &&
-            !localModel
-              .getLocalGameBoard()
-              .getPlayer()
-              .getPlayedCards()
-              .containsKey(new Position(0, 1)))
-        )
-    );
+    actions.add(() -> {
+      LocalGameBoard localGameBoard = localModel
+        .getLocalGameBoard()
+        .orElse(null);
+      assertTrue(
+        (localGameBoard != null &&
+          client1.get() == playingClient.get() &&
+          localGameBoard
+            .getPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1)) &&
+          !localGameBoard
+            .getNextPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1))) ||
+        (localGameBoard != null &&
+          client2.get() == playingClient.get() &&
+          localGameBoard
+            .getCurrentPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1)) &&
+          !localGameBoard
+            .getPlayer()
+            .getPlayedCards()
+            .containsKey(new Position(0, 1)))
+      );
+    });
 
     actions.add(
       () ->

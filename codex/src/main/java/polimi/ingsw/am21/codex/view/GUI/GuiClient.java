@@ -23,23 +23,18 @@ public class GuiClient extends ViewClient {
     new Thread(() -> Application.launch(gui.getClass())).start();
 
     try {
-      while (!gui.isInitialized()) {
-        Thread.sleep(100);
-      }
-      Thread.sleep(2000);
+      gui.getIsInitializedLatch().await();
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     super.start(connectionType, address, port);
     gui.setClient(client);
 
-    while (!super.isInitialized()) {
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+    try {
+      super.getIsInitializedLatch().await();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
   }
 

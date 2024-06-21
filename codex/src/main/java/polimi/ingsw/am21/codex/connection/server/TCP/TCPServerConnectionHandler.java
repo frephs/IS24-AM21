@@ -8,12 +8,10 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.connection.server.NotAClientMessageException;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.exceptions.GameNotFoundException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
 import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.messages.Message;
@@ -201,7 +199,9 @@ public class TCPServerConnectionHandler implements Runnable {
   /** Determines the message type and calls the appropriate method based on that */
   private void handleMessage(Message message)
     throws NotAClientMessageException {
-    if (message.getType() != MessageType.HEART_BEAT) System.out.println(
+    if (
+      Main.Options.isDebug() && message.getType() != MessageType.HEART_BEAT
+    ) System.out.println(
       "Received " + message.getType() + " from " + socket.getInetAddress()
     );
     switch (message.getType()) {
@@ -225,6 +225,7 @@ public class TCPServerConnectionHandler implements Runnable {
         (GetStarterCardSideMessage) message
       );
       case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
+      case LEAVE_LOBBY -> handleMessage((LeaveLobbyMessage) message);
       default -> throw new NotAClientMessageException();
     }
   }
@@ -389,11 +390,21 @@ public class TCPServerConnectionHandler implements Runnable {
     }
   }
 
+  public void handleMessage(LeaveLobbyMessage message) {
+    try {
+      controller.quitFromLobby(message.getConnectionID());
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
+    }
+  }
+
   /** Sends a message synchronously to the client socket */
   public void send(Message message) {
     try {
       if (socket.isConnected() && !socket.isClosed()) {
-        System.out.println("Sending " + message.getType());
+        if (Main.Options.isDebug()) {
+          System.out.println("Sending " + message.getType());
+        }
         synchronized (outputStream) {
           outputStream.writeObject(message);
           outputStream.flush();
