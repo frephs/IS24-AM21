@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.view.Notification;
@@ -147,4 +148,7 @@ public class DummyView implements View {
 
   @Override
   public void drawStarterCardSides() {}
+
+  @Override
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {}
 }
