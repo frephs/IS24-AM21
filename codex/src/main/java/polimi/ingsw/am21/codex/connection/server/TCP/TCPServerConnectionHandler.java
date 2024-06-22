@@ -225,6 +225,7 @@ public class TCPServerConnectionHandler implements Runnable {
         (GetStarterCardSideMessage) message
       );
       case SEND_CHAT_MESSAGE -> handleMessage((SendChatMessage) message);
+      case LEAVE_LOBBY -> handleMessage((LeaveLobbyMessage) message);
       default -> throw new NotAClientMessageException();
     }
   }
@@ -384,6 +385,14 @@ public class TCPServerConnectionHandler implements Runnable {
         message.getConnectionID(),
         message.getMessage()
       );
+    } catch (InvalidActionException e) {
+      send(InvalidActionMessage.fromException(e));
+    }
+  }
+
+  public void handleMessage(LeaveLobbyMessage message) {
+    try {
+      controller.quitFromLobby(message.getConnectionID());
     } catch (InvalidActionException e) {
       send(InvalidActionMessage.fromException(e));
     }

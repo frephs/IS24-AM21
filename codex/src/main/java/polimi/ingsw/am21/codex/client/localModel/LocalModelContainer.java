@@ -24,12 +24,12 @@ public class LocalModelContainer implements GameEventListener {
   /**
    * Contains the players in the lobby
    * */
-  private LocalLobby lobby;
+  private Optional<LocalLobby> lobby = Optional.empty();
 
   /**
    * Contains all the players in the game and the gameboard
    * */
-  private LocalGameBoard gameBoard;
+  private Optional<LocalGameBoard> gameBoard = Optional.empty();
 
   private final CardsLoader cardsLoader = new CardsLoader();
 
@@ -66,11 +66,7 @@ public class LocalModelContainer implements GameEventListener {
   }
 
   public Optional<String> getGameId() {
-    if (lobby != null) {
-      return Optional.ofNullable(lobby.getGameId());
-    } else {
-      return Optional.empty();
-    }
+    return lobby.map(LocalLobby::getGameId);
   }
 
   public LocalModelContainer() {
@@ -89,11 +85,11 @@ public class LocalModelContainer implements GameEventListener {
     return menu;
   }
 
-  public LocalLobby getLocalLobby() {
+  public Optional<LocalLobby> getLocalLobby() {
     return lobby;
   }
 
-  public LocalGameBoard getLocalGameBoard() {
+  public Optional<LocalGameBoard> getLocalGameBoard() {
     return gameBoard;
   }
 
@@ -131,9 +127,9 @@ public class LocalModelContainer implements GameEventListener {
     // TODO delete game on gameOver
     menu.getGames().remove(gameId);
 
-    if (lobby != null && lobby.getGameId().equals(gameId)) {
-      lobby = null;
-      gameBoard = null;
+    if (lobby.map(LocalLobby::getGameId).orElse("").equals(gameId)) {
+      lobby = Optional.empty();
+      gameBoard = Optional.empty();
     }
   }
 
@@ -165,16 +161,15 @@ public class LocalModelContainer implements GameEventListener {
     // if it's you, create a new lobby
     if (this.socketId.equals(socketId)) {
       clientContextContainer.set(ClientContext.LOBBY);
-      lobby = new LocalLobby(gameId);
-      gameBoard = new LocalGameBoard(
-        gameId,
-        menu.getGames().get(gameId).getMaxPlayers()
+      lobby = Optional.of(new LocalLobby(gameId));
+      gameBoard = Optional.of(
+        new LocalGameBoard(gameId, menu.getGames().get(gameId).getMaxPlayers())
       );
       addToLobby(socketId);
     }
 
-    // if it's not you, update lobby if you have one,
-    if (lobby != null && lobby.getGameId().equals(gameId)) {
+    // if it's not you, update lobby if you have one
+    if (lobby.map(LocalLobby::getGameId).orElse("").equals(gameId)) {
       addToLobby(socketId);
     }
   }
@@ -183,7 +178,7 @@ public class LocalModelContainer implements GameEventListener {
    * Internal utility to add a player to the current lobby
    */
   private void addToLobby(UUID socketId) {
-    lobby.getPlayers().put(socketId, new LocalPlayer(socketId));
+    lobby.orElseThrow().getPlayers().put(socketId, new LocalPlayer(socketId));
   }
 
   @Override
@@ -192,22 +187,22 @@ public class LocalModelContainer implements GameEventListener {
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {
-    if (lobby != null) {
+    lobby.ifPresent(lobby ->
       lobby
         .getPlayers()
         .computeIfPresent(socketID, (uuid, player) -> {
           player.setConnectionStatus(status);
           return player;
-        });
-    }
+        }));
 
-    if (gameBoard != null) {
-      gameBoard
-        .getPlayers()
-        .stream()
-        .filter(player -> player.getSocketID().equals(socketID))
-        .forEach(player -> player.setConnectionStatus(status));
-    }
+    gameBoard.ifPresent(
+      gameBoard ->
+        gameBoard
+          .getPlayers()
+          .stream()
+          .filter(player -> player.getSocketID().equals(socketID))
+          .forEach(player -> player.setConnectionStatus(status))
+    );
     //TODO check this out
   }
 
@@ -220,17 +215,12 @@ public class LocalModelContainer implements GameEventListener {
         return gameEntry;
       });
 
-    if (lobby.getGameId().equals(gameId)) {
-      lobby.getPlayers().remove(socketID);
-    }
+    lobby.ifPresent(lobby -> lobby.getPlayers().remove(socketID));
 
     if (socketID.equals(this.socketId)) {
-      lobby = null;
-      gameBoard = null;
-    }
-
-    if (lobby != null && lobby.getGameId().equals(gameId)) {
-      lobby.getPlayers().remove(socketID);
+      lobby = Optional.empty();
+      gameBoard = Optional.empty();
+      clientContextContainer.set(ClientContext.MENU);
     }
   }
 
@@ -238,11 +228,11 @@ public class LocalModelContainer implements GameEventListener {
    * Internal utility to set the token color in the current lobby
    * */
   private void setPlayerToken(UUID socketId, TokenColor token) {
-    lobby.getPlayers().get(socketId).setToken(token);
+    lobby.orElseThrow().getPlayers().get(socketId).setToken(token);
   }
 
   public void tokenTaken(TokenColor token) {
-    lobby.getAvailableTokens().remove(token);
+    lobby.ifPresent(lobby -> lobby.getAvailableTokens().remove(token));
   }
 
   @Override
@@ -253,25 +243,25 @@ public class LocalModelContainer implements GameEventListener {
     TokenColor token
   ) {
     // return if you're not in a lobby
-    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
+    if (lobby.isEmpty() || !lobby.get().getGameId().equals(gameId)) return;
 
-    Set<TokenColor> availableTokens = lobby.getAvailableTokens();
+    Set<TokenColor> availableTokens = lobby.get().getAvailableTokens();
     availableTokens.remove(token);
 
-    lobby.getPlayers().get(socketId).setToken(token);
+    lobby.get().getPlayers().get(socketId).setToken(token);
   }
 
   /**
    * Internal utility to set the nickname of a player in the current lobby
    */
   private void setPlayerNickname(UUID socketId, String nickname) {
-    lobby.getPlayers().get(socketId).setNickname(nickname);
+    lobby.orElseThrow().getPlayers().get(socketId).setNickname(nickname);
   }
 
   @Override
   public void playerSetNickname(String gameId, UUID socketId, String nickname) {
-    if (lobby == null || !lobby.getGameId().equals(gameId)) return;
-    lobby.getPlayers().get(socketId).setNickname(nickname);
+    if (lobby.isEmpty() || !lobby.get().getGameId().equals(gameId)) return;
+    lobby.get().getPlayers().get(socketId).setNickname(nickname);
   }
 
   @Override
@@ -282,28 +272,31 @@ public class LocalModelContainer implements GameEventListener {
   ) {}
 
   public CardPair<Card> getAvailableObjectives() {
-    return lobby.getAvailableObjectives();
+    return lobby.orElseThrow().getAvailableObjectives();
   }
 
   public void playerChoseObjectiveCard(Boolean isFirst) {
-    this.gameBoard.setSecretObjective(
+    this.gameBoard.orElseThrow()
+      .setSecretObjective(
         isFirst
-          ? this.lobby.getAvailableObjectives().getFirst()
-          : this.lobby.getAvailableObjectives().getSecond()
+          ? this.lobby.orElseThrow().getAvailableObjectives().getFirst()
+          : this.lobby.orElseThrow().getAvailableObjectives().getSecond()
       );
   }
 
   @Override
   public void getObjectiveCards(Pair<Integer, Integer> cardIdPair) {
-    lobby.setAvailableObjectives(
-      cardsLoader.getCardFromId(cardIdPair.getKey()),
-      cardsLoader.getCardFromId(cardIdPair.getValue())
-    );
+    lobby
+      .orElseThrow()
+      .setAvailableObjectives(
+        cardsLoader.getCardFromId(cardIdPair.getKey()),
+        cardsLoader.getCardFromId(cardIdPair.getValue())
+      );
   }
 
   @Override
   public void getStarterCard(Integer cardId) {
-    lobby.setStarterCard(cardsLoader.getCardFromId(cardId));
+    lobby.orElseThrow().setStarterCard(cardsLoader.getCardFromId(cardId));
   }
 
   @Override
@@ -321,8 +314,8 @@ public class LocalModelContainer implements GameEventListener {
 
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
-    if (this.gameBoard.getGameId().equals(gameId)) {
-      gameBoard.getPlayers().clear();
+    if (gameBoard.isPresent() && gameBoard.get().getGameId().equals(gameId)) {
+      gameBoard.get().getPlayers().clear();
 
       clientContextContainer.set(ClientContext.GAME);
 
@@ -330,6 +323,7 @@ public class LocalModelContainer implements GameEventListener {
         .getUsers()
         .forEach((GameInfo.GameInfoUser player) -> {
           LocalPlayer localPlayer = lobby
+            .orElseThrow()
             .getPlayers()
             .get(player.getSocketID());
 
@@ -360,38 +354,48 @@ public class LocalModelContainer implements GameEventListener {
           localPlayer.getResources().putAll(player.getResources());
           localPlayer.getObjects().putAll(player.getObjects());
 
-          gameBoard.getPlayers().add(localPlayer);
+          gameBoard.get().getPlayers().add(localPlayer);
         });
 
-      gameBoard.setCurrentPlayerIndex(gameInfo.getCurrentUserIndex());
+      gameBoard.get().setCurrentPlayerIndex(gameInfo.getCurrentUserIndex());
       for (int i = 0; i < gameInfo.getUsers().size(); ++i) {
         UUID userSocketID = gameInfo.getUsers().get(i).getSocketID();
         if (userSocketID.equals(socketId)) {
-          gameBoard.setPlayerIndex(i);
+          gameBoard.get().setPlayerIndex(i);
           break;
         }
       }
 
-      gameBoard.setGoldCards(
-        CardPair.fromCardIndexPair(cardsLoader, gameInfo.getGoldCards())
-      );
-      gameBoard.setObjectiveCards(
-        CardPair.fromCardIndexPair(cardsLoader, gameInfo.getObjectiveCards())
-      );
-      gameBoard.setResourceCards(
-        CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
-      );
+      gameBoard
+        .get()
+        .setGoldCards(
+          CardPair.fromCardIndexPair(cardsLoader, gameInfo.getGoldCards())
+        );
+      gameBoard
+        .get()
+        .setObjectiveCards(
+          CardPair.fromCardIndexPair(cardsLoader, gameInfo.getObjectiveCards())
+        );
+      gameBoard
+        .get()
+        .setResourceCards(
+          CardPair.fromCardIndexPair(cardsLoader, gameInfo.getResourceCards())
+        );
 
-      gameBoard.setResourceDeckTopCard(
-        (PlayableCard) cardsLoader.getCardFromId(
-          gameInfo.getResourceDeckTopCardId()
-        )
-      );
-      gameBoard.setGoldDeckTopCard(
-        (PlayableCard) cardsLoader.getCardFromId(
-          gameInfo.getGoldDeckTopCardId()
-        )
-      );
+      gameBoard
+        .get()
+        .setResourceDeckTopCard(
+          (PlayableCard) cardsLoader.getCardFromId(
+            gameInfo.getResourceDeckTopCardId()
+          )
+        );
+      gameBoard
+        .get()
+        .setGoldDeckTopCard(
+          (PlayableCard) cardsLoader.getCardFromId(
+            gameInfo.getGoldDeckTopCardId()
+          )
+        );
     }
   }
 
@@ -410,7 +414,7 @@ public class LocalModelContainer implements GameEventListener {
     Set<Position> forbiddenPositions
   ) {
     Card card = cardsLoader.getCardFromId(cardId);
-    LocalPlayer localPlayer = gameBoard.getCurrentPlayer();
+    LocalPlayer localPlayer = gameBoard.orElseThrow().getCurrentPlayer();
 
     localPlayer.addPlayedCards(card, side, position);
 
@@ -455,7 +459,7 @@ public class LocalModelContainer implements GameEventListener {
   ) {
     if (drawnCardId != null) {
       Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
-      gameBoard.getCurrentPlayer().getHand().add(drawnCard);
+      gameBoard.orElseThrow().getCurrentPlayer().getHand().add(drawnCard);
     }
 
     switch (source) {
@@ -463,8 +467,8 @@ public class LocalModelContainer implements GameEventListener {
         Card newPairCard = cardsLoader.getCardFromId(newPairCardId);
         CardPair<Card> cardPairToUpdate =
           switch (deck) {
-            case GOLD -> gameBoard.getGoldCards();
-            case RESOURCE -> gameBoard.getResourceCards();
+            case GOLD -> gameBoard.orElseThrow().getGoldCards();
+            case RESOURCE -> gameBoard.orElseThrow().getResourceCards();
           };
 
         switch (source) {
@@ -502,6 +506,8 @@ public class LocalModelContainer implements GameEventListener {
     Integer resourceDeckTopCardId,
     Integer goldDeckTopCardId
   ) {
+    LocalGameBoard gameBoard = this.gameBoard.orElseThrow();
+
     gameBoard.setCurrentPlayerIndex(playerIndex);
     gameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
     gameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
@@ -523,45 +529,53 @@ public class LocalModelContainer implements GameEventListener {
   @Override
   public void playerScoresUpdate(Map<String, Integer> newScores) {
     gameBoard
+      .orElseThrow()
       .getPlayers()
       .forEach(player -> player.setPoints(newScores.get(player.getNickname())));
   }
 
   @Override
   public void remainingRounds(String gameID, int remainingRounds) {
-    if (Objects.equals(gameBoard.getGameId(), gameID)) {
-      this.gameBoard.setRemainingRounds(remainingRounds);
+    if (Objects.equals(gameBoard.orElseThrow().getGameId(), gameID)) {
+      this.gameBoard.orElseThrow().setRemainingRounds(remainingRounds);
     }
   }
 
   @Override
   public void winningPlayer(String nickname) {
-    lobby = null;
-    gameBoard = null;
+    lobby = Optional.empty();
+    gameBoard = Optional.empty();
   }
 
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) {
-    this.lobby.getPlayers().clear();
-    usersInfo
-      .getUsers()
-      .forEach((uuid, lobbyInfoUser) -> {
-        addToLobby(uuid);
-        lobbyInfoUser
-          .getNickname()
-          .ifPresent(nickname -> setPlayerNickname(uuid, nickname));
-        lobbyInfoUser
-          .getTokenColor()
-          .ifPresent(token -> setPlayerToken(uuid, token));
-      });
+    // Update the current players in the game entry (like for menus)
+    this.menu.getGames()
+      .get(usersInfo.getGameID())
+      .setCurrentPlayers(usersInfo.getUsers().size());
 
-    clientContextContainer.set(ClientContext.LOBBY);
+    if (lobby.isPresent()) {
+      lobby.get().getPlayers().clear();
+      usersInfo
+        .getUsers()
+        .forEach((uuid, lobbyInfoUser) -> {
+          addToLobby(uuid);
+          lobbyInfoUser
+            .getNickname()
+            .ifPresent(nickname -> setPlayerNickname(uuid, nickname));
+          lobbyInfoUser
+            .getTokenColor()
+            .ifPresent(token -> setPlayerToken(uuid, token));
+        });
+
+      clientContextContainer.set(ClientContext.LOBBY);
+    }
   }
 
   @Override
   public void chatMessage(String gameID, ChatMessage message) {
-    if (Objects.equals(gameID, gameBoard.getGameId())) {
-      gameBoard.getChat().postMessage(message);
+    if (Objects.equals(gameID, gameBoard.orElseThrow().getGameId())) {
+      gameBoard.orElseThrow().getChat().postMessage(message);
     }
   }
 

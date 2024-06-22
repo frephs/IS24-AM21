@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.view.GUI;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -29,6 +30,7 @@ import javafx.util.Pair;
 import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -54,6 +56,9 @@ public class Gui extends Application implements View {
 
   private static ClientConnectionHandler client;
   private final LocalModelContainer localModel;
+  private static final CountDownLatch isInitializedLatch = new CountDownLatch(
+    1
+  );
 
   public Gui() {
     gui = this;
@@ -111,9 +116,24 @@ public class Gui extends Application implements View {
       notificationLoader = new NotificationLoader(new Stage());
       exceptionLoader = new ExceptionLoader(new Stage());
       rulebookHandler = new RulebookHandler(new Stage());
+      isInitializedLatch.countDown();
 
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
+
+      primaryStage.getIcons().add(loadImage("icon.png").getImage());
+      primaryStage.setOnCloseRequest(event -> {
+        if (Main.Options.isDebug()) {
+          try {
+            exceptionLoader.loadException(new RuntimeException("Closing"));
+          } catch (IOException e) {
+            // TODO: Handle exception
+            System.err.println(e);
+          }
+        }
+
+        System.exit(0);
+      });
 
       primaryStage.show();
     } catch (IOException e) {
@@ -122,10 +142,8 @@ public class Gui extends Application implements View {
     }
   }
 
-  public boolean isInitialized() {
-    return (
-      scene != null && notificationLoader != null && exceptionLoader != null
-    );
+  public CountDownLatch getIsInitializedLatch() {
+    return isInitializedLatch;
   }
 
   public static void main(String[] args) {
@@ -305,7 +323,7 @@ public class Gui extends Application implements View {
       try {
         exceptionLoader.loadException(exception);
         // TODO: Handle exception
-        System.err.println(exception);
+        exception.printStackTrace();
       } catch (IOException e) {
         // TODO: Handle exception
         System.err.println(exception);
@@ -340,6 +358,7 @@ public class Gui extends Application implements View {
   @Override
   public void drawAvailableGames() {
     Platform.runLater(() -> {
+      ((Pane) scene.lookup("#side-content")).getChildren().clear();
       loadSceneFXML("LobbyMenu.fxml", "#content");
       ((Text) scene.lookup("#window-title")).setText("Menu");
 
@@ -421,7 +440,8 @@ public class Gui extends Application implements View {
       loadSceneFXML("LobbyToken.fxml", "#content");
 
       ((Text) scene.lookup("#window-title")).setText(
-          "Lobby of the game " + localModel.getLocalLobby().getGameId()
+          "Lobby of the game " +
+          localModel.getLocalLobby().orElseThrow().getGameId()
         );
 
       Node tokenContainer = scene.lookup("#token-container");
@@ -431,6 +451,7 @@ public class Gui extends Application implements View {
         .addAll(
           localModel
             .getLocalLobby()
+            .orElseThrow()
             .getAvailableTokens()
             .stream()
             .map(tokenColor -> {
@@ -465,13 +486,14 @@ public class Gui extends Application implements View {
 
       scene
         .lookup("#back-to-menu-button-lobby")
-        .setOnMouseClicked((MouseEvent event) -> client.getGames());
+        .setOnMouseClicked((MouseEvent event) -> client.leaveGameLobby());
 
       GridPane playerGrid =
         ((GridPane) scene.lookup("#lobby-player-container"));
 
       List<LocalPlayer> players = localModel
         .getLocalLobby()
+        .orElseThrow()
         .getPlayers()
         .values()
         .stream()
@@ -507,6 +529,7 @@ public class Gui extends Application implements View {
 
       List<LocalPlayer> sortedPlayers = localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getPlayers()
         .stream()
         .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
@@ -528,7 +551,11 @@ public class Gui extends Application implements View {
         if (
           Objects.equals(
             player.getNickname(),
-            localModel.getLocalGameBoard().getCurrentPlayer().getNickname()
+            localModel
+              .getLocalGameBoard()
+              .orElseThrow()
+              .getCurrentPlayer()
+              .getNickname()
           )
         ) {
           nicknameAndToken.getStyleClass().add("highlighted");
@@ -633,7 +660,10 @@ public class Gui extends Application implements View {
     // TODO handle other players (switch button etc)
     loadSceneFXML("PlayerBoard.fxml", "#content");
 
-    List<LocalPlayer> players = localModel.getLocalGameBoard().getPlayers();
+    List<LocalPlayer> players = localModel
+      .getLocalGameBoard()
+      .orElseThrow()
+      .getPlayers();
 
     players
       .stream()
@@ -641,7 +671,9 @@ public class Gui extends Application implements View {
         player ->
           player
             .getNickname()
-            .equals(localModel.getLocalGameBoard().getPlayerNickname())
+            .equals(
+              localModel.getLocalGameBoard().orElseThrow().getPlayerNickname()
+            )
       )
       .findFirst()
       .ifPresent(player -> {
@@ -658,7 +690,7 @@ public class Gui extends Application implements View {
     );
 
     playerBoardChoiceBox.setValue(
-      localModel.getLocalGameBoard().getPlayer().getNickname()
+      localModel.getLocalGameBoard().orElseThrow().getPlayer().getNickname()
     );
 
     playerBoardChoiceBox.setOnAction(event -> {
@@ -675,7 +707,9 @@ public class Gui extends Application implements View {
         player ->
           player
             .getNickname()
-            .equals(localModel.getLocalGameBoard().getPlayerNickname())
+            .equals(
+              localModel.getLocalGameBoard().orElseThrow().getPlayerNickname()
+            )
       )
       .findFirst()
       .ifPresent(player -> drawHand());
@@ -698,6 +732,7 @@ public class Gui extends Application implements View {
 
       LocalPlayer player = localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getPlayers()
         .stream()
         .filter(p -> p.getNickname().equals(nickname))
@@ -776,14 +811,18 @@ public class Gui extends Application implements View {
   private boolean canPlayerPlaceCards() {
     return (
       !localModel.currentPlayerHasPlacedCard() &&
+      localModel.getLocalGameBoard().isPresent() &&
       localModel
         .getLocalGameBoard()
+        .get()
         .getCurrentPlayer()
         .getNickname()
-        .equals(localModel.getLocalGameBoard().getPlayer().getNickname()) &&
+        .equals(
+          localModel.getLocalGameBoard().get().getPlayer().getNickname()
+        ) &&
       visibleUserNickname != null &&
       visibleUserNickname.equals(
-        localModel.getLocalGameBoard().getPlayer().getNickname()
+        localModel.getLocalGameBoard().get().getPlayer().getNickname()
       )
     );
   }
@@ -796,9 +835,14 @@ public class Gui extends Application implements View {
       localModel.currentPlayerHasPlacedCard() &&
       localModel
         .getLocalGameBoard()
-        .getCurrentPlayer()
-        .getNickname()
-        .equals(localModel.getLocalGameBoard().getPlayer().getNickname())
+        .map(
+          gameBoard ->
+            gameBoard
+              .getCurrentPlayer()
+              .getNickname()
+              .equals(gameBoard.getPlayer().getNickname())
+        )
+        .orElse(false)
     );
   }
 
@@ -869,7 +913,14 @@ public class Gui extends Application implements View {
       primaryStage.setTitle(
         primaryStage.getTitle() +
         " [" +
-        localModel.getLocalGameBoard().getPlayer().getNickname() +
+        localModel
+          .getLocalGameBoard()
+          .map(
+            gameBoard ->
+              Optional.ofNullable(gameBoard.getPlayer().getNickname()).orElse(
+                gameBoard.getPlayer().getSocketID().toString()
+              )
+          ) +
         "]"
       );
       drawChat();
@@ -927,6 +978,7 @@ public class Gui extends Application implements View {
       winningPlayer(
         localModel
           .getLocalGameBoard()
+          .orElseThrow()
           .getPlayers()
           .stream()
           .min((p1, p2) -> p2.getPoints() - p1.getPoints())
@@ -955,7 +1007,11 @@ public class Gui extends Application implements View {
   public void drawHand() {
     Platform.runLater(() -> {
       // Save the hand in case we need to flip it
-      List<Card> hand = localModel.getLocalGameBoard().getPlayer().getHand();
+      List<Card> hand = localModel
+        .getLocalGameBoard()
+        .orElseThrow()
+        .getPlayer()
+        .getHand();
 
       scene
         .lookup("#flip-hand-button")
@@ -1027,8 +1083,12 @@ public class Gui extends Application implements View {
 
       CardPair<Card> resourceCards = localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getResourceCards();
-      CardPair<Card> goldCards = localModel.getLocalGameBoard().getGoldCards();
+      CardPair<Card> goldCards = localModel
+        .getLocalGameBoard()
+        .orElseThrow()
+        .getGoldCards();
 
       // TODO how do we want to display two sides?
       List<ImageView> images = List.of(
@@ -1109,6 +1169,7 @@ public class Gui extends Application implements View {
 
       CardPair<Card> cardPair = localModel
         .getLocalLobby()
+        .orElseThrow()
         .getAvailableObjectives();
 
       ImageView first = loadImage(cardPair.getFirst());
@@ -1144,7 +1205,7 @@ public class Gui extends Application implements View {
 
       ((Text) scene.lookup("#window-title")).setText("Lobby");
 
-      Card card = localModel.getLocalLobby().getStarterCard();
+      Card card = localModel.getLocalLobby().orElseThrow().getStarterCard();
 
       ImageView front = loadCardImage(card, CardSideType.FRONT);
       ImageView back = loadCardImage(card, CardSideType.BACK);
@@ -1186,15 +1247,16 @@ public class Gui extends Application implements View {
       "#chat-recipient"
     );
 
-    localModel
+    LocalGameBoard localGameBoard = localModel
       .getLocalGameBoard()
+      .orElseThrow();
+
+    localGameBoard
       .getPlayers()
       .stream()
       .filter(
         player ->
-          !player
-            .getNickname()
-            .equals(localModel.getLocalGameBoard().getPlayerNickname())
+          !player.getNickname().equals(localGameBoard.getPlayerNickname())
       )
       .forEach(
         player -> recipientChoiceBox.getItems().add(player.getNickname())
@@ -1215,13 +1277,13 @@ public class Gui extends Application implements View {
 
         if (!Objects.equals(recipient, "Broadcast")) {
           chatMessage = new ChatMessage(
-            localModel.getLocalGameBoard().getPlayerNickname(),
+            localGameBoard.getPlayerNickname(),
             recipient,
             message
           );
         } else {
           chatMessage = new ChatMessage(
-            localModel.getLocalGameBoard().getPlayerNickname(),
+            localGameBoard.getPlayerNickname(),
             message
           );
         }
@@ -1266,6 +1328,7 @@ public class Gui extends Application implements View {
 
         Image tokenImage = localModel
           .getLocalGameBoard()
+          .orElseThrow()
           .getPlayers()
           .stream()
           .filter(player -> player.getNickname().equals(message.getSender()))
@@ -1285,6 +1348,7 @@ public class Gui extends Application implements View {
         chatMessage.setAlignment(
           (localModel
                 .getLocalGameBoard()
+                .orElseThrow()
                 .getPlayerNickname()
                 .equals(message.getSender()))
             ? Pos.CENTER_RIGHT
@@ -1320,6 +1384,7 @@ public class Gui extends Application implements View {
 
       CardPair<Card> cardPair = localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getObjectiveCards();
 
       List<ImageView> images = List.of(
@@ -1353,7 +1418,11 @@ public class Gui extends Application implements View {
     vbox.getChildren().clear();
 
     ImageView image = loadCardImage(
-      localModel.getLocalGameBoard().getPlayer().getObjectiveCard(),
+      localModel
+        .getLocalGameBoard()
+        .orElseThrow()
+        .getPlayer()
+        .getObjectiveCard(),
       CardSideType.FRONT
     );
     image.setPreserveRatio(true);
@@ -1373,9 +1442,11 @@ public class Gui extends Application implements View {
 
       PlayableCard firstResourceCard = localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getResourceDeckTopCard();
       PlayableCard firstGoldCard = localModel
         .getLocalGameBoard()
+        .orElseThrow()
         .getGoldDeckTopCard();
 
       resourceCardsDeck.getChildren().clear();
@@ -1458,7 +1529,14 @@ public class Gui extends Application implements View {
   @Override
   public void playerLeftLobby(String gameId, UUID socketID) {
     View.super.playerLeftLobby(gameId, socketID);
-    drawLobby();
+
+    ClientContext context = localModel
+      .getClientContextContainer()
+      .get()
+      .orElse(null);
+
+    if (ClientContext.LOBBY.equals(context)) drawLobby();
+    else if (ClientContext.MENU.equals(context)) drawAvailableGames();
   }
 
   @Override
@@ -1476,10 +1554,12 @@ public class Gui extends Application implements View {
       } else if (
         localModel
           .getLocalLobby()
-          .getPlayers()
-          .get(localModel.getSocketID())
-          .getToken() ==
-        null
+          .map(
+            lobby ->
+              lobby.getPlayers().get(localModel.getSocketID()).getToken() ==
+              null
+          )
+          .orElse(false)
       ) {
         drawAvailableTokenColors();
       }
@@ -1579,14 +1659,20 @@ public class Gui extends Application implements View {
 
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) {
-    View.super.lobbyInfo(usersInfo);
+    if (
+      ClientContext.LOBBY.equals(
+        localModel.getClientContextContainer().get().orElse(null)
+      )
+    ) drawLobby();
+
     if (
       localModel
         .getLocalLobby()
-        .getPlayers()
-        .get(localModel.getSocketID())
-        .getToken() ==
-      null
+        .map(
+          lobby ->
+            lobby.getPlayers().get(localModel.getSocketID()).getToken() == null
+        )
+        .orElse(false)
     ) drawAvailableTokenColors();
   }
 

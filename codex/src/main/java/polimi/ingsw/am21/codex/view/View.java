@@ -52,7 +52,11 @@ public interface View extends GameEventListener {
 
   default void drawPlayerBoard() {
     drawPlayerBoard(
-      getLocalModel().getLocalGameBoard().getPlayer().getNickname()
+      getLocalModel()
+        .getLocalGameBoard()
+        .orElseThrow()
+        .getPlayer()
+        .getNickname()
     );
   }
 
@@ -113,7 +117,12 @@ public interface View extends GameEventListener {
     String message;
     if (getLocalModel().getSocketID().equals(socketID)) {
       message = "You joined the game " + gameId;
-    } else if (getLocalModel().getLocalGameBoard().getGameId().equals(gameId)) {
+    } else if (
+      getLocalModel()
+        .getLocalGameBoard()
+        .map(gameBoard -> gameBoard.getGameId().equals(gameId))
+        .orElse(false)
+    ) {
       message = socketID.toString() + " joined your game";
     } else {
       message = socketID.toString() + " joined game " + gameId;
@@ -128,7 +137,12 @@ public interface View extends GameEventListener {
 
     if (getLocalModel().getSocketID().equals(socketID)) {
       message = "You left the lobby of the game " + gameId;
-    } else if (getLocalModel().getLocalGameBoard().getGameId().equals(gameId)) {
+    } else if (
+      getLocalModel()
+        .getLocalGameBoard()
+        .map(gameBoard -> gameBoard.getGameId().equals(gameId))
+        .orElse(false)
+    ) {
       message = socketID.toString() + " left your game lobby";
     } else {
       message = socketID.toString() + " left the game lobby " + gameId;
@@ -216,6 +230,7 @@ public interface View extends GameEventListener {
     if (
       getLocalModel()
         .getLocalGameBoard()
+        .orElseThrow()
         .getCurrentPlayer()
         .getSocketID()
         .equals(getLocalModel().getSocketID())
@@ -225,7 +240,11 @@ public interface View extends GameEventListener {
       postNotification(
         NotificationType.UPDATE,
         "It's " +
-        getLocalModel().getLocalGameBoard().getCurrentPlayer().getNickname() +
+        getLocalModel()
+          .getLocalGameBoard()
+          .orElseThrow()
+          .getCurrentPlayer()
+          .getNickname() +
         "'s turn. "
       );
     }
@@ -261,11 +280,16 @@ public interface View extends GameEventListener {
       "It's " +
       (!Objects.equals(
             playerNickname,
-            getLocalModel().getLocalGameBoard().getPlayer().getNickname()
+            getLocalModel()
+              .getLocalGameBoard()
+              .orElseThrow()
+              .getPlayer()
+              .getNickname()
           )
           ? "your "
           : getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getCurrentPlayer()
             .getNickname() +
           "'s ") +
@@ -367,9 +391,7 @@ public interface View extends GameEventListener {
   }
 
   @Override
-  default void lobbyInfo(LobbyUsersInfo usersInfo) {
-    drawLobby();
-  }
+  void lobbyInfo(LobbyUsersInfo usersInfo);
 
   @Override
   default void chatMessage(String gameID, ChatMessage message) {
