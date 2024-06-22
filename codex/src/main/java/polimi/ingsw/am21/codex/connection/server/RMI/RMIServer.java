@@ -7,6 +7,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.AbstractServer;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -17,7 +18,8 @@ public class RMIServer extends AbstractServer {
     super(port, controller);
   }
 
-  public void start() throws MalformedURLException, RemoteException {
+  public void start()
+    throws MalformedURLException, RemoteException, UnknownHostException {
     try { //special exception handler for registry creation
       System.setProperty(
         "java.rmi.server.hostname",
@@ -35,7 +37,10 @@ public class RMIServer extends AbstractServer {
       //do nothing, error means registry already exists
       System.out.println("java RMI registry already exists.");
     } catch (UnknownHostException e) {
-      throw new RuntimeException(e);
+      System.out.println(
+        "Error occurred while starting RMI server" + e.getMessage()
+      );
+      throw e;
     }
   }
 
