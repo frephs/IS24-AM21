@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.connection.server.RMI;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -19,7 +20,7 @@ public class RMIServer extends AbstractServer {
   }
 
   public void start()
-    throws MalformedURLException, RemoteException, UnknownHostException {
+    throws MalformedURLException, RemoteException, UnknownHostException, AlreadyBoundException {
     try { //special exception handler for registry creation
       System.setProperty(
         "java.rmi.server.hostname",
@@ -30,7 +31,7 @@ public class RMIServer extends AbstractServer {
       RMIServerConnectionHandlerImpl handler =
         new RMIServerConnectionHandlerImpl(this.controller);
 
-      registry.rebind("IS24-AM21-CODEX", handler);
+      registry.bind("IS24-AM21-CODEX", handler);
 
       serverReadyLatch.countDown();
     } catch (RemoteException e) {
@@ -40,6 +41,9 @@ public class RMIServer extends AbstractServer {
       System.out.println(
         "Error occurred while starting RMI server" + e.getMessage()
       );
+      throw e;
+    } catch (AlreadyBoundException e) {
+      System.out.println("There is already a server running on this port.");
       throw e;
     }
   }
