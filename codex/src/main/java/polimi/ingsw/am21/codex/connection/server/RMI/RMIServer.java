@@ -1,6 +1,8 @@
 package polimi.ingsw.am21.codex.connection.server.RMI;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -16,19 +18,36 @@ public class RMIServer extends AbstractServer {
   }
 
   public void start() throws MalformedURLException, RemoteException {
-    int port = ConnectionType.RMI.getDefaultPort();
     try { //special exception handler for registry creation
+      System.setProperty(
+        "java.rmi.server.hostname",
+        InetAddress.getLocalHost().getHostName()
+      );
       Registry registry = LocateRegistry.createRegistry(port);
       System.out.println("java RMI registry created.");
       RMIServerConnectionHandlerImpl handler =
         new RMIServerConnectionHandlerImpl(this.controller);
 
+      registry.rebind("IS24-AM21-CODEX", handler);
+
       // Bind this object instance to the name we want
-      registry.rebind("//127.0.0.1:" + port + "/IS24-AM21-CODEX", handler);
+      //      registry.rebind("//127.0.0.1:" + port + "/IS24-AM21-CODEX", handler);
+
+      //      print the address
+      //      System.out.println(
+      //        "RMI Server started on rmi://" +
+      //        InetAddress.getLocalHost().getHostAddress() +
+      //        ":" +
+      //        port +
+      //        "/IS24-AM21-CODEX"
+      //      );
+
       serverReadyLatch.countDown();
     } catch (RemoteException e) {
       //do nothing, error means registry already exists
       System.out.println("java RMI registry already exists.");
+    } catch (UnknownHostException e) {
+      throw new RuntimeException(e);
     }
   }
 
