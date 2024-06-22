@@ -39,6 +39,7 @@ public class Server {
   }
 
   public void stop() {
+    //TODO use stop method when keyboard interrupt is received
     this.rmiServer.stop();
     this.tcpServer.stop();
   }

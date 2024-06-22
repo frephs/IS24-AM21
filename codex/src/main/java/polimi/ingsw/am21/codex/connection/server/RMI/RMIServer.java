@@ -8,8 +8,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import polimi.ingsw.am21.codex.Main;
-import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.server.AbstractServer;
 import polimi.ingsw.am21.codex.controller.GameController;
 
