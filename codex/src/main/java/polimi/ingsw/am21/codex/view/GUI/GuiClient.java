@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.view.GUI;
 import java.util.List;
 import java.util.Objects;
 import javafx.application.Application;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -42,6 +43,9 @@ public class GuiClient extends ViewClient {
     if (args.length != 3) throw new IllegalArgumentException(
       "Usage: GuiClient <connection-type> <address> <port>"
     );
+
+    new Main.Options(true);
+    new Cli.Options(true);
 
     GuiClient guiClient = new GuiClient();
 

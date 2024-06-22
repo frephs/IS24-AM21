@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -756,6 +757,9 @@ public class CliClient extends ViewClient {
     if (args.length != 3) throw new IllegalArgumentException(
       "Usage: CliClient <connection-type> <address> <port>"
     );
+
+    new Main.Options(true);
+    new Cli.Options(true);
 
     CliClient cliClient = new CliClient();
 
