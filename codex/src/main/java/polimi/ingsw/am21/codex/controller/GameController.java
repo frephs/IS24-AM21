@@ -388,6 +388,8 @@ public class GameController {
   ) {
     List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
 
+    List<UUID> totalDisconnections = new ArrayList<>(disconnectedClients);
+
     for (UUID disconnectedClient : disconnectedClients) {
       sameContextClients
         .stream()
@@ -427,6 +429,7 @@ public class GameController {
           );
       } catch (RemoteException e) {
         if (userContexts.containsKey(toNotify.getKey())) {
+          totalDisconnections.add(toNotify.getValue());
           if (userContexts.get(toNotify.getKey()).disconnected()) {
             listenersToNotify.removeIf(
               listener -> listener.getKey().equals(toNotify.getKey())
@@ -437,6 +440,25 @@ public class GameController {
                   new Pair<>(listener.getKey(), toNotify.getKey())
                 )
             );
+          }
+        }
+      }
+    }
+
+    for (UUID disconnectClient : totalDisconnections) {
+      if (userContexts.containsKey(disconnectClient)) {
+        UserGameContext userContext = userContexts.get(disconnectClient);
+        if (
+          userContext.getConnectionStatus() ==
+          UserGameContext.ConnectionStatus.DISCONNECTED
+        ) {
+          if (
+            userContext.getGameId().isPresent() &&
+            userContext.getStatus() == UserGameContextStatus.IN_LOBBY
+          ) {
+            try {
+              this.quitFromLobby(disconnectClient);
+            } catch (InvalidActionException ignored) {}
           }
         }
       }
@@ -621,13 +643,18 @@ public class GameController {
   }
 
   public void quitFromLobby(UUID socketID) throws InvalidActionException {
-    String gameId = userContexts
-      .get(socketID)
+    if (!userContexts.containsKey(socketID)) throw new PlayerNotFoundException(
+      socketID
+    );
+    UserGameContext userContext = userContexts.get(socketID);
+    String gameId = userContext
       .getGameId()
       .orElseThrow(NotInGameException::new);
 
     Game game = this.getGame(gameId);
     this.removePlayerFromLobby(game, socketID);
+
+    userContext.removeGameId();
 
     notifyClients(
       userContexts
