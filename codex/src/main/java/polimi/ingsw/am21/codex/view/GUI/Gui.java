@@ -121,6 +121,7 @@ public class Gui extends Application implements View {
       primaryStage.setTitle("Codex Naturalis");
       primaryStage.setScene(scene);
 
+      primaryStage.getIcons().add(loadImage("icon.png").getImage());
       primaryStage.setOnCloseRequest(event -> {
         if (Main.Options.isDebug()) {
           try {
