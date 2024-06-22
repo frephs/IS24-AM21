@@ -45,21 +45,17 @@ class RMIServerTest {
       });
 
       server.getServerReadyLatch().await();
-      Thread.sleep(5000);
 
       Registry registry = LocateRegistry.getRegistry(4567);
 
       RMIServerConnectionHandler client =
-        (RMIServerConnectionHandler) registry.lookup(
-          "//" + "127.0.0.1" + ":" + 4567 + "/IS24-AM21-CODEX"
-        );
+        (RMIServerConnectionHandler) registry.lookup("IS24-AM21-CODEX");
 
       //generate new random UUID
 
-      client.connect(UUID.randomUUID(), new DummyRemoteGameEventLister());
-
       UUID socketID = UUID.randomUUID();
       assertDoesNotThrow(() -> {
+        client.connect(UUID.randomUUID(), new DummyRemoteGameEventLister());
         client.connect(socketID, new DummyRemoteGameEventLister());
         operationsLatch.countDown();
         client.createGame(socketID, "TestGame", 4);
