@@ -22,7 +22,7 @@ public class RMIServer extends AbstractServer {
     try { //special exception handler for registry creation
       System.setProperty(
         "java.rmi.server.hostname",
-        InetAddress.getLocalHost().getHostName()
+        InetAddress.getLocalHost().getHostAddress()
       );
       Registry registry = LocateRegistry.createRegistry(port);
       System.out.println("java RMI registry created.");
