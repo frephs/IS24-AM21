@@ -79,13 +79,7 @@ public class RMIClientConnectionHandler
 
       gameEventHandler.listGames();
 
-      games.forEach(game -> {
-        this.gameEventHandler.gameCreated(
-            game,
-            currentPlayers.get(game),
-            maxPlayers.get(game)
-          );
-      });
+      gameEventHandler.refreshLobbies(games, currentPlayers, maxPlayers);
     } catch (RemoteException e) {
       this.messageNotSent();
     }
@@ -95,7 +89,6 @@ public class RMIClientConnectionHandler
   public void createGame(String gameId, int players) {
     try {
       rmiConnectionHandler.createGame(this.getSocketID(), gameId, players);
-      this.gameEventHandler.gameCreated(gameId, 0, players);
     } catch (RemoteException | EmptyDeckException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
