@@ -30,18 +30,6 @@ public class RMIServer extends AbstractServer {
 
       registry.rebind("IS24-AM21-CODEX", handler);
 
-      // Bind this object instance to the name we want
-      //      registry.rebind("//127.0.0.1:" + port + "/IS24-AM21-CODEX", handler);
-
-      //      print the address
-      //      System.out.println(
-      //        "RMI Server started on rmi://" +
-      //        InetAddress.getLocalHost().getHostAddress() +
-      //        ":" +
-      //        port +
-      //        "/IS24-AM21-CODEX"
-      //      );
-
       serverReadyLatch.countDown();
     } catch (RemoteException e) {
       //do nothing, error means registry already exists
@@ -54,7 +42,7 @@ public class RMIServer extends AbstractServer {
   public void stop() {
     try {
       Registry registry = LocateRegistry.getRegistry(port);
-      registry.unbind("//127.0.0.1:" + port + "/IS24-AM21-CODEX");
+      registry.unbind("IS24-AM21-CODEX");
       System.out.println("RMI Server stopped.");
     } catch (RemoteException | NotBoundException e) {
       System.out.println(
