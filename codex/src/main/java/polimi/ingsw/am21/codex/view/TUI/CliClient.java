@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -310,9 +311,9 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "leave-game",
-        "Leave the current game",
-        ClientContext.GAME
+        "leave-lobby",
+        "Leave the current lobby",
+        ClientContext.LOBBY
       ) {
         @Override
         public void handle(String[] command) {
@@ -514,7 +515,11 @@ public class CliClient extends ViewClient {
         public void handle(String[] command) {
           client.sendChatMessage(
             new ChatMessage(
-              view.getLocalModel().getLocalGameBoard().getPlayerNickname(),
+              view
+                .getLocalModel()
+                .getLocalGameBoard()
+                .orElseThrow()
+                .getPlayerNickname(),
               command[1],
               Arrays.stream(command).skip(2).collect(Collectors.joining(" "))
             )
@@ -534,6 +539,7 @@ public class CliClient extends ViewClient {
           view
             .getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayerByNickname(command[2])
             .ifPresentOrElse(
               player -> cli.drawPlayerBoard(command[2]),
@@ -569,6 +575,7 @@ public class CliClient extends ViewClient {
           Card card = view
             .getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayers()
             .stream()
             .flatMap(player ->
@@ -602,7 +609,11 @@ public class CliClient extends ViewClient {
           switch (command[1]) {
             case "playerboard":
               view.drawPlayerBoard(
-                view.getLocalModel().getLocalGameBoard().getPlayerNickname()
+                view
+                  .getLocalModel()
+                  .getLocalGameBoard()
+                  .orElseThrow()
+                  .getPlayerNickname()
               );
               break;
             case "leaderboard":
@@ -616,6 +627,7 @@ public class CliClient extends ViewClient {
                 view
                   .getLocalModel()
                   .getLocalGameBoard()
+                  .orElseThrow()
                   .getPlayer()
                   .getObjectiveCard()
               );
@@ -745,6 +757,9 @@ public class CliClient extends ViewClient {
     if (args.length != 3) throw new IllegalArgumentException(
       "Usage: CliClient <connection-type> <address> <port>"
     );
+
+    new Main.Options(true);
+    new Cli.Options(true);
 
     CliClient cliClient = new CliClient();
 

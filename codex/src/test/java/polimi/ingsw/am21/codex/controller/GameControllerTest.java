@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.controller.exceptions.*;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
@@ -188,7 +189,7 @@ class GameControllerTest {
       try {
         controller.connect(connectionID1, new DummyRemoteGameEventListener());
         controller.joinLobby(connectionID1, gameId);
-      } catch (InvalidActionException e) {
+      } catch (NullPointerException | InvalidActionException e) {
         fail("Error joining the game '" + gameId + "': " + e.getMessage());
       }
     }
@@ -196,6 +197,7 @@ class GameControllerTest {
       UUID connectionID = UUID.randomUUID();
       playerIDs.add(connectionID);
       try {
+        controller.connect(connectionID, new DummyRemoteGameEventListener());
         controller.joinLobby(connectionID, gameId);
       } catch (InvalidActionException e) {
         fail("Error joining the game '" + gameId + "': " + e.getMessage());
@@ -291,6 +293,8 @@ class GameControllerTest {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 
+    controller.connect(playerId, new DummyRemoteGameEventListener());
+
     assertThrows(
       GameNotFoundException.class,
       () -> controller.joinLobby(playerId, gameId)
@@ -379,13 +383,14 @@ class GameControllerTest {
   @Test
   void lobbySetNickname() {
     final String gameId = "test";
+
     assertThrows(
       PlayerNotFoundException.class,
       () -> controller.lobbySetNickname(UUID.randomUUID(), "test")
     );
     List<UUID> connectionIDs = createGame(gameId, 4, 2);
     assertDoesNotThrow(
-      () -> controller.lobbySetNickname(connectionIDs.get(0), "test")
+      () -> controller.lobbySetNickname(connectionIDs.getFirst(), "test")
     );
     assertDoesNotThrow(
       () -> controller.lobbySetNickname(connectionIDs.get(1), "test2")
@@ -393,7 +398,7 @@ class GameControllerTest {
 
     assertThrows(
       NicknameAlreadyTakenException.class,
-      () -> controller.lobbySetNickname(connectionIDs.get(0), "test2")
+      () -> controller.lobbySetNickname(connectionIDs.getFirst(), "test2")
     );
   }
 
@@ -447,29 +452,51 @@ class GameControllerTest {
   }
 
   @Test
-  void joinGame() {}
+  void joinGame() {
+    //TODO
+
+  }
 
   @Test
-  void createGame() {}
+  void createGame() {
+    //TODO
+
+  }
 
   @Test
-  void isLastRound() {}
+  void isLastRound() {
+    //TODO
+
+  }
 
   @Test
-  void deleteGame() {}
+  void deleteGame() {
+    //TODO
+  }
 
   @Test
-  void nextTurn() {}
+  void nextTurn() {
+    //TODO
+  }
 
   @Test
-  void testNextTurn() {}
+  void testNextTurn() {
+    //TODO
+  }
 
   @Test
-  void registerListener() {}
+  void registerListener() {
+    //TODO
+  }
 
   @Test
-  void removeListener() {}
+  void removeListener() {
+    //TODO
+
+  }
 
   @Test
-  void placeCard() {}
+  void placeCard() {
+    //TODO
+  }
 }

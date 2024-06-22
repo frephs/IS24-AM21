@@ -323,6 +323,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           gameEventHandler
             .getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayerNickname(),
           playerHandCardNumber,
           side,
@@ -349,6 +350,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           gameID,
           this.gameEventHandler.getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayerNickname(),
           drawingSource,
           deckType
@@ -367,6 +369,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
           gameEventHandler
             .getLocalModel()
             .getLocalGameBoard()
+            .orElseThrow()
             .getPlayerNickname()
         )
       );
