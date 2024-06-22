@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.connection.server.RMI;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,8 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public class DummyRemoteGameEventLister implements RemoteGameEventListener {
+public class DummyRemoteGameEventLister
+  implements RemoteGameEventListener, Serializable {
 
   @Override
   public void gameCreated(String gameId, int currentPlayers, int maxPlayers)
