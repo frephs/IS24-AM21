@@ -33,6 +33,8 @@ public class Main {
       ConnectionType.RMI.getDefaultPort() +
       " for RMI)"
     );
+    System.out.println("--ip: the IP address to connect to");
+    System.out.println("--cli: use TUI client (by default it uses GUI)");
     System.out.println("Server Parameters: ");
     System.out.println(
       "--server: [REQUIRED] start as server (by default it starts as client)"
