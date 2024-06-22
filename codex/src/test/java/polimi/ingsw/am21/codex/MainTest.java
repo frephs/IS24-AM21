@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -62,7 +63,8 @@ class MainTest {
           MalformedURLException
           | RemoteException
           | PortUnreachableException
-          | UnknownHostException e
+          | UnknownHostException
+          | AlreadyBoundException e
         ) {
           throw new RuntimeException(e);
         }
