@@ -40,9 +40,9 @@ public class RMIClientConnectionHandler
   @Override
   public void connect() {
     try {
-      Registry registry = LocateRegistry.getRegistry(this.port);
+      Registry registry = LocateRegistry.getRegistry(this.host, this.port);
       this.rmiConnectionHandler = (RMIServerConnectionHandler) registry.lookup(
-        "//" + this.host + ":" + this.port + "/IS24-AM21-CODEX"
+        "IS24-AM21-CODEX"
       );
       this.rmiConnectionHandler.connect(
           this.getSocketID(),
