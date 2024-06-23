@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.Main;
+import polimi.ingsw.am21.codex.connection.server.RMI.DummyRemoteGameEventLister;
 import polimi.ingsw.am21.codex.controller.exceptions.*;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
@@ -23,9 +24,12 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 class GameControllerTest {
 
@@ -34,146 +38,6 @@ class GameControllerTest {
   @BeforeEach
   void setup() {
     this.controller = new GameController();
-  }
-
-  static class DummyRemoteGameEventListener implements RemoteGameEventListener {
-
-    @Override
-    public void gameCreated(String gameId, int currentPlayers, int maxPlayers)
-      throws RemoteException {}
-
-    @Override
-    public void refreshLobbies(
-      Set<String> lobbyIds,
-      Map<String, Integer> currentPlayers,
-      Map<String, Integer> maxPlayers
-    ) throws RemoteException {}
-
-    @Override
-    public void gameDeleted(String gameId) throws RemoteException {}
-
-    @Override
-    public void playerJoinedLobby(String gameId, UUID socketID)
-      throws RemoteException {}
-
-    @Override
-    public void playerLeftLobby(String gameId, UUID socketID)
-      throws RemoteException {}
-
-    @Override
-    public void playerSetToken(
-      String gameId,
-      UUID socketID,
-      String nickname,
-      TokenColor token
-    ) throws RemoteException {}
-
-    @Override
-    public void playerSetNickname(
-      String gameId,
-      UUID socketID,
-      String nickname
-    ) throws RemoteException {}
-
-    @Override
-    public void playerChoseObjectiveCard(
-      String gameId,
-      UUID socketID,
-      String nickname
-    ) throws RemoteException {}
-
-    @Override
-    public void playerJoinedGame(
-      String gameId,
-      UUID socketID,
-      String nickname,
-      TokenColor color,
-      List<Integer> handIDs,
-      Integer starterCard,
-      CardSideType starterSide
-    ) throws RemoteException {}
-
-    @Override
-    public void gameStarted(String gameId, GameInfo gameInfo)
-      throws RemoteException {}
-
-    @Override
-    public void changeTurn(
-      String gameId,
-      String playerNickname,
-      Integer playerIndex,
-      Boolean isLastRound,
-      DrawingCardSource source,
-      DrawingDeckType deck,
-      Integer cardId,
-      Integer newPairCardId,
-      Set<Position> availableSpots,
-      Set<Position> forbiddenSpots,
-      Integer resourceDeckTopCardId,
-      Integer goldDeckTopCardId
-    ) throws RemoteException {}
-
-    @Override
-    public void changeTurn(
-      String gameId,
-      String playerNickname,
-      Integer playerIndex,
-      Boolean isLastRound,
-      Set<Position> availableSpots,
-      Set<Position> forbiddenSpots,
-      Integer resourceDeckTopCardId,
-      Integer goldDeckTopCardId
-    ) throws RemoteException {}
-
-    @Override
-    public void cardPlaced(
-      String gameId,
-      String playerId,
-      Integer playerHandCardNumber,
-      Integer cardId,
-      CardSideType side,
-      Position position,
-      int newPlayerScore,
-      Map<ResourceType, Integer> updatedResources,
-      Map<ObjectType, Integer> updatedObjects,
-      Set<Position> availableSpots,
-      Set<Position> forbiddenSpots
-    ) throws RemoteException {}
-
-    @Override
-    public void gameOver() throws RemoteException {}
-
-    @Override
-    public void playerScoresUpdate(Map<String, Integer> newScores)
-      throws RemoteException {}
-
-    @Override
-    public void remainingRounds(String gameID, int remainingRounds)
-      throws RemoteException {}
-
-    @Override
-    public void winningPlayer(String nickname) throws RemoteException {}
-
-    @Override
-    public void playerConnectionChanged(
-      UUID socketID,
-      String nickname,
-      GameController.UserGameContext.ConnectionStatus status
-    ) throws RemoteException {}
-
-    @Override
-    public void lobbyInfo(LobbyUsersInfo usersInfo) throws RemoteException {}
-
-    @Override
-    public void chatMessage(String gameID, ChatMessage message)
-      throws RemoteException {}
-
-    @Override
-    public void getObjectiveCards(Pair<Integer, Integer> objectiveCards)
-      throws RemoteException {}
-
-    @Override
-    public void getStarterCard(Integer cardId) throws RemoteException {}
   }
 
   private List<UUID> createGame(String gameId, int maxPlayers, int players) {
@@ -187,7 +51,7 @@ class GameControllerTest {
     if (players > 0) {
       playerIDs.add(connectionID1);
       try {
-        controller.connect(connectionID1, new DummyRemoteGameEventListener());
+        controller.connect(connectionID1, new DummyRemoteGameEventLister());
         controller.joinLobby(connectionID1, gameId);
       } catch (NullPointerException | InvalidActionException e) {
         fail("Error joining the game '" + gameId + "': " + e.getMessage());
@@ -197,13 +61,33 @@ class GameControllerTest {
       UUID connectionID = UUID.randomUUID();
       playerIDs.add(connectionID);
       try {
-        controller.connect(connectionID, new DummyRemoteGameEventListener());
+        controller.connect(connectionID, new DummyRemoteGameEventLister());
         controller.joinLobby(connectionID, gameId);
       } catch (InvalidActionException e) {
         fail("Error joining the game '" + gameId + "': " + e.getMessage());
       }
     }
     return playerIDs;
+  }
+
+  @Test
+  void registerListener() {
+    final UUID connectionID = UUID.randomUUID();
+    final RemoteGameEventListener listener = new DummyRemoteGameEventLister();
+
+    assertDoesNotThrow(() -> controller.connect(connectionID, listener));
+    controller.userContexts.forEach(
+      (key, value) -> assertEquals(listener, value.getListener())
+    );
+  }
+
+  @Test
+  void removeListener() {
+    final UUID connectionID = UUID.randomUUID();
+    final RemoteGameEventListener listener = new DummyRemoteGameEventLister();
+
+    assertDoesNotThrow(() -> controller.connect(connectionID, listener));
+    //TODO
   }
 
   @Test
@@ -293,7 +177,7 @@ class GameControllerTest {
     final String gameId = "test";
     final UUID playerId = UUID.randomUUID();
 
-    controller.connect(playerId, new DummyRemoteGameEventListener());
+    controller.connect(playerId, new DummyRemoteGameEventLister());
 
     assertThrows(
       GameNotFoundException.class,
@@ -439,6 +323,12 @@ class GameControllerTest {
         controller.lobbySetTokenColor(connectionID, colors.removeLast());
         controller.lobbySetNickname(connectionID, "test-" + colors.size());
         controller.lobbyChooseObjective(connectionID, true);
+
+        assertThrows(
+          GameNotReadyException.class,
+          () -> controller.startGame(connectionID)
+        );
+
         controller.joinGame(connectionID, gameId, CardSideType.FRONT);
       } catch (InvalidActionException e) {
         fail("Error setting up the game '" + gameId + "': " + e.getMessage());
@@ -453,50 +343,238 @@ class GameControllerTest {
 
   @Test
   void joinGame() {
-    //TODO
+    final String gameId = "test";
 
+    List<UUID> connectionIDs = createGame(gameId, 4, 4);
+
+    assertThrows(
+      IncompleteLobbyPlayerException.class,
+      () ->
+        controller.joinGame(connectionIDs.get(0), gameId, CardSideType.FRONT)
+    );
+
+    List<TokenColor> colors = new ArrayList<>(
+      Arrays.asList(TokenColor.values())
+    );
+
+    for (UUID connectionID : connectionIDs) {
+      try {
+        controller.lobbySetTokenColor(connectionID, colors.removeLast());
+        controller.lobbySetNickname(connectionID, "test-" + colors.size());
+        controller.lobbyChooseObjective(connectionID, true);
+        controller.joinGame(connectionID, gameId, CardSideType.FRONT);
+      } catch (InvalidActionException e) {
+        fail("Error setting up the game '" + gameId + "': " + e.getMessage());
+      }
+    }
+
+    assertThrows(
+      PlayerNotFoundException.class,
+      () ->
+        controller.joinGame(connectionIDs.get(0), gameId, CardSideType.FRONT)
+    );
+
+    assertThrows(GameAlreadyStartedException.class, () -> {
+      controller.connect(UUID.randomUUID(), new DummyRemoteGameEventLister());
+      controller.joinLobby(UUID.randomUUID(), gameId);
+    });
   }
 
   @Test
   void createGame() {
-    //TODO
+    final String gameId = "test";
+    final UUID playerId = UUID.randomUUID();
 
+    assertDoesNotThrow(() -> controller.createGame(playerId, gameId, 4));
+    assertThrows(
+      GameAlreadyExistsException.class,
+      () -> controller.createGame(playerId, gameId, 4)
+    );
   }
 
   @Test
-  void isLastRound() {
-    //TODO
-
-  }
+  void isLastRound() {}
 
   @Test
   void deleteGame() {
-    //TODO
+    // TODO
+
+    //    final String gameId = "test";
+    //    UUID notInGameUser = UUID.randomUUID();
+    //    assertThrows(
+    //      GameNotFoundException.class,
+    //      () -> controller.deleteGame(UUID.randomUUID(), gameId)
+    //    );
+    //
+    //    List<UUID> connectionIDs = createGame(gameId, 1, 1);
+    //
+    //    assertThrows(
+    //      NotInGameException.class,
+    //      () -> controller.deleteGame(notInGameUser, gameId)
+    //    );
+    //
+    //    assertThrows(
+    //      NotInGameException.class,
+    //      () -> controller.quitFromLobby(notInGameUser)
+    //    );
+    //
+    //    assertDoesNotThrow(
+    //      () -> controller.quitFromLobby(connectionIDs.getFirst())
+    //    );
+    //
+    //    assertDoesNotThrow(
+    //      () -> controller.deleteGame(connectionIDs.getFirst(), gameId)
+    //    );
+    //
+    //    assertThrows(GameNotFoundException.class, () -> controller.getGame(gameId));
   }
 
   @Test
   void nextTurn() {
-    //TODO
-  }
+    final String gameId = "test";
 
-  @Test
-  void testNextTurn() {
-    //TODO
-  }
+    List<UUID> connectionIDs = createGame(gameId, 4, 4);
 
-  @Test
-  void registerListener() {
-    //TODO
-  }
+    List<TokenColor> colors = new ArrayList<>(
+      Arrays.asList(TokenColor.values())
+    );
 
-  @Test
-  void removeListener() {
-    //TODO
+    for (UUID connectionID : connectionIDs) {
+      try {
+        controller.lobbySetTokenColor(connectionID, colors.removeLast());
+        controller.lobbySetNickname(connectionID, "test-" + colors.size());
+        controller.lobbyChooseObjective(connectionID, true);
+        controller.joinGame(connectionID, gameId, CardSideType.FRONT);
+      } catch (InvalidActionException e) {
+        fail("Error setting up the game '" + gameId + "': " + e.getMessage());
+      }
+    }
+    try {
+      for (int i = 0; i < connectionIDs.size(); i++) {
+        UUID socketId = controller
+          .getGame(gameId)
+          .getPlayers()
+          .get(i)
+          .getSocketId();
 
+        int index = connectionIDs.indexOf(socketId);
+
+        for (int j = 1; j <= connectionIDs.size() - 1; j++) {
+          int finalJ = j;
+          assertThrows(
+            PlayerNotActive.class,
+            () ->
+              controller.nextTurn(
+                connectionIDs.get((index + finalJ) % 4),
+                DrawingCardSource.Deck,
+                DrawingDeckType.RESOURCE
+              )
+          );
+        }
+
+        controller.placeCard(
+          connectionIDs.get(index),
+          2,
+          CardSideType.FRONT,
+          new Position(0, 1)
+        );
+
+        assertThrows(
+          InvalidNextTurnCallException.class,
+          () -> controller.nextTurn(connectionIDs.get(index))
+        );
+
+        assertDoesNotThrow(
+          () ->
+            controller.nextTurn(
+              connectionIDs.get(index),
+              DrawingCardSource.Deck,
+              DrawingDeckType.RESOURCE
+            )
+        );
+      }
+    } catch (InvalidActionException e) {
+      fail("Error starting the game '" + gameId + "': " + e.getMessage());
+    }
   }
 
   @Test
   void placeCard() {
-    //TODO
+    final String gameId = "test";
+
+    List<UUID> connectionIDs = createGame(gameId, 4, 4);
+
+    List<TokenColor> colors = new ArrayList<>(
+      Arrays.asList(TokenColor.values())
+    );
+
+    for (UUID connectionID : connectionIDs) {
+      try {
+        controller.lobbySetTokenColor(connectionID, colors.removeLast());
+        controller.lobbySetNickname(connectionID, "test-" + colors.size());
+        controller.lobbyChooseObjective(connectionID, true);
+        controller.joinGame(connectionID, gameId, CardSideType.FRONT);
+      } catch (InvalidActionException e) {
+        fail("Error setting up the game '" + gameId + "': " + e.getMessage());
+      }
+    }
+
+    try {
+      for (int i = 0; i < connectionIDs.size(); i++) {
+        UUID socketId = controller
+          .getGame(gameId)
+          .getPlayers()
+          .get(i)
+          .getSocketId();
+
+        int index = connectionIDs.indexOf(socketId);
+
+        for (int j = 1; j <= connectionIDs.size() - 1; j++) {
+          int finalJ = j;
+          assertThrows(
+            PlayerNotActive.class,
+            () ->
+              controller.placeCard(
+                connectionIDs.get((index + finalJ) % 4),
+                2,
+                CardSideType.FRONT,
+                new Position(0, 1)
+              )
+          );
+        }
+
+        assertDoesNotThrow(
+          () ->
+            controller.placeCard(
+              connectionIDs.get(index),
+              2,
+              CardSideType.FRONT,
+              new Position(0, 1)
+            )
+        );
+
+        assertThrows(
+          AlreadyPlacedCardException.class,
+          () ->
+            controller.placeCard(
+              connectionIDs.get(index),
+              2,
+              CardSideType.FRONT,
+              new Position(0, 1)
+            )
+        );
+
+        assertDoesNotThrow(
+          () ->
+            controller.nextTurn(
+              connectionIDs.get(index),
+              DrawingCardSource.Deck,
+              DrawingDeckType.RESOURCE
+            )
+        );
+      }
+    } catch (InvalidActionException e) {
+      fail("Error starting the game '" + gameId + "': " + e.getMessage());
+    }
   }
 }

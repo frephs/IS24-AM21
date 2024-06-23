@@ -987,6 +987,7 @@ public class GameController {
       }
     }
     manager.deleteGame(gameId);
+    // TODO remove also from userContexts?
 
     this.notifySameContextClients(
         connectionID,
