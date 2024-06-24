@@ -1058,7 +1058,13 @@ public class GameController {
         (listener, targetSocketID) ->
           listener.changeTurn(
             gameID,
-            game.getCurrentPlayer().getNickname(),
+            game
+              .getPlayers()
+              .get(
+                (game.getCurrentPlayerIndex() - 1 + game.getPlayers().size()) %
+                game.getPlayers().size()
+              )
+              .getNickname(),
             game.getCurrentPlayerIndex(),
             game.isLastRound(),
             game.getCurrentPlayer().getBoard().getAvailableSpots(),
@@ -1107,7 +1113,15 @@ public class GameController {
               (listener, targetSocketID) ->
                 listener.changeTurn(
                   gameId,
-                  game.getCurrentPlayer().getNickname(),
+                  game
+                    .getPlayers()
+                    .get(
+                      (game.getCurrentPlayerIndex() -
+                        1 +
+                        game.getPlayers().size()) %
+                      game.getPlayers().size()
+                    )
+                    .getNickname(),
                   game.getCurrentPlayerIndex(),
                   game.isLastRound(),
                   drawingSource,

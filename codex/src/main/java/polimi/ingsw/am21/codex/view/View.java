@@ -275,30 +275,16 @@ public interface View extends GameEventListener {
       ". "
     );
 
-    postNotification(
-      NotificationType.UPDATE,
-      "It's " +
-      (!Objects.equals(
-            playerNickname,
-            getLocalModel()
-              .getLocalGameBoard()
-              .orElseThrow()
-              .getPlayer()
-              .getNickname()
-          )
-          ? "your "
-          : getLocalModel()
-            .getLocalGameBoard()
-            .orElseThrow()
-            .getCurrentPlayer()
-            .getNickname() +
-          "'s ") +
-      "'turn" +
-      (isLastRound ? " (last round)" : "")
+    changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
     );
-
-    drawHand();
-    drawGameBoard();
   }
 
   @Override
@@ -315,8 +301,24 @@ public interface View extends GameEventListener {
     postNotification(
       NotificationType.UPDATE,
       "It's " +
-      playerNickname +
-      "'s turn" +
+      (getLocalModel()
+            .getLocalGameBoard()
+            .get()
+            .getPlayerNickname()
+            .equals(
+              getLocalModel()
+                .getLocalGameBoard()
+                .orElseThrow()
+                .getCurrentPlayer()
+                .getNickname()
+            )
+          ? "your "
+          : getLocalModel()
+            .getLocalGameBoard()
+            .orElseThrow()
+            .getCurrentPlayer()
+            .getNickname()) +
+      "'turn" +
       (isLastRound ? " (last round)" : "")
     );
 
