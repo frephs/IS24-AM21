@@ -1552,7 +1552,6 @@ public class Gui extends Application implements View {
     String nickname,
     TokenColor token
   ) {
-    View.super.playerSetToken(gameId, socketID, nickname, token);
     if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawNicknameChoice();
@@ -1575,7 +1574,6 @@ public class Gui extends Application implements View {
 
   @Override
   public void playerSetNickname(String gameId, UUID socketID, String nickname) {
-    View.super.playerSetNickname(gameId, socketID, nickname);
     if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawObjectiveCardChoice();
