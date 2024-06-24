@@ -458,11 +458,30 @@ public class Cli implements View {
     printUpdate(
       CliUtils.colorize(
         message.getSender(),
-        Color.PURPLE,
-        ColorStyle.BACKGROUND
+        localModel
+          .getLocalGameBoard()
+          .get()
+          .getPlayers()
+          .stream()
+          .filter(player -> player.getNickname().equals(message.getSender()))
+          .findFirst()
+          .orElseThrow()
+          .getToken()
+          .getColor(),
+        ColorStyle.BOLD
       ) +
-      message.getRecipient().map(recipient -> " whispered").orElse("said ") +
-      message.getContent()
+      message.getRecipient().map(recipient -> " whispered ").orElse(" said ") +
+      message
+        .getRecipient()
+        .map(
+          recipient ->
+            CliUtils.colorize(
+              message.getContent(),
+              Color.PURPLE,
+              ColorStyle.NORMAL
+            )
+        )
+        .orElse(message.getContent())
     );
   }
 

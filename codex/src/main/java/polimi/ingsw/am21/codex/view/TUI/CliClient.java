@@ -82,7 +82,11 @@ public class CliClient extends ViewClient {
           if (!matchingContext.isEmpty()) {
             Set<CommandHandler> matchingUsages = matchingContext
               .stream()
-              .filter(commandHandlers -> commandHandlers.matchUsageString(line))
+              .filter(
+                commandHandlers ->
+                  commandHandlers.matchUsageString(line) ||
+                  commandHandlers.skipUsageCheck
+              )
               .collect(Collectors.toSet());
 
             if (matchingUsages.isEmpty() && !line.isEmpty()) {
@@ -142,6 +146,7 @@ public class CliClient extends ViewClient {
     private final String usage;
     private final String description;
     private final ClientContext context;
+    private Boolean skipUsageCheck = false;
 
     public CommandHandler(
       String usage,
@@ -151,6 +156,16 @@ public class CliClient extends ViewClient {
       this.usage = usage;
       this.description = description;
       this.context = context;
+    }
+
+    public CommandHandler(
+      String usage,
+      String description,
+      ClientContext context,
+      Boolean skipUsageCheck
+    ) {
+      this(usage, description, context);
+      this.skipUsageCheck = skipUsageCheck;
     }
 
     public boolean matchUsageString(String input) {
@@ -494,22 +509,8 @@ public class CliClient extends ViewClient {
       new CommandHandler(
         "chat <message>",
         "Broadcast a message",
-        ClientContext.GAME
-      ) {
-        @Override
-        public void handle(String[] command) {
-          client.sendChatMessage(
-            new ChatMessage(view.getLocalModel().getSocketID(), command[1])
-          );
-        }
-      }
-    );
-
-    commandHandlers.add(
-      new CommandHandler(
-        "chat <player> <message>",
-        "Send a message to a player",
-        ClientContext.GAME
+        ClientContext.GAME,
+        true
       ) {
         @Override
         public void handle(String[] command) {
@@ -518,12 +519,62 @@ public class CliClient extends ViewClient {
               view
                 .getLocalModel()
                 .getLocalGameBoard()
-                .orElseThrow()
+                .get()
                 .getPlayerNickname(),
-              command[1],
-              Arrays.stream(command).skip(2).collect(Collectors.joining(" "))
+              Arrays.stream(command).skip(1).collect(Collectors.joining(" "))
             )
           );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
+        "whisper <player> <message>",
+        "Send a message to a player",
+        ClientContext.GAME,
+        true
+      ) {
+        @Override
+        public void handle(String[] command) {
+          if (command.length < 2) {
+            cli.postNotification(
+              NotificationType.ERROR,
+              "Specify the player you want to whisper to"
+            );
+            return;
+          }
+          if (
+            !(view
+                .getLocalModel()
+                .getLocalGameBoard()
+                .get()
+                .getPlayers()
+                .stream()
+                .filter(
+                  localPlayer -> localPlayer.getNickname().equals(command[1])
+                )
+                .collect(Collectors.toSet())
+                .isEmpty())
+          ) {
+            client.sendChatMessage(
+              new ChatMessage(
+                view
+                  .getLocalModel()
+                  .getLocalGameBoard()
+                  .orElseThrow()
+                  .getPlayerNickname(),
+                command[1],
+                Arrays.stream(command).skip(2).collect(Collectors.joining(" "))
+              )
+            );
+          } else {
+            cli.postNotification(NotificationType.ERROR, "Player not found");
+            cli.postNotification(
+              NotificationType.WARNING,
+              "Usage: " + this.getUsage()
+            );
+          }
         }
       }
     );
