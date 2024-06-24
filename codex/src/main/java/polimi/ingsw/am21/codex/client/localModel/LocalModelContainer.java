@@ -14,37 +14,81 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
+/***
+ * The LocalModelContainer class is the container of the model of the game that is stored locally on the client side to enable client interaction with the server.
+ * <br><br>
+ * Since the server model has some controller functionality included, we opted to create a mere container local model for the view to draw things properly and keep track of game events client side.
+ * <br><br>
+ * The status of the game is updated by the server: the client is notified and
+ * the local gameboard updated through the client game event handler, which updates the local model and the view.
+ * <br><br>
+ * It contains the local menu, lobby and game board.
+ * @implNote The LocalModelContainer implements GameEventLister to be able to process game events from the server and update the local model for each of them.
+ * @see LocalMenu
+ * @see LocalLobby
+ * @see LocalGameBoard
+ * @see polimi.ingsw.am21.codex.client.ClientGameEventHandler
+ *
+ */
 public class LocalModelContainer implements GameEventListener {
 
   /**
-   * Contains the game entries
+   * Contains the game entries.
+   * @see LocalMenu
    * */
   private final LocalMenu menu = new LocalMenu();
 
   /**
    * Contains the players in the lobby
+   * It is an optional since the player may not have joined a lobby yet.
+   * @see LocalLobby
    * */
   private Optional<LocalLobby> lobby = Optional.empty();
 
   /**
-   * Contains all the players in the game and the gameboard
+   * Contains all the players in the game and the game board.
+   * It is an optional since the player may not have joined a game yet.
+   * @see LocalGameBoard
    * */
   private Optional<LocalGameBoard> gameBoard = Optional.empty();
 
+  /**
+   * Since no cards are sent to the server for security and performance reasons,
+   * the client loads the cards from the local file using their unique identifier (their id)
+   * A cards loader is used to load the cards from the file from their ID
+   * @see CardsLoader
+   * */
   private final CardsLoader cardsLoader = new CardsLoader();
 
+  /**
+   * The unique identifier of the player's connection.
+   */
   private UUID connectionID;
 
   /**
    * A boolean that keeps track of whether the current player has place their card
    * for their turn
    */
-  private boolean currentPlayerHasPlacedCard = false;
+  private boolean currentPlayerHasPlacedCard = false; //TODO maybe refactor this to local gameboard
 
+  /**
+   * A class used to store the client context in the localModel,
+   * It is queried by the view in case View Updates are received.
+   * It is used as follows by:
+   * <ul>
+   * <li> the GUI to filter scene changing events to only those who matter to the current client context since view updates can be not related to the player's current game or lobby, the client context is need  </li>
+   * <li> the CLI to filter available commands by those available in the current context
+   * </ul>
+   * @see ClientContext
+   * */
   public static class ClientContextContainer {
 
     private ClientContext context;
 
+    /**
+     * ClientContext constructor, the default context is obviously the game menu.
+     * @see LocalMenu
+     * */
     ClientContextContainer() {
       context = ClientContext.MENU;
     }

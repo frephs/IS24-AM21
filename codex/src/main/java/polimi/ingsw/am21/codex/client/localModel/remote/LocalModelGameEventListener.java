@@ -18,12 +18,23 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
+/**
+ * Interface implementation of the RemoteGameEventListener for the local model
+ * It's used as Registry by the RMI server to allow the clients to be updated
+ * to process events thrown by the clients. It forwards the events to the
+ * local GameEventListener which calls the corresponding methods in the
+ * model and the view.
+ * */
 public class LocalModelGameEventListener
   extends UnicastRemoteObject
   implements RemoteGameEventListener {
 
   private final GameEventListener listener;
 
+  /**
+   * LocalModelGameEventListener constructor.
+   * @param listener the GameEventListener to forward the events to.
+   * */
   public LocalModelGameEventListener(GameEventListener listener)
     throws RemoteException {
     this.listener = listener;

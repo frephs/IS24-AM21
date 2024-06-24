@@ -8,26 +8,85 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Chat.Chat;
 
+/**
+ * Class that represents the local game board
+ * It is included in the local model container class
+ * It is used to store the information about the current game the player is in for view drawing purposes only.
+ * It includes the current status of the current game the player's in,  such as
+ * <ul>
+ * <li> the common game board</li>
+ * <li> the players information including their personal board</li>
+ * <li> information about the game status, such as the current player index</li>
+ * <li> the chat</li>
+ * <li> the remaining rounds</li>
+ * <li> the index of player associated with the client</li>
+ * <li> the secret objective of the player associated with the client</li>
+ * </ul>
+ * @see LocalModelContainer
+ * @see polimi.ingsw.am21.codex.client.localModel.LocalPlayer
+ * */
 public class LocalGameBoard {
 
+  /**
+   * The unique identifier of the game the player joined
+   */
   private final String gameId;
 
+  /**
+   * The common gold card pair available in the gameboard
+   */
   private CardPair<Card> goldCards;
+
+  /**
+   * The resource cards in the game
+   */
   private CardPair<Card> resourceCards;
+
+  /**
+   * The objective cards in the game
+   */
   private CardPair<Card> objectiveCards;
 
+  /**
+   * The top card of the resource deck
+   */
   private PlayableCard resourceDeckTopCard;
+
+  /**
+   * The top card of the gold deck
+   */
   private PlayableCard goldDeckTopCard;
 
+  /**
+   * The secret objective of the player
+   */
   private Card secretObjective;
+
+  /**
+   * The chat of the game
+   */
   private final Chat chat = new Chat();
 
+  /**
+   * The index of the current player
+   */
   private Integer currentPlayerIndex;
 
+  /**
+   * The remaining rounds in the game
+   */
   private Integer remainingRounds;
 
+  /**
+   * The index of the player associated with the client
+   */
   private Integer playerIndex;
 
+  /**
+   * Constructor for the LocalGameBoard class
+   * @param gameId The unique identifier of the game
+   * @param maxPlayers The maximum number of players in the game
+   */
   public LocalGameBoard(String gameId, Integer maxPlayers) {
     this.gameId = gameId;
     this.players = new ArrayList<>(maxPlayers);
