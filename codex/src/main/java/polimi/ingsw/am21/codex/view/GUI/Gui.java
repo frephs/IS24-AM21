@@ -643,7 +643,14 @@ public class Gui extends Application implements View {
         .setOnMouseClicked((MouseEvent event) -> {
           String nickname =
             ((TextField) (scene.lookup("#nickname-input"))).getText();
-          client.lobbySetNickname(nickname);
+          if (nickname.contains(" ")) {
+            postNotification(
+              NotificationType.WARNING,
+              "No spaces allowed in nickname"
+            );
+          } else {
+            client.lobbySetNickname(nickname);
+          }
         });
     });
   }
