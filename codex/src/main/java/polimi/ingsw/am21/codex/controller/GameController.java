@@ -694,6 +694,17 @@ public class GameController {
         .collect(Collectors.toList()),
       ((listener, connectionID) -> {
           listener.playerJoinedLobby(gameId, socketID);
+        })
+    );
+
+    notifyClients(
+      userContexts
+        .entrySet()
+        .stream()
+        .filter(user -> user.getKey().equals(socketID))
+        .map(user -> new Pair<>(user.getKey(), user.getValue()))
+        .collect(Collectors.toList()),
+      ((listener, connectionID) -> {
           listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game));
         })
     );
