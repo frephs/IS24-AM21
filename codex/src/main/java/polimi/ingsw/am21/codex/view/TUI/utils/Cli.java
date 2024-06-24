@@ -282,15 +282,29 @@ public class Cli implements View {
         .getPlayers()
         .values()
         .stream()
-        .sorted((a, b) -> b.getPoints() - a.getPoints())
         .map(player -> {
           String nickname = player.getNickname();
+          ColorStyle nicknameStyle = ColorStyle.NORMAL;
+
+          if (
+            nickname.equals(
+              localModel
+                .getLocalGameBoard()
+                .orElseThrow()
+                .getCurrentPlayer()
+                .getNickname()
+            )
+          ) {
+            nickname = "> " + nickname;
+            nicknameStyle = ColorStyle.BOLD;
+          }
+
           int points = player.getPoints();
           return (
             CliUtils.colorize(
               nickname,
               player.getToken().getColor(),
-              ColorStyle.NORMAL
+              nicknameStyle
             ) +
             " - " +
             CliUtils.colorize(
