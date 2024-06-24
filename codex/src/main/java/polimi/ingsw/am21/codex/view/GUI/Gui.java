@@ -527,15 +527,13 @@ public class Gui extends Application implements View {
       GridPane container = (GridPane) scene.lookup("#leaderboard-grid");
       container.getChildren().clear();
 
-      List<LocalPlayer> sortedPlayers = localModel
+      List<LocalPlayer> players = localModel
         .getLocalGameBoard()
         .orElseThrow()
-        .getPlayers()
-        .stream()
-        .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
-        .toList();
-      for (int i = 0; i < sortedPlayers.size(); i++) {
-        LocalPlayer player = sortedPlayers.get(i);
+        .getPlayers();
+
+      for (int i = 0; i < players.size(); i++) {
+        LocalPlayer player = players.get(i);
 
         ImageView token = loadImage(player.getToken());
         token.setPreserveRatio(true);
