@@ -920,7 +920,8 @@ public class Gui extends Application implements View {
               Optional.ofNullable(gameBoard.getPlayer().getNickname()).orElse(
                 gameBoard.getPlayer().getSocketID().toString()
               )
-          ) +
+          )
+          .orElseThrow() +
         "]"
       );
       drawChat();
