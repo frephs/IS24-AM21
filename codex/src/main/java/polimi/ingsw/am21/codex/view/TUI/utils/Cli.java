@@ -1,10 +1,10 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -393,6 +393,8 @@ public class Cli implements View {
 
   @Override
   public void drawHand() {
+    AtomicInteger index = new AtomicInteger();
+
     printUpdate(
       "Hand:\n" +
       localModel
@@ -402,6 +404,10 @@ public class Cli implements View {
         .getHand()
         .stream()
         .map(Card::cardToAscii)
+        .map(card -> {
+          index.getAndIncrement();
+          return index + ": \n" + card;
+        })
         .collect(Collectors.joining("\n"))
     );
   }
