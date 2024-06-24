@@ -702,7 +702,7 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
-        "place <hand number> <row> <column> <front|back>",
+        "place <hand number> <x> <y> <front|back>",
         "Place a card on the game board",
         ClientContext.GAME
       ) {
