@@ -27,7 +27,7 @@ public class LocalModelContainer implements GameEventListener {
   private Optional<LocalLobby> lobby = Optional.empty();
 
   /**
-   * Contains all the players in the game and the gameboard
+   * Contains all the players in the game and the GameBoard
    * */
   private Optional<LocalGameBoard> gameBoard = Optional.empty();
 
@@ -297,6 +297,44 @@ public class LocalModelContainer implements GameEventListener {
   @Override
   public void getStarterCard(Integer cardId) {
     lobby.orElseThrow().setStarterCard(cardsLoader.getCardFromId(cardId));
+  }
+
+  @Override
+  public void gameHalted(String gameID) {
+    gameBoard.ifPresent(gb -> {
+      if (gb.getGameId().equals(gameID)) gb.gameHalted();
+    });
+  }
+
+  @Override
+  public void gameResumed(String gameID) {
+    gameBoard.ifPresent(gb -> {
+      if (gb.getGameId().equals(gameID)) gb.gameResumed();
+    });
+  }
+
+  @Override
+  public void userContext(FullUserGameContext context) {
+    if (context.getStatus() == GameController.UserGameContextStatus.MENU) {
+      clientContextContainer.set(ClientContext.MENU);
+    } else if (
+      context.getStatus() == GameController.UserGameContextStatus.IN_LOBBY
+    ) {
+      clientContextContainer.set(ClientContext.LOBBY);
+      context.getLobbyUsers().ifPresent(this::lobbyInfo);
+    } else if (
+      context.getStatus() == GameController.UserGameContextStatus.IN_GAME
+    ) {
+      clientContextContainer.set(ClientContext.GAME);
+      if (
+        context.getGameID().isPresent() && context.getGameInfo().isPresent()
+      ) {
+        this.gameStarted(
+            context.getGameID().get(),
+            context.getGameInfo().get()
+          );
+      }
+    }
   }
 
   @Override

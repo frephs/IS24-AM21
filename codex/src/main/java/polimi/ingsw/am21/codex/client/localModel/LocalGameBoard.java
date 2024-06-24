@@ -27,6 +27,7 @@ public class LocalGameBoard {
   private Integer remainingRounds;
 
   private Integer playerIndex;
+  private Boolean halted;
 
   public LocalGameBoard(String gameId, Integer maxPlayers) {
     this.gameId = gameId;
@@ -135,5 +136,17 @@ public class LocalGameBoard {
 
   public void setGoldDeckTopCard(PlayableCard goldDeckTopCard) {
     this.goldDeckTopCard = goldDeckTopCard;
+  }
+
+  public void gameHalted() {
+    this.halted = true;
+  }
+
+  public void gameResumed() {
+    this.halted = false;
+  }
+
+  public Boolean isHalted() {
+    return this.halted;
   }
 }

@@ -447,6 +447,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case PLAYER_CONNECTION_CHANGED -> handleMessage(
         (PlayerConnectionChangedMessage) message
       );
+      case GAME_HALTED_UPDATE -> handleMessage((GameHaltedMessage) message);
       // Game
       case CARD_PLACED -> handleMessage((CardPlacedMessage) message);
       case GAME_OVER -> handleMessage((GameOverMessage) message);
@@ -658,5 +659,13 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       gameEventHandler.getLocalModel().getGameId().orElse(""),
       message.getMessage()
     );
+  }
+
+  public void handleMessage(GameHaltedMessage gameHaltedMessage) {
+    if (gameHaltedMessage.getHalted()) {
+      gameEventHandler.gameHalted(gameHaltedMessage.getGameID());
+    } else {
+      gameEventHandler.gameResumed(gameHaltedMessage.getGameID());
+    }
   }
 }

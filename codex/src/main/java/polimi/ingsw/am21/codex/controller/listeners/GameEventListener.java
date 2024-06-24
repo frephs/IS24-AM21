@@ -134,4 +134,13 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   @Override
   void getStarterCard(Integer cardId);
+
+  @Override
+  void gameHalted(String gameID);
+
+  @Override
+  void gameResumed(String gameID);
+
+  @Override
+  void userContext(FullUserGameContext context);
 }

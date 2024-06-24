@@ -7,11 +7,13 @@ import java.rmi.registry.Registry;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.server.RMI.RMIServerConnectionHandler;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -33,7 +35,7 @@ public class RMIClientConnectionHandler
     View view,
     ClientGameEventHandler gameEventHandler
   ) {
-    super(host, port, view, gameEventHandler);
+    super(host, port, view, gameEventHandler, UUID.randomUUID());
     this.connectionType = ConnectionType.RMI;
   }
 
@@ -283,7 +285,8 @@ public class RMIClientConnectionHandler
   }
 
   @Override
-  public void heartBeat(Runnable successful, Runnable failed) {
+  public void heartBeat(Runnable successful, Runnable failed)
+    throws PlayerNotFoundException {
     try {
       rmiConnectionHandler.heartBeat(this.getSocketID());
       successful.run();

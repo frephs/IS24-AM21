@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -78,5 +79,6 @@ public interface RMIServerConnectionHandler extends Remote {
   void connect(UUID connectionID, RemoteGameEventListener listener)
     throws RemoteException;
 
-  void heartBeat(UUID connectionID) throws RemoteException;
+  void heartBeat(UUID connectionID)
+    throws RemoteException, PlayerNotFoundException;
 }

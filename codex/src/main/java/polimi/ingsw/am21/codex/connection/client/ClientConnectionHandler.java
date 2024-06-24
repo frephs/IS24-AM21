@@ -8,6 +8,7 @@ import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -38,9 +39,19 @@ public abstract class ClientConnectionHandler {
     View view,
     ClientGameEventHandler gameEventHandler
   ) {
+    this(host, port, view, gameEventHandler, UUID.randomUUID());
+  }
+
+  public ClientConnectionHandler(
+    String host,
+    Integer port,
+    View view,
+    ClientGameEventHandler gameEventHandler,
+    UUID socketID
+  ) {
     this.host = host;
     this.port = port;
-    this.socketID = UUID.randomUUID();
+    this.socketID = socketID;
     this.gameEventHandler = gameEventHandler;
     this.gameEventHandler.getLocalModel().setSocketId(socketID);
     this.view = view;
@@ -161,7 +172,8 @@ public abstract class ClientConnectionHandler {
   /**
    * Sends a heart beat to the server
    */
-  public abstract void heartBeat(Runnable successful, Runnable failed);
+  public abstract void heartBeat(Runnable successful, Runnable failed)
+    throws PlayerNotFoundException;
 
   public abstract void sendChatMessage(ChatMessage message);
 

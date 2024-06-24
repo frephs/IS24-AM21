@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientContext;
+import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.model.Cards.Card;
@@ -52,6 +53,18 @@ public class CliClient extends ViewClient {
     while (true) {
       try {
         cli.printPrompt();
+        if (
+          cli
+            .getLocalModel()
+            .getLocalGameBoard()
+            .map(LocalGameBoard::isHalted)
+            .orElse(false)
+        ) {
+          cli.postNotification(
+            NotificationType.WARNING,
+            "The game has been halted, wait for the game to resume"
+          );
+        }
         String line = scanner.nextLine().trim();
         String[] command = line.split(" ");
 

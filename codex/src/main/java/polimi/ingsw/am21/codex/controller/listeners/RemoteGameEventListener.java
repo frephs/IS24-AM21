@@ -139,4 +139,9 @@ public interface RemoteGameEventListener extends Remote {
     throws RemoteException;
 
   void getStarterCard(Integer cardId) throws RemoteException;
+
+  void gameHalted(String gameID) throws RemoteException;
+  void gameResumed(String gameID) throws RemoteException;
+
+  void userContext(FullUserGameContext context) throws RemoteException;
 }

@@ -27,7 +27,8 @@ public class InvalidActionException extends Exception {
     INVALID_TOKEN_COLOR,
     TOKEN_ALREADY_TAKEN,
     CARD_NOT_PLACED,
-    GAME_OVER;
+    GAME_OVER,
+    NOT_ENOUGH_PLAYERS_CONNECTED;
 
     public Integer getErrorCode() {
       return this.ordinal();
@@ -60,6 +61,7 @@ public class InvalidActionException extends Exception {
         case TOKEN_ALREADY_TAKEN -> "Token already taken";
         case GAME_OVER -> "Game over";
         case CARD_NOT_PLACED -> "Card not placed yet, place a card before drawing";
+        case NOT_ENOUGH_PLAYERS_CONNECTED -> "Not enough players connected";
       };
     }
   }
