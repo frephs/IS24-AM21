@@ -737,7 +737,7 @@ public class CliClient extends ViewClient {
             return;
           }
           client.placeCard(
-            handIndex,
+            handIndex - 1,
             CardSideType.valueOf(command[4].toUpperCase()),
             position
           );
