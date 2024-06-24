@@ -554,4 +554,22 @@ public class ClientGameEventHandler
     localModel.getStarterCard(cardId);
     view.getStarterCard(cardId);
   }
+
+  @Override
+  public void gameHalted(String gameID) {
+    localModel.gameHalted(gameID);
+    view.gameHalted(gameID);
+  }
+
+  @Override
+  public void gameResumed(String gameID) {
+    localModel.gameHalted(gameID);
+    view.gameHalted(gameID);
+  }
+
+  @Override
+  public void userContext(FullUserGameContext context) {
+    localModel.userContext(context);
+    view.userContext(context);
+  }
 }

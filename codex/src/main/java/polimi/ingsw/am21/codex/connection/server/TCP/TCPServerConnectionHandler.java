@@ -376,7 +376,11 @@ public class TCPServerConnectionHandler implements Runnable {
   }
 
   private void handleMessage(HeartBeatMessage message) {
-    controller.heartBeat(message.getConnectionID());
+    try {
+      controller.heartBeat(message.getConnectionID());
+    } catch (PlayerNotFoundException e) {
+      send(InvalidActionMessage.fromException(e));
+    }
   }
 
   public void handleMessage(SendChatMessage message) {

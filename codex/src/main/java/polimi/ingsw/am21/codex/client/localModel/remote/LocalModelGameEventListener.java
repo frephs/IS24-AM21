@@ -5,10 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
-import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
-import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
-import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
+import polimi.ingsw.am21.codex.controller.listeners.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -262,5 +259,20 @@ public class LocalModelGameEventListener
   @Override
   public void getStarterCard(Integer cardId) throws RemoteException {
     listener.getStarterCard(cardId);
+  }
+
+  @Override
+  public void gameHalted(String gameID) throws RemoteException {
+    listener.gameHalted(gameID);
+  }
+
+  @Override
+  public void gameResumed(String gameID) throws RemoteException {
+    listener.gameResumed(gameID);
+  }
+
+  @Override
+  public void userContext(FullUserGameContext context) throws RemoteException {
+    listener.userContext(context);
   }
 }

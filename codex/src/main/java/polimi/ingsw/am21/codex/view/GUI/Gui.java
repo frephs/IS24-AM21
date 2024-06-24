@@ -35,6 +35,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -1719,6 +1720,15 @@ public class Gui extends Application implements View {
   public void getStarterCard(Integer cardId) {
     // Don't display the response automatically, it's handled in a different section
   }
+
+  @Override
+  public void gameHalted(String gameID) {}
+
+  @Override
+  public void gameResumed(String gameID) {}
+
+  @Override
+  public void userContext(FullUserGameContext context) {}
 
   @Override
   public void cardPlaced(

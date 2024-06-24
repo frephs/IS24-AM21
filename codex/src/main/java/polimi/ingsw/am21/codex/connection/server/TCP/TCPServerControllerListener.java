@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
@@ -255,4 +256,20 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void getStarterCard(Integer cardId) {}
+
+  @Override
+  public void gameHalted(String gameID) {
+    broadcast.accept(new GameHaltedMessage(gameID, true));
+  }
+
+  @Override
+  public void gameResumed(String gameID) {
+    broadcast.accept(new GameHaltedMessage(gameID, false));
+  }
+
+  @Override
+  public void userContext(FullUserGameContext context) {
+    // TODO
+    //    broadcast.accept(new UserContextMessage(context));
+  }
 }

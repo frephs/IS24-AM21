@@ -286,4 +286,9 @@ public interface RemoteGameEventListener extends Remote {
    * @param cardId The unique identifier of the starter card that the player has chosen.
    */
   void getStarterCard(Integer cardId) throws RemoteException;
+
+  void gameHalted(String gameID) throws RemoteException;
+  void gameResumed(String gameID) throws RemoteException;
+
+  void userContext(FullUserGameContext context) throws RemoteException;
 }

@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.Card;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
@@ -562,6 +563,22 @@ public class Cli implements View {
   public void getStarterCard(Integer cardId) {
     drawStarterCardSides();
   }
+
+  @Override
+  public void gameHalted(String gameID) {
+    postNotification(
+      NotificationType.UPDATE,
+      "Game halted, waiting at least 2 players to be connected"
+    );
+  }
+
+  @Override
+  public void gameResumed(String gameID) {
+    postNotification(NotificationType.UPDATE, "Game resumed");
+  }
+
+  @Override
+  public void userContext(FullUserGameContext context) {}
 
   @Override
   public void drawNicknameChoice() {}
