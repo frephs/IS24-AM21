@@ -542,7 +542,10 @@ public class Cli implements View {
   }
 
   @Override
-  public void lobbyInfo(LobbyUsersInfo usersInfo) {}
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    drawAvailableTokenColors();
+    drawLobby();
+  }
 
   @Override
   public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
@@ -644,8 +647,5 @@ public class Cli implements View {
   @Override
   public void playerJoinedLobby(String gameId, UUID socketID) {
     View.super.playerJoinedLobby(gameId, socketID);
-    if (socketID.equals(localModel.getSocketID())) {
-      drawAvailableTokenColors();
-    }
   }
 }
