@@ -34,6 +34,8 @@ public class Main {
       ConnectionType.RMI.getDefaultPort() +
       " for RMI)"
     );
+    System.out.println("--ip: the IP address to connect to");
+    System.out.println("--cli: use TUI client (by default it uses GUI)");
     System.out.println("Server Parameters: ");
     System.out.println(
       "--server: [REQUIRED] start as server (by default it starts as client)"
@@ -57,6 +59,13 @@ public class Main {
   private static void startServer(Integer tcpPort, Integer rmiPort) {
     Server server = new Server(tcpPort, rmiPort);
     try {
+      Runtime.getRuntime()
+        .addShutdownHook(
+          new Thread(() -> {
+            server.stop();
+            System.out.println("Server stopped. Goodbye!");
+          })
+        );
       server.start();
     } catch (Exception e) {
       e.printStackTrace();

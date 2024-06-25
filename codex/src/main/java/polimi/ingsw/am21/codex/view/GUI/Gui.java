@@ -241,6 +241,12 @@ public class Gui extends Application implements View {
           screenBounds.getHeight()
         );
 
+        scene.setOnKeyPressed(event -> {
+          if (event.getCode().toString().equals("ALT")) {
+            Platform.runLater(() -> {});
+          }
+        });
+
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
       } catch (IOException e) {
@@ -528,15 +534,13 @@ public class Gui extends Application implements View {
       GridPane container = (GridPane) scene.lookup("#leaderboard-grid");
       container.getChildren().clear();
 
-      List<LocalPlayer> sortedPlayers = localModel
+      List<LocalPlayer> players = localModel
         .getLocalGameBoard()
         .orElseThrow()
-        .getPlayers()
-        .stream()
-        .sorted((p1, p2) -> p2.getPoints() - p1.getPoints())
-        .toList();
-      for (int i = 0; i < sortedPlayers.size(); i++) {
-        LocalPlayer player = sortedPlayers.get(i);
+        .getPlayers();
+
+      for (int i = 0; i < players.size(); i++) {
+        LocalPlayer player = players.get(i);
 
         ImageView token = loadImage(player.getToken());
         token.setPreserveRatio(true);
@@ -646,7 +650,14 @@ public class Gui extends Application implements View {
         .setOnMouseClicked((MouseEvent event) -> {
           String nickname =
             ((TextField) (scene.lookup("#nickname-input"))).getText();
-          client.lobbySetNickname(nickname);
+          if (nickname.contains(" ")) {
+            postNotification(
+              NotificationType.WARNING,
+              "No spaces allowed in nickname"
+            );
+          } else {
+            client.lobbySetNickname(nickname);
+          }
         });
     });
   }
@@ -921,7 +932,8 @@ public class Gui extends Application implements View {
               Optional.ofNullable(gameBoard.getPlayer().getNickname()).orElse(
                 gameBoard.getPlayer().getSocketID().toString()
               )
-          ) +
+          )
+          .orElseThrow() +
         "]"
       );
       drawChat();
@@ -1547,7 +1559,6 @@ public class Gui extends Application implements View {
     String nickname,
     TokenColor token
   ) {
-    View.super.playerSetToken(gameId, socketID, nickname, token);
     if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawNicknameChoice();
@@ -1570,7 +1581,6 @@ public class Gui extends Application implements View {
 
   @Override
   public void playerSetNickname(String gameId, UUID socketID, String nickname) {
-    View.super.playerSetNickname(gameId, socketID, nickname);
     if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (socketID.equals(localModel.getSocketID())) {
         drawObjectiveCardChoice();

@@ -1,10 +1,10 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
-import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
@@ -283,15 +283,29 @@ public class Cli implements View {
         .getPlayers()
         .values()
         .stream()
-        .sorted((a, b) -> b.getPoints() - a.getPoints())
         .map(player -> {
           String nickname = player.getNickname();
+          ColorStyle nicknameStyle = ColorStyle.NORMAL;
+
+          if (
+            nickname.equals(
+              localModel
+                .getLocalGameBoard()
+                .orElseThrow()
+                .getCurrentPlayer()
+                .getNickname()
+            )
+          ) {
+            nickname = "> " + nickname;
+            nicknameStyle = ColorStyle.BOLD;
+          }
+
           int points = player.getPoints();
           return (
             CliUtils.colorize(
               nickname,
               player.getToken().getColor(),
-              ColorStyle.NORMAL
+              nicknameStyle
             ) +
             " - " +
             CliUtils.colorize(
@@ -394,6 +408,8 @@ public class Cli implements View {
 
   @Override
   public void drawHand() {
+    AtomicInteger index = new AtomicInteger();
+
     printUpdate(
       "Hand:\n" +
       localModel
@@ -403,6 +419,10 @@ public class Cli implements View {
         .getHand()
         .stream()
         .map(Card::cardToAscii)
+        .map(card -> {
+          index.getAndIncrement();
+          return index + ": \n" + card;
+        })
         .collect(Collectors.joining("\n"))
     );
   }
@@ -459,11 +479,30 @@ public class Cli implements View {
     printUpdate(
       CliUtils.colorize(
         message.getSender(),
-        Color.PURPLE,
-        ColorStyle.BACKGROUND
+        localModel
+          .getLocalGameBoard()
+          .get()
+          .getPlayers()
+          .stream()
+          .filter(player -> player.getNickname().equals(message.getSender()))
+          .findFirst()
+          .orElseThrow()
+          .getToken()
+          .getColor(),
+        ColorStyle.BOLD
       ) +
-      message.getRecipient().map(recipient -> " whispered").orElse("said ") +
-      message.getContent()
+      message.getRecipient().map(recipient -> " whispered ").orElse(" said ") +
+      message
+        .getRecipient()
+        .map(
+          recipient ->
+            CliUtils.colorize(
+              message.getContent(),
+              Color.PURPLE,
+              ColorStyle.NORMAL
+            )
+        )
+        .orElse(message.getContent())
     );
   }
 
@@ -524,7 +563,10 @@ public class Cli implements View {
   }
 
   @Override
-  public void lobbyInfo(LobbyUsersInfo usersInfo) {}
+  public void lobbyInfo(LobbyUsersInfo usersInfo) {
+    drawAvailableTokenColors();
+    drawLobby();
+  }
 
   @Override
   public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
@@ -642,8 +684,5 @@ public class Cli implements View {
   @Override
   public void playerJoinedLobby(String gameId, UUID socketID) {
     View.super.playerJoinedLobby(gameId, socketID);
-    if (socketID.equals(localModel.getSocketID())) {
-      drawAvailableTokenColors();
-    }
   }
 }

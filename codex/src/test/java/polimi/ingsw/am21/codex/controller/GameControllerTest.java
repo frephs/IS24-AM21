@@ -13,6 +13,8 @@ import javafx.util.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import polimi.ingsw.am21.codex.Main;
+import polimi.ingsw.am21.codex.connection.server.RMI.DummyRemoteGameEventLister;
 import polimi.ingsw.am21.codex.controller.exceptions.*;
 import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
@@ -28,9 +30,12 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
+import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
+import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
 
 class GameControllerTest {
 
@@ -243,6 +248,26 @@ class GameControllerTest {
       players,
       connectionID -> new DummyRemoteGameEventListener(Assertions::fail)
     );
+  }
+
+  @Test
+  void registerListener() {
+    final UUID connectionID = UUID.randomUUID();
+    final RemoteGameEventListener listener = new DummyRemoteGameEventLister();
+
+    assertDoesNotThrow(() -> controller.connect(connectionID, listener));
+    controller.userContexts.forEach(
+      (key, value) -> assertEquals(listener, value.getListener())
+    );
+  }
+
+  @Test
+  void removeListener() {
+    final UUID connectionID = UUID.randomUUID();
+    final RemoteGameEventListener listener = new DummyRemoteGameEventLister();
+
+    assertDoesNotThrow(() -> controller.connect(connectionID, listener));
+    //TODO
   }
 
   @Test
@@ -481,6 +506,12 @@ class GameControllerTest {
         controller.lobbySetTokenColor(connectionID, colors.removeLast());
         controller.lobbySetNickname(connectionID, "test-" + colors.size());
         controller.lobbyChooseObjective(connectionID, true);
+
+        assertThrows(
+          GameNotReadyException.class,
+          () -> controller.startGame(connectionID)
+        );
+
         controller.joinGame(connectionID, gameId, CardSideType.FRONT);
       } catch (InvalidActionException e) {
         fail("Error setting up the game '" + gameId + "': " + e.getMessage());
@@ -495,51 +526,239 @@ class GameControllerTest {
 
   @Test
   void joinGame() {
-    //TODO
+    final String gameId = "test";
 
+    List<UUID> connectionIDs = createGame(gameId, 4, 4);
+
+    assertThrows(
+      IncompleteLobbyPlayerException.class,
+      () ->
+        controller.joinGame(connectionIDs.get(0), gameId, CardSideType.FRONT)
+    );
+
+    List<TokenColor> colors = new ArrayList<>(
+      Arrays.asList(TokenColor.values())
+    );
+
+    for (UUID connectionID : connectionIDs) {
+      try {
+        controller.lobbySetTokenColor(connectionID, colors.removeLast());
+        controller.lobbySetNickname(connectionID, "test-" + colors.size());
+        controller.lobbyChooseObjective(connectionID, true);
+        controller.joinGame(connectionID, gameId, CardSideType.FRONT);
+      } catch (InvalidActionException e) {
+        fail("Error setting up the game '" + gameId + "': " + e.getMessage());
+      }
+    }
+
+    assertThrows(
+      PlayerNotFoundException.class,
+      () ->
+        controller.joinGame(connectionIDs.get(0), gameId, CardSideType.FRONT)
+    );
+
+    assertThrows(GameAlreadyStartedException.class, () -> {
+      controller.connect(UUID.randomUUID(), new DummyRemoteGameEventLister());
+      controller.joinLobby(UUID.randomUUID(), gameId);
+    });
   }
 
   @Test
   void createGame() {
-    //TODO
+    final String gameId = "test";
+    final UUID playerId = UUID.randomUUID();
 
+    assertDoesNotThrow(() -> controller.createGame(playerId, gameId, 4));
+    assertThrows(
+      GameAlreadyExistsException.class,
+      () -> controller.createGame(playerId, gameId, 4)
+    );
   }
 
   @Test
-  void isLastRound() {
-    //TODO
-
-  }
+  void isLastRound() {}
 
   @Test
   void deleteGame() {
-    //TODO
+    // TODO
+
+    //    final String gameId = "test";
+    //    UUID notInGameUser = UUID.randomUUID();
+    //    assertThrows(
+    //      GameNotFoundException.class,
+    //      () -> controller.deleteGame(UUID.randomUUID(), gameId)
+    //    );
+    //
+    //    List<UUID> connectionIDs = createGame(gameId, 1, 1);
+    //
+    //    assertThrows(
+    //      NotInGameException.class,
+    //      () -> controller.deleteGame(notInGameUser, gameId)
+    //    );
+    //
+    //    assertThrows(
+    //      NotInGameException.class,
+    //      () -> controller.quitFromLobby(notInGameUser)
+    //    );
+    //
+    //    assertDoesNotThrow(
+    //      () -> controller.quitFromLobby(connectionIDs.getFirst())
+    //    );
+    //
+    //    assertDoesNotThrow(
+    //      () -> controller.deleteGame(connectionIDs.getFirst(), gameId)
+    //    );
+    //
+    //    assertThrows(GameNotFoundException.class, () -> controller.getGame(gameId));
   }
 
   @Test
   void nextTurn() {
-    //TODO
-  }
+    final String gameId = "test";
 
-  @Test
-  void testNextTurn() {
-    //TODO
-  }
+    List<UUID> connectionIDs = createGame(gameId, 4, 4);
 
-  @Test
-  void registerListener() {
-    //TODO
-  }
+    List<TokenColor> colors = new ArrayList<>(
+      Arrays.asList(TokenColor.values())
+    );
 
-  @Test
-  void removeListener() {
-    //TODO
+    for (UUID connectionID : connectionIDs) {
+      try {
+        controller.lobbySetTokenColor(connectionID, colors.removeLast());
+        controller.lobbySetNickname(connectionID, "test-" + colors.size());
+        controller.lobbyChooseObjective(connectionID, true);
+        controller.joinGame(connectionID, gameId, CardSideType.FRONT);
+      } catch (InvalidActionException e) {
+        fail("Error setting up the game '" + gameId + "': " + e.getMessage());
+      }
+    }
+    try {
+      for (int i = 0; i < connectionIDs.size(); i++) {
+        UUID socketId = controller
+          .getGame(gameId)
+          .getPlayers()
+          .get(i)
+          .getSocketId();
 
+        int index = connectionIDs.indexOf(socketId);
+
+        for (int j = 1; j <= connectionIDs.size() - 1; j++) {
+          int finalJ = j;
+          assertThrows(
+            PlayerNotActive.class,
+            () ->
+              controller.nextTurn(
+                connectionIDs.get((index + finalJ) % 4),
+                DrawingCardSource.Deck,
+                DrawingDeckType.RESOURCE
+              )
+          );
+        }
+
+        controller.placeCard(
+          connectionIDs.get(index),
+          2,
+          CardSideType.FRONT,
+          new Position(0, 1)
+        );
+
+        assertThrows(
+          InvalidNextTurnCallException.class,
+          () -> controller.nextTurn(connectionIDs.get(index))
+        );
+
+        assertDoesNotThrow(
+          () ->
+            controller.nextTurn(
+              connectionIDs.get(index),
+              DrawingCardSource.Deck,
+              DrawingDeckType.RESOURCE
+            )
+        );
+      }
+    } catch (InvalidActionException e) {
+      fail("Error starting the game '" + gameId + "': " + e.getMessage());
+    }
   }
 
   @Test
   void placeCard() {
-    //TODO
+    final String gameId = "test";
+
+    List<UUID> connectionIDs = createGame(gameId, 4, 4);
+
+    List<TokenColor> colors = new ArrayList<>(
+      Arrays.asList(TokenColor.values())
+    );
+
+    for (UUID connectionID : connectionIDs) {
+      try {
+        controller.lobbySetTokenColor(connectionID, colors.removeLast());
+        controller.lobbySetNickname(connectionID, "test-" + colors.size());
+        controller.lobbyChooseObjective(connectionID, true);
+        controller.joinGame(connectionID, gameId, CardSideType.FRONT);
+      } catch (InvalidActionException e) {
+        fail("Error setting up the game '" + gameId + "': " + e.getMessage());
+      }
+    }
+
+    try {
+      for (int i = 0; i < connectionIDs.size(); i++) {
+        UUID socketId = controller
+          .getGame(gameId)
+          .getPlayers()
+          .get(i)
+          .getSocketId();
+
+        int index = connectionIDs.indexOf(socketId);
+
+        for (int j = 1; j <= connectionIDs.size() - 1; j++) {
+          int finalJ = j;
+          assertThrows(
+            PlayerNotActive.class,
+            () ->
+              controller.placeCard(
+                connectionIDs.get((index + finalJ) % 4),
+                2,
+                CardSideType.FRONT,
+                new Position(0, 1)
+              )
+          );
+        }
+
+        assertDoesNotThrow(
+          () ->
+            controller.placeCard(
+              connectionIDs.get(index),
+              2,
+              CardSideType.FRONT,
+              new Position(0, 1)
+            )
+        );
+
+        assertThrows(
+          AlreadyPlacedCardException.class,
+          () ->
+            controller.placeCard(
+              connectionIDs.get(index),
+              2,
+              CardSideType.FRONT,
+              new Position(0, 1)
+            )
+        );
+
+        assertDoesNotThrow(
+          () ->
+            controller.nextTurn(
+              connectionIDs.get(index),
+              DrawingCardSource.Deck,
+              DrawingDeckType.RESOURCE
+            )
+        );
+      }
+    } catch (InvalidActionException e) {
+      fail("Error starting the game '" + gameId + "': " + e.getMessage());
+    }
   }
 
   @Test

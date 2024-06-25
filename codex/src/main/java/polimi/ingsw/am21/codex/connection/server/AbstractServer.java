@@ -2,6 +2,8 @@ package polimi.ingsw.am21.codex.connection.server;
 
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
+import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.util.concurrent.CountDownLatch;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -27,7 +29,7 @@ public abstract class AbstractServer {
   }
 
   public abstract void start()
-    throws MalformedURLException, RemoteException, PortUnreachableException;
+    throws MalformedURLException, RemoteException, PortUnreachableException, UnknownHostException, AlreadyBoundException;
 
   public abstract void stop();
 
