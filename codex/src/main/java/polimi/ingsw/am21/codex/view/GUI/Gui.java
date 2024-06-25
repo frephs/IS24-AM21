@@ -240,6 +240,12 @@ public class Gui extends Application implements View {
           screenBounds.getHeight()
         );
 
+        scene.setOnKeyPressed(event -> {
+          if (event.getCode().toString().equals("ALT")) {
+            Platform.runLater(() -> {});
+          }
+        });
+
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
       } catch (IOException e) {
