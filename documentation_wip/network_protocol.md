@@ -7,45 +7,93 @@ In this documentation only Socket messages are represented, as there is duality 
 
 ## General message handling 
 
-### Failed connection handling
-After a connection is enstablished, if the servers fails to respond to a message before the timeout, the clients will try to resend the message for a maximum of 3 times. If the server still fails to respond, the client will close the connection and notify the user that the connection has been lost.
+### Client Action message handling
+The following diagram reports a general rapresentation of our architecture's flow when a ClientAction is sent to the server.
+The **listener  classes** calling `gameEventListenerMethods(...)` implement either the `RemoteGameEventListener` class or the `GameEventListener` which extends it and does not throw `RemoteException`. 
+
+Note: for listener we mean every `RMIClientConnectionHandler`'s reference and every `TCPServerConnectionHandler` object saved for every client, which handle the connection with the client. 
 
 ```mermaid
 sequenceDiagram
-    actor Client
-    Client -x Server: Message (timed out)
-    Client ->> Server: Message (no response)
-    Server --x Client: ConfirmMessage (lost)
-    Client -x Server: Message (timed out)
-    Client --> Client : Log (Connection Lost)
-    Destroy Client
+Actor Client 
+Client  -->> ServerConnectionHandler : ClientActionMessage
+ServerConnectionHandler --> Controller : Controller.gameEventListenerMethod(...)
+Note right of Controller: the action is performed by the controller which <br> through the game manager  updates the correct game. 
+Controller --> Controller : Action is performed 
+Note over Controller, Clients: A view update is sent to every concerned client
+loop For each registered listener
+Controller --> Clients: listener.gameEventListenerMethod(...)
+end
+Clients --> ClientGameEventHandler : ClientConnectionHandler.gameEventListenerMethod(...) 
+ClientGameEventHandler --> ClientGameEventHandler  : LocalModelContainer.gameEventListenerMethod(...)
+ClientGameEventHandler --> ClientGameEventHandler : View.gameEventListenerMethod(...)
+
+```
+
+### Failed connection handling
+After a connection is enstablished, the client starts sending regular heartbeats. After two missed heartbeats the client loosing connection's `ClientConnectionHandler` notifies the user while the other clients are notified by the server. The client is considered disconnected after 10 missed heartbeats.
+
+The one reported is a simplified view with less actors, the architecture is the same as described above.
+
+
+
+```mermaid
+sequenceDiagram
+    actor Client 1
+    loop 2 times
+    Client 1 --x Server: Heartbeat (timed out)
+    end 
+    Client 1 --> Client 1 : ClientConnectionHandler.failedHeartBeats++
+    Client 1 --> Client 1 : View.postnotification()"You're loosing connection to the server")
+    Server -->> Other clients : PlayerConnectionChangedMessage(IS_LOSING)
+    Other clients --> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
+    alt The next heartbeats don't fail
+        Client 1 --> Client 1 : ClientConnectionHandler.failedHeartBeats = 0
+    Client 1 --> Client 1 : View.postnotification()"Connection restored")
+    Server -->> Other clients : PlayerConnectionChangedMessage(CONNECTED)
+    Other clients --> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
+    else 
+    loop 8 times more
+        Client 1 --x Server: Heartbeat 
+    end 
+    Client 1 --> Client 1 : ClientConnectionHandler.connectionFailed()
+
+    Client 1 --> Client 1 : view.postNotification("Connection lost")
+
+    Client 1 --> Client 1 : exit
+    Destroy Client 1
+    Client 1 --> Client 1 : 
+    Server -->> Other clients: PlayerConnectionChangedMessage(DISCONNECTED)
+    Other clients --> Other clients : view.ClientGameEventHandler.playerConnectionChanged(...)
+    end
+    
 
 ```
 
 ### "Not allowed" message handling
-In the event a client sends a message for an action that the server doesn't expect or that they cannot perform in that moment, and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the aforesaid client. 
+In the event a client sends a message for an action that the server which is untimely for the user's context  or that they cannot perform in that moment, and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the aforesaid client. 
+
+Client's side the error's are parsed by the `ClientGameEventHandler` which implements the `GameErrorListener` interface.
+
+Since updates are only register by the local model once the server validates them only the `View` implements the class as the errors need only to be notified to the users. 
 
 
 ```mermaid
 sequenceDiagram
     actor Client
 
-    Note over Client,Server: Client sends a type of message <br> that is not expected 
-    Client ->> Server: <Unexpected message>
-    alt client is the lobby view
-    Server ->> Controller : Controller.checkIfCurrentPlayer(game, nickname)
-    Controller --) Server : PlayerNotActive
-
-    else client is the game view 
-    Server ->> Controller : Controller.joinGame(socketId,game)
-    Controller --) Server : IncompletePlayerBuilderException
-    end
-    Server --) Client: ActionNotAllowedMessage 
+    Note over Client,ServerConnectionHandler: Client sends a type of message <br> that is not expected 
+    Client ->> ServerConnectionHandler: Untimely or forbidden ActionMessage 
+ServerConnectionHandler ->> Controller : Controller.gameEventListenerMethod(...)
+    Controller --) ServerConnectionHandler : < ? extends InvalidActionException> thrown
+    ServerConnectionHandler --) Client : InvalidActionMessage
+    Client --> Client : Message.toException() is parsed by the ClientGameEventHandler
 
 
-    Note over Client,Server: Client sends a message which <br>is not recognized by the server
-    Client ->> Server: <Unknown-type message>
-    Server --)  Client : unknownMessageTypeMessage
+    
+    Note over Client,ServerConnectionHandler: Client sends a message which <br>is not recognized by the server
+    Client ->> ServerConnectionHandler: <Unknown-type message>
+    ServerConnectionHandler --)  Client : unknownMessageTypeMessage
 ```
 
 ## Game Dynamics' Flows
