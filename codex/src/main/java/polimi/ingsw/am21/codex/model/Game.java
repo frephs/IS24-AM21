@@ -315,7 +315,7 @@ public class Game {
 
   public void playerReconnected(String player)
     throws PlayerNotFoundGameException {
-    disconnectedPlayers.add(getPlayerIndex(player));
+    disconnectedPlayers.remove(getPlayerIndex(player));
   }
 
   /**

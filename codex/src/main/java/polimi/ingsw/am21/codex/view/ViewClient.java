@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.view;
 
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -23,7 +24,12 @@ public abstract class ViewClient {
     );
   }
 
-  public void start(ConnectionType connectionType, String address, int port) {
+  public void start(
+    ConnectionType connectionType,
+    String address,
+    int port,
+    UUID connectionID
+  ) {
     if (connectionType == ConnectionType.TCP) {
       client = new TCPClientConnectionHandler(
         address,
@@ -36,7 +42,8 @@ public abstract class ViewClient {
         address,
         port,
         view,
-        gameEventHandler
+        gameEventHandler,
+        connectionID
       );
     }
     client.connect();

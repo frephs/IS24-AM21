@@ -69,7 +69,7 @@ public class FullUserGameContext {
     GameInfo gameInfo
   ) {
     this(
-      GameController.UserGameContextStatus.IN_LOBBY,
+      GameController.UserGameContextStatus.IN_GAME,
       gameID,
       nickname,
       tokenColor,
