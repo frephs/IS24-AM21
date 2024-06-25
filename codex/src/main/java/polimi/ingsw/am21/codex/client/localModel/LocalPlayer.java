@@ -59,7 +59,7 @@ public class LocalPlayer {
    * */
   private Card objectiveCard;
 
-  // this is only present if the player is the current player ( these are the 2 objectiva cards )
+  // this is only present if the player is the current player ( these are the 2 objective cards )
   private CardPair<ObjectiveCard> objectiveCards; //TODO look into this
 
   /**
@@ -127,21 +127,19 @@ public class LocalPlayer {
     return connectionID;
   }
 
-  public void addPlayedCards(
+  /**
+   * Adds a card to the player's playerboard, to be used when initializing the LocalPlayer
+   * @param card The card to add
+   * @param side The side that should be shown after the card is placed
+   * @param position The model position in which the card has been placed
+   */
+  public void addPlayedCard(
     PlayableCard card,
     CardSideType side,
     Position position
   ) {
     this.playedCardsByPosition.put(position, new Pair<>(card, side));
     this.playedCardsByOrder.add(new Pair<>(position, new Pair<>(card, side)));
-  }
-
-  public void addResource(ResourceType resourceType, Integer amount) {
-    this.resources.put(resourceType, amount);
-  }
-
-  public void addObjects(ObjectType objectType, Integer amount) {
-    this.objects.put(objectType, amount);
   }
 
   public String getNickname() {

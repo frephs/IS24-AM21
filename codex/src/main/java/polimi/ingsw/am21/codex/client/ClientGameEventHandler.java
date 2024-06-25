@@ -37,9 +37,19 @@ import polimi.ingsw.am21.codex.view.View;
 public class ClientGameEventHandler
   implements GameEventListener, GameErrorListener {
 
+  /**
+   * The listener to propagate events to
+   */
   private final RemoteGameEventListener listener;
 
+  /**
+   * The local model container of the handler's client
+   */
   protected LocalModelContainer localModel;
+
+  /**
+   * The view the associated client is using
+   */
   private final View view;
 
   public View getView() {

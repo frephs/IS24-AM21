@@ -73,7 +73,7 @@ public class LocalGameBoard {
   private Integer currentPlayerIndex;
 
   /**
-   * The remaining rounds in the game
+   * The number of remaining rounds in the game
    */
   private Integer remainingRounds;
 
@@ -92,6 +92,9 @@ public class LocalGameBoard {
     this.players = new ArrayList<>(maxPlayers);
   }
 
+  /**
+   * Gets the player that is currently playing their turn.
+   */
   public LocalPlayer getCurrentPlayer() {
     return players.get(currentPlayerIndex);
   }
@@ -107,6 +110,9 @@ public class LocalGameBoard {
       .findFirst();
   }
 
+  /**
+   * The list of local players in the game
+   */
   private final List<LocalPlayer> players;
 
   public String getGameId() {
@@ -120,10 +126,18 @@ public class LocalGameBoard {
     return players.get(playerIndex);
   }
 
+  /**
+   * Gets the nickname of the local player associated with the client
+   * @return
+   */
   public String getPlayerNickname() {
     return getPlayer().getNickname();
   }
 
+  /**
+   * Sets the index of the local player associated with the client, referring to
+   * the list of players in the game
+   */
   public void setPlayerIndex(int playerIndex) {
     this.playerIndex = playerIndex;
   }
@@ -176,6 +190,9 @@ public class LocalGameBoard {
     return chat;
   }
 
+  /**
+   * Gets the player that is supposed to play next (assuming the game is not ending)
+   */
   public LocalPlayer getNextPlayer() {
     return players.get((currentPlayerIndex + 1) % players.size());
   }

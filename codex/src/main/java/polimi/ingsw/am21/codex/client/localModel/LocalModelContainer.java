@@ -14,7 +14,7 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-/***
+/**
  * The LocalModelContainer class is the container of the model of the game that is stored locally on the client side to enable client interaction with the server.
  * <br><br>
  * Since the server model has some controller functionality included, we opted to create a mere container local model for the view to draw things properly and keep track of game events client side.
@@ -177,6 +177,10 @@ public class LocalModelContainer implements GameEventListener {
     }
   }
 
+  /**
+   * Interface method used to process
+   * @param gameId The identifier of the lobby that has been filled.
+   */
   public void lobbyFull(String gameId) {
     menu
       .getGames()
@@ -322,6 +326,9 @@ public class LocalModelContainer implements GameEventListener {
     String nickname
   ) {}
 
+  /**
+   * Gets the objectives the local player can choose from in the lobby
+   */
   public CardPair<Card> getAvailableObjectives() {
     return lobby.orElseThrow().getAvailableObjectives();
   }
@@ -398,7 +405,7 @@ public class LocalModelContainer implements GameEventListener {
               PlayableCard card = (PlayableCard) cardsLoader.getCardFromId(
                 cardInfo.getKey()
               );
-              localPlayer.addPlayedCards(card, cardInfo.getValue(), position);
+              localPlayer.addPlayedCard(card, cardInfo.getValue(), position);
             });
           localPlayer.setAvailableSpots(player.getAvailableSpots());
           localPlayer.setForbiddenSpots(player.getForbiddenSpots());
@@ -467,7 +474,7 @@ public class LocalModelContainer implements GameEventListener {
     PlayableCard card = (PlayableCard) cardsLoader.getCardFromId(cardId);
     LocalPlayer localPlayer = gameBoard.orElseThrow().getCurrentPlayer();
 
-    localPlayer.addPlayedCards(card, side, position);
+    localPlayer.addPlayedCard(card, side, position);
 
     List<Card> nextHand = new ArrayList<>();
     for (int i = 0; i < localPlayer.getHand().size(); i++) {
@@ -490,9 +497,6 @@ public class LocalModelContainer implements GameEventListener {
 
   }
 
-  /**
-   * @param playerNickname is the playerNickname of the new player
-   * */
   @Override
   public void changeTurn(
     String gameId,
@@ -543,9 +547,6 @@ public class LocalModelContainer implements GameEventListener {
     );
   }
 
-  /**
-   * @param playerNickname is the nickname of the new player
-   * */
   @Override
   public void changeTurn(
     String gameId,
@@ -630,6 +631,10 @@ public class LocalModelContainer implements GameEventListener {
     }
   }
 
+  /**
+   * Gets whether the current player has already placed a card for their turn, and
+   * they now have to draw.
+   */
   public boolean currentPlayerHasPlacedCard() {
     return currentPlayerHasPlacedCard;
   }

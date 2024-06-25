@@ -11,12 +11,12 @@ public class CardPair<T extends Card> extends CardPairBase<T> {
 
   public static <T extends Card> CardPair<T> fromCardIndexPair(
     CardsLoader cardsLoader,
-    CardIndexPair cardIndexPair
+    CardIdPair cardIdPair
   ) {
     //noinspection unchecked
     return new CardPair<T>(
-      (T) cardsLoader.getCardFromId(cardIndexPair.getFirst()),
-      (T) cardsLoader.getCardFromId(cardIndexPair.getSecond())
+      (T) cardsLoader.getCardFromId(cardIdPair.getFirst()),
+      (T) cardsLoader.getCardFromId(cardIdPair.getSecond())
     );
   }
 }

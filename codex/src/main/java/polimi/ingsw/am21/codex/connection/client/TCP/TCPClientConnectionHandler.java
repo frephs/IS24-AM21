@@ -48,15 +48,34 @@ import polimi.ingsw.am21.codex.view.View;
 
 public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
+  /**
+   * The socket that is handling the TCP connection with the server
+   */
   private Socket socket;
 
+  /**
+   * A stream of objects that are automatically deserialized and parsed to local
+   * class instances
+   */
   private ObjectInputStream inputStream;
+  /**
+   * A stream of objects that need to be serialized and sent to the server
+   */
   private ObjectOutputStream outputStream;
 
+  /**
+   * The executor service that is handling all client threads
+   */
   private final ExecutorService threadManager = Executors.newCachedThreadPool();
 
+  /**
+   * Whether the client is waiting for a server response
+   */
   private Boolean waiting = false;
 
+  /**
+   * A queue of messages that need to be handled
+   */
   private final Queue<Message> incomingMessages;
 
   public TCPClientConnectionHandler(
@@ -70,13 +89,16 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     this.incomingMessages = new ArrayDeque<>();
   }
 
+  /**
+   * Gets the current game ID, and calls {@link ClientGameEventHandler#notInGame()}
+   * if the client is not currently in a game
+   */
   private Optional<String> getGameIDWithMessage() {
-    if (this.gameEventHandler.getLocalModel().getGameId().isEmpty()) {
-      this.gameEventHandler.notInGame();
-      return Optional.empty();
-    }
-    String gameID = this.gameEventHandler.getLocalModel().getGameId().get();
-    return Optional.of(gameID);
+    if (
+      this.gameEventHandler.getLocalModel().getGameId().isEmpty()
+    ) this.gameEventHandler.notInGame();
+
+    return this.gameEventHandler.getLocalModel().getGameId();
   }
 
   /**
@@ -127,6 +149,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     });
   }
 
+  /**
+   * Runs a thread that synchronously handles incoming messages
+   */
   private void startMessageHandler() {
     threadManager.execute(() -> {
       while (true) synchronized (incomingMessages) {
@@ -156,6 +181,12 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     });
   }
 
+  /**
+   * Sends a message to the server
+   * @param message The message to send
+   * @param successful A callback to execute if the action is successful
+   * @param failed A callback to execute if the action is not successful
+   */
   private void send(
     ClientMessage message,
     Runnable successful,
@@ -195,10 +226,18 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     successful.run();
   }
 
+  /**
+   * Sends a message to the server
+   * @param message The message to send
+   */
   private void send(ClientMessage message) {
     this.send(message, () -> {}, () -> {});
   }
 
+  /**
+   * Gets the view associated
+   * @return
+   */
   private View getView() {
     return gameEventHandler.getView();
   }
@@ -395,12 +434,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     return null;
   }
 
-  /*
-   * ----------------------
-   * MESSAGE PARSING
-   * ----------------------
-   * */
-
+  // <editor-fold desc="Message handling">
   public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
       this.waiting = false;
@@ -470,12 +504,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     }
   }
 
-  /*
-   * -------------------------
-   * SERVER RESPONSES HANDLERS
-   * -------------------------
-   * */
-
+  // <editor-fold desc="Server Responses">
   public void handleMessage(AvailableGameLobbiesMessage message) {
     gameEventHandler.refreshLobbies(
       message.getLobbyIds(),
@@ -492,14 +521,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     gameEventHandler.getStarterCard(message.getCardId());
   }
 
-  /*
-   * ------------------------
-   * SERVER ERRORS HANDLERS
-   * ------------------------
-   */
+  // </editor-fold>
 
-  //game
-
+  // <editor-fold desc="Server Errors">
   public void handleMessage(InvalidActionMessage message) {
     gameEventHandler.handleInvalidActionException(message.toException());
   }
@@ -520,13 +544,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       );
   }
 
-  /*
-   * ----------------------
-   * VIEW UPDATES HANDLERS
-   * ----------------------
-   */
+  // </editor-fold>
 
-  // LOBBY
+  // <editor-fold desc="View updates">
+  // <editor-fold desc="Lobby">
   public void handleMessage(LobbyInfoMessage message) {
     gameEventHandler.lobbyInfo(message.getLobbyUsersInfo());
   }
@@ -597,8 +618,9 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     );
   }
 
-  // GAME
+  // </editor-fold>
 
+  // <editor-fold desc="Game">
   public void handleMessage(CardPlacedMessage message) {
     gameEventHandler.cardPlaced(
       message.getGameId(),
@@ -666,4 +688,5 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getMessage()
     );
   }
+  // </editor-fold>
 }

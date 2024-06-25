@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
-import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardIndexPair;
+import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardIdPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
@@ -16,20 +16,64 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class GameInfo implements Serializable {
 
+  /**
+   * Represents a player in a game
+   */
   public static class GameInfoUser implements Serializable {
 
+    /**
+     * The nickname of the player
+     */
     private final String nickname;
+    /**
+     * The token color of the player
+     */
     private final TokenColor tokenColor;
+    /**
+     * The connection ID of the player
+     */
     private final UUID connectionID;
+    /**
+     * The connection status of the player
+     */
     private final GameController.UserGameContext.ConnectionStatus connectionStatus;
+    /**
+     * A map where the keys are the position of the cards and the values are pairs
+     * containing the card ID and the side that has been played
+     */
     private final Map<Position, Pair<Integer, CardSideType>> playedCards;
+    /**
+     * The IDs of the cards in the player's hand
+     */
     private final List<Integer> handIDs;
+    /**
+     * The number of points the player has
+     */
     private final Integer points;
+    /**
+     * The ID of the player's secret objective card
+     */
     private final Integer secretObjectiveCard;
+    /**
+     * The positions in which the player can currently play a card
+     */
     private final Set<Position> availableSpots;
+    /**
+     * The positions in which the player cannot currently play a card because they
+     * are locked by a non-available corner in one of the neighboring cards
+     */
     private final Set<Position> forbiddenSpots;
+    /**
+     * The internal index of the player, compared to the list of all players
+     */
     private final Integer index;
+    /**
+     * The counts of the resources of the player
+     */
     private final Map<ResourceType, Integer> resources;
+    /**
+     * The counts of the objects of the player
+     */
     private final Map<ObjectType, Integer> objects;
 
     public GameInfoUser(
@@ -115,30 +159,57 @@ public class GameInfo implements Serializable {
     }
   }
 
+  /**
+   * The ID of the game
+   */
   private final String gameId;
+  /**
+   * The list of players in the game
+   */
   private final List<GameInfoUser> users;
-  private final Integer currentUser;
+  /**
+   * The index of the player who is currently playing
+   */
+  private final Integer currentUserIndex;
+  /**
+   * The number of rounds remaining in the game
+   */
   private final Integer remainingRounds;
-  private final CardIndexPair objectiveCards;
-  private final CardIndexPair resourceCards;
-  private final CardIndexPair goldCards;
+  /**
+   * The IDs of the objective cards on the player board
+   */
+  private final CardIdPair objectiveCards;
+  /**
+   * The IDs of the resource cards on the player board
+   */
+  private final CardIdPair resourceCards;
+  /**
+   * The IDs of the gold cards on the player board
+   */
+  private final CardIdPair goldCards;
+  /**
+   * The ID of the resource card on the top of the deck
+   */
   private final Integer resourceDeckTopCardId;
+  /**
+   * The ID of the gold card on the top of the deck
+   */
   private final Integer goldDeckTopCardId;
 
   public GameInfo(
     String gameId,
     List<GameInfoUser> users,
-    Integer currentUser,
+    Integer currentUserIndex,
     Integer remainingRounds,
-    CardIndexPair objectiveCards,
-    CardIndexPair resourceCards,
-    CardIndexPair goldCards,
+    CardIdPair objectiveCards,
+    CardIdPair resourceCards,
+    CardIdPair goldCards,
     Integer resourceDeckTopCardId,
     Integer goldDeckTopCardId
   ) {
     this.gameId = gameId;
     this.users = users;
-    this.currentUser = currentUser;
+    this.currentUserIndex = currentUserIndex;
     this.remainingRounds = remainingRounds;
     this.objectiveCards = objectiveCards;
     this.resourceCards = resourceCards;
@@ -150,7 +221,7 @@ public class GameInfo implements Serializable {
   public GameInfo(
     String gameId,
     List<GameInfoUser> users,
-    Integer currentUser,
+    Integer currentUserIndex,
     Integer remainingRounds,
     CardPair<ObjectiveCard> objectiveCards,
     CardPair<PlayableCard> resourceCards,
@@ -161,11 +232,11 @@ public class GameInfo implements Serializable {
     this(
       gameId,
       users,
-      currentUser,
+      currentUserIndex,
       remainingRounds,
-      CardIndexPair.fromCardPair(objectiveCards),
-      CardIndexPair.fromCardPair(resourceCards),
-      CardIndexPair.fromCardPair(goldCards),
+      CardIdPair.fromCardPair(objectiveCards),
+      CardIdPair.fromCardPair(resourceCards),
+      CardIdPair.fromCardPair(goldCards),
       resourceDeckTopCardId,
       goldDeckTopCardId
     );
@@ -180,22 +251,22 @@ public class GameInfo implements Serializable {
   }
 
   public Integer getCurrentUserIndex() {
-    return currentUser;
+    return currentUserIndex;
   }
 
   public GameInfoUser getCurrentUser() {
-    return users.get(currentUser);
+    return users.get(currentUserIndex);
   }
 
-  public CardIndexPair getObjectiveCards() {
+  public CardIdPair getObjectiveCards() {
     return objectiveCards;
   }
 
-  public CardIndexPair getResourceCards() {
+  public CardIdPair getResourceCards() {
     return resourceCards;
   }
 
-  public CardIndexPair getGoldCards() {
+  public CardIdPair getGoldCards() {
     return goldCards;
   }
 

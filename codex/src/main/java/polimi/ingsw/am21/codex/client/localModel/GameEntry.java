@@ -13,7 +13,7 @@ public class GameEntry {
   private final Integer maxPlayers;
 
   /**
-   * GameEntry constructor. It is used to create a new empty game entry .
+   * GameEntry constructor. It is used to create a new empty game entry.
    * @param gameId the game id
    * @param maxPlayers the maximum number of players
    * */

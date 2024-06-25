@@ -20,16 +20,41 @@ import polimi.ingsw.am21.codex.view.View;
 
 public abstract class ClientConnectionHandler {
 
+  /**
+   * The game event handler associated with the client
+   */
   protected final ClientGameEventHandler gameEventHandler;
+  /**
+   * The ID associated with this connection
+   */
   protected UUID connectionID;
 
+  /**
+   * The host where the server is running
+   */
   protected final String host;
+  /**
+   * The port that should be used to access the server with the current {@link ClientConnectionHandler#connectionType}
+   */
   protected final Integer port;
+  /**
+   * The status of the connection
+   */
   private GameController.UserGameContext.ConnectionStatus connectionStatus =
     GameController.UserGameContext.ConnectionStatus.DISCONNECTED;
+  /**
+   * The number of consecutive heartbeats that the client will try to send before
+   * determining that the server is unreachable
+   */
   private Integer consecutiveFailedHeartBeats = 0;
+  /**
+   * The type of connection teh client is using to communicate with the server
+   */
   protected ConnectionType connectionType;
 
+  /**
+   * The view the client is using
+   */
   private final View view;
 
   public ClientConnectionHandler(
@@ -50,7 +75,7 @@ public abstract class ClientConnectionHandler {
     return gameEventHandler.getLocalModel().getConnectionID();
   }
 
-  View getView() {
+  private View getView() {
     return view;
   }
 

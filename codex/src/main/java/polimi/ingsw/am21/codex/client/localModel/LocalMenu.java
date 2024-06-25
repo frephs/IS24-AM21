@@ -12,6 +12,9 @@ import java.util.Map;
  * */
 public class LocalMenu {
 
+  /**
+   * A map with the game ids as keys and the corresponding game entries as values
+   */
   private final Map<String, GameEntry> games = new HashMap<>();
 
   LocalMenu() {}

@@ -20,6 +20,7 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 /**
  * Interface implementation of the RemoteGameEventListener for the local model
+ * <p>
  * It's used as Registry by the RMI server to allow the clients to be updated
  * to process events thrown by the clients. It forwards the events to the
  * local GameEventListener which calls the corresponding methods in the

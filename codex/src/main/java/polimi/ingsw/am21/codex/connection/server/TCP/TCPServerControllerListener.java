@@ -22,6 +22,9 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class TCPServerControllerListener implements GameEventListener {
 
+  /**
+   * The consumer to be called to broadcast messages to all players
+   */
   private final Consumer<Message> broadcast;
 
   public TCPServerControllerListener(Consumer<Message> broadcast) {

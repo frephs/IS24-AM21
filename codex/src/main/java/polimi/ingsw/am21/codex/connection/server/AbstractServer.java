@@ -20,6 +20,9 @@ public abstract class AbstractServer {
    */
   protected Integer port;
 
+  /**
+   * A latch that is used to wait for the server to be ready
+   */
   protected final CountDownLatch serverReadyLatch;
 
   protected AbstractServer(Integer port, GameController controller) {
@@ -28,9 +31,15 @@ public abstract class AbstractServer {
     this.serverReadyLatch = new CountDownLatch(1);
   }
 
+  /**
+   * Starts the server
+   */
   public abstract void start()
     throws MalformedURLException, RemoteException, PortUnreachableException, UnknownHostException, AlreadyBoundException;
 
+  /**
+   * Gracefully stops the server
+   */
   public abstract void stop();
 
   public CountDownLatch getServerReadyLatch() {

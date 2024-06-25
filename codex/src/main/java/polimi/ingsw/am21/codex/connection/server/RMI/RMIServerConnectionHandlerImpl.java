@@ -20,6 +20,9 @@ public class RMIServerConnectionHandlerImpl
   extends UnicastRemoteObject
   implements RMIServerConnectionHandler {
 
+  /**
+   * The controller of the game
+   */
   GameController controller;
 
   public RMIServerConnectionHandlerImpl(GameController controller)
@@ -80,12 +83,6 @@ public class RMIServerConnectionHandlerImpl
   }
 
   @Override
-  public void startGame(UUID connectionID)
-    throws RemoteException, InvalidActionException {
-    this.controller.startGame(connectionID);
-  }
-
-  @Override
   public void joinGame(UUID connectionID, String gameID, CardSideType sideType)
     throws RemoteException, InvalidActionException {
     this.controller.joinGame(connectionID, gameID, sideType);
@@ -137,12 +134,6 @@ public class RMIServerConnectionHandlerImpl
   public void leaveLobby(UUID connectionID)
     throws RemoteException, InvalidActionException {
     this.controller.quitFromLobby(connectionID);
-  }
-
-  @Override
-  public Set<TokenColor> getAvailableTokens(String gameId)
-    throws RemoteException, InvalidActionException {
-    return this.controller.getAvailableTokens(gameId);
   }
 
   @Override

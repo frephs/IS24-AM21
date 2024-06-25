@@ -25,6 +25,9 @@ public class RMIClientConnectionHandler
   extends ClientConnectionHandler
   implements Remote {
 
+  /**
+   * The server connection handler this instance is connected to
+   */
   private RMIServerConnectionHandler rmiConnectionHandler;
 
   public RMIClientConnectionHandler(
