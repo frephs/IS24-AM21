@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.connection.server.RMI;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.PortUnreachableException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -18,7 +19,7 @@ public class RMIServer extends AbstractServer {
   }
 
   public void start()
-    throws MalformedURLException, RemoteException, UnknownHostException, AlreadyBoundException {
+    throws MalformedURLException, RemoteException, UnknownHostException, AlreadyBoundException, PortUnreachableException {
     try { //special exception handler for registry creation
       System.setProperty(
         "java.rmi.server.hostname",
@@ -35,6 +36,7 @@ public class RMIServer extends AbstractServer {
     } catch (RemoteException e) {
       //do nothing, error means registry already exists
       System.out.println("java RMI registry already exists.");
+      throw new PortUnreachableException();
     } catch (UnknownHostException e) {
       System.out.println(
         "Error occurred while starting RMI server" + e.getMessage()
