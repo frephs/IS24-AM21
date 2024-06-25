@@ -639,27 +639,29 @@ public class LocalModelContainer implements GameEventListener {
 
   @Override
   public void lobbyInfo(LobbyUsersInfo usersInfo) {
-    // Update the current players in the game entry (like for menus)
-    this.menu.getGames()
-      .get(usersInfo.getGameID())
-      .setCurrentPlayers(usersInfo.getUsers().size());
+    lobby = Optional.of(new LocalLobby(usersInfo.getGameID()));
 
-    if (lobby.isPresent()) {
-      lobby.get().getPlayers().clear();
-      usersInfo
-        .getUsers()
-        .forEach((uuid, lobbyInfoUser) -> {
-          addToLobby(uuid);
-          lobbyInfoUser
-            .getNickname()
-            .ifPresent(nickname -> setPlayerNickname(uuid, nickname));
-          lobbyInfoUser
-            .getTokenColor()
-            .ifPresent(token -> setPlayerToken(uuid, token));
-        });
+    gameBoard = Optional.of(
+      new LocalGameBoard(
+        usersInfo.getGameID(),
+        menu.getGames().get(usersInfo.getGameID()).getMaxPlayers()
+      )
+    );
 
-      clientContextContainer.set(ClientContext.LOBBY);
-    }
+    clientContextContainer.set(ClientContext.LOBBY);
+
+    lobby.get().getPlayers().clear();
+    usersInfo
+      .getUsers()
+      .forEach((uuid, lobbyInfoUser) -> {
+        addToLobby(uuid);
+        lobbyInfoUser
+          .getNickname()
+          .ifPresent(nickname -> setPlayerNickname(uuid, nickname));
+        lobbyInfoUser
+          .getTokenColor()
+          .ifPresent(token -> setPlayerToken(uuid, token));
+      });
   }
 
   @Override

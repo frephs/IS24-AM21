@@ -904,6 +904,18 @@ public class GameController {
       userContexts
         .entrySet()
         .stream()
+        .filter(user -> user.getKey().equals(connectionID))
+        .map(user -> new Pair<>(user.getKey(), user.getValue()))
+        .collect(Collectors.toList()),
+      ((listener, targetConnectionID) -> {
+          listener.lobbyInfo(generateLobbyInfo(gameId, game));
+        })
+    );
+
+    notifyClients(
+      userContexts
+        .entrySet()
+        .stream()
         .filter(
           entry ->
             entry.getValue().getStatus().equals(UserGameContextStatus.MENU) ||
