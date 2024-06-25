@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import polimi.ingsw.am21.codex.client.ClientType;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -66,7 +67,8 @@ public class Main {
     String serverAddress,
     ClientType clientType,
     ConnectionType connectionType,
-    Integer port
+    Integer port,
+    UUID connectionID
   ) throws MalformedURLException, NotBoundException, RemoteException {
     System.out.println(
       "Starting client " +
@@ -87,7 +89,7 @@ public class Main {
       client = new GuiClient();
     }
 
-    client.start(connectionType, serverAddress, port);
+    client.start(connectionType, serverAddress, port, connectionID);
   }
 
   public static void main(String[] args)
@@ -167,7 +169,24 @@ public class Main {
           port.set(Integer.parseInt(arg.split("=")[1]));
         });
 
-      startClient(serverAddress.get(), clientType, connectionType, port.get());
+      AtomicReference<UUID> connectionID = new AtomicReference<>(
+        UUID.randomUUID()
+      );
+
+      Arrays.stream(args)
+        .filter(arg -> arg.startsWith("--connection-id"))
+        .findFirst()
+        .ifPresent(arg -> {
+          connectionID.set(UUID.fromString(arg.split("=")[1]));
+        });
+
+      startClient(
+        serverAddress.get(),
+        clientType,
+        connectionType,
+        port.get(),
+        connectionID.get()
+      );
     }
   }
 

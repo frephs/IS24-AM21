@@ -33,9 +33,10 @@ public class RMIClientConnectionHandler
     String host,
     Integer port,
     View view,
-    ClientGameEventHandler gameEventHandler
+    ClientGameEventHandler gameEventHandler,
+    UUID connectionID
   ) {
-    super(host, port, view, gameEventHandler, UUID.randomUUID());
+    super(host, port, view, gameEventHandler, connectionID);
     this.connectionType = ConnectionType.RMI;
   }
 

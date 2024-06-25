@@ -39,8 +39,13 @@ public class CliClient extends ViewClient {
   }
 
   @Override
-  public void start(ConnectionType connectionType, String address, int port) {
-    super.start(connectionType, address, port);
+  public void start(
+    ConnectionType connectionType,
+    String address,
+    int port,
+    UUID connectionID
+  ) {
+    super.start(connectionType, address, port, connectionID);
     cli.setClient(client);
 
     cli.postNotification(
@@ -767,8 +772,10 @@ public class CliClient extends ViewClient {
   }
 
   public static void main(String[] args) {
-    if (args.length != 3) throw new IllegalArgumentException(
-      "Usage: CliClient <connection-type> <address> <port>"
+    if (
+      args.length != 3 && args.length != 4
+    ) throw new IllegalArgumentException(
+      "Usage: CliClient <connection-type> <address> <port> ?<your-previous-id>?"
     );
 
     new Main.Options(true);
@@ -786,7 +793,10 @@ public class CliClient extends ViewClient {
         args[1] != null ? args[1] : "localhost",
         args[2] != null
           ? Integer.parseInt(args[2])
-          : connectionType.getDefaultPort()
+          : connectionType.getDefaultPort(),
+        Optional.ofNullable(args.length == 4 ? args[3] : null)
+          .map(UUID::fromString)
+          .orElse(UUID.randomUUID())
       );
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("Invalid port number");
