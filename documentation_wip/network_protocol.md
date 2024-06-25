@@ -341,15 +341,23 @@ sequenceDiagram
 
 ## Advanced Features
 ### Chat
-This exchange happens when a player (`Client`) wants to write a message in the chat. After `PostMessage` is sent, the server replies that the message has been received and posted. After that, the server sends a notification to all the recipients of the message informing them that there is a new message in the chat.
+The chat feature works similarly to the other view updates. Every view update is sent to the concerned clients present in the `ChatMessage` object. 
 
 ```mermaid
 sequenceDiagram
 actor Client
-    Client -) Server: PostMessage
-    Server --) Client: ConfirmMessage
+alt The message is a broadcast message
+    Client --) Server: SendChatMessage (broadcast)
+else The message is a private message to an user
 actor Recipient
-    loop for each recipient
-        Server -) Recipient: NewMessageInChatMessage
+    loop for each client in the same game
+        Server --) Recipient: ChatMessageSentMessage
     end
+    end
+Client --) Server: SendChatMessage (whisper)
+ Server --) Recipient: ChatMessageSentMessage
+  Server --) Client: ChatMessageMessage
+
+
+
 ```
