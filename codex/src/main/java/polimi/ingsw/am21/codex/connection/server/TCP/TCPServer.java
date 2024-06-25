@@ -61,6 +61,7 @@ public class TCPServer extends AbstractServer {
   public void stop() {
     try {
       serverSocket.close();
+      System.out.println("TCP Server stopped.");
     } catch (IOException ignored) {}
   }
 }

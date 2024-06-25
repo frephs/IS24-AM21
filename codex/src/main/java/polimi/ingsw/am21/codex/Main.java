@@ -58,6 +58,13 @@ public class Main {
   private static void startServer(Integer tcpPort, Integer rmiPort) {
     Server server = new Server(tcpPort, rmiPort);
     try {
+      Runtime.getRuntime()
+        .addShutdownHook(
+          new Thread(() -> {
+            server.stop();
+            System.out.println("Server stopped. Goodbye!");
+          })
+        );
       server.start();
     } catch (Exception e) {
       e.printStackTrace();
