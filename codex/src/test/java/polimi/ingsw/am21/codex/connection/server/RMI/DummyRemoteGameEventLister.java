@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
@@ -156,4 +157,13 @@ public class DummyRemoteGameEventLister
 
   @Override
   public void getStarterCard(Integer cardId) throws RemoteException {}
+
+  @Override
+  public void gameHalted(String gameID) throws RemoteException {}
+
+  @Override
+  public void gameResumed(String gameID) throws RemoteException {}
+
+  @Override
+  public void userContext(FullUserGameContext context) throws RemoteException {}
 }
