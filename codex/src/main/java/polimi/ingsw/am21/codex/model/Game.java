@@ -358,7 +358,7 @@ public class Game {
       if (remainingRoundsChanged) remainingRoundsChange.accept(
         this.remainingRounds
       );
-    } while (!disconnectedPlayers.contains(currentPlayer));
+    } while (disconnectedPlayers.contains(currentPlayer));
 
     if (nextTurnEvent != null) nextTurnEvent.run();
   }
