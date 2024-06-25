@@ -133,19 +133,23 @@ public class TCPServerConnectionHandler implements Runnable {
         } catch (ClassNotFoundException e) {
           send(new UnknownMessageTypeMessage());
         } catch (IOException e) {
-          System.err.println(
-            "IOException caught when parsing message from client at " +
-            socket.getInetAddress() +
-            ". Parser is exiting.\n"
-          );
-          e.printStackTrace();
+          if (Main.Options.isDebug()) {
+            System.err.println(
+              "IOException caught when parsing message from client at " +
+              socket.getInetAddress() +
+              ". Parser is exiting.\n"
+            );
+            e.printStackTrace();
+          }
           break;
         } catch (InterruptedException e) {
-          System.err.println(
-            "Parser thread for " +
-            socket.getInetAddress() +
-            "interrupted, exiting."
-          );
+          if (Main.Options.isDebug()) {
+            System.err.println(
+              "Parser thread for " +
+              socket.getInetAddress() +
+              "interrupted, exiting."
+            );
+          }
           break;
         }
       }
