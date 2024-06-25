@@ -168,13 +168,13 @@ class GameTest {
       int players = game.getLobby().getRemainingPlayerSlots();
       int i = -1;
       while (++i < players) {
-        UUID playerSocketID = UUID.randomUUID();
+        UUID playerConnectionID = UUID.randomUUID();
 
         try {
           game
             .getLobby()
             .addPlayer(
-              playerSocketID,
+              playerConnectionID,
               game.drawObjectiveCardPair(),
               game.drawStarterCard()
             );
@@ -183,30 +183,30 @@ class GameTest {
         }
 
         try {
-          game.getLobby().setNickname(playerSocketID, "Player_" + i);
+          game.getLobby().setNickname(playerConnectionID, "Player_" + i);
         } catch (NicknameAlreadyTakenException e) {
           fail("Nickname already taken exception");
         }
 
         try {
-          game.getLobby().setToken(playerSocketID, TokenColor.values()[i]);
+          game.getLobby().setToken(playerConnectionID, TokenColor.values()[i]);
         } catch (TokenAlreadyTakenException e) {
           fail("Token already taken exception");
         }
         Optional<CardPair<ObjectiveCard>> firstPlayerObjectiveCards = game
           .getLobby()
-          .getPlayerObjectiveCards(playerSocketID);
+          .getPlayerObjectiveCards(playerConnectionID);
         if (firstPlayerObjectiveCards.isEmpty()) fail(
           "The first player objective cards are null, this should never " +
           "happened 💀"
         );
 
-        game.getLobby().setObjectiveCard(playerSocketID, true);
+        game.getLobby().setObjectiveCard(playerConnectionID, true);
         try {
           Player player = game
             .getLobby()
             .finalizePlayer(
-              playerSocketID,
+              playerConnectionID,
               CardSideType.FRONT,
               game.drawHand()
             );

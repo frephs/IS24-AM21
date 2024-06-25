@@ -20,7 +20,7 @@ public class GameInfo implements Serializable {
 
     private final String nickname;
     private final TokenColor tokenColor;
-    private final UUID socketID;
+    private final UUID connectionID;
     private final GameController.UserGameContext.ConnectionStatus connectionStatus;
     private final Map<Position, Pair<Integer, CardSideType>> playedCards;
     private final List<Integer> handIDs;
@@ -35,7 +35,7 @@ public class GameInfo implements Serializable {
     public GameInfoUser(
       String nickname,
       TokenColor tokenColor,
-      UUID socketID,
+      UUID connectionID,
       GameController.UserGameContext.ConnectionStatus connectionStatus,
       Map<Position, Pair<Integer, CardSideType>> playedCards,
       List<Integer> handIDs,
@@ -49,7 +49,7 @@ public class GameInfo implements Serializable {
     ) {
       this.nickname = nickname;
       this.tokenColor = tokenColor;
-      this.socketID = socketID;
+      this.connectionID = connectionID;
       this.connectionStatus = connectionStatus;
       this.playedCards = playedCards;
       this.handIDs = handIDs;
@@ -70,8 +70,8 @@ public class GameInfo implements Serializable {
       return this.tokenColor;
     }
 
-    public UUID getSocketID() {
-      return this.socketID;
+    public UUID getConnectionID() {
+      return this.connectionID;
     }
 
     public GameController.UserGameContext.ConnectionStatus getConnectionStatus() {

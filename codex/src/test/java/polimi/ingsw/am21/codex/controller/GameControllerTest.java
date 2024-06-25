@@ -2,29 +2,20 @@ package polimi.ingsw.am21.codex.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.connection.server.RMI.DummyRemoteGameEventLister;
 import polimi.ingsw.am21.codex.controller.exceptions.*;
-import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
-import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
-import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.model.Cards.ResourceType;
-import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Game;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.GameBoard.exceptions.TokenAlreadyTakenException;
-import polimi.ingsw.am21.codex.model.Lobby.exceptions.IncompletePlayerBuilderException;
 import polimi.ingsw.am21.codex.model.Lobby.exceptions.NicknameAlreadyTakenException;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
@@ -451,13 +442,13 @@ class GameControllerTest {
     }
     try {
       for (int i = 0; i < connectionIDs.size(); i++) {
-        UUID socketId = controller
+        UUID connectionID = controller
           .getGame(gameId)
           .getPlayers()
           .get(i)
-          .getSocketId();
+          .getConnectionID();
 
-        int index = connectionIDs.indexOf(socketId);
+        int index = connectionIDs.indexOf(connectionID);
 
         for (int j = 1; j <= connectionIDs.size() - 1; j++) {
           int finalJ = j;
@@ -521,13 +512,13 @@ class GameControllerTest {
 
     try {
       for (int i = 0; i < connectionIDs.size(); i++) {
-        UUID socketId = controller
+        UUID connectionID = controller
           .getGame(gameId)
           .getPlayers()
           .get(i)
-          .getSocketId();
+          .getConnectionID();
 
-        int index = connectionIDs.indexOf(socketId);
+        int index = connectionIDs.indexOf(connectionID);
 
         for (int j = 1; j <= connectionIDs.size() - 1; j++) {
           int finalJ = j;

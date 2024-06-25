@@ -7,17 +7,17 @@ import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 public class PlayerChoseObjectiveCardMessage extends ViewUpdatingMessage {
 
   private final String gameId;
-  private final UUID socketId;
+  private final UUID connectionID;
   private final String nickname;
 
   public PlayerChoseObjectiveCardMessage(
     String gamedId,
-    UUID socketId,
+    UUID connectionID,
     String nickname
   ) {
     super(MessageType.PLAYER_CHOSE_OBJECTIVE);
     this.gameId = gamedId;
-    this.socketId = socketId;
+    this.connectionID = connectionID;
     this.nickname = nickname;
   }
 
@@ -25,8 +25,8 @@ public class PlayerChoseObjectiveCardMessage extends ViewUpdatingMessage {
     return gameId;
   }
 
-  public UUID getSocketId() {
-    return socketId;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   public String getNickname() {
@@ -36,7 +36,13 @@ public class PlayerChoseObjectiveCardMessage extends ViewUpdatingMessage {
   @Override
   public String toString() {
     return (
-      getType() + "{" + "gameId='" + gameId + "', socketId=" + socketId + '}'
+      getType() +
+      "{" +
+      "gameId='" +
+      gameId +
+      "', connectionID=" +
+      connectionID +
+      '}'
     );
   }
 }

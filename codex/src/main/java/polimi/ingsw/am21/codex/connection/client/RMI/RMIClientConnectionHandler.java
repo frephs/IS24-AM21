@@ -45,7 +45,7 @@ public class RMIClientConnectionHandler
         "IS24-AM21-CODEX"
       );
       this.rmiConnectionHandler.connect(
-          this.getSocketID(),
+          this.getConnectionID(),
           this.gameEventHandler.getRemoteListener()
         );
       this.connectionEstablished();
@@ -88,7 +88,7 @@ public class RMIClientConnectionHandler
   @Override
   public void createGame(String gameId, int players) {
     try {
-      rmiConnectionHandler.createGame(this.getSocketID(), gameId, players);
+      rmiConnectionHandler.createGame(this.getConnectionID(), gameId, players);
     } catch (RemoteException | EmptyDeckException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -103,7 +103,7 @@ public class RMIClientConnectionHandler
   @Override
   public void connectToGame(String gameId) {
     try {
-      rmiConnectionHandler.joinLobby(this.getSocketID(), gameId);
+      rmiConnectionHandler.joinLobby(this.getConnectionID(), gameId);
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -114,7 +114,7 @@ public class RMIClientConnectionHandler
   @Override
   public void leaveGameLobby() {
     try {
-      this.rmiConnectionHandler.leaveLobby(this.getSocketID());
+      this.rmiConnectionHandler.leaveLobby(this.getConnectionID());
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -126,11 +126,11 @@ public class RMIClientConnectionHandler
   public void createAndConnectToGame(String gameId, int numberPlayers) {
     try {
       rmiConnectionHandler.createGame(
-        this.getSocketID(),
+        this.getConnectionID(),
         gameId,
         numberPlayers
       );
-      rmiConnectionHandler.joinLobby(this.getSocketID(), gameId);
+      rmiConnectionHandler.joinLobby(this.getConnectionID(), gameId);
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -141,7 +141,7 @@ public class RMIClientConnectionHandler
   @Override
   public void lobbySetToken(TokenColor color) {
     try {
-      rmiConnectionHandler.lobbySetTokenColor(this.getSocketID(), color);
+      rmiConnectionHandler.lobbySetTokenColor(this.getConnectionID(), color);
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -152,7 +152,7 @@ public class RMIClientConnectionHandler
   @Override
   public void lobbySetNickname(String nickname) {
     try {
-      rmiConnectionHandler.lobbySetNickname(this.getSocketID(), nickname);
+      rmiConnectionHandler.lobbySetNickname(this.getConnectionID(), nickname);
       this.getObjectiveCards();
     } catch (RemoteException e) {
       this.messageNotSent();
@@ -167,7 +167,7 @@ public class RMIClientConnectionHandler
       gameEventHandler
         .getLocalModel()
         .getObjectiveCards(
-          rmiConnectionHandler.getLobbyObjectiveCards(this.getSocketID())
+          rmiConnectionHandler.getLobbyObjectiveCards(this.getConnectionID())
         );
     } catch (RemoteException e) {
       this.messageNotSent();
@@ -179,7 +179,7 @@ public class RMIClientConnectionHandler
   @Override
   public void lobbyChooseObjectiveCard(Boolean first) {
     try {
-      rmiConnectionHandler.lobbyChooseObjective(this.getSocketID(), first);
+      rmiConnectionHandler.lobbyChooseObjective(this.getConnectionID(), first);
       this.gameEventHandler.getLocalModel().playerChoseObjectiveCard(first);
       //TODO change to clientGameEventHandler
     } catch (RemoteException e) {
@@ -194,7 +194,7 @@ public class RMIClientConnectionHandler
     try {
       gameEventHandler
         .getLocalModel()
-        .getStarterCard(rmiConnectionHandler.getLobbyStarterCard(socketID));
+        .getStarterCard(rmiConnectionHandler.getLobbyStarterCard(connectionID));
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -207,7 +207,7 @@ public class RMIClientConnectionHandler
     if (this.getGameIDWithMessage().isEmpty()) return;
     String gameID = this.getGameIDWithMessage().get();
     try {
-      rmiConnectionHandler.joinGame(this.getSocketID(), gameID, cardSide);
+      rmiConnectionHandler.joinGame(this.getConnectionID(), gameID, cardSide);
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -223,7 +223,7 @@ public class RMIClientConnectionHandler
   ) {
     try {
       this.rmiConnectionHandler.placeCard(
-          this.getSocketID(),
+          this.getConnectionID(),
           playerHandCardNumber,
           side,
           position
@@ -238,7 +238,7 @@ public class RMIClientConnectionHandler
   @Override
   public void leaveLobby() {
     try {
-      rmiConnectionHandler.leaveLobby(this.getSocketID());
+      rmiConnectionHandler.leaveLobby(this.getConnectionID());
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -253,7 +253,7 @@ public class RMIClientConnectionHandler
   ) {
     try {
       this.rmiConnectionHandler.nextTurn(
-          this.getSocketID(),
+          this.getConnectionID(),
           drawingSource,
           deckType
         );
@@ -267,7 +267,7 @@ public class RMIClientConnectionHandler
   @Override
   public void nextTurn() {
     try {
-      rmiConnectionHandler.nextTurn(this.getSocketID());
+      rmiConnectionHandler.nextTurn(this.getConnectionID());
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -278,7 +278,7 @@ public class RMIClientConnectionHandler
   @Override
   public void heartBeat(Runnable successful, Runnable failed) {
     try {
-      rmiConnectionHandler.heartBeat(this.getSocketID());
+      rmiConnectionHandler.heartBeat(this.getConnectionID());
       successful.run();
     } catch (RemoteException e) {
       failed.run();
@@ -288,7 +288,7 @@ public class RMIClientConnectionHandler
   @Override
   public void sendChatMessage(ChatMessage message) {
     try {
-      rmiConnectionHandler.sendChatMessage(getSocketID(), message);
+      rmiConnectionHandler.sendChatMessage(getConnectionID(), message);
     } catch (InvalidActionException e) {
       this.handleInvalidActionException(e);
     } catch (RemoteException e) {

@@ -129,48 +129,52 @@ public class ClientGameEventHandler
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID) {
-    localModel.playerJoinedLobby(gameId, socketID);
-    view.playerJoinedLobby(gameId, socketID);
+  public void playerJoinedLobby(String gameId, UUID connectionID) {
+    localModel.playerJoinedLobby(gameId, connectionID);
+    view.playerJoinedLobby(gameId, connectionID);
   }
 
   @Override
-  public void playerLeftLobby(String gameId, UUID socketID) {
-    localModel.playerLeftLobby(gameId, socketID);
-    view.playerLeftLobby(gameId, socketID);
+  public void playerLeftLobby(String gameId, UUID connectionID) {
+    localModel.playerLeftLobby(gameId, connectionID);
+    view.playerLeftLobby(gameId, connectionID);
   }
 
   @Override
   public void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) {
-    localModel.playerSetToken(gameId, socketID, nickname, token);
-    view.playerSetToken(gameId, socketID, nickname, token);
+    localModel.playerSetToken(gameId, connectionID, nickname, token);
+    view.playerSetToken(gameId, connectionID, nickname, token);
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
-    localModel.playerSetNickname(gameId, socketID, nickname);
-    view.playerSetNickname(gameId, socketID, nickname);
+  public void playerSetNickname(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  ) {
+    localModel.playerSetNickname(gameId, connectionID, nickname);
+    view.playerSetNickname(gameId, connectionID, nickname);
   }
 
   @Override
   public void playerChoseObjectiveCard(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) {
-    localModel.playerChoseObjectiveCard(gameId, socketID, nickname);
-    view.playerChoseObjectiveCard(gameId, socketID, nickname);
+    localModel.playerChoseObjectiveCard(gameId, connectionID, nickname);
+    view.playerChoseObjectiveCard(gameId, connectionID, nickname);
   }
 
   @Override
   public void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -179,7 +183,7 @@ public class ClientGameEventHandler
   ) {
     localModel.playerJoinedGame(
       gameId,
-      socketID,
+      connectionID,
       nickname,
       color,
       handIDs,
@@ -188,7 +192,7 @@ public class ClientGameEventHandler
     );
     view.playerJoinedGame(
       gameId,
-      socketID,
+      connectionID,
       nickname,
       color,
       handIDs,
@@ -504,12 +508,12 @@ public class ClientGameEventHandler
 
   @Override
   public void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {
-    localModel.playerConnectionChanged(socketID, nickname, status);
-    view.playerConnectionChanged(socketID, nickname, status);
+    localModel.playerConnectionChanged(connectionID, nickname, status);
+    view.playerConnectionChanged(connectionID, nickname, status);
   }
 
   @Override

@@ -32,22 +32,22 @@ class LobbyTest {
     this.mockGameboard = new GameBoard(new CardsLoader());
   }
 
-  UUID generateNewSocketID() {
-    UUID socketID;
+  UUID generateNewConnectionID() {
+    UUID connectionID;
     do {
-      socketID = UUID.randomUUID();
-    } while (this.lobby.containsSocketID(socketID));
-    return socketID;
+      connectionID = UUID.randomUUID();
+    } while (this.lobby.containsConnectionID(connectionID));
+    return connectionID;
   }
 
   @Test
   void getRemainingPlayerSlots() {
     assertEquals(MAX_PLAYERS, this.lobby.getRemainingPlayerSlots());
     for (int i = 0; i < MAX_PLAYERS; i++) {
-      UUID socketID = generateNewSocketID();
+      UUID connectionID = generateNewConnectionID();
       try {
         this.lobby.addPlayer(
-            socketID,
+            connectionID,
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           );
@@ -71,10 +71,10 @@ class LobbyTest {
   void getPlayersCount() {
     assertEquals(0, this.lobby.getPlayersCount());
     for (int i = 0; i < MAX_PLAYERS; ++i) {
-      UUID socketID = generateNewSocketID();
+      UUID connectionID = generateNewConnectionID();
       try {
         this.lobby.addPlayer(
-            socketID,
+            connectionID,
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           );
@@ -92,13 +92,13 @@ class LobbyTest {
 
   @Test
   void addPlayer() {
-    UUID socketID = generateNewSocketID();
-    UUID firstAdded = socketID;
-    UUID lastAdded = socketID;
+    UUID connectionID = generateNewConnectionID();
+    UUID firstAdded = connectionID;
+    UUID lastAdded = connectionID;
     for (int i = 0; i < MAX_PLAYERS; ++i) {
       try {
         this.lobby.addPlayer(
-            socketID,
+            connectionID,
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           );
@@ -107,14 +107,14 @@ class LobbyTest {
       } catch (EmptyDeckException e) {
         fail("Invalid mock GameBoard, the decks are empty");
       }
-      lastAdded = socketID;
-      socketID = generateNewSocketID();
+      lastAdded = connectionID;
+      connectionID = generateNewConnectionID();
     }
     assertThrows(
       LobbyFullException.LobbyFullInternalException.class,
       () ->
         this.lobby.addPlayer(
-            generateNewSocketID(),
+            generateNewConnectionID(),
             this.mockGameboard.drawObjectiveCardPair(),
             this.mockGameboard.drawStarterCardFromDeck()
           )
@@ -134,10 +134,10 @@ class LobbyTest {
 
   @Test
   void removePlayer() {
-    UUID socketID = generateNewSocketID();
+    UUID connectionID = generateNewConnectionID();
     try {
       this.lobby.addPlayer(
-          socketID,
+          connectionID,
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
@@ -147,9 +147,9 @@ class LobbyTest {
       fail("Invalid mock GameBoard, the decks are empty");
     }
 
-    UUID fakeUUID = generateNewSocketID();
+    UUID fakeUUID = generateNewConnectionID();
     try {
-      this.lobby.removePlayer(socketID);
+      this.lobby.removePlayer(connectionID);
     } catch (PlayerNotFoundGameException e) {
       fail("Player not found");
     }
@@ -161,10 +161,10 @@ class LobbyTest {
 
   @Test
   void setNickname() {
-    UUID socketID = generateNewSocketID();
+    UUID connectionID = generateNewConnectionID();
     try {
       this.lobby.addPlayer(
-          socketID,
+          connectionID,
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
@@ -175,25 +175,25 @@ class LobbyTest {
     }
 
     try {
-      this.lobby.setNickname(socketID, "test");
+      this.lobby.setNickname(connectionID, "test");
     } catch (NicknameAlreadyTakenException | PlayerNotFoundGameException e) {
       fail(e);
     }
     Optional<String> playerNickname = Optional.empty();
     try {
-      playerNickname = this.lobby.getPlayerNickname(socketID);
+      playerNickname = this.lobby.getPlayerNickname(connectionID);
     } catch (PlayerNotFoundGameException e) {
       fail(e);
     }
     if (playerNickname.isEmpty()) fail(
-      "could not find player with socket id" + socketID
+      "could not find player with socket id" + connectionID
     );
     assertEquals(playerNickname.get(), "test");
 
-    UUID socketID2 = generateNewSocketID();
+    UUID connectionID2 = generateNewConnectionID();
     try {
       this.lobby.addPlayer(
-          socketID2,
+          connectionID2,
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
@@ -205,11 +205,11 @@ class LobbyTest {
 
     assertThrows(
       NicknameAlreadyTakenException.class,
-      () -> this.lobby.setNickname(socketID2, "test")
+      () -> this.lobby.setNickname(connectionID2, "test")
     );
 
     try {
-      this.lobby.setNickname(socketID2, "test2");
+      this.lobby.setNickname(connectionID2, "test2");
     } catch (NicknameAlreadyTakenException e) {
       fail("Wrongfully thrown NicknameAlreadyTakenException");
     } catch (PlayerNotFoundGameException e) {
@@ -219,10 +219,10 @@ class LobbyTest {
 
   @Test
   void setToken() {
-    UUID socketID = generateNewSocketID();
+    UUID connectionID = generateNewConnectionID();
     try {
       this.lobby.addPlayer(
-          socketID,
+          connectionID,
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
@@ -233,7 +233,7 @@ class LobbyTest {
     }
 
     try {
-      this.lobby.setToken(socketID, TokenColor.GREEN);
+      this.lobby.setToken(connectionID, TokenColor.GREEN);
     } catch (TokenAlreadyTakenException e) {
       fail("Wrongfully thrown TokenAlreadyTakenException");
     } catch (PlayerNotFoundGameException e) {
@@ -241,19 +241,19 @@ class LobbyTest {
     }
     Optional<TokenColor> playerTokenColor = Optional.empty();
     try {
-      playerTokenColor = this.lobby.getPlayerTokenColor(socketID);
+      playerTokenColor = this.lobby.getPlayerTokenColor(connectionID);
     } catch (PlayerNotFoundGameException e) {
       fail("Wrongfully thrown PlayerNotFoundGameException");
     }
     if (playerTokenColor.isEmpty()) fail(
-      "could not find player with socket id" + socketID
+      "could not find player with socket id" + connectionID
     );
     assertEquals(playerTokenColor.get(), TokenColor.GREEN);
 
-    UUID socketID2 = generateNewSocketID();
+    UUID connectionID2 = generateNewConnectionID();
     try {
       this.lobby.addPlayer(
-          socketID2,
+          connectionID2,
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
@@ -265,10 +265,10 @@ class LobbyTest {
 
     assertThrows(
       TokenAlreadyTakenException.class,
-      () -> this.lobby.setToken(socketID2, TokenColor.GREEN)
+      () -> this.lobby.setToken(connectionID2, TokenColor.GREEN)
     );
     try {
-      this.lobby.setToken(socketID2, TokenColor.RED);
+      this.lobby.setToken(connectionID2, TokenColor.RED);
     } catch (TokenAlreadyTakenException e) {
       fail("Wrongfully thrown TokenAlreadyTakenException");
     } catch (PlayerNotFoundGameException e) {
@@ -278,10 +278,10 @@ class LobbyTest {
 
   @Test
   void finalizePlayer() {
-    UUID socketID = generateNewSocketID();
+    UUID connectionID = generateNewConnectionID();
     try {
       this.lobby.addPlayer(
-          socketID,
+          connectionID,
           this.mockGameboard.drawObjectiveCardPair(),
           this.mockGameboard.drawStarterCardFromDeck()
         );
@@ -292,26 +292,26 @@ class LobbyTest {
     }
 
     try {
-      this.lobby.setNickname(socketID, "test");
+      this.lobby.setNickname(connectionID, "test");
     } catch (NicknameAlreadyTakenException | PlayerNotFoundGameException e) {
       fail(e);
     }
 
     Optional<String> playerNickname = Optional.empty();
     try {
-      playerNickname = this.lobby.getPlayerNickname(socketID);
+      playerNickname = this.lobby.getPlayerNickname(connectionID);
     } catch (PlayerNotFoundGameException e) {
       fail(e);
     }
     if (playerNickname.isEmpty()) fail(
-      "could not find player with socket id" + socketID
+      "could not find player with socket id" + connectionID
     );
     assertEquals(playerNickname.get(), "test");
   }
 
   @Test
   void getPlayerObjectiveCards() {
-    UUID playerId = generateNewSocketID();
+    UUID playerId = generateNewConnectionID();
     try {
       CardPair<ObjectiveCard> objectiveCards =
         this.mockGameboard.drawObjectiveCardPair();
@@ -339,7 +339,7 @@ class LobbyTest {
   void setObjectiveCard() {}
 
   @Test
-  void containsSocketID() {
+  void containsconnectionID() {
     UUID existingID = UUID.randomUUID();
     UUID nonExistingID = UUID.randomUUID();
     while (nonExistingID.equals(existingID)) nonExistingID = UUID.randomUUID();
@@ -353,8 +353,8 @@ class LobbyTest {
       fail("Failed to add player", e);
     }
 
-    assertTrue(this.lobby.containsSocketID(existingID));
-    assertFalse(this.lobby.containsSocketID(nonExistingID));
+    assertTrue(this.lobby.containsConnectionID(existingID));
+    assertFalse(this.lobby.containsConnectionID(nonExistingID));
   }
 
   @Test

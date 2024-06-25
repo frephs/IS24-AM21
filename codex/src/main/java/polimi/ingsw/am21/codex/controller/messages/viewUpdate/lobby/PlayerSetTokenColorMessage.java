@@ -8,19 +8,19 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
 
   private final String gameId;
-  private final UUID socketId;
+  private final UUID connectionID;
   private final TokenColor color;
   private final String nickname;
 
   public PlayerSetTokenColorMessage(
     String gamedId,
-    UUID socketId,
+    UUID connectionID,
     String nickname,
     TokenColor color
   ) {
     super(MessageType.PLAYER_SET_TOKEN_COLOR);
     this.gameId = gamedId;
-    this.socketId = socketId;
+    this.connectionID = connectionID;
     this.color = color;
     this.nickname = nickname;
   }
@@ -29,8 +29,8 @@ public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
     return gameId;
   }
 
-  public UUID getSocketId() {
-    return socketId;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   public TokenColor getColor() {
@@ -48,8 +48,8 @@ public class PlayerSetTokenColorMessage extends ViewUpdatingMessage {
       "{" +
       "gameId='" +
       gameId +
-      "', socketId=" +
-      socketId +
+      "', connectionID=" +
+      connectionID +
       ", color=" +
       color +
       ", nickname='" +

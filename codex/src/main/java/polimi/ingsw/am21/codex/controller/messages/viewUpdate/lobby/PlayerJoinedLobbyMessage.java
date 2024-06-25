@@ -7,20 +7,20 @@ import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 public class PlayerJoinedLobbyMessage extends ViewUpdatingMessage {
 
   private final String lobbyId;
-  private final UUID socketId;
+  private final UUID connectionID;
 
-  public PlayerJoinedLobbyMessage(String lobbyId, UUID socketId) {
+  public PlayerJoinedLobbyMessage(String lobbyId, UUID connectionID) {
     super(MessageType.PLAYER_JOINED_LOBBY);
     this.lobbyId = lobbyId;
-    this.socketId = socketId;
+    this.connectionID = connectionID;
   }
 
   public String getLobbyId() {
     return lobbyId;
   }
 
-  public UUID getSocketId() {
-    return socketId;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   @Override
@@ -31,8 +31,8 @@ public class PlayerJoinedLobbyMessage extends ViewUpdatingMessage {
       "lobbyId='" +
       lobbyId +
       '\'' +
-      ", socketId=" +
-      socketId +
+      ", connectionID=" +
+      connectionID +
       '}'
     );
   }

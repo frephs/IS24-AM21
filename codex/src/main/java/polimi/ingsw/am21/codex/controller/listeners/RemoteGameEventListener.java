@@ -53,28 +53,29 @@ public interface RemoteGameEventListener extends Remote {
   /**
    * Interface method used to process the event of a player joining a game lobby.
    * @param gameId The identifier of the game lobby that the player has joined.
-   * @param socketID The unique identifier of the player that has joined the lobby.
+   * @param connectionID The unique identifier of the player that has joined the lobby.
    * */
-  void playerJoinedLobby(String gameId, UUID socketID) throws RemoteException;
+  void playerJoinedLobby(String gameId, UUID connectionID)
+    throws RemoteException;
 
   /**
    * Interface method used to process the event of a player leaving a game lobby.
    * @param gameId The identifier of the game lobby that the player has left.
-   * @param socketID The unique identifier of the player that has left the lobby.
+   * @param connectionID The unique identifier of the player that has left the lobby.
    * */
-  void playerLeftLobby(String gameId, UUID socketID) throws RemoteException;
+  void playerLeftLobby(String gameId, UUID connectionID) throws RemoteException;
 
   /**
    * Interface method used to process the event of a player choosing their token color.
    * @param gameId The identifier of the game lobby in which the player has set their token color.
-   * @param socketID The unique identifier of the player that has set their token color.
+   * @param connectionID The unique identifier of the player that has set their token color.
    * @param nickname The nickname of the player that has set their token color,
    *                 if they have chosen it already
    * @param token The token color that the player has chosen
    * */
   void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) throws RemoteException;
@@ -82,26 +83,29 @@ public interface RemoteGameEventListener extends Remote {
   /**
    * Interface method used to process the event of a player choosing their nickname.
    * @param gameId The identifier of the game lobby in which the player has set their nickname.
-   * @param socketID The unique identifier of the player that has set their nickname.
+   * @param connectionID The unique identifier of the player that has set their nickname.
    * @param nickname The nickname of the player that has set their nickname
    * */
-  void playerSetNickname(String gameId, UUID socketID, String nickname)
+  void playerSetNickname(String gameId, UUID connectionID, String nickname)
     throws RemoteException;
 
   /**
    * Interface method used to process the event of a player choosing their objective card.
    * @param gameId The identifier of the game lobby in which the player has set their objective card.
-   * @param socketID The unique identifier of the player that has set their objective card.
+   * @param connectionID The unique identifier of the player that has set their objective card.
    * @param nickname The nickname of the player that has set their objective card, if they have chosen it already
    */
-  void playerChoseObjectiveCard(String gameId, UUID socketID, String nickname)
-    throws RemoteException;
+  void playerChoseObjectiveCard(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  ) throws RemoteException;
 
   /**
    * Interface method used to process the event of a player joining a game.
    * This happens when a player chooses which side of their starter card they prefer to place
    * @param gameId The identifier of the game that the player has joined.
-   * @param socketID The unique identifier of the player that has joined the game.
+   * @param connectionID The unique identifier of the player that has joined the game.
    * @param nickname The nickname of the player that has joined the game.
    * @param color The token color of the player that has joined the game.
    * @param handIDs The unique identifiers of the cards in the player's hand.
@@ -110,7 +114,7 @@ public interface RemoteGameEventListener extends Remote {
    * */
   void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -242,13 +246,13 @@ public interface RemoteGameEventListener extends Remote {
 
   /**
    * Interface method used to process the event of a player's connection status changing.
-   * @param socketID The unique identifier of the player whose connection status has changed.
+   * @param connectionID The unique identifier of the player whose connection status has changed.
    *                 This is the identifier that the player uses to connect to the server.
    * @param nickname The nickname of the player whose connection status has changed.
    * @param status The new connection status of the player.
    * */
   void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) throws RemoteException;

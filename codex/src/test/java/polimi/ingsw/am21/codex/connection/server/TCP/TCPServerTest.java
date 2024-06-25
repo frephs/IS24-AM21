@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 import polimi.ingsw.am21.codex.Main;
+import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
@@ -64,7 +65,10 @@ class TCPServerTest {
     );
     Socket clientSocket;
 
-    TCPServer server = new TCPServer(4567, new GameController());
+    TCPServer server = new TCPServer(
+      ConnectionType.TCP.getDefaultPort(),
+      new GameController()
+    );
     try (ExecutorService executor = Executors.newCachedThreadPool()) {
       executor.execute(() -> {
         try {
@@ -118,14 +122,14 @@ class TCPServerTest {
         }
       });
 
-      UUID socketID = UUID.randomUUID();
+      UUID connectionID = UUID.randomUUID();
       List.of(
-        new ConnectMessage(socketID),
-        new CreateGameMessage(socketID, "TestGame", 4),
-        new GetAvailableGameLobbiesMessage(socketID),
-        new JoinLobbyMessage(socketID, "TestGame"),
-        new SetTokenColorMessage(socketID, TokenColor.RED, "TestGame"),
-        new SetNicknameMessage(socketID, "TestNickname", "TestGame")
+        new ConnectMessage(connectionID),
+        new CreateGameMessage(connectionID, "TestGame", 4),
+        new GetAvailableGameLobbiesMessage(connectionID),
+        new JoinLobbyMessage(connectionID, "TestGame"),
+        new SetTokenColorMessage(connectionID, TokenColor.RED, "TestGame"),
+        new SetNicknameMessage(connectionID, "TestNickname", "TestGame")
       ).forEach(message -> {
         try {
           outputStream.writeObject(message);

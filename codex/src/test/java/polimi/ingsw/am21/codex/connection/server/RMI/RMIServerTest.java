@@ -53,20 +53,20 @@ class RMIServerTest {
 
       //generate new random UUID
 
-      UUID socketID = UUID.randomUUID();
+      UUID connectionID = UUID.randomUUID();
       assertDoesNotThrow(() -> {
         client.connect(UUID.randomUUID(), new DummyRemoteGameEventLister());
-        client.connect(socketID, new DummyRemoteGameEventLister());
+        client.connect(connectionID, new DummyRemoteGameEventLister());
         operationsLatch.countDown();
-        client.createGame(socketID, "TestGame", 4);
+        client.createGame(connectionID, "TestGame", 4);
         operationsLatch.countDown();
-        client.joinLobby(socketID, "TestGame");
+        client.joinLobby(connectionID, "TestGame");
         operationsLatch.countDown();
-        client.lobbySetTokenColor(socketID, TokenColor.RED);
+        client.lobbySetTokenColor(connectionID, TokenColor.RED);
         operationsLatch.countDown();
-        client.lobbySetNickname(socketID, "TestNickname");
+        client.lobbySetNickname(connectionID, "TestNickname");
         operationsLatch.countDown();
-        client.lobbyChooseObjective(socketID, true);
+        client.lobbyChooseObjective(connectionID, true);
         operationsLatch.countDown();
       });
 

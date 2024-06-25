@@ -929,7 +929,7 @@ public class Gui extends Application implements View {
           .map(
             gameBoard ->
               Optional.ofNullable(gameBoard.getPlayer().getNickname()).orElse(
-                gameBoard.getPlayer().getSocketID().toString()
+                gameBoard.getPlayer().getConnectionID().toString()
               )
           )
           .orElseThrow() +
@@ -1521,10 +1521,10 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID) {
-    View.super.playerJoinedLobby(gameId, socketID);
+  public void playerJoinedLobby(String gameId, UUID connectionID) {
+    View.super.playerJoinedLobby(gameId, connectionID);
     if (gameId.equals(localModel.getGameId().orElse(null))) {
-      if (socketID.equals(localModel.getSocketID())) {
+      if (connectionID.equals(localModel.getConnectionID())) {
         drawAvailableTokenColors();
       } else {
         drawLobby();
@@ -1539,8 +1539,8 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void playerLeftLobby(String gameId, UUID socketID) {
-    View.super.playerLeftLobby(gameId, socketID);
+  public void playerLeftLobby(String gameId, UUID connectionID) {
+    View.super.playerLeftLobby(gameId, connectionID);
 
     ClientContext context = localModel
       .getClientContextContainer()
@@ -1554,12 +1554,12 @@ public class Gui extends Application implements View {
   @Override
   public void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) {
     if (gameId.equals(localModel.getGameId().orElse(null))) {
-      if (socketID.equals(localModel.getSocketID())) {
+      if (connectionID.equals(localModel.getConnectionID())) {
         drawNicknameChoice();
         client.getObjectiveCards();
       } else if (
@@ -1567,7 +1567,7 @@ public class Gui extends Application implements View {
           .getLocalLobby()
           .map(
             lobby ->
-              lobby.getPlayers().get(localModel.getSocketID()).getToken() ==
+              lobby.getPlayers().get(localModel.getConnectionID()).getToken() ==
               null
           )
           .orElse(false)
@@ -1579,9 +1579,9 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
+  public void playerSetNickname(String gameId, UUID connectionID, String nickname) {
     if (gameId.equals(localModel.getGameId().orElse(null))) {
-      if (socketID.equals(localModel.getSocketID())) {
+      if (connectionID.equals(localModel.getConnectionID())) {
         drawObjectiveCardChoice();
         client.getStarterCard();
       }
@@ -1593,12 +1593,12 @@ public class Gui extends Application implements View {
   @Override
   public void playerChoseObjectiveCard(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) {
-    View.super.playerChoseObjectiveCard(gameId, socketID, nickname);
+    View.super.playerChoseObjectiveCard(gameId, connectionID, nickname);
     if (gameId.equals(localModel.getGameId().orElse(null))) {
-      if (socketID.equals(localModel.getSocketID())) {
+      if (connectionID.equals(localModel.getConnectionID())) {
         drawStarterCardSides();
       } else {
         drawLobby();
@@ -1612,7 +1612,9 @@ public class Gui extends Application implements View {
     visibleUserNickname = gameInfo
       .getUsers()
       .stream()
-      .filter(user -> user.getSocketID().equals(localModel.getSocketID()))
+      .filter(
+        user -> user.getConnectionID().equals(localModel.getConnectionID())
+      )
       .findFirst()
       .map(GameInfo.GameInfoUser::getNickname)
       .orElse(null);
@@ -1650,11 +1652,11 @@ public class Gui extends Application implements View {
 
   @Override
   public void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {
-    View.super.playerConnectionChanged(socketID, nickname, status);
+    View.super.playerConnectionChanged(connectionID, nickname, status);
     //TODO make it visible in the leaderBoard
     if (
       localModel
@@ -1680,7 +1682,8 @@ public class Gui extends Application implements View {
         .getLocalLobby()
         .map(
           lobby ->
-            lobby.getPlayers().get(localModel.getSocketID()).getToken() == null
+            lobby.getPlayers().get(localModel.getConnectionID()).getToken() ==
+            null
         )
         .orElse(false)
     ) drawAvailableTokenColors();

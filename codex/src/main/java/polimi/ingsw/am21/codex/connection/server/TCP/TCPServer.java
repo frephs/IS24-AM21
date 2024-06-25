@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.net.PortUnreachableException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import polimi.ingsw.am21.codex.connection.server.AbstractServer;
@@ -31,7 +27,6 @@ public class TCPServer extends AbstractServer {
       serverReadyLatch.countDown();
       System.out.println("TCP server ready on port " + port);
       while (true) {
-        UUID socketId = UUID.randomUUID();
         try {
           Socket connectionSocket = serverSocket.accept();
           System.out.println(

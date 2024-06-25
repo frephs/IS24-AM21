@@ -10,7 +10,7 @@ import polimi.ingsw.am21.codex.model.Player.TokenColor;
 public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
 
   private final String gameId;
-  private final UUID socketId;
+  private final UUID connectionID;
   private final String nickname;
   private final TokenColor color;
   private final List<Integer> handIDs;
@@ -19,7 +19,7 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
 
   public PlayerJoinedGameMessage(
     String gameId,
-    UUID socketId,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -28,7 +28,7 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
   ) {
     super(MessageType.PLAYER_JOINED_GAME);
     this.gameId = gameId;
-    this.socketId = socketId;
+    this.connectionID = connectionID;
     this.nickname = nickname;
     this.color = color;
     this.handIDs = handIDs;
@@ -40,8 +40,8 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
     return gameId;
   }
 
-  public UUID getSocketId() {
-    return socketId;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   public String getNickname() {
@@ -71,8 +71,8 @@ public class PlayerJoinedGameMessage extends ViewUpdatingMessage {
       "{" +
       "gameId=" +
       gameId +
-      ", socketId=" +
-      socketId +
+      ", connectionID=" +
+      connectionID +
       ", nickname='" +
       nickname +
       '\'' +

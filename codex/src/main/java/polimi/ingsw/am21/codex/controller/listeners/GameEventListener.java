@@ -24,29 +24,33 @@ public interface GameEventListener extends RemoteGameEventListener {
   void gameDeleted(String gameId);
 
   @Override
-  void playerJoinedLobby(String gameId, UUID socketID);
+  void playerJoinedLobby(String gameId, UUID connectionID);
 
   @Override
-  void playerLeftLobby(String gameId, UUID socketID);
+  void playerLeftLobby(String gameId, UUID connectionID);
 
   @Override
   void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   );
 
   @Override
-  void playerSetNickname(String gameId, UUID socketID, String nickname);
+  void playerSetNickname(String gameId, UUID connectionID, String nickname);
 
   @Override
-  void playerChoseObjectiveCard(String gameId, UUID socketID, String nickname);
+  void playerChoseObjectiveCard(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  );
 
   @Override
   void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -118,7 +122,7 @@ public interface GameEventListener extends RemoteGameEventListener {
 
   @Override
   void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   );

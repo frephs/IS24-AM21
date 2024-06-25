@@ -81,12 +81,12 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {
     broadcast.accept(
-      new PlayerConnectionChangedMessage(socketID, nickname, status)
+      new PlayerConnectionChangedMessage(connectionID, nickname, status)
     );
   }
 
@@ -181,47 +181,53 @@ public class TCPServerControllerListener implements GameEventListener {
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID) {
-    broadcast.accept(new PlayerJoinedLobbyMessage(gameId, socketID));
+  public void playerJoinedLobby(String gameId, UUID connectionID) {
+    broadcast.accept(new PlayerJoinedLobbyMessage(gameId, connectionID));
   }
 
   @Override
-  public void playerLeftLobby(String gameId, UUID socketID) {
-    broadcast.accept(new PlayerLeftLobbyMessage(gameId, socketID));
+  public void playerLeftLobby(String gameId, UUID connectionID) {
+    broadcast.accept(new PlayerLeftLobbyMessage(gameId, connectionID));
   }
 
   @Override
   public void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) {
     broadcast.accept(
-      new PlayerSetTokenColorMessage(gameId, socketID, nickname, token)
+      new PlayerSetTokenColorMessage(gameId, connectionID, nickname, token)
     );
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname) {
-    broadcast.accept(new PlayerSetNicknameMessage(gameId, socketID, nickname));
+  public void playerSetNickname(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  ) {
+    broadcast.accept(
+      new PlayerSetNicknameMessage(gameId, connectionID, nickname)
+    );
   }
 
   @Override
   public void playerChoseObjectiveCard(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) {
     broadcast.accept(
-      new PlayerChoseObjectiveCardMessage(gameId, socketID, nickname)
+      new PlayerChoseObjectiveCardMessage(gameId, connectionID, nickname)
     );
   }
 
   @Override
   public void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -231,7 +237,7 @@ public class TCPServerControllerListener implements GameEventListener {
     broadcast.accept(
       new PlayerJoinedGameMessage(
         gameId,
-        socketID,
+        connectionID,
         nickname,
         color,
         handIDs,

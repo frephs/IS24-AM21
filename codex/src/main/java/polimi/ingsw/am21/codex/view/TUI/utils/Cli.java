@@ -665,7 +665,7 @@ public class Cli implements View {
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID) {
-    View.super.playerJoinedLobby(gameId, socketID);
+  public void playerJoinedLobby(String gameId, UUID connectionID) {
+    View.super.playerJoinedLobby(gameId, connectionID);
   }
 }

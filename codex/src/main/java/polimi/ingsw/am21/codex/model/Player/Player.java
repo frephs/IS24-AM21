@@ -18,10 +18,10 @@ public class Player {
   private final PlayerBoard board;
   private final TokenColor token;
   private int points;
-  private final UUID socketId;
+  private final UUID connectionID;
   private Boolean cardPlaced = false;
 
-  Player(PlayerBuilder builder, UUID socketId)
+  Player(PlayerBuilder builder, UUID connectionID)
     throws IllegalCardSideChoiceException, IllegalPlacingPositionException {
     this.nickname = builder.nickname;
     this.token = builder.token;
@@ -31,11 +31,11 @@ public class Player {
       builder.starterCard,
       builder.getObjectiveCard().orElse(null)
     );
-    this.socketId = socketId;
+    this.connectionID = connectionID;
   }
 
-  public UUID getSocketId() {
-    return socketId;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   public static class PlayerBuilder {
@@ -148,10 +148,10 @@ public class Player {
     /**
      * @return a functioning player
      */
-    public Player build(UUID socketId)
+    public Player build(UUID connectionID)
       throws IncompletePlayerBuilderException, IllegalCardSideChoiceException, IllegalPlacingPositionException {
       IncompletePlayerBuilderException.checkPlayerBuilder(this);
-      return new Player(this, socketId);
+      return new Player(this, connectionID);
     }
 
     /**

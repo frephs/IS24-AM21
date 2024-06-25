@@ -50,46 +50,49 @@ public class LocalModelGameEventListener
   }
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID)
+  public void playerJoinedLobby(String gameId, UUID connectionID)
     throws RemoteException {
-    listener.playerJoinedLobby(gameId, socketID);
+    listener.playerJoinedLobby(gameId, connectionID);
   }
 
   @Override
-  public void playerLeftLobby(String gameId, UUID socketID)
+  public void playerLeftLobby(String gameId, UUID connectionID)
     throws RemoteException {
-    listener.playerLeftLobby(gameId, socketID);
+    listener.playerLeftLobby(gameId, connectionID);
   }
 
   @Override
   public void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) throws RemoteException {
-    listener.playerSetToken(gameId, socketID, nickname, token);
+    listener.playerSetToken(gameId, connectionID, nickname, token);
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname)
-    throws RemoteException {
-    listener.playerSetNickname(gameId, socketID, nickname);
+  public void playerSetNickname(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  ) throws RemoteException {
+    listener.playerSetNickname(gameId, connectionID, nickname);
   }
 
   @Override
   public void playerChoseObjectiveCard(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) throws RemoteException {
-    listener.playerChoseObjectiveCard(gameId, socketID, nickname);
+    listener.playerChoseObjectiveCard(gameId, connectionID, nickname);
   }
 
   @Override
   public void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -98,7 +101,7 @@ public class LocalModelGameEventListener
   ) throws RemoteException {
     listener.playerJoinedGame(
       gameId,
-      socketID,
+      connectionID,
       nickname,
       color,
       handIDs,
@@ -220,11 +223,11 @@ public class LocalModelGameEventListener
 
   @Override
   public void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) throws RemoteException {
-    listener.playerConnectionChanged(socketID, nickname, status);
+    listener.playerConnectionChanged(connectionID, nickname, status);
   }
 
   @Override

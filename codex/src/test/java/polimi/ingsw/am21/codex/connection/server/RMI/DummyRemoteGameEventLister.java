@@ -38,36 +38,39 @@ public class DummyRemoteGameEventLister
   public void gameDeleted(String gameId) throws RemoteException {}
 
   @Override
-  public void playerJoinedLobby(String gameId, UUID socketID)
+  public void playerJoinedLobby(String gameId, UUID connectionID)
     throws RemoteException {}
 
   @Override
-  public void playerLeftLobby(String gameId, UUID socketID)
+  public void playerLeftLobby(String gameId, UUID connectionID)
     throws RemoteException {}
 
   @Override
   public void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) throws RemoteException {}
 
   @Override
-  public void playerSetNickname(String gameId, UUID socketID, String nickname)
-    throws RemoteException {}
+  public void playerSetNickname(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  ) throws RemoteException {}
 
   @Override
   public void playerChoseObjectiveCard(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) throws RemoteException {}
 
   @Override
   public void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -138,7 +141,7 @@ public class DummyRemoteGameEventLister
 
   @Override
   public void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) throws RemoteException {}

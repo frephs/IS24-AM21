@@ -113,9 +113,9 @@ public interface View extends GameEventListener {
   }
 
   @Override
-  default void playerJoinedLobby(String gameId, UUID socketID) {
+  default void playerJoinedLobby(String gameId, UUID connectionID) {
     String message;
-    if (getLocalModel().getSocketID().equals(socketID)) {
+    if (getLocalModel().getConnectionID().equals(connectionID)) {
       message = "You joined the game " + gameId;
     } else if (
       getLocalModel()
@@ -123,19 +123,19 @@ public interface View extends GameEventListener {
         .map(gameBoard -> gameBoard.getGameId().equals(gameId))
         .orElse(false)
     ) {
-      message = socketID.toString() + " joined your game";
+      message = connectionID.toString() + " joined your game";
     } else {
-      message = socketID.toString() + " joined game " + gameId;
+      message = connectionID.toString() + " joined game " + gameId;
     }
 
     postNotification(NotificationType.UPDATE, message);
   }
 
   @Override
-  default void playerLeftLobby(String gameId, UUID socketID) {
+  default void playerLeftLobby(String gameId, UUID connectionID) {
     String message;
 
-    if (getLocalModel().getSocketID().equals(socketID)) {
+    if (getLocalModel().getConnectionID().equals(connectionID)) {
       message = "You left the lobby of the game " + gameId;
     } else if (
       getLocalModel()
@@ -143,9 +143,9 @@ public interface View extends GameEventListener {
         .map(gameBoard -> gameBoard.getGameId().equals(gameId))
         .orElse(false)
     ) {
-      message = socketID.toString() + " left your game lobby";
+      message = connectionID.toString() + " left your game lobby";
     } else {
-      message = socketID.toString() + " left the game lobby " + gameId;
+      message = connectionID.toString() + " left the game lobby " + gameId;
     }
 
     postNotification(NotificationType.UPDATE, message);
@@ -154,19 +154,19 @@ public interface View extends GameEventListener {
   @Override
   default void playerSetToken(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor token
   ) {
     postNotification(
       NotificationType.UPDATE,
       new String[] {
-        getLocalModel().getSocketID().equals(socketID)
+        getLocalModel().getConnectionID().equals(connectionID)
           ? "You"
           : ("The player " +
             (nickname != null
                 ? nickname
-                : socketID.toString().substring(0, 6))),
+                : connectionID.toString().substring(0, 6))),
         " set their token to ",
       },
       token,
@@ -177,14 +177,14 @@ public interface View extends GameEventListener {
   @Override
   default void playerSetNickname(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) {
     postNotification(
       NotificationType.UPDATE,
-      getLocalModel().getSocketID().equals(socketID)
+      getLocalModel().getConnectionID().equals(connectionID)
         ? "You set your nickname to " + nickname
-        : socketID.toString().substring(0, 6) +
+        : connectionID.toString().substring(0, 6) +
         " set their nickname to " +
         nickname
     );
@@ -193,13 +193,13 @@ public interface View extends GameEventListener {
   @Override
   default void playerChoseObjectiveCard(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname
   ) {
     postNotification(
       NotificationType.UPDATE,
       "Player " +
-      (nickname != null ? nickname : socketID.toString().substring(0, 6)) +
+      (nickname != null ? nickname : connectionID.toString().substring(0, 6)) +
       " has chosen their secret objective card"
     );
   }
@@ -207,7 +207,7 @@ public interface View extends GameEventListener {
   @Override
   default void playerJoinedGame(
     String gameId,
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     TokenColor color,
     List<Integer> handIDs,
@@ -232,8 +232,8 @@ public interface View extends GameEventListener {
         .getLocalGameBoard()
         .orElseThrow()
         .getCurrentPlayer()
-        .getSocketID()
-        .equals(getLocalModel().getSocketID())
+        .getConnectionID()
+        .equals(getLocalModel().getConnectionID())
     ) {
       postNotification(NotificationType.UPDATE, "It's your turn. ");
     } else {
@@ -379,7 +379,7 @@ public interface View extends GameEventListener {
 
   @Override
   default void playerConnectionChanged(
-    UUID socketID,
+    UUID connectionID,
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {

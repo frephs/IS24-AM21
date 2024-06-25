@@ -21,7 +21,7 @@ import polimi.ingsw.am21.codex.view.View;
 public abstract class ClientConnectionHandler {
 
   protected final ClientGameEventHandler gameEventHandler;
-  protected UUID socketID;
+  protected UUID connectionID;
 
   protected final String host;
   protected final Integer port;
@@ -40,14 +40,14 @@ public abstract class ClientConnectionHandler {
   ) {
     this.host = host;
     this.port = port;
-    this.socketID = UUID.randomUUID();
+    this.connectionID = UUID.randomUUID();
     this.gameEventHandler = gameEventHandler;
-    this.gameEventHandler.getLocalModel().setSocketId(socketID);
+    this.gameEventHandler.getLocalModel().setConnectionID(connectionID);
     this.view = view;
   }
 
-  protected UUID getSocketID() {
-    return gameEventHandler.getLocalModel().getSocketID();
+  protected UUID getConnectionID() {
+    return gameEventHandler.getLocalModel().getConnectionID();
   }
 
   View getView() {
@@ -232,7 +232,7 @@ public abstract class ClientConnectionHandler {
     this.connectionStatus =
       GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);
-    System.out.println("Your ID is: " + this.getSocketID());
+    System.out.println("Your ID is: " + this.getConnectionID());
     Runnable heartBeatRunnable = new Runnable() {
       @Override
       public void run() {

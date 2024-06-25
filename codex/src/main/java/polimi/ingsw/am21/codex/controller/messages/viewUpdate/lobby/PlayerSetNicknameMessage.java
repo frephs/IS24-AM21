@@ -7,17 +7,17 @@ import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
 public class PlayerSetNicknameMessage extends ViewUpdatingMessage {
 
   private final String gameId;
-  private final UUID socketId;
+  private final UUID connectionID;
   private final String nickname;
 
   public PlayerSetNicknameMessage(
     String gameId,
-    UUID socketId,
+    UUID connectionID,
     String nickname
   ) {
     super(MessageType.PLAYER_SET_NICKNAME);
     this.gameId = gameId;
-    this.socketId = socketId;
+    this.connectionID = connectionID;
     this.nickname = nickname;
   }
 
@@ -25,8 +25,8 @@ public class PlayerSetNicknameMessage extends ViewUpdatingMessage {
     return gameId;
   }
 
-  public UUID getSocketId() {
-    return socketId;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   public String getNickname() {

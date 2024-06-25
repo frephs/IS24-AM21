@@ -8,14 +8,13 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
-import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
 public class LocalPlayer {
 
-  private final UUID socketID;
+  private final UUID connectionID;
   private String nickname;
   private TokenColor token;
   private int points;
@@ -41,8 +40,8 @@ public class LocalPlayer {
   private final Map<Position, Pair<Card, CardSideType>> playedCards =
     new HashMap<>();
 
-  public LocalPlayer(UUID socketID) {
-    this.socketID = socketID;
+  public LocalPlayer(UUID connectionID) {
+    this.connectionID = connectionID;
 
     Arrays.stream(ResourceType.values()).forEach(
       resourceType -> resources.put(resourceType, 0)
@@ -53,8 +52,8 @@ public class LocalPlayer {
     );
   }
 
-  public UUID getSocketID() {
-    return socketID;
+  public UUID getConnectionID() {
+    return connectionID;
   }
 
   public void addPlayedCards(Card card, CardSideType side, Position position) {
