@@ -15,10 +15,9 @@ import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Colorable;
 import polimi.ingsw.am21.codex.view.View;
 
-public class DummyView implements View {
+public class DummyView extends Cli {
 
   final String id;
-
   Cli.Options options;
 
   public DummyView(String id) {
@@ -31,134 +30,20 @@ public class DummyView implements View {
   public void setClient(ClientConnectionHandler client) {}
 
   @Override
-  public LocalModelContainer getLocalModel() {
-    return null;
-  }
-
-  @Override
-  public void postNotification(
-    NotificationType notificationType,
-    String message
-  ) {
+  public void printUpdate(String string) {
     System.out.println(
-      CliUtils.colorize(
-        "[" + id + "] " + message,
-        notificationType.getColor(),
-        ColorStyle.NORMAL
-      )
+      "\r" +
+      "[ " +
+      id +
+      " ] " +
+      string +
+      " ".repeat(string.length() <= 100 ? 100 - string.length() : 0)
     );
   }
-
-  @Override
-  public void postNotification(Notification notification) {}
-
-  @Override
-  public void postNotification(
-    NotificationType notificationType,
-    String[] messages,
-    Colorable colorable,
-    int colorableIndex
-  ) {}
-
-  @Override
-  public void listGames() {}
 
   @Override
   public void displayException(Exception e) {
-    CliUtils.colorize(
-      "[" + id + "] " + e.getMessage(),
-      NotificationType.ERROR.getColor(),
-      ColorStyle.NORMAL
-    );
-
-    e.printStackTrace();
+    System.out.println("[" + id + " ]");
+    super.displayException(e);
   }
-
-  @Override
-  public void drawAvailableGames() {}
-
-  @Override
-  public void drawLobby() {}
-
-  @Override
-  public void drawGameBoard() {}
-
-  @Override
-  public void drawLeaderBoard() {}
-
-  @Override
-  public void drawPlayerBoards() {}
-
-  @Override
-  public void drawPlayerBoard(String nickname) {}
-
-  @Override
-  public void drawGame() {}
-
-  @Override
-  public void drawGameOver() {}
-
-  @Override
-  public void drawCard(Card card) {}
-
-  @Override
-  public void drawHand() {}
-
-  @Override
-  public void drawPairs() {}
-
-  @Override
-  public void drawAvailableTokenColors() {}
-
-  @Override
-  public void drawObjectiveCardChoice() {}
-
-  @Override
-  public void drawChatMessage(ChatMessage message) {
-    System.out.println(
-      CliUtils.colorize(
-        "[" +
-        id +
-        "] received a message from: " +
-        message.getSender() +
-        ": " +
-        message.getContent(),
-        NotificationType.UPDATE.getColor(),
-        ColorStyle.NORMAL
-      )
-    );
-  }
-
-  @Override
-  public void drawCommonObjectiveCards() {}
-
-  @Override
-  public void drawPlayerObjective() {}
-
-  @Override
-  public void drawCardDecks() {}
-
-  @Override
-  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {}
-
-  @Override
-  public void getStarterCard(Integer cardId) {}
-
-  @Override
-  public void gameHalted(String gameID) {}
-
-  @Override
-  public void gameResumed(String gameID) {}
-
-  @Override
-  public void userContext(FullUserGameContext context) {}
-
-  @Override
-  public void drawNicknameChoice() {}
-
-  @Override
-  public void drawStarterCardSides() {}
-
-  @Override
-  public void lobbyInfo(LobbyUsersInfo usersInfo) {}
 }
