@@ -346,17 +346,18 @@ The chat feature works similarly to the other view updates. Every view update is
 ```mermaid
 sequenceDiagram
 actor Client
+Note over Client, Server: The messages can be either <br>broadcasts or whispers.
 alt The message is a broadcast message
-    Client --) Server: SendChatMessage (broadcast)
+    Client --) Server: SendChatMessage
+    loop for each client in the same game
+        Server --) Recipient: ChatMessageMessage
+    end
 else The message is a private message to an user
 actor Recipient
-    loop for each client in the same game
-        Server --) Recipient: ChatMessageSentMessage
-    end
-    end
-Client --) Server: SendChatMessage (whisper)
+Client --) Server: SendChatMessage
  Server --) Recipient: ChatMessageSentMessage
   Server --) Client: ChatMessageMessage
+    end
 
 
 
