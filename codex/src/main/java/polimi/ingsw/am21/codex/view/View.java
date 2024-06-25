@@ -325,6 +325,7 @@ public interface View extends GameEventListener {
     drawHand();
     drawLeaderBoard();
     drawPlayerBoard();
+    drawGameBoard();
   }
 
   @Override
