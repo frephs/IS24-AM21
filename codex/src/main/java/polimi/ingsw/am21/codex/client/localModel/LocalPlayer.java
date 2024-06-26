@@ -8,6 +8,7 @@ import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.ObjectType;
 import polimi.ingsw.am21.codex.model.Cards.Objectives.ObjectiveCard;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
+import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
@@ -37,8 +38,13 @@ public class LocalPlayer {
   private Set<Position> availableSpots = new HashSet<>();
   private Set<Position> forbiddenSpots = new HashSet<>();
 
-  private final Map<Position, Pair<Card, CardSideType>> playedCards =
-    new HashMap<>();
+  private final Map<
+    Position,
+    Pair<PlayableCard, CardSideType>
+  > playedCardsByPosition = new HashMap<>();
+  private final List<
+    Pair<Position, Pair<PlayableCard, CardSideType>>
+  > playedCardsByOrder = new ArrayList<>();
 
   public LocalPlayer(UUID connectionID) {
     this.connectionID = connectionID;
@@ -56,8 +62,13 @@ public class LocalPlayer {
     return connectionID;
   }
 
-  public void addPlayedCards(Card card, CardSideType side, Position position) {
-    this.playedCards.put(position, new Pair<>(card, side));
+  public void addPlayedCards(
+    PlayableCard card,
+    CardSideType side,
+    Position position
+  ) {
+    this.playedCardsByPosition.put(position, new Pair<>(card, side));
+    this.playedCardsByOrder.add(new Pair<>(position, new Pair<>(card, side)));
   }
 
   public void addResource(ResourceType resourceType, Integer amount) {
@@ -132,8 +143,17 @@ public class LocalPlayer {
     this.forbiddenSpots = forbiddenSpots;
   }
 
-  public Map<Position, Pair<Card, CardSideType>> getPlayedCards() {
-    return playedCards;
+  public Map<
+    Position,
+    Pair<PlayableCard, CardSideType>
+  > getPlayedCardsByPosition() {
+    return playedCardsByPosition;
+  }
+
+  public List<
+    Pair<Position, Pair<PlayableCard, CardSideType>>
+  > getPlayedCardsByOrder() {
+    return playedCardsByOrder;
   }
 
   public CardPair<ObjectiveCard> getObjectiveCards() {

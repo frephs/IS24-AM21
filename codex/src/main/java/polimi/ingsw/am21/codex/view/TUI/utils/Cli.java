@@ -347,33 +347,40 @@ public class Cli implements View {
       .getPlayerByNickname(nickname)
       .orElseThrow();
 
-    player
-      .getPlayedCards()
-      .forEach(
-        (position, placedCard) ->
-          printUpdate(
-            "Card " +
-            (placedCard.getKey().getId()) +
-            " placed at " +
-            position +
-            " on side " +
-            placedCard.getValue()
-          )
-      );
-    printUpdate("Available spots: ");
-    player
-      .getAvailableSpots()
-      .ifPresent(
-        availableSpots ->
-          availableSpots.forEach(position -> printUpdate(position.toString()))
-      );
-    printUpdate("Forbidden spots: ");
-    player
-      .getForbiddenSpots()
-      .ifPresent(
-        forbiddenSpots ->
-          forbiddenSpots.forEach(position -> printUpdate(position.toString()))
-      );
+    CliPlayerBoard.drawPlayerBoard(
+      player.getPlayedCardsByOrder(),
+      player.getAvailableSpots().orElseThrow(),
+      player.getForbiddenSpots().orElseThrow(),
+      0,
+      0
+    );
+    //    player
+    //      .getPlayedCardsByPosition()
+    //      .forEach(
+    //        (position, placedCard) ->
+    //          printUpdate(
+    //            "Card " +
+    //            (placedCard.getKey().getId()) +
+    //            " placed at " +
+    //            position +
+    //            " on side " +
+    //            placedCard.getValue()
+    //          )
+    //      );
+    //    printUpdate("Available spots: ");
+    //    player
+    //      .getAvailableSpots()
+    //      .ifPresent(
+    //        availableSpots ->
+    //          availableSpots.forEach(position -> printUpdate(position.toString()))
+    //      );
+    //    printUpdate("Forbidden spots: ");
+    //    player
+    //      .getForbiddenSpots()
+    //      .ifPresent(
+    //        forbiddenSpots ->
+    //          forbiddenSpots.forEach(position -> printUpdate(position.toString()))
+    //      );
   }
 
   @Override

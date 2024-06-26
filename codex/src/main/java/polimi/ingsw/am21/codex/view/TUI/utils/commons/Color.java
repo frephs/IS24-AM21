@@ -1,5 +1,9 @@
 package polimi.ingsw.am21.codex.view.TUI.utils.commons;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 public enum Color {
   RESET("\u001B[0m", null, null, null, null),
 
@@ -49,5 +53,12 @@ public enum Color {
       case BACKGROUND -> this.background;
       case BRIGHT -> this.bright;
     };
+  }
+
+  public static List<String> getAllModifiers() {
+    return Arrays.stream(Color.values())
+      .flatMap(color -> Arrays.stream(ColorStyle.values()).map(color::getCode))
+      .filter(Objects::nonNull)
+      .toList();
   }
 }

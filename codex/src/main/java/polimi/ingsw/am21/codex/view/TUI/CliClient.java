@@ -634,7 +634,11 @@ public class CliClient extends ViewClient {
                 // Get cards from the player hands
                 player.getHand().stream(),
                 // Get cards from the player boards
-                player.getPlayedCards().values().stream().map(Pair::getKey)
+                player
+                  .getPlayedCardsByPosition()
+                  .values()
+                  .stream()
+                  .map(Pair::getKey)
               ))
             .filter(c -> c.getId() == cardId)
             .findFirst()

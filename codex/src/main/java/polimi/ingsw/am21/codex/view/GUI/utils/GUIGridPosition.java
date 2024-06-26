@@ -2,7 +2,7 @@ package polimi.ingsw.am21.codex.view.GUI.utils;
 
 import polimi.ingsw.am21.codex.model.Cards.Position;
 
-public class ViewGridPosition {
+public class GUIGridPosition {
 
   private final int row;
   private final int col;
@@ -10,12 +10,12 @@ public class ViewGridPosition {
   // This needs to be odd to avoid off centering
   public static int gridSize = 201;
 
-  public ViewGridPosition(int row, int col) {
+  public GUIGridPosition(int row, int col) {
     this.row = row;
     this.col = col;
   }
 
-  public ViewGridPosition(Position modelPosition) {
+  public GUIGridPosition(Position modelPosition) {
     this(
       gridSize / 2 + modelPosition.getX() - modelPosition.getY(),
       gridSize / 2 + modelPosition.getX() + modelPosition.getY()
