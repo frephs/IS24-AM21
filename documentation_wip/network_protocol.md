@@ -1,70 +1,75 @@
 # Network Protocol
 The network protocol we designed is meant to be implemented with both RMI and Client-Server Socket functionality.
-Both client and server are equipped with a message parser for serialized Java objects sent through the network and a set of RMI interfaces which are meant to update the views in the client and call controller methods to update the model in the server.
-
-## Notes on RMI 
-In this documentation only Socket messages are represented, as there is duality in the two approaches since every message corresponds to a remote method invocation.
+Both client and server are equipped with listeners whichi implement the same interface for asking the controller to update the game, the clients to communicate the updates and the `ClientGameEventHandler`s to update every client's status and View. 
 
 ## General message handling 
 
-### Client Action message handling
-The following diagram reports a general rapresentation of our architecture's flow when a ClientAction is sent to the server.
-The **listener  classes** calling `gameEventListenerMethods(...)` implement either the `RemoteGameEventListener` class or the `GameEventListener` which extends it and does not throw `RemoteException`. 
+### Client Action general handling
+The following diagram reports a general rapresentation of our architecture's interaction when a `ClientAction` is sent to the server and an update is sent back to the concerned clients.
 
-Note: for listener we mean every `RMIClientConnectionHandler`'s reference and every `TCPServerConnectionHandler` object saved for every client, which handle the connection with the client. 
+Both in client and server we set up listeners implementing the `RemoteGameEventListener` class or the `GameEventListener` which extends it and does not throw `RemoteException`. This allow's us to require all clients to process all the `GameEvents`. 
+
+As for the client listeners, the `RMICLientConnectionHandler` calls the omonymous methods in the Controller, while the `TCPClientConnectionHandler` method implementation send a message to the server which is parsed calling the same methods in the controlle. 
+
+As for the server listeners we have every `RMIClientConnectionHandler`'s reference and every `TCPServerConnectionHandler` registered in the server for every client handling the connection with the client by invoking directly a method of the `ClientGameEventHandler` in the case of RMI or by sending a message which will be parsed by the `TCPCLientConnectionHandler` which will call the ClientGameEVentHandler with the same effect on the client. 
+
+In the following diagram we report a general rapresentation using GameEventListenerMethod as an alias.
 
 ```mermaid
 sequenceDiagram
 Actor Client 
-Client  -->> ServerConnectionHandler : ClientActionMessage
-ServerConnectionHandler --> Controller : Controller.gameEventListenerMethod(...)
-Note right of Controller: the action is performed by the controller which <br> through the game manager  updates the correct game. 
-Controller --> Controller : Action is performed 
+Client  --) ServerConnectionHandler : client.gameEventListener()
+ServerConnectionHandler -> Controller : Controller.gameEventListenerMethod(...)
+Note right of Controller: The action is performed by the controller which <br> the updates the correct game through the game manager. 
+Controller -> Controller : Action is performed 
 Note over Controller, Clients: A view update is sent to every concerned client
 loop For each registered listener
-Controller --> Clients: listener.gameEventListenerMethod(...)
+Controller -->> Clients: listener.gameEventListenerMethod(...)
 end
-Clients --> ClientGameEventHandler : ClientConnectionHandler.gameEventListenerMethod(...) 
-ClientGameEventHandler --> ClientGameEventHandler  : LocalModelContainer.gameEventListenerMethod(...)
-ClientGameEventHandler --> ClientGameEventHandler : View.gameEventListenerMethod(...)
+Clients -> ClientGameEventHandler : ClientConnectionHandler.gameEventListenerMethod(...) 
+ClientGameEventHandler -> ClientGameEventHandler  : LocalModelContainer.gameEventListenerMethod(...)
+ClientGameEventHandler --) ClientGameEventHandler : View.gameEventListenerMethod(...)
 
 ```
 
 ### Failed connection handling
 After a connection is enstablished, the client starts sending regular heartbeats. After two missed heartbeats the client loosing connection's `ClientConnectionHandler` notifies the user while the other clients are notified by the server. The client is considered disconnected after 10 missed heartbeats.
 
-The one reported is a simplified view with less actors, the architecture is the same as described above.
-
-
+The one reported is a simplified view with less actors. As described above, but omitted in the following diagram, `ClientGameEventHandler` updates the `LocalModelContainer` synchronously and the view aynchronously.
 
 ```mermaid
 sequenceDiagram
     actor Client 1
     loop 2 times
-    Client 1 --x Server: Heartbeat (timed out)
+    Client 1 --x ServerConnectionHandler: client.hearBeat() (timed out)
     end 
-    Client 1 --> Client 1 : ClientConnectionHandler.failedHeartBeats++
-    Client 1 --> Client 1 : View.postnotification()"You're loosing connection to the server")
-    Server -->> Other clients : PlayerConnectionChangedMessage(IS_LOSING)
-    Other clients --> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
+    Client 1 -> Client 1 : ClientConnectionHandler.failedHeartBeats++
+    Client 1 -) Client 1 : View.postnotification()"You're loosing connection to the server")
+    ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, IS_LOSING)
+    ServerConnectionHandler -->> Other clients : listener.playerConnectionChanged(IS_LOSING)
+    Other clients -> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
     alt The next heartbeats don't fail
-        Client 1 --> Client 1 : ClientConnectionHandler.failedHeartBeats = 0
-    Client 1 --> Client 1 : View.postnotification()"Connection restored")
-    Server -->> Other clients : PlayerConnectionChangedMessage(CONNECTED)
-    Other clients --> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
+        Client 1 --) ServerConnectionHandler: client.heartBeat()
+
+        Client 1 -> Client 1 : ClientConnectionHandler.failedHeartBeats = 0
+    Client 1 -) Client 1 : View.postnotification()"Connection restored")
+    ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, CONNECTED)
+    ServerConnectionHandler -->> Other clients : listener.PlayerConnectionChanged(CONNECTED)
+    Other clients -> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
     else 
     loop 8 times more
-        Client 1 --x Server: Heartbeat 
+        Client 1 --x ServerConnectionHandler: Heartbeat 
     end 
-    Client 1 --> Client 1 : ClientConnectionHandler.connectionFailed()
+    Client 1 -> Client 1 : ClientConnectionHandler.connectionFailed()
 
-    Client 1 --> Client 1 : view.postNotification("Connection lost")
+    Client 1 -) Client 1 : view.postNotification("Connection lost")
 
-    Client 1 --> Client 1 : exit
+    Client 1 -> Client 1 : exit
     Destroy Client 1
     Client 1 --> Client 1 : 
-    Server -->> Other clients: PlayerConnectionChangedMessage(DISCONNECTED)
-    Other clients --> Other clients : view.ClientGameEventHandler.playerConnectionChanged(...)
+    ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, DISCONNECTED)
+    ServerConnectionHandler -->> Other clients: listener.playerConnectionChanged(DISCONNECTED)
+    Other clients --> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
     end
     
 
@@ -83,73 +88,185 @@ sequenceDiagram
     actor Client
 
     Note over Client,ServerConnectionHandler: Client sends a type of message <br> that is not expected 
-    Client ->> ServerConnectionHandler: Untimely or forbidden ActionMessage 
-ServerConnectionHandler ->> Controller : Controller.gameEventListenerMethod(...)
-    Controller --) ServerConnectionHandler : < ? extends InvalidActionException> thrown
-    ServerConnectionHandler --) Client : InvalidActionMessage
-    Client --> Client : Message.toException() is parsed by the ClientGameEventHandler
+    Client --) ServerConnectionHandler: Untimely or forbidden action 
+ServerConnectionHandler -> Controller : Controller.gameEventListenerMethod(...)
+    Controller --> Controller : < ? extends InvalidActionException> thrown
+     Controller --) ServerConnectionHandler  : corresponding listener.invalidActionMethod()
 
-
+    ServerConnectionHandler --) Client : corresponding listener.invalidActionMethod()
     
-    Note over Client,ServerConnectionHandler: Client sends a message which <br>is not recognized by the server
-    Client ->> ServerConnectionHandler: <Unknown-type message>
-    ServerConnectionHandler --)  Client : unknownMessageTypeMessage
+    Note over Client,ServerConnectionHandler: We covered the possibility of a Tcp Client sending <br>  a message which is not recognized by the server
+    Client -->> ServerConnectionHandler: <Unknown-type message>
+    ServerConnectionHandler -->>  Client : unknownMessageTypeMessage
 ```
 
 ## Game Dynamics' Flows
-### Lobby Flow
-The player building process requires a series of essential steps, which are reported in the following sequence diagram.
-
-Other than `ConfirmMessage`, which is required by the client to confirm the message has been received and handled correctly, we added a series of messages whose recipients are all the clients in the lobby or in the game. They are used to update the views of the clients and to notify them of the status of the lobby.
+### Connection and menu flow
+As the user connects to the server, a `UUID` identifying the user's client is sent to the server and a listener is registered attached to that UUID.
+The user then asks for the available games at the moment and the server responds with a list of game entries, containing the gameId, the current number of players and maximum number of players, which are displayed in the menu.
 
 ```mermaid
 sequenceDiagram
     actor Client
-    autonumber
-    
-    # Get the available lobbies
-    Note over Client,Server : Client is in the lobby view
-    Client ->> Server : GetAvailableGameLobbiesMessage
-    Server ->> Controller : Controller.getAvailableGameLobbies()
-    alt there are no games available
-        Server ->> Controller: Controller.createGame()
-        Controller --) Server : Returns gameIds: List<int>
-    else there are games available 
-        Server ->> Controller : Controller.listGames()
-        Controller --) Server : Returns gameIds: List<int>
+    Note over Client, ServerConnectionHandler: The user connects to the server
+    Client --) ServerConnectionHandler : client.connect(connectionID) 
+    ServerConnectionHandler -> Controller : registerListener(connectionID, handler)
 
+    # Get the available lobbies
+    Note over Client,ServerConnectionHandler : Client is in the game menu 
+    Client --) ServerConnectionHandler : client.getAvailableGameLobbies()
+    ServerConnectionHandler -> Controller : controller.getAvailableGameLobbies()
+    alt there are no games available
+
+        Controller --> Controller : Returns games: List.of()
+    else there are games available 
+        Controller --> Controller : Returns games: List<GameEntry>
     end 
-    Server --) Client : AvailableGameLobbiesMessage
-    
+    Controller --) ServerConnectionHandler : listener.availableGameLobbies(...)
+    ServerConnectionHandler -->> Client : listener.availableGameLobbies(...)
+    Client -> Client : cLientGameEventHandler.avaialableGameLobbies(...)
+```
+
+### Lobby Flow
+The player building process requires a series of essential steps, which are reported in the following sequence diagram.
+
+For the sake of Semplicity we omit the `ServerConnectionHandler` and Listener actors. The architecture remains the same as described above.
+The `GameEventListener` method implentations of the `Controller` class call the methods omonymous the listeners which send an update the client.
+
+#### Selecting or creating a game
+```mermaid
+sequenceDiagram
+    actor Client
+
+   
     # Join the Game Lobby
-    Note over Client,Server : Client selects a game lobby or creates a new one
     alt Client selects a game lobby
 
-    loop until the selected lobby is not full
-        Client -) Server : JoinLobbyMessage
-        alt Lobby is full
-            Server ->> Controller : Controller.lobbyJoin(socketId, lobbyId)
-            Controller --) Server : LobbyFullException
-            Server --) Client : LobbyFullMessage
-        else Lobby is not full
-            Controller ->> Server : Controller.lobbyJoin(socketId, gameId)
-            Controller -->Server: Returns
-            Server --) Client : ConfirmMessage
+    Client --) ServerConnectionHandler : client.connectToGame
+    alt Lobby is full
+        ServerConnectionHandler -> Controller : controller.connectToGame(socketId, lobbyId)
+        Controller -> Controller : LobbyFullException
+        Controller --) ServerConnectionHandler : listener.lobbyFull()
+        ServerConnectionHandler --) Client : listener.lobbyFull()
+    else Lobby is not full
+         ServerConnectionHandler -> Controller : Controller.joinLobby(socketId, gameId)
+         Note over Controller, ServerConnectionHandler:  The client who joined a lobby get's the info of <br> the players already inside the lobby. (Tokens, nicknames)
+        Controller --) ServerConnectionHandler : listener.lobbyInfo(...)
+        ServerConnectionHandler -->> Client : listener.lobbyInfo(...)
+        loop for each client in the menu 
+            Note over Controller, Client in the menu view: The clients in the menu get <br> their game entries updated <br> with the correct number of players
+            Controller --) Client in the menu view : listener.playerJoinedLobby(connectionId, gameId)
+        end
+        loop for each client in the lobby
+            Note Over Controller, Client in the lobby view: The clients in the lobby get <br> a notification a new  <br> player has joined
+            Controller --) Client in the lobby view :  listener.playerJoinedLobby(connectionId, gameId)
         end
     end
+    
 
     else Client creates a new game lobby
-        Client ->> Server : CreateGameLobbyMessage
-        Server ->> Controller : Controller.createGame()
-        Controller --> Server : Returns 
+        Client ->> ServerConnectionHandler : client.createGame(connectionID, gameID, players)
+        ServerConnectionHandler ->> Controller : Controller.createGame(...)
+        Note over Controller, Client in the menu view : The clients in the menu register it and redraw the available games
+        Controller --) Client in the menu view : listener.gameCreated() 
+        Note over Controller, Client in the game view : The clients in the lobbies and game register it 
+        Controller --) Client in the lobby view : listener.gameCreated()
+        Controller --) Client in the game view : listener.gameCreated()
 
-        Server ->> Controller : Controller.lobbyJoin(socketId, gameId)
 
-        Controller --) Server : Returns 
-        Server --) Client : ConfirmMessage
     end
 
+```
+#### Player Setup Process
+```mermaid
+sequenceDiagram
+    actor Client
 
+    # Player Token Color 
+    Note over Client,ServerConnectionHandler : Client selects a token color
+
+        Client ->> ServerConnectionHandler : client.setToken() 
+        ServerConnectionHandler ->> Controller: controller.lobbySetTokenColor(nickname, tokenColor)
+        alt Token color is already taken
+            Controller --> Controller : NoSuchElementException
+            Controller --) ServerConnectionHandler : listener.tokenTaken() 
+            ServerConnectionHandler --) Client : listener.tokenTaken
+        else Token color is accepted
+            loop for each client in the lobby
+                ServerConnectionHandler -) Client in the lobby view:  listener.playerSetToken()
+            end
+        end
+
+    # Player Nickname
+    Note over Client,ServerConnectionHandler : Client selects a nickname
+        Client -->> ServerConnectionHandler : client.setNickname(..)
+        ServerConnectionHandler -> Controller: controller.lobbySetNickname(socketId, nickname)
+        alt Nickname is already taken   
+            Controller --> Controller: NicknameAlreadyTakenException
+            Controller --) ServerConnectionHandler : listener.nicknameTaken()
+            ServerConnectionHandler --) Client : listener.nicknameTaken()
+        else Nickname is accepted
+            loop for each client in the lobby
+                ServerConnectionHandler -) Client in the lobby view:  listener.playerSetNickname
+            end
+        end    
+
+  
+
+
+    # Player Secret Objective 
+    Note over Client,ServerConnectionHandler: Client selects a secret objective
+    Client ->> ServerConnectionHandler : client.getObjectiveCards()
+    ServerConnectionHandler ->> Controller : Controller.getObjectiveCards()
+    Controller --> Controller : Returns cardIds: Pair<int> 
+    Controller --) ServerConnectionHandler : listener.getObjectiveCards(pair(id1,id2))
+    ServerConnectionHandler -->> Client : listener.getObjectiveCards(pair(id1,id2))
+    
+    Client -) ServerConnectionHandler : listener.playerChooseObjectiveCard(boolean first) 
+     loop for each client in the lobby
+            ServerConnectionHandler -) Client in the lobby view:  listener.playerChoseObjectiveCard(first)
+     end
+    
+
+    # Player Starter Card Side to Place
+    Note over Client,ServerConnectionHandler: Client selects a starter card side to play
+    Client ->> ServerConnectionHandler : client.getStarterCardSides()
+    ServerConnectionHandler ->> Controller : Controller.getStarterCardSides()
+    Controller --> Controller : Returns cardIds: Pair<int> 
+    Controller --) ServerConnectionHandler : listener.joinedGame(pair(id1,id2))
+    ServerConnectionHandler --) Client : listener.joinedGame(pair(id1,id2))
+    Controller --) ServerConnectionHandler : listener.gameInfo(...)
+    ServerConnectionHandler --) Client : listener.gameInfo(pair(id1,id2))
+
+    
+     loop for each client in the lobby 
+            ServerConnectionHandler -) Client in the lobby view:  listener.playerJoinedGame(first)
+     end
+
+    loop for each client in the game
+        ServerConnectionHandler -) Client in the game view: listener.playerJoinedGame
+    end
+
+    Note over Client,ServerConnectionHandler: The player is now in waitroom
+    
+    alt Not all players are in the game
+        Note over Client,ServerConnectionHandler: The player knows he's still connected to the server.
+    loop
+        Client ->> ServerConnectionHandler : client.heartBeat()
+    end
+    else All players are in the game
+        ServerConnectionHandler ->> Controller: controller.playerJoinedGame(..)
+        Controller ->> Controller : Controller.gameStarted(gameId)
+        loop for each client in the game view
+            Controller -) Client in the game view: listener.gameStarted(...)
+        end
+    end
+```
+#### The lobby steps to join a game. 
+
+```mermaid
+sequenceDiagram
+    actor Client
     # Player Nickname
     Note over Client,Server : Client selects a nickname
     loop until the selected nickname is not taken
@@ -353,11 +470,11 @@ alt The message is a broadcast message
         Server --) Recipient: ChatMessageMessage
     end
 else The message is a private message to an user
-actor Recipient
-Client --) Server: SendChatMessage
- Server --) Recipient: ChatMessageSentMessage
-  Server --) Client: ChatMessageMessage
-    end
+    actor Recipient
+    Client --) Server: SendChatMessage
+    Server --) Recipient: ChatMessageSentMessage
+    Server --) Client: ChatMessageMessage
+end
 
 
 
