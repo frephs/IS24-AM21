@@ -13,6 +13,7 @@ import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.UserContextMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -260,7 +261,6 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void userContext(FullUserGameContext context) {
-    // TODO
-    //    broadcast.accept(new UserContextMessage(context));
+    broadcast.accept(new UserContextMessage(context));
   }
 }
