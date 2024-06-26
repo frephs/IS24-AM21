@@ -271,58 +271,49 @@ As before, other than the `ConfirmMessage`, we have a series of messages whose r
 ```mermaid
 sequenceDiagram
     actor Playing client
-    Server -) Controller: Controller.startGame()
-    Server -) Client : GameStatusMessage (GAME_START) 
+    actor Client
+    Controller -> Controller: gameStarted()
+    Controller -) Client : listener.gameStarted()
 
     loop until the game is over
         # New turn 
-        Note over Server,Client: Current Player Changes
+        Note over Server,Playing client: Current Player Changes
         
         # Place card  
         Note over Playing client,Server: The playing client can place a card  
         loop until the card placement is valid
-            Playing client ->> Server : PlaceCardMessage
-            Server --) Controller: Controller.placeCard(handIndex, side, position)
+            Playing client ->> Server : client.placeCard(handIndex, position, side)
+            Server --) Controller: Controller.placeCard(...)
             alt card placement is not valid
-                Controller --) Server: InvalidCardPlacementMessage
-                Server --) Playing client : InvalidCardPlacementMessage
+                Controller -> Controller: InvalidCardPlacementException <br> IllegalCardSideChoice <br>
+                Controller --) Playing client : listener.invalidCardPlacement(exceptionMessage)
             else card placement is valid
-                Controller --> Server: Returns
-                Server --) Playing client : ConfirmMessage
+                loop for every client in the game
+                    Controller --) Client : listener.cardPlaced(...)
+                end
             end
-        end
-        loop for each client
-            Server -) Client : CardPlacedMessage
-            opt only if the player's score is updated
-                Server -) Client : PlayerScoreUpdateMessage
-            end
-            Server -) Client : NextPlayerActionMessage
-        end 
-        
+        end        
 
         # Draw card 
         Note over Playing client,Server: The playing client can draw a card
-        Playing client ->> Server : DeckDrawMessage OR CardPairDrawMessage
-        Server --) Controller: Controller.drawCard()
+        Playing client ->> Server : listener.nextTurn(drawingSource, drawingDeckType)
+        Server --) Controller: Controller.nextTurn(...)
         alt deck is empty
-            Controller --) Server: EmptyDeckException
+            Controller -> Controller: EmptyDeckException
             loop for each client
-                Server --) Playing client : LastRoundMessage
+                Controller --) Client : listener.remainingTurns()
             end
         else deck is not empty
-            Note over Playing client,Server: This notfication serves also to notify the
-            Server --) Playing client : ConfirmMessage
             loop for each client
-                Server -) Client : DeckCardDrawnMessage OR CardPairDrawnMessage
+                Controller -) Client : listener.nextTurn(...)
             end
         end
-        Server -) Client : NotifyNextPlayerMessage
     end
 ```
 ### Game over flow
-When `Game.nextTurn()` detects that a player has a winning score or an `EmptyDeckException` is caught by the controller, a message is sent to all the clients to notify them of the number of remaining rounds.
+When `controller.nextTurn()` detects that a player has a winning score or an `EmptyDeckException` is caught by the controller, all the clients are notified of the number of remaining rounds.
 
-After the final rounds are played, the server will send a series of messages to all the clients to notify them that the game is over and update the final scores of the players after adding the objective cards' points.
+After the final rounds are played, the server will notify the clients the final scores after the objectives are evaluated and the winning player nickname.
 
 ```mermaid
 sequenceDiagram
@@ -330,31 +321,29 @@ sequenceDiagram
     participant Server
     actor Client
 
-    Note over Server: Normal Turn flow interactions
     loop until game.remainingTurns is set
-        Controller --> Client : turn flow messages 
+        Note over Controller, Client : Normal turn flow
     end 
 
-    Note over Server: Last round interactions
-    Controller --> Controller: Last round reached
+    Note over Controller, Client: Last round is reached
+    Controller -> Controller: GameOverExcpetion 
     Controller ->> Server: nextTurn() (lastRound)
 
-    Server -) Client : RemainingTurnsMessage 
+    Server -) Client : listener.nextTurn() 
     loop for each client 
-        Controller -> Client : normal turn interactions 
+        Controller --> Client : normal turn interactions 
     end 
     
-    Note over Server: Game overs
-    Controller --> Controller: Game over
-    Controller ->> Server: setGameOver
+    Note over Controller, Client: Game overs
+    Controller --> Controller: GameOverException <br> EmptyDeckException
     loop for each client 
-        Server -) Client : GameOverMessage
+        Controller -) Client : listener.gameOver()
         loop for each player
             opt if the player's score is updated
-                Server -) Client : PlayerScoreUpdateMessage
+                Controller -) Client : listener.playerScoreUpdate(newScores)
             end
         end
-        Server -) Client : WinningPlayerMessage  
+        Controller -) Client : listener.winningPlayer(nickname)
     end
 ```
 
