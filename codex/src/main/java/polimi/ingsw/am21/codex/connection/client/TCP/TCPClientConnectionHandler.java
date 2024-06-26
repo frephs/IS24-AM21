@@ -33,6 +33,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessag
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.UserContextMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -487,6 +488,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
         (PlayerConnectionChangedMessage) message
       );
       case GAME_HALTED_UPDATE -> handleMessage((GameHaltedMessage) message);
+      case USER_CONTEXT -> handleMessage((UserContextMessage) message);
       // Game
       case CARD_PLACED -> handleMessage((CardPlacedMessage) message);
       case GAME_OVER -> handleMessage((GameOverMessage) message);
@@ -696,6 +698,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     } else {
       gameEventHandler.gameResumed(gameHaltedMessage.getGameID());
     }
+  }
+
+  public void handleMessage(UserContextMessage message) {
+    gameEventHandler.userContext(message.getContext());
   }
   // </editor-fold>
 }
