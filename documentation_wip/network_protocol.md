@@ -149,7 +149,7 @@ sequenceDiagram
         Controller --) ServerConnectionHandler : listener.lobbyFull()
         ServerConnectionHandler --) Client : listener.lobbyFull()
     else Lobby is not full
-         ServerConnectionHandler -> Controller : Controller.joinLobby(socketId, gameId)
+         ServerConnectionHandler -> Controller : controller.joinLobby(socketId, gameId)
          Note over Controller, ServerConnectionHandler:  The client who joined a lobby get's the info of <br> the players already inside the lobby. (Tokens, nicknames)
         Controller --) ServerConnectionHandler : listener.lobbyInfo(...)
         ServerConnectionHandler -->> Client : listener.lobbyInfo(...)
@@ -261,103 +261,6 @@ sequenceDiagram
             Controller -) Client in the game view: listener.gameStarted(...)
         end
     end
-```
-#### The lobby steps to join a game. 
-
-```mermaid
-sequenceDiagram
-    actor Client
-    # Player Nickname
-    Note over Client,Server : Client selects a nickname
-    loop until the selected nickname is not taken
-        Client ->> Server : SetNicknameMessage
-        Server ->> Controller: Controller.lobbySetNickname(socketId, nickname)
-        alt Nickname is already taken   
-            Controller --) Server: NicknameAlreadyTakenException
-            Server --) Client : NicknameAlreadyTakenMessage
-        else Nickname is accepted
-            Controller --> Server : Returns 
-            Server --) Client : ConfirmMessage
-        end    
-    end
-    loop for each client in the lobby
-        Server -) Client in the lobby view:  PlayerNicknameSetMessage
-    end
-
-    # Player Token color 
-    Note over Client,Server : Client selects a token color
-    
-    loop until the selected token color is not taken
-        loop until the player has not selected a token color
-            Client ->> Server : GetAvailableTokenColorsMessage
-            Server ->> Controller: Controller.lobbyGetAvailableTokenColors() 
-            Controller --) Server : Returns tokens: List<TokenColor> 
-            Server --) Client : AvailableTokenColorsMessage
-        end
-
-        Client ->> Server : SetTokenColorMessage 
-        Server ->> Controller: Controller.lobbySetTokenColor(nickname, tokenColor)
-        alt Token color is already taken
-            Controller --) Server : NoSuchElementException
-            Server --) Client : TokenColorAlreadyTakenMessage 
-        else Token color is accepted
-            Controller --> Server : Returns
-            Server --) Client : ConfirmMessage
-        end
-    end   
-  
-    loop for each client in the lobby
-        Server -) Client in the lobby view:  PlayerTokenColorSetMessage
-    end
-    
-
-
-    # Player Secret Objective 
-    Note over Client,Server: Client selects a secret objective
-    Client ->> Server : GetObjectiveCardsMessage
-    Server ->> Controller : Controller.lobbyGetObjectiveCards()
-    Controller --> Server : Returns cardIds: Pair<int> 
-    Server -->> Client : ObjectiveCardsMessage 
-    
-    Client -) Server : SelectFromPairMessage 
-    Server ->> Controller : Controller.lobbyChooseObjectiveCard(first)
-    Controller --> Server : Returns
-    Server ->> Client : ConfirmMessage
-    
-
-    # Player Starter Card Side to place
-    Note over Client,Server: Client selects a starter card side to play
-
-    Client ->> Server : GetStarterCardSidesMessage
-    Server ->> Controller : Controller.lobbyGetStarterCardSides()
-    Controller --> Server : Returns cardId: int
-    Server --) Client : StarterCardSidesMessage
-
-    Client ->> Server : SelectFromPairMessage
-    Server ->> Controller : Controller.lobbyChooseStarterCardSide(first)
-    Controller --> Server : Returns
-    Server --) Client : ConfirmMessage
-
-    loop for each client in the game
-    Server -) Client in the game view: PlayerGameJoinMessage
-    end
-    Note over Client,Server: The player in now in the game view
-    Client ->> Server : GetGameStatusMessage
-    
-    Server ->> Controller: Controller.checkIfGameStarted()
-    alt Not all players are in the game
-        Controller --) Server: Returns false
-
-        Note left of Server: No response
-    else All players are in the game
-        Server ->> Controller: Controller.gameStart(gameId)
-        Controller --) Server: Returns true
-        Server --) Client: GameStatusMessage (GAME_START)
-        loop: for each client in the game view
-            Server -) Client in the game view: GameStatusMessage (GAME_START)
-        end
-    end
-
 ```
 
 ### Normal game turns flow 
