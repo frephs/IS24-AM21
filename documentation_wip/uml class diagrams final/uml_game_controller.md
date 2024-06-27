@@ -53,7 +53,6 @@ class GameController {
   + createGame(UUID, String, Integer) void
 }
 
-class ClientGameEventHandler 
 
   GameEventListener  <--  GameController : implements
 style GameEventListener stroke:#ff,stroke-width:4px
@@ -135,9 +134,9 @@ class ConnectionStatus {
   + values() ConnectionStatus[]
   + valueOf(String) ConnectionStatus
 }
-  GameController "1" <-- "1" GameManager
-  GameController <-- UserGameContext  
-  GameController <-- EventDispatchMode
-  UserGameContext <-- UserGameContextStatus
-  UserGameContext <-- ConnectionStatus  
+  GameController "1" <-- "1" GameManager : composition
+  GameController "1" <-- "0..*" UserGameContext : composition
+  GameController -- EventDispatchMode : link
+  UserGameContext <-- UserGameContextStatus : composition
+  UserGameContext "1" <-- 1 ConnectionStatus  : composition
  ```
