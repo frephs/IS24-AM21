@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
@@ -12,6 +13,10 @@
 
 
 <VBox alignment="CENTER" prefHeight="279.0" prefWidth="582.0" styleClass="bordered" stylesheets="@Style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <styleClass>
+      <String fx:value="bordered" />
+      <String fx:value="container" />
+   </styleClass>
    <children>
       <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="48.0" prefWidth="432.0" text="Please wait while the other players join the game" textAlignment="CENTER" />
       <HBox alignment="CENTER" prefHeight="115.0" prefWidth="581.0">

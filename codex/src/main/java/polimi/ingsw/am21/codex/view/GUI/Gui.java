@@ -123,6 +123,7 @@ public class Gui extends Application implements View {
       primaryStage.setScene(scene);
 
       primaryStage.getIcons().add(loadImage("icon.png").getImage());
+
       primaryStage.setOnCloseRequest(event -> {
         if (Main.Options.isDebug()) {
           try {
@@ -153,7 +154,7 @@ public class Gui extends Application implements View {
 
   /**
    * Helper function: sets the #content container to the fxml template provided
-   * @param fxmlPath the path of the template to load in the #contant container
+   * @param fxmlPath the path of the template to load in the #content container
    * @param containerId the container to lead the scene in (e.g. #content, #side-content)
    * */
   private void loadSceneFXML(String fxmlPath, String containerId) {
@@ -1693,10 +1694,60 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void gameHalted(String gameID) {}
+  public void gameHalted(String gameID) {
+    StackPane pane = (StackPane) scene.lookup("#content-container");
+    // we load LobbyWaitRoom first
+    String waitRoomId = "wait-room";
+
+    try {
+      pane
+        .getChildren()
+        .forEach(node -> {
+          if (
+            node.getId() == null || !node.getId().equals(waitRoomId)
+          ) node.setVisible(false);
+        });
+
+      Node lobbyWaitRoom = FXMLLoader.load(
+        Objects.requireNonNull(Gui.class.getResource("LobbyWaitRoom.fxml"))
+      );
+      lobbyWaitRoom.setId(waitRoomId);
+      if (
+        !pane
+          .getChildren()
+          .stream()
+          .anyMatch(
+            node -> node.getId() != null && node.getId().equals(waitRoomId)
+          )
+      ) pane.getChildren().add(lobbyWaitRoom);
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+  }
 
   @Override
-  public void gameResumed(String gameID) {}
+  public void gameResumed(String gameID) {
+    StackPane pane = (StackPane) scene.lookup("#content-container");
+    // we load LobbyWaitRoom first
+    String waitRoomId = "wait-room";
+
+    try {
+      pane
+        .getChildren()
+        .forEach(node -> {
+          if (
+            node.getId() == null || !node.getId().equals(waitRoomId)
+          ) node.setVisible(true);
+        });
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+    pane
+      .getChildren()
+      .removeIf(
+        node -> node.getId() != null && node.getId().equals(waitRoomId)
+      );
+  }
 
   @Override
   public void userContext(FullUserGameContext context) {}
