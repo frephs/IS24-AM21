@@ -929,7 +929,18 @@ public class GameController {
         .collect(Collectors.toList()),
       ((listener, targetConnectionID) -> {
           listener.playerJoinedLobby(gameId, connectionID);
-          listener.lobbyInfo(generateLobbyInfo(gameId, game));
+        })
+    );
+
+    notifyClients(
+      userContexts
+        .entrySet()
+        .stream()
+        .filter(user -> user.getKey().equals(connectionID))
+        .map(user -> new Pair<>(user.getKey(), user.getValue()))
+        .collect(Collectors.toList()),
+      ((listener, targetConnectionID) -> {
+          listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game));
         })
     );
   }
