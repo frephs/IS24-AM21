@@ -3,6 +3,7 @@ package polimi.ingsw.am21.codex.view.TUI.utils;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.util.Pair;
+import org.apache.commons.lang3.StringUtils;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
@@ -55,10 +56,23 @@ public class CliPlayerBoard {
 
     availableSpots.forEach(modelPosition -> {
       CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
+
+      String spot = CliPlayerBoard.multilineOverwrite(
+        BORDER,
+        "┆" +
+        StringUtils.center(
+          modelPosition.getX() + ";" + modelPosition.getY(),
+          BORDER.split("\n")[2].length() - 2
+        ) +
+        "┆",
+        2,
+        0
+      );
+
       result.set(
         CliPlayerBoard.multilineOverwrite(
           result.get(),
-          (BORDER),
+          (spot),
           viewPosition.getStringRow(verticalOffset),
           viewPosition.getStringColumn(horizontalOffset)
         )
