@@ -7,9 +7,8 @@
 
 ### Presented by deadline (not final)
 The presentation documents of the UML diagrams presented by the deadline for peer reviews.
-
-    - [Presentation document for the game Model](UML_presentation_document_AM21.pdf)
-    - [Presentation document for the network protocol](NETWORK_presentation_document_AM21.pdf)
+- [Presentation document for the game Model](UML_presentation_document_AM21.pdf)
+- [Presentation document for the network protocol](NETWORK_presentation_document_AM21.pdf)
 
 ### Final UML diagrams of the game implementation
  - [Final High level and in-detail UML class diagrams for the project](
