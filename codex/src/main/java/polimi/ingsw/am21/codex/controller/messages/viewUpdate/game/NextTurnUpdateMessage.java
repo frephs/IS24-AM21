@@ -21,8 +21,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
   private final Integer newPairCardId;
   private final Set<Position> availableSpots;
   private final Set<Position> forbiddenSpots;
-  private final Optional<Integer> resourceDeckTopCardId;
-  private final Optional<Integer> goldDeckTopCardId;
+  private final Integer resourceDeckTopCardId;
+  private final Integer goldDeckTopCardId;
 
   public NextTurnUpdateMessage(
     String gameId,
@@ -109,8 +109,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     this.newPairCardId = newPairCardId;
     this.availableSpots = availableSpots;
     this.forbiddenSpots = forbiddenSpots;
-    this.resourceDeckTopCardId = resourceDeckTopCardId;
-    this.goldDeckTopCardId = goldDeckTopCardId;
+    this.resourceDeckTopCardId = resourceDeckTopCardId.orElse(null);
+    this.goldDeckTopCardId = goldDeckTopCardId.orElse(null);
   }
 
   public String getGameId() {
@@ -154,11 +154,11 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
   }
 
   public Optional<Integer> getResourceDeckTopCardId() {
-    return resourceDeckTopCardId;
+    return Optional.ofNullable(resourceDeckTopCardId);
   }
 
   public Optional<Integer> getGoldDeckTopCardId() {
-    return goldDeckTopCardId;
+    return Optional.ofNullable(goldDeckTopCardId);
   }
 
   @Override
