@@ -6,7 +6,7 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 ## Overview
  This project aims to present a Java version of the game Codex Naturalis ©. 
  
- ![Publisher](graphic_resources/publisher.png)
+ ![Publisher](img/publisher.png)
 
 
 
