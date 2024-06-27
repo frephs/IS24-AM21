@@ -32,11 +32,11 @@ public class CliPlayerBoard {
 
   private static final String BORDER =
     ("""
-      ┌─────────────┐
-      │             │
-      │             │
-      │             │
-      └─────────────┘
+      ╭┄┄┄┄┄┄┄┄┄┄┄┄┄╮
+      ┆             ┆
+      ┆             ┆
+      ┆             ┆
+      ╰┄┄┄┄┄┄┄┄┄┄┄┄┄╯
       """).trim();
 
   public static void drawPlayerBoard(
@@ -44,7 +44,6 @@ public class CliPlayerBoard {
       Pair<Position, Pair<PlayableCard, CardSideType>>
     > playedCardsByPosition,
     Set<Position> avaiableSpots,
-    Set<Position> forbiddenSpots,
     int verticalOffset,
     int horizontalOffset
   ) {
@@ -54,32 +53,17 @@ public class CliPlayerBoard {
         )
     );
 
-    //    avaiableSpots.forEach(modelPosition -> {
-    //      String border = colorizeByChar(BORDER, Color.GREEN, ColorStyle.NORMAL);
-    //      CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
-    //      result.set(
-    //        CliPlayerBoard.multilineOverwrite(
-    //          result.get(),
-    //          border,
-    //          viewPosition.getStringRow(verticalOffset),
-    //          viewPosition.getStringColumn(horizontalOffset)
-    //        )
-    //      );
-    //    });
-
-    //
-    //    forbiddenSpots.forEach(modelPosition -> {
-    //      String border = CliUtils.colorize(BORDER, Color.RED, ColorStyle.NORMAL);
-    //      CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
-    //      result.set(
-    //        CliPlayerBoard.multilineOverwrite(
-    //          result.get(),
-    //          border,
-    //          viewPosition.getStringRow(verticalOffset),
-    //          viewPosition.getStringColumn(horizontalOffset)
-    //        )
-    //      );
-    //    });
+    avaiableSpots.forEach(modelPosition -> {
+      CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
+      result.set(
+        CliPlayerBoard.multilineOverwrite(
+          result.get(),
+          (BORDER),
+          viewPosition.getStringRow(verticalOffset),
+          viewPosition.getStringColumn(horizontalOffset)
+        )
+      );
+    });
 
     playedCardsByPosition.forEach(entry -> {
       Position modelPosition = entry.getKey();
@@ -102,7 +86,6 @@ public class CliPlayerBoard {
           viewPosition.getStringColumn(horizontalOffset)
         )
       );
-      System.out.println(result);
     });
 
     System.out.println(colorizeLater(result.get()));
@@ -176,6 +159,10 @@ public class CliPlayerBoard {
           ResourceType.ANIMAL.getColor(),
           ColorStyle.NORMAL
         )
+      )
+      .replaceAll(
+        "([╭╮╰╯┄┆])",
+        CliUtils.colorize("$1", Color.GREEN, ColorStyle.NORMAL)
       );
   }
 

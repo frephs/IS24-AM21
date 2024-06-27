@@ -350,7 +350,6 @@ public class Cli implements View {
     CliPlayerBoard.drawPlayerBoard(
       player.getPlayedCardsByOrder(),
       player.getAvailableSpots().orElseThrow(),
-      player.getForbiddenSpots().orElseThrow(),
       0,
       0
     );

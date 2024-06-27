@@ -5,14 +5,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import javafx.util.Pair;
 import org.junit.jupiter.api.Test;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
-import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
 
 class CliPlayerBoardTest {
 
@@ -51,8 +49,7 @@ class CliPlayerBoardTest {
 
     CliPlayerBoard.drawPlayerBoard(
       playedCards,
-      Set.of(new Position(1, 1)),
-      Set.of(new Position(-1, -1)),
+      Set.of(new Position(2, -2)),
       0,
       0
     );
