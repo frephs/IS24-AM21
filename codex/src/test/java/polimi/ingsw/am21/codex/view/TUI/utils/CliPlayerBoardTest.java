@@ -22,16 +22,22 @@ class CliPlayerBoardTest {
   void testDrawPlayerBoard() {
     new Cli.Options(true);
 
-    List<Integer> cards = List.of(1, 37, 46);
+    List<Integer> cards = List.of(1, 37, 46, 1, 37, 46, 1, 37, 46);
     List<Position> positions = List.of(
       new Position(0, 0),
-      new Position(1, 0),
-      new Position(0, 1)
+      new Position(-1, 0),
+      new Position(0, -1),
+      new Position(0, 2),
+      new Position(1, 1),
+      new Position(2, 1),
+      new Position(3, 2),
+      new Position(4, 1),
+      new Position(-2, 1)
     );
 
     List<Pair<Position, Pair<PlayableCard, CardSideType>>> playedCards =
       new ArrayList<>();
-    for (int i = 0; i < cards.size(); i++) {
+    for (int i = 0; i < positions.size(); i++) {
       playedCards.add(
         new Pair<>(
           positions.get(i),
@@ -49,6 +55,20 @@ class CliPlayerBoardTest {
       Set.of(new Position(-1, -1)),
       0,
       0
+    );
+  }
+
+  @Test
+  void testAddBoxCharacters() {
+    CliPlayerBoard.BOX_CHARACTERS.forEach(
+      a ->
+        CliPlayerBoard.BOX_CHARACTERS.forEach(
+          b ->
+            assertEquals(
+              CliPlayerBoard.addBoxCharacters(a, b),
+              CliPlayerBoard.addBoxCharacters(b, a)
+            )
+        )
     );
   }
 }

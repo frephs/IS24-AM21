@@ -1,31 +1,42 @@
 package polimi.ingsw.am21.codex.view.TUI.utils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Playable.PlayableCard;
 import polimi.ingsw.am21.codex.model.Cards.Position;
+import polimi.ingsw.am21.codex.model.Cards.ResourceType;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.Color;
 import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class CliPlayerBoard {
 
-  public static final int SECTION_COLS = 11;
-  public static final int SECTION_ROWS = 11;
+  public static final int SECTION_COLS = 21;
+  public static final int SECTION_ROWS = 21;
+
+  public static final List<String> BOX_CHARACTERS = List.of(
+    "─",
+    "│",
+    "┌",
+    "┬",
+    "┐",
+    "├",
+    "┤",
+    "└",
+    "┴",
+    "┘",
+    " ",
+    "┼"
+  );
 
   private static final String BORDER =
     ("""
-      ┌───┬─────┬───┐
-      │   │     │   │
-      ├───┤     ├───┤
-      │   │     │   │
-      └───┴─────┴───┘
+      ┌─────────────┐
+      │             │
+      │             │
+      │             │
+      └─────────────┘
       """).trim();
 
   public static void drawPlayerBoard(
@@ -42,9 +53,9 @@ public class CliPlayerBoard {
           SECTION_ROWS * CLIGridPosition.HEIGHT_OFFEST
         )
     );
-    //
+
     //    avaiableSpots.forEach(modelPosition -> {
-    //      String border = CliUtils.colorize(BORDER, Color.GREEN, ColorStyle.NORMAL);
+    //      String border = colorizeByChar(BORDER, Color.GREEN, ColorStyle.NORMAL);
     //      CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
     //      result.set(
     //        CliPlayerBoard.multilineOverwrite(
@@ -55,6 +66,7 @@ public class CliPlayerBoard {
     //        )
     //      );
     //    });
+
     //
     //    forbiddenSpots.forEach(modelPosition -> {
     //      String border = CliUtils.colorize(BORDER, Color.RED, ColorStyle.NORMAL);
@@ -74,22 +86,26 @@ public class CliPlayerBoard {
       PlayableCard card = entry.getValue().getKey();
       CardSideType cardSide = entry.getValue().getValue();
 
-      String ASCIISide = card.getSide(cardSide).cardToAscii(new HashMap<>());
+      final String[] ASCIISide = {
+        card.getSide(cardSide).cardToAscii(new HashMap<>()),
+      };
+      Color.getAllModifiers()
+        .forEach(modifier -> ASCIISide[0] = ASCIISide[0].replace(modifier, ""));
 
       CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
 
       result.set(
         CliPlayerBoard.multilineOverwrite(
           result.get(),
-          ASCIISide,
+          ASCIISide[0],
           viewPosition.getStringRow(verticalOffset),
           viewPosition.getStringColumn(horizontalOffset)
         )
       );
-      //      System.out.println(result.get());
+      System.out.println(result);
     });
 
-    System.out.println(result.get());
+    System.out.println(colorizeLater(result.get()));
   }
 
   public static String multilineOverwrite(
@@ -113,59 +129,124 @@ public class CliPlayerBoard {
     String[] replacementLines = replacement.split("\n", -1);
     for (int l = 0; l < replacementLines.length; l++) {
       String currLine = originalLines[line + l];
-      StringBuilder firstPart = new StringBuilder();
-      StringBuilder secondPart;
+      String replacementLine = replacementLines[l].trim();
 
-      int modifiersOffset = Color.getAllModifiers()
-        .stream()
-        .map(
-          modifier ->
-            (currLine.split(Pattern.quote(modifier), -1).length - 1) *
-            modifier.length()
-        )
-        .reduce(0, Integer::sum);
-      int actualColumn = column + modifiersOffset;
+      StringBuilder mergedReplacement = new StringBuilder();
 
-      firstPart.append(currLine, 0, actualColumn);
+      for (int i = 0; i < replacementLine.length(); i++) {
+        String a = currLine.substring(column + i, column + i + 1);
+        String b = replacementLine.substring(i, i + 1);
 
-      int virtualReplacementLength = 0;
-      for (int j = 0; j < replacementLines[l].length(); j++) {
         if (
-          !Color.getAllModifiers()
-            .contains(replacementLines[l].substring(j, j + 1))
-        ) virtualReplacementLength++;
+          BOX_CHARACTERS.contains(a) && BOX_CHARACTERS.contains(b)
+        ) mergedReplacement.append(CliPlayerBoard.addBoxCharacters(a, b));
+        else mergedReplacement.append(b);
       }
 
-      int actualReplacedPartLength = 0;
-      for (
-        int virtualReplacedPartLength = 0;
-        virtualReplacedPartLength < virtualReplacementLength;
-        actualReplacedPartLength++
-      ) {
-        if (
-          !Color.getAllModifiers()
-            .contains(
-              replacementLines[l].substring(
-                  actualReplacedPartLength,
-                  actualReplacedPartLength + 1
-                )
-            )
-        ) virtualReplacedPartLength++;
-      }
-
-      secondPart = new StringBuilder(replacementLines[l]);
-      secondPart.append(
-        firstPart.length() + actualReplacedPartLength < currLine.length()
-          ? currLine.substring(firstPart.length() + actualReplacedPartLength)
-          : ""
-      );
-
-      originalLines[line + l] = firstPart.toString() + secondPart;
-      //      originalLines[line + l] = originalLines[line + l].substring(0, column) +
-      //      replacementLines[l] +
-      //      originalLines[line + l].substring(column + 15);
+      originalLines[line + l] = currLine.substring(0, column) +
+      mergedReplacement +
+      currLine.substring(column + replacementLine.length());
     }
 
-    return String.join("\n", originalLines);
+    return (String.join("\n", originalLines));
+  }
+
+  public static String colorizeLater(String string) {
+    return string
+      .replaceAll(
+        "F",
+        CliUtils.colorize("F", ResourceType.FUNGI.getColor(), ColorStyle.NORMAL)
+      )
+      .replaceAll(
+        "I",
+        CliUtils.colorize(
+          "I",
+          ResourceType.INSECT.getColor(),
+          ColorStyle.NORMAL
+        )
+      )
+      .replaceAll(
+        "P",
+        CliUtils.colorize("P", ResourceType.PLANT.getColor(), ColorStyle.NORMAL)
+      )
+      .replaceAll(
+        "A",
+        CliUtils.colorize(
+          "A",
+          ResourceType.ANIMAL.getColor(),
+          ColorStyle.NORMAL
+        )
+      );
+  }
+
+  public static String addBoxCharacters(String a, String b) {
+    // ─ │ ┌ ┬ ┐ ├ ┤ └ ┴ ┘
+    // ┼
+    if (a.equals("┼") || b.equals("┼")) return "┼";
+    return switch (a) {
+      case "─" -> switch (b) {
+        case "─", " " -> "─";
+        case "│", "┤", "├" -> "┼";
+        case "┌", "┐", "┬" -> "┬";
+        case "└", "┘", "┴" -> "┴";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "│" -> switch (b) {
+        case "─", "┬", "┴" -> "┼";
+        case "│", " " -> "│";
+        case "┌", "├", "└" -> "├";
+        case "┐", "┘", "┤" -> "┤";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "┌" -> switch (b) {
+        case "─", "┬", "┐" -> "┬";
+        case "┌", " " -> "┌";
+        case "│", "└", "├" -> "├";
+        case "┴", "┘", "┤" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "┬" -> switch (b) {
+        case "─", "┌", "┐", "┬", " " -> "┬";
+        case "│", "└", "┴", "┘", "┤", "├" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "┐" -> switch (b) {
+        case "─", "┬", "┐", "┌", " " -> "┬";
+        case "┘", "│", "┤" -> "┤";
+        case "├", "└", "┴" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "├" -> switch (b) {
+        case "└", "┌", "│", "├", " " -> "├";
+        case "─", "┬", "┐", "┴", "┘", "┤" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "┤" -> switch (b) {
+        case "┐", "┘", "│", "┤", " " -> "┤";
+        case "─", "┌", "┬", "└", "├", "┴" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "└" -> switch (b) {
+        case "└", " " -> "└";
+        case "┌", "│", "├" -> "├";
+        case "─", "┘", "┴" -> "┴";
+        case "┬", "┐", "┤" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "┴" -> switch (b) {
+        case "└", "┘", "─", "┴", " " -> "┴";
+        case "┌", "┐", "┬", "┤", "│", "├" -> "┼";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case "┘" -> switch (b) {
+        case "┘", " " -> "┘";
+        case "└", "─", "┴" -> "┴";
+        case "┌", "┬", "├" -> "┼";
+        case "┤", "┐", "│" -> "┤";
+        default -> throw new IllegalStateException("Unexpected value: " + b);
+      };
+      case " " -> b;
+      default -> throw new IllegalStateException("Unexpected value: " + a);
+    };
   }
 }
