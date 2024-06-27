@@ -55,7 +55,7 @@ class GameController {
 
 class ClientGameEventHandler 
 
-  GameEventListener  <..  GameController : implements
+  GameEventListener  <--  GameController : implements
 style GameEventListener stroke:#ff,stroke-width:4px
 
 

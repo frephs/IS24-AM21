@@ -193,19 +193,19 @@ class Server {
 }
 
 
-Main "1" <-- "1" Server : contains 
-Main "1" <-- "1" ViewClient : contains
+Main "1" *-- "1" Server : composition 
+Main "1" *-- "1" ViewClient : composition
 
 
-Server "1" <-- "1" RMIServer  : contains
-Server "1" <-- "1" TCPServer : contains
+Server "1" *-- "1" RMIServer  : composition
+Server "1" *-- "1" TCPServer : composition
 
-TCPServer "1" <-- "0..*" TCPServerConnectionHandler : contains
+TCPServer "1" *-- "0..*" TCPServerConnectionHandler : composition
 
-RMIServer "1" <-- "0..*" RMIServerConnectionHandler : contains
+RMIServer "1" *-- "0..*" RMIServerConnectionHandler : composition
 
-Server "1" <-- "1" GameController : contains
-GameController "1" <-- "1" GameManager : contains
+Server "1" *-- "1" GameController : composition
+GameController "1" *-- "1" GameManager : composition
 
 
 class TCPClientConnectionHandler {
@@ -393,43 +393,43 @@ class ClientConnectionHandler {
   + placeCard(Integer, CardSideType, Position) void
 }
 
-  View <.. Cli : implements
-  View <.. Gui : implements
+  View <-- Cli : implements
+  View <-- Gui : implements
 
-  GuiClient <-- Gui : contains
-  CliClient <-- Cli : contains
+  GuiClient *-- Gui : composition
+  CliClient *-- Cli : composition
 
   ViewClient <-- CliClient : extends
   ViewClient <-- GuiClient : extends
 
   ViewClient <-- ConnectionType : uses
   ViewClient <-- ClientType : uses
-  ViewClient <-- ClientConnectionHandler : contains
+  ViewClient *-- ClientConnectionHandler : composition
 
-  ViewClient <-- View : contains
+  ViewClient *-- View : composition
 
 
-  GameErrorListener <.. ClientGameEventHandler : implements
-  GameEventListener <.. ClientGameEventHandler : implements
+  GameErrorListener <-- ClientGameEventHandler : implements
+  GameEventListener <-- ClientGameEventHandler : implements
   
-  CliClient "1" <-- "1..*"  CommandHandler : contains
+  CliClient "1" *-- "1..*" CommandHandler : composition
 
   RemoteGameEventListener <-- GameEventListener 
   
-  Cli <-- Cli-Options : contains
-  Main <-- Main-Options : contains
+  Cli *-- Cli-Options : composition
+  Main *-- Main-Options : composition
   
   ClientConnectionHandler <-- RMIClientConnectionHandler : extends
   ClientConnectionHandler <-- TCPClientConnectionHandler : extends
 
 
-  TCPServer <-- AbstractServer   : extends
-  RMIServer <--  AbstractServer  : extends
+  TCPServer --> AbstractServer   : extends
+  RMIServer -->  AbstractServer  : extends
 
-  RMIServerConnectionHandler <.. RMIServerConnectionHandlerImpl : implements
+  RMIServerConnectionHandler <-- RMIServerConnectionHandlerImpl : implements
   
-  TCPServerConnectionHandler <-- TCPServerControllerListener: contains  
-  GameEventListener <.. TCPServerControllerListener : implements
+  TCPServerConnectionHandler *-- TCPServerControllerListener: composition  
+  GameEventListener <-- TCPServerControllerListener : implements
 
   GameEventListener <-- View : extends 
 

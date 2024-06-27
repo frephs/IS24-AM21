@@ -31,9 +31,9 @@ class LocalModelContainer {
   + getClientContextContainer() ClientContextContainer
 }
 
-ClientGameEventHandler <-- LocalModelContainer : contains
-GameEventListener <.. ClientGameEventHandler : implements
-GameEventListener <.. LocalModelContainer : implements
+ClientGameEventHandler *-- LocalModelContainer : composition
+GameEventListener <-- ClientGameEventHandler : implements
+GameEventListener <-- LocalModelContainer : implements
 
 style GameEventListener stroke:#ff,stroke-width:4px
 
@@ -57,10 +57,10 @@ class ClientContextContainer {
 
 class ClientGameEventHandler 
 
-  ClientGameEventHandler "1" <-- "1" LocalModelContainer : contains
+  ClientGameEventHandler "1" *-- "1" LocalModelContainer : composition
 
   LocalModelContainer <-- ClientContextContainer  
-    ClientContextContainer <-- ClientContext : contains
+    ClientContextContainer *-- ClientContext : composition
 
   class GameEntry {
   + GameEntry(String, Integer, Integer) 
@@ -174,12 +174,12 @@ class LocalPlayer {
 }
 
 
- LocalModelContainer "1" <-- "1" LocalGameBoard : contains
-  LocalModelContainer "1" <-- "1" LocalLobby : contains
-  LocalModelContainer "1" <-- "1" LocalMenu : contains
-  LocalMenu "1" <-- "0..*" GameEntry : contains 
-  LocalGameBoard "1" <-- "0..4" LocalPlayer : contains
-  LocalLobby "1" <-- "0..4" LocalPlayer : contains
+ LocalModelContainer "1" *-- "1" LocalGameBoard : composition
+  LocalModelContainer "1" *-- "1" LocalLobby : composition
+  LocalModelContainer "1" *-- "1" LocalMenu : composition
+  LocalMenu "1" *-- "0..*" GameEntry : composition 
+  LocalGameBoard "1" *-- "0..4" LocalPlayer : composition
+  LocalLobby "1" *-- "0..4" LocalPlayer : composition
 ```
 
 ## View 
