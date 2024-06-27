@@ -11,10 +11,10 @@
     - [Presentation document for the network protocol](NETWORK_presentation_document_AM21.pdf)
 
 ### Final UML diagrams and implementation
- - [High level and in-detail UML class diagrams for the project](
+ - [Final High level and in-detail UML class diagrams for the project](
 uml_class_diagrams_final_implementation/README.md)
 
- - [Final network protocol implementation](network_protocol.md)
+ - [Final UML sequence diagrams of the network protocol implementation](network_protocol.md)
 
 ## JavaDoc
 - [JavaDoc](javadoc/index.html)
