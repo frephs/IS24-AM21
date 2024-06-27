@@ -93,7 +93,7 @@ public class Cli implements View {
   ) {
     ArrayList<String> result = new ArrayList<>();
     Arrays.stream(parts)
-      .limit(2)
+      .limit(Math.min(colorableIndex, parts.length))
       .map(
         e ->
           CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
@@ -106,7 +106,7 @@ public class Cli implements View {
       )
     );
     Arrays.stream(parts)
-      .skip(2)
+      .skip(Math.min(colorableIndex, parts.length))
       .map(
         e ->
           CliUtils.colorize(e, notificationType.getColor(), ColorStyle.NORMAL)
