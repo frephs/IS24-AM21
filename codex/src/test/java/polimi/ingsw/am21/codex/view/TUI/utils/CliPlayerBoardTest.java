@@ -82,17 +82,21 @@ class CliPlayerBoardTest {
       );
     }
 
-    CliPlayerBoard.drawPlayerBoard(
-      playedCards,
-      Set.of(new Position(2, -2)),
-      0,
-      0
+    System.out.println(
+      CliPlayerBoard.drawPlayerBoard(
+        playedCards,
+        Set.of(new Position(2, -2)),
+        0,
+        0
+      )
     );
-    CliPlayerBoard.drawPlayerBoard(
-      playedCards,
-      Set.of(new Position(2, -2)),
-      -1,
-      1
+    System.out.println(
+      CliPlayerBoard.drawPlayerBoard(
+        playedCards,
+        Set.of(new Position(2, -2)),
+        -1,
+        1
+      )
     );
   }
 

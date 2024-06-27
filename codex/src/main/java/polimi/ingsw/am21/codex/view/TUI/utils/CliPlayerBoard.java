@@ -40,7 +40,7 @@ public class CliPlayerBoard {
       ╰┄┄┄┄┄┄┄┄┄┄┄┄┄╯
       """).trim();
 
-  public static void drawPlayerBoard(
+  public static String drawPlayerBoard(
     List<
       Pair<Position, Pair<PlayableCard, CardSideType>>
     > playedCardsByPosition,
@@ -102,7 +102,7 @@ public class CliPlayerBoard {
       );
     });
 
-    System.out.println(colorizeLater(result.get()));
+    return (colorizeLater(result.get()));
   }
 
   public static String multilineOverwrite(
