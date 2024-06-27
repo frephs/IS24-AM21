@@ -19,23 +19,23 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 
 ## Development status:
 
-| Requirement | Scope| Status |
-|-------------|---|:-------:|
-| Complete Rules | Model| 🟢 |
-| GUI | View |🟢 |
-| Rmi  | Connection | 🟢 |
-| Socket | Connection| 🟢 | 
-| Chat | Advanced functionality 1 | 🟢|
-| Multiple games  | Advanced functionality 2| 🟢
-| Client disconnection resilience |Advanced functionality 3 | 🟡|
-| Game saving on disk | Advanced functionality 4 | ❌ |
+| Requirement                     | Scope                    | Status |
+|---------------------------------|--------------------------|:------:|
+| Complete Rules                  | Model                    |   🟢   |
+| GUI                             | View                     |   🟢   |
+| Rmi                             | Connection               |   🟢   |
+| Socket                          | Connection               |   🟢   | 
+| Chat                            | Advanced functionality 1 |   🟢   |
+| Multiple games                  | Advanced functionality 2 |   🟢   |
+| Client disconnection resilience | Advanced functionality 3 |   🟡   |
+| Game saving on disk             | Advanced functionality 4 |   ❌    |
 
 See the [deliverables folder](deliveries)
 
 ## Usage
 Run the game with
 ```
-$ java -jar /path/to/AM21_{OS}.jar
+$ java -jar /path/to/AM21-CodexNaturalis.jar
 ```
 ### Server
 First, run the server using the `--server` flag. Specify the ports with the `--tcp-port` and `--rmi-port` flags.
@@ -51,13 +51,11 @@ Specify the connection type with the `--rmi` or `--tcp` flag. If not specified, 
 
 Specify the interface with the `--cli` or `--gui` flag. If not specified, the default is GUI.
 
-Specify the 
-
-
-
 
 ### Help message
-```$ java -jar AM21_linux.jar --help
+```
+$ java -jar AM21-CodexNaturalis.jar --help
+
 _________            .___              
 \_   ___ \  ____   __| _/____ ___  ___ 
 /    \  \/ /  _ \ / __ |/ __ \\  \/  / 
@@ -80,6 +78,14 @@ Server Parameters:
 --tcp-port=<port>: specify the TCP Server port (default 2002)
 Common Parameters: 
 --help: print this help message
+```
+
+## Building the source
+
+To build a JAR file for your OS, run the following command:
+
+```shell
+mvn clean package
 ```
 
 ## License
