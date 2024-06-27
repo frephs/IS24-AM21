@@ -30,12 +30,6 @@ public class ResourceCardFrontSide
     return ((playerBoard, integer) -> points);
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     if (!cardStringMap.containsKey(5) && points > 0) {

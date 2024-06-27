@@ -15,19 +15,19 @@ class CliPrintableTest {
     CardsLoader cardsLoader = new CardsLoader();
 
     Deck<PlayableCard> resourceDeck = new Deck<PlayableCard>(
-      cardsLoader.loadResourceCards()
+      cardsLoader.getResourceCards()
     );
 
     Deck<PlayableCard> goldDeck = new Deck<PlayableCard>(
-      cardsLoader.loadGoldCards()
+      cardsLoader.getGoldCards()
     );
 
     Deck<PlayableCard> starterDeck = new Deck<PlayableCard>(
-      cardsLoader.loadStarterCards()
+      cardsLoader.getStarterCards()
     );
 
     Deck<ObjectiveCard> objectiveDeck = new Deck<ObjectiveCard>(
-      cardsLoader.loadObjectiveCards()
+      cardsLoader.getObjectiveCards()
     );
 
     new Cli.Options(true);

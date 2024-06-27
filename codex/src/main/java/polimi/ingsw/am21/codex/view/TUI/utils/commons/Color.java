@@ -41,10 +41,17 @@ public enum Color {
     this.bright = bright;
   }
 
+  /**
+   * Colorizes a string with the given color and style, automatically resetting
+   * the formatting afterward
+   */
   public static String colorize(String string, Color color, ColorStyle style) {
     return (color.getCode(style) + string + Color.RESET.normal);
   }
 
+  /**
+   * Gets the modified code for the given style
+   */
   public String getCode(ColorStyle style) {
     return switch (style) {
       case NORMAL -> this.normal;

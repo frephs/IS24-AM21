@@ -9,14 +9,17 @@ public class CardPair<T extends Card> extends CardPairBase<T> {
     super(firstCard, secondCard);
   }
 
+  /**
+   * Creates a CardPair from a CardIdPair
+   */
   public static <T extends Card> CardPair<T> fromCardIndexPair(
     CardsLoader cardsLoader,
-    CardIndexPair cardIndexPair
+    CardIdPair cardIdPair
   ) {
     //noinspection unchecked
-    return new CardPair<T>(
-      (T) cardsLoader.getCardFromId(cardIndexPair.getFirst()),
-      (T) cardsLoader.getCardFromId(cardIndexPair.getSecond())
+    return new CardPair<>(
+      (T) cardsLoader.getCardFromId(cardIdPair.getFirst()),
+      (T) cardsLoader.getCardFromId(cardIdPair.getSecond())
     );
   }
 }

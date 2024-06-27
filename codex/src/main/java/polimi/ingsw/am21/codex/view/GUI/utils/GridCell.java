@@ -58,6 +58,9 @@ public class GridCell extends AnchorPane {
     this.status = status;
   }
 
+  /**
+   * Loads a card in the cell and makes it inactive
+   */
   public void placeCard(ImageView cardImage) {
     setStatus(GridCellStatus.INACTIVE);
 

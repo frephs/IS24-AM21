@@ -36,12 +36,6 @@ public class PlayableBackSide extends PlayableSide implements CliCard {
     return ((playerBoard, coveredCorners) -> 0);
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     final int BEGIN = 4;

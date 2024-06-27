@@ -4,3 +4,4 @@ public enum ClientType {
   CLI,
   GUI,
 }
+//TODO refactor to connection

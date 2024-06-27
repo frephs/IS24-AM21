@@ -28,12 +28,28 @@ import polimi.ingsw.am21.codex.model.exceptions.GameAlreadyExistsException;
 import polimi.ingsw.am21.codex.view.NotificationType;
 import polimi.ingsw.am21.codex.view.View;
 
+/**
+ * Class that handles the events thrown by the server, caught by the clients and forwards them to the local model and the view.
+ * It implements the GameEventListener and GameErrorListener interfaces.
+ * @see GameEventListener
+ * @see GameErrorListener
+ * */
 public class ClientGameEventHandler
   implements GameEventListener, GameErrorListener {
 
+  /**
+   * The listener to propagate events to
+   */
   private final RemoteGameEventListener listener;
 
+  /**
+   * The local model container of the handler's client
+   */
   protected LocalModelContainer localModel;
+
+  /**
+   * The view the associated client is using
+   */
   private final View view;
 
   public View getView() {
@@ -53,7 +69,6 @@ public class ClientGameEventHandler
   }
 
   public RemoteGameEventListener getRemoteListener() {
-    // TODO implement this in TCP or change location.
     return listener;
   }
 

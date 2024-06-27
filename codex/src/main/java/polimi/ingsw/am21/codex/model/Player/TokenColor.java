@@ -20,6 +20,7 @@ public enum TokenColor implements Colorable, Serializable, GuiElement {
       case BLUE -> Color.BLUE;
       case GREEN -> Color.GREEN;
       case YELLOW -> Color.YELLOW;
+      // This is disabled as it's not a token that the player can pick
       //case BLACK -> Color.BLACK;
     };
   }

@@ -25,8 +25,16 @@ import polimi.ingsw.am21.codex.view.NotificationType;
 
 public class NotificationLoader {
 
+  public static final int NOTIFICATION_DURATION = 2000;
+
+  /**
+   * The stage used to display notifications
+   */
   private static Stage notificationStage;
 
+  /**
+   * The queue of notifications to be displayed
+   */
   private final Queue<NotificationLayout> notifications = new LinkedList<>();
 
   public NotificationLoader(Stage notificationStage) {
@@ -45,6 +53,9 @@ public class NotificationLoader {
     notificationStage.initModality(Modality.NONE);
   }
 
+  /**
+   * Adds a notification to the queue
+   */
   public void addNotification(
     NotificationType notificationType,
     String message
@@ -63,6 +74,9 @@ public class NotificationLoader {
     }
   }
 
+  /**
+   * Recursively processes the notifications in the queue until it's empty
+   */
   public void processNotifications() throws IOException {
     if (!notifications.isEmpty()) {
       NotificationLayout notification = notifications.poll();
@@ -73,12 +87,12 @@ public class NotificationLoader {
       notificationStage.setScene(notificationScene);
       notificationStage.show();
 
-      notification.startProgressBar(2000, true);
+      notification.startProgressBar(NOTIFICATION_DURATION, true);
 
       // Close the notification after the duration and process the next one
       new Thread(() -> {
         try {
-          Thread.sleep(2000); // Duration in milliseconds
+          Thread.sleep(NOTIFICATION_DURATION); // Duration in milliseconds
         } catch (InterruptedException e) {
           Gui.getInstance().displayException(e);
         }

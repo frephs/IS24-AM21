@@ -692,6 +692,7 @@ public class Gui extends Application implements View {
         drawPlayerObjective();
       });
 
+    // noinspection unchecked
     ChoiceBox<String> playerBoardChoiceBox = (ChoiceBox<String>) scene.lookup(
       "#player-board-choice"
     );
@@ -1264,6 +1265,7 @@ public class Gui extends Application implements View {
     loadSceneFXML("Chat.fxml", "#side-content-bottom");
     // add recipients to chat-recipient combo box
 
+    // noinspection unchecked
     ChoiceBox<String> recipientChoiceBox = (ChoiceBox<String>) scene.lookup(
       "#chat-recipient"
     );

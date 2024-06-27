@@ -39,12 +39,6 @@ public enum ObjectType implements CornerContentType, Colorable, GuiElement {
     visitor.visit(this, arg);
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   @Override
   public Color getColor() {
     return Color.YELLOW;

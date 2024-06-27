@@ -37,12 +37,6 @@ public enum ResourceType implements CornerContentType, Colorable, GuiElement {
     visitor.visit(this, arg);
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   public Color getColor() {
     return switch (this) {
       case PLANT -> Color.GREEN;

@@ -25,10 +25,6 @@ public class GeometricObjective extends Objective implements CliCard {
     this.geometry = new HashMap<>(geometry);
   }
 
-  /**
-   * The function get the PlayerBoard and the points of the objective card you are evaluating
-   * @return the point that you get from that objective card
-   */
   @Override
   public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
     return (playerBoard, points) ->

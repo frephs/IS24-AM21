@@ -38,6 +38,10 @@ public abstract class Card implements CliCard, GuiElement {
     return getImagePath(CardSideType.FRONT);
   }
 
+  /**
+   * Returns the path of the image of the card, given the side type
+   * @param sideType The visible side of the card
+   */
   public String getImagePath(CardSideType sideType) {
     return switch (sideType) {
       case FRONT -> "cards/front/" + String.format("%03d", id) + ".png";

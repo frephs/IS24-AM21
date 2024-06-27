@@ -25,22 +25,12 @@ public class ObjectiveCard extends Card implements CliCard {
     this.objective = objective;
   }
 
-  /**
-   * Take the PlayerBoard of player
-   * @return The points of the objective card
-   */
   @Override
   public Function<PlayerBoard, Integer> getEvaluator() {
     return playerBoard -> {
       return objective.getEvaluator().apply(playerBoard, points);
     };
   }
-
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
 
   @Override
   public String cardToString() {

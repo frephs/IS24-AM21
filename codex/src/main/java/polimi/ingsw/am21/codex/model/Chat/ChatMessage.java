@@ -12,9 +12,6 @@ public class ChatMessage implements Serializable {
   private final String sender;
   private final Date timestamp;
 
-  /**
-   * Message for chosen player
-   */
   public ChatMessage(
     String sender,
     String recipient,

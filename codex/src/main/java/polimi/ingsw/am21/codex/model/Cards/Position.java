@@ -2,6 +2,13 @@ package polimi.ingsw.am21.codex.model.Cards;
 
 import java.io.Serializable;
 
+/**
+ * Represents a position in the isometric grid
+ * The isometric grid is a grid with the following properties:<br>
+ * 1. The origin is in the center of the grid<br>
+ * 2. The x-axis is oriented to the bottom-right part of the screen<br>
+ * 3. The y-axis is oriented to the top-right part of the screen<br>
+ */
 public class Position implements Serializable {
 
   private final Integer x, y;
@@ -24,6 +31,9 @@ public class Position implements Serializable {
     return y;
   }
 
+  /**
+   * Calculates the position of the given relative offset
+   */
   public Position computeAdjacentPosition(AdjacentPosition adjacentPosition) {
     return switch (adjacentPosition) {
       // isometric grid
