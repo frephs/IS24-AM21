@@ -22,7 +22,6 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 | Requirement | Scope| Status |
 |-------------|---|:-------:|
 | Complete Rules | Model| 🟢 |
-| TUI | View| 🟡🟡|
 | GUI | View |🟢 |
 | Rmi  | Connection | 🟢 |
 | Socket | Connection| 🟢 | 
