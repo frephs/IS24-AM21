@@ -57,8 +57,6 @@ class ClientContextContainer {
 
 class ClientGameEventHandler 
 
-  ClientGameEventHandler "1" *-- "1" LocalModelContainer : composition
-
   LocalModelContainer "1" *-- "1" ClientContextContainer : composition
     ClientContextContainer "1" *-- "1" ClientContext : composition 
 

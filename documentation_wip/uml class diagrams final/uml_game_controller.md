@@ -138,5 +138,5 @@ class ConnectionStatus {
   GameController "1" <-- "0..*" UserGameContext : composition
   GameController -- EventDispatchMode : link
   UserGameContext <-- UserGameContextStatus : composition
-  UserGameContext "1" <-- 1 ConnectionStatus  : composition
+  UserGameContext "1" <-- "1" ConnectionStatus  : composition
  ```
