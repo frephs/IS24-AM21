@@ -115,8 +115,8 @@ public class TCPServerControllerListener implements GameEventListener {
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     broadcast.accept(
       new NextTurnUpdateMessage(
@@ -143,8 +143,8 @@ public class TCPServerControllerListener implements GameEventListener {
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     broadcast.accept(
       new NextTurnUpdateMessage(

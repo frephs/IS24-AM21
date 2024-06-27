@@ -950,8 +950,11 @@ public class GameController {
             game.getObjectiveCards(),
             game.getResourceCards(),
             game.getGoldCards(),
-            game.getGameBoard().peekResourceCardFromDeck().getId(),
-            game.getGameBoard().peekGoldCardFromDeck().getId()
+            game
+              .getGameBoard()
+              .peekResourceCardFromDeck()
+              .map(PlayableCard::getId),
+            game.getGameBoard().peekGoldCardFromDeck().map(PlayableCard::getId)
           );
           listener.gameStarted(gameId, gameInfo);
         });
@@ -1145,8 +1148,11 @@ public class GameController {
             game.isLastRound(),
             game.getCurrentPlayer().getBoard().getAvailableSpots(),
             game.getCurrentPlayer().getBoard().getForbiddenSpots(),
-            game.getGameBoard().peekResourceCardFromDeck().getId(),
-            game.getGameBoard().peekGoldCardFromDeck().getId()
+            game
+              .getGameBoard()
+              .peekResourceCardFromDeck()
+              .map(PlayableCard::getId),
+            game.getGameBoard().peekGoldCardFromDeck().map(PlayableCard::getId)
           )
       );
   }
@@ -1207,8 +1213,14 @@ public class GameController {
                   pairCardId,
                   game.getCurrentPlayer().getBoard().getAvailableSpots(),
                   game.getCurrentPlayer().getBoard().getForbiddenSpots(),
-                  game.getGameBoard().peekResourceCardFromDeck().getId(),
-                  game.getGameBoard().peekGoldCardFromDeck().getId()
+                  game
+                    .getGameBoard()
+                    .peekResourceCardFromDeck()
+                    .map(PlayableCard::getId),
+                  game
+                    .getGameBoard()
+                    .peekGoldCardFromDeck()
+                    .map(PlayableCard::getId)
                 )
             ),
         () -> this.nextTurnEvent(connectionID, gameId, game),

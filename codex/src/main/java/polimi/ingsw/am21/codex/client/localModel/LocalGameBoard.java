@@ -50,12 +50,12 @@ public class LocalGameBoard {
   /**
    * The top card of the resource deck
    */
-  private PlayableCard resourceDeckTopCard;
+  private Optional<PlayableCard> resourceDeckTopCard;
 
   /**
    * The top card of the gold deck
    */
-  private PlayableCard goldDeckTopCard;
+  private Optional<PlayableCard> goldDeckTopCard;
 
   /**
    * The secret objective of the player
@@ -197,19 +197,21 @@ public class LocalGameBoard {
     return players.get((currentPlayerIndex + 1) % players.size());
   }
 
-  public PlayableCard getResourceDeckTopCard() {
+  public Optional<PlayableCard> getResourceDeckTopCard() {
     return resourceDeckTopCard;
   }
 
-  public void setResourceDeckTopCard(PlayableCard resourceDeckTopCard) {
+  public void setResourceDeckTopCard(
+    Optional<PlayableCard> resourceDeckTopCard
+  ) {
     this.resourceDeckTopCard = resourceDeckTopCard;
   }
 
-  public PlayableCard getGoldDeckTopCard() {
+  public Optional<PlayableCard> getGoldDeckTopCard() {
     return goldDeckTopCard;
   }
 
-  public void setGoldDeckTopCard(PlayableCard goldDeckTopCard) {
+  public void setGoldDeckTopCard(Optional<PlayableCard> goldDeckTopCard) {
     this.goldDeckTopCard = goldDeckTopCard;
   }
 }

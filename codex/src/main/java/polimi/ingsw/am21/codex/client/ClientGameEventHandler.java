@@ -1,10 +1,7 @@
 package polimi.ingsw.am21.codex.client;
 
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.remote.LocalModelGameEventListener;
@@ -234,8 +231,8 @@ public class ClientGameEventHandler
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     localModel.changeTurn(
       gameId,
@@ -275,8 +272,8 @@ public class ClientGameEventHandler
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     localModel.changeTurn(
       gameId,

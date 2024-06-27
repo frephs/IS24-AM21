@@ -140,8 +140,8 @@ public class LocalModelGameEventListener
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) throws RemoteException {
     listener.changeTurn(
       gameId,
@@ -167,8 +167,8 @@ public class LocalModelGameEventListener
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) throws RemoteException {
     listener.changeTurn(
       gameId,

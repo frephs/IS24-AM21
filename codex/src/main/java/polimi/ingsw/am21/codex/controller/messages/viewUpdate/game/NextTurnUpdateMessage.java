@@ -1,5 +1,6 @@
 package polimi.ingsw.am21.codex.controller.messages.viewUpdate.game;
 
+import java.util.Optional;
 import java.util.Set;
 import polimi.ingsw.am21.codex.controller.messages.MessageType;
 import polimi.ingsw.am21.codex.controller.messages.ViewUpdatingMessage;
@@ -20,8 +21,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
   private final Integer newPairCardId;
   private final Set<Position> availableSpots;
   private final Set<Position> forbiddenSpots;
-  private final Integer resourceDeckTopCardId;
-  private final Integer goldDeckTopCardId;
+  private final Optional<Integer> resourceDeckTopCardId;
+  private final Optional<Integer> goldDeckTopCardId;
 
   public NextTurnUpdateMessage(
     String gameId,
@@ -33,8 +34,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     this(
       MessageType.NEXT_TURN_UPDATE,
@@ -59,8 +60,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     Integer playerIndex,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     this(
       MessageType.NEXT_TURN_UPDATE,
@@ -94,8 +95,8 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     super(type);
     this.gameId = gameId;
@@ -152,11 +153,11 @@ public class NextTurnUpdateMessage extends ViewUpdatingMessage {
     return playerIndex;
   }
 
-  public Integer getResourceDeckTopCardId() {
+  public Optional<Integer> getResourceDeckTopCardId() {
     return resourceDeckTopCardId;
   }
 
-  public Integer getGoldDeckTopCardId() {
+  public Optional<Integer> getGoldDeckTopCardId() {
     return goldDeckTopCardId;
   }
 

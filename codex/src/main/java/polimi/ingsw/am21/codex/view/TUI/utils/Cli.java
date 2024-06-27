@@ -521,26 +521,27 @@ public class Cli implements View {
 
   @Override
   public void drawCardDecks() {
-    PlayableCard firstResourceCard = localModel
+    Optional<PlayableCard> firstResourceCard = localModel
       .getLocalGameBoard()
       .orElseThrow()
       .getResourceDeckTopCard();
-    PlayableCard firstGoldCard = localModel
+    Optional<PlayableCard> firstGoldCard = localModel
       .getLocalGameBoard()
       .orElseThrow()
       .getGoldDeckTopCard();
 
-    if (firstResourceCard != null) {
+    if (firstResourceCard.isPresent()) {
       printUpdate(
         "Resource cards deck:\n" +
-        firstResourceCard.getSides().get(1).cardToAscii()
+        firstResourceCard.get().getSides().get(1).cardToAscii()
       );
     } else {
       printUpdate("Resource cards deck:\n" + "Empty deck");
     }
-    if (firstGoldCard != null) {
+    if (firstGoldCard.isPresent()) {
       printUpdate(
-        "Gold cards deck:\n" + firstGoldCard.getSides().get(1).cardToAscii()
+        "Gold cards deck:\n" +
+        firstGoldCard.get().getSides().get(1).cardToAscii()
       );
     } else {
       printUpdate("Gold cards deck:\n" + "Empty deck");
@@ -675,8 +676,8 @@ public class Cli implements View {
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     View.super.changeTurn(
       gameId,

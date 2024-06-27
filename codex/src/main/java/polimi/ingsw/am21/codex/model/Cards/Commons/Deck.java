@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.model.Cards.Commons;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class Deck<T> {
 
@@ -68,7 +69,7 @@ public class Deck<T> {
    * Lets you peek the top card of the deck, without removing it
    * @return The top card of the deck
    */
-  public T peek() {
-    return this.cards.getLast();
+  public Optional<T> peek() {
+    return Optional.ofNullable(this.cards.getLast());
   }
 }

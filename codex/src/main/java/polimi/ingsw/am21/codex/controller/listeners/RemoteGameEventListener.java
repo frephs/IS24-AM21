@@ -156,8 +156,8 @@ public interface RemoteGameEventListener extends Remote {
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) throws RemoteException;
 
   /**
@@ -182,8 +182,8 @@ public interface RemoteGameEventListener extends Remote {
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) throws RemoteException;
 
   /**

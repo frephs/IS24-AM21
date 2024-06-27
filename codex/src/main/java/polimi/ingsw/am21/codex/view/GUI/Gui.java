@@ -1464,19 +1464,19 @@ public class Gui extends Application implements View {
       HBox resourceCardsDeck = (HBox) scene.lookup("#resource-cards-deck");
       HBox goldCardsDeck = (HBox) scene.lookup("#gold-cards-deck");
 
-      PlayableCard firstResourceCard = localModel
+      Optional<PlayableCard> firstResourceCard = localModel
         .getLocalGameBoard()
         .orElseThrow()
         .getResourceDeckTopCard();
-      PlayableCard firstGoldCard = localModel
+      Optional<PlayableCard> firstGoldCard = localModel
         .getLocalGameBoard()
         .orElseThrow()
         .getGoldDeckTopCard();
 
       resourceCardsDeck.getChildren().clear();
-      if (firstResourceCard != null) {
+      if (firstResourceCard.isPresent()) {
         ImageView resource = loadCardImage(
-          firstResourceCard,
+          firstResourceCard.get(),
           CardSideType.BACK
         );
         resource.setPreserveRatio(true);
@@ -1494,8 +1494,8 @@ public class Gui extends Application implements View {
       }
 
       goldCardsDeck.getChildren().clear();
-      if (firstGoldCard != null) {
-        ImageView gold = loadCardImage(firstGoldCard, CardSideType.BACK);
+      if (firstGoldCard.isPresent()) {
+        ImageView gold = loadCardImage(firstGoldCard.get(), CardSideType.BACK);
         gold.setPreserveRatio(true);
         gold.setFitWidth(150);
         gold.getStyleClass().add("card");
@@ -1761,8 +1761,8 @@ public class Gui extends Application implements View {
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     View.super.changeTurn(
       gameId,

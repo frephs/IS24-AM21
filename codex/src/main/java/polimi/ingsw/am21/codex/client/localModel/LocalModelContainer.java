@@ -443,16 +443,16 @@ public class LocalModelContainer implements GameEventListener {
       gameBoard
         .get()
         .setResourceDeckTopCard(
-          (PlayableCard) cardsLoader.getCardFromId(
-            gameInfo.getResourceDeckTopCardId()
-          )
+          gameInfo
+            .getResourceDeckTopCardId()
+            .map(id -> (PlayableCard) cardsLoader.getCardFromId(id))
         );
       gameBoard
         .get()
         .setGoldDeckTopCard(
-          (PlayableCard) cardsLoader.getCardFromId(
-            gameInfo.getGoldDeckTopCardId()
-          )
+          gameInfo
+            .getGoldDeckTopCardId()
+            .map(id -> (PlayableCard) cardsLoader.getCardFromId(id))
         );
     }
   }
@@ -509,8 +509,8 @@ public class LocalModelContainer implements GameEventListener {
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     if (drawnCardId != null) {
       Card drawnCard = cardsLoader.getCardFromId(drawnCardId);
@@ -555,19 +555,22 @@ public class LocalModelContainer implements GameEventListener {
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     LocalGameBoard gameBoard = this.gameBoard.orElseThrow();
 
     gameBoard.setCurrentPlayerIndex(playerIndex);
     gameBoard.getCurrentPlayer().setAvailableSpots(availableSpots);
     gameBoard.getCurrentPlayer().setForbiddenSpots(forbiddenSpots);
+
     gameBoard.setResourceDeckTopCard(
-      (PlayableCard) cardsLoader.getCardFromId(resourceDeckTopCardId)
+      resourceDeckTopCardId.map(
+        id -> (PlayableCard) cardsLoader.getCardFromId(id)
+      )
     );
     gameBoard.setGoldDeckTopCard(
-      (PlayableCard) cardsLoader.getCardFromId(goldDeckTopCardId)
+      goldDeckTopCardId.map(id -> (PlayableCard) cardsLoader.getCardFromId(id))
     );
 
     currentPlayerHasPlacedCard = false;

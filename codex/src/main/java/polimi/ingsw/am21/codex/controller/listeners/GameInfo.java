@@ -190,11 +190,11 @@ public class GameInfo implements Serializable {
   /**
    * The ID of the resource card on the top of the deck
    */
-  private final Integer resourceDeckTopCardId;
+  private final Optional<Integer> resourceDeckTopCardId;
   /**
    * The ID of the gold card on the top of the deck
    */
-  private final Integer goldDeckTopCardId;
+  private final Optional<Integer> goldDeckTopCardId;
 
   public GameInfo(
     String gameId,
@@ -204,8 +204,8 @@ public class GameInfo implements Serializable {
     CardIdPair objectiveCards,
     CardIdPair resourceCards,
     CardIdPair goldCards,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     this.gameId = gameId;
     this.users = users;
@@ -226,8 +226,8 @@ public class GameInfo implements Serializable {
     CardPair<ObjectiveCard> objectiveCards,
     CardPair<PlayableCard> resourceCards,
     CardPair<PlayableCard> goldCards,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) {
     this(
       gameId,
@@ -274,11 +274,11 @@ public class GameInfo implements Serializable {
     return Optional.ofNullable(remainingRounds);
   }
 
-  public Integer getResourceDeckTopCardId() {
+  public Optional<Integer> getResourceDeckTopCardId() {
     return resourceDeckTopCardId;
   }
 
-  public Integer getGoldDeckTopCardId() {
+  public Optional<Integer> getGoldDeckTopCardId() {
     return goldDeckTopCardId;
   }
 }

@@ -127,7 +127,7 @@ public class GameBoard {
   /**
    * Returns the first card of the gold deck, without drawing it
    */
-  public PlayableCard peekGoldCardFromDeck() {
+  public Optional<PlayableCard> peekGoldCardFromDeck() {
     return this.goldDeck.peek();
   }
 
@@ -274,7 +274,7 @@ public class GameBoard {
   /**
    * Returns the first card of the resource deck, without drawing it
    */
-  public PlayableCard peekResourceCardFromDeck() {
+  public Optional<PlayableCard> peekResourceCardFromDeck() {
     return this.resourceDeck.peek();
   }
 
