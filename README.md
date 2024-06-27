@@ -31,6 +31,8 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 | Client disconnection resilience |Advanced functionality 3 | 🟡|
 | Game saving on disk | Advanced functionality 4 | ❌ |
 
+See the [deliveables folder](deliveries)
+
 ## Usage
 Run the game with
 ```
