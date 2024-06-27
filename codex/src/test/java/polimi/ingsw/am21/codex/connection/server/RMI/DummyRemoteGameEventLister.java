@@ -2,10 +2,7 @@ package polimi.ingsw.am21.codex.connection.server.RMI;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
@@ -94,8 +91,8 @@ public class DummyRemoteGameEventLister
     Integer newPairCardId,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) throws RemoteException {}
 
   @Override
@@ -106,8 +103,8 @@ public class DummyRemoteGameEventLister
     Boolean isLastRound,
     Set<Position> availableSpots,
     Set<Position> forbiddenSpots,
-    Integer resourceDeckTopCardId,
-    Integer goldDeckTopCardId
+    Optional<Integer> resourceDeckTopCardId,
+    Optional<Integer> goldDeckTopCardId
   ) throws RemoteException {}
 
   @Override
