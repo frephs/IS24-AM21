@@ -12,7 +12,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -68,6 +67,9 @@ public class ExceptionLoader {
       return exceptionLayout;
     }
 
+    /**
+     * Loads the exception layout
+     */
     private void loadException() throws IOException {
       FXMLLoader fxmlLoader = new FXMLLoader(
         Gui.class.getResource("Exception.fxml")
@@ -76,11 +78,14 @@ public class ExceptionLoader {
       exceptionLayout = fxmlLoader.load();
     }
 
+    /**
+     * Populates the exception layout with the details from the given exception
+     */
     public void loadExceptionDetails(Exception exception) {
       exceptionTitle.setText(exception.getClass().getSimpleName());
-      exceptionCloseButton.setOnMouseClicked((MouseEvent event) -> {
-        exceptionStage.close();
-      });
+      exceptionCloseButton.setOnMouseClicked(
+        (MouseEvent event) -> exceptionStage.close()
+      );
 
       Text message = new Text(
         exception.getMessage() != null

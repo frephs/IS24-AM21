@@ -46,6 +46,10 @@ public final class CardsLoader {
     throw new RuntimeException("Invalid AdjacentPosition value");
   }
 
+  /**
+   * Instantiates a new CardsLoader by parsing a JSON file at the given path.
+   * @param path Resource path to the JSON file
+   */
   public CardsLoader(String path) {
     try {
       InputStream is = getClass().getResourceAsStream(path);
@@ -63,6 +67,10 @@ public final class CardsLoader {
     }
   }
 
+  /**
+   * Instantiates a new CardsLoader by parsing a JSON array.
+   * @param cards JSON array containing the cards
+   */
   public CardsLoader(JSONArray cards) {
     this.cards = cards;
   }
@@ -92,6 +100,10 @@ public final class CardsLoader {
     objectiveCardsList.addAll(this.objectiveCardsList);
   }
 
+  /**
+   * @param ids the ids of the cards to be returned
+   * @return the list of cards with the given ids
+   */
   public List<Card> getCardsFromIds(List<Integer> ids) {
     List<Card> cards = new ArrayList<>();
     for (int id : ids) {
@@ -100,9 +112,13 @@ public final class CardsLoader {
     return cards;
   }
 
+  /**
+   * @param id the id of the card to be returned
+   * @return the card with the given id
+   */
   public Card getCardFromId(int id) {
     if (cardList == null) {
-      this.cardList = new ArrayList<Card>();
+      this.cardList = new ArrayList<>();
       cardList.addAll(resourceCardsList);
       cardList.addAll(goldCardsList);
       cardList.addAll(starterCardsList);
@@ -115,22 +131,25 @@ public final class CardsLoader {
       .orElseThrow();
   }
 
-  public List<PlayableCard> loadStarterCards() {
-    return new ArrayList<PlayableCard>(this.starterCardsList);
+  public List<PlayableCard> getStarterCards() {
+    return new ArrayList<>(this.starterCardsList);
   }
 
-  public List<PlayableCard> loadGoldCards() {
-    return new ArrayList<PlayableCard>(this.goldCardsList);
+  public List<PlayableCard> getGoldCards() {
+    return new ArrayList<>(this.goldCardsList);
   }
 
-  public List<PlayableCard> loadResourceCards() {
+  public List<PlayableCard> getResourceCards() {
     return new ArrayList<>(this.resourceCardsList);
   }
 
-  public List<ObjectiveCard> loadObjectiveCards() {
+  public List<ObjectiveCard> getObjectiveCards() {
     return new ArrayList<>(this.objectiveCardsList);
   }
 
+  /**
+   * Loads the cards from the JSON array. Will not re-run after subsequent calls.
+   */
   public void loadCards() {
     if (loaded) return;
     for (int i = 0; i < cards.length(); i++) {
@@ -150,10 +169,7 @@ public final class CardsLoader {
         JSONArray geometryObjectivesArray = card.getJSONArray(
           "objectiveGeometry"
         );
-        Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<
-          AdjacentPosition,
-          ResourceType
-        >();
+        Map<AdjacentPosition, ResourceType> objectiveGeometry = new HashMap<>();
 
         for (int j = 0; j < geometryObjectivesArray.length(); j++) {
           if (!geometryObjectivesArray.isNull(j)) {

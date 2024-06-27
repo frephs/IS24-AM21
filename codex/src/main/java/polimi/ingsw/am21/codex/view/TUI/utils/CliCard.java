@@ -20,6 +20,9 @@ public interface CliCard {
    */
   String cardToAscii(HashMap<Integer, String> cardStringMap);
 
+  /**
+   * @see CliCard#cardToAscii(HashMap)
+   */
   static String playableCardToAscii(HashMap<Integer, String> cardStringMap) {
     return (
       "┌───" +

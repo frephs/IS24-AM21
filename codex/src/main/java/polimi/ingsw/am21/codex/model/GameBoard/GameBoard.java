@@ -50,10 +50,10 @@ public class GameBoard {
 
   public GameBoard(CardsLoader loader) {
     this(
-      loader.loadStarterCards(),
-      loader.loadResourceCards(),
-      loader.loadGoldCards(),
-      loader.loadObjectiveCards()
+      loader.getStarterCards(),
+      loader.getResourceCards(),
+      loader.getGoldCards(),
+      loader.getObjectiveCards()
     );
   }
 

@@ -232,14 +232,6 @@ public class PlayerBoard {
       .ifPresent(content -> content.acceptVisitor(mapUpdater, delta));
   }
 
-  private void updateMap(ObjectType object, int delta) {
-    mapUpdater.visit(object, delta);
-  }
-
-  private void updateMap(ResourceType resource, int delta) {
-    mapUpdater.visit(resource, delta);
-  }
-
   private class MapUpdater implements CornerContentVisitor {
 
     MapUpdater() {}

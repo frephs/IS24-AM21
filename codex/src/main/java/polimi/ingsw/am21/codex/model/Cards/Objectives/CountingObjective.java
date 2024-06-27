@@ -31,10 +31,6 @@ public class CountingObjective extends Objective implements CliCard {
     this.objects = new HashMap<>(objects);
   }
 
-  /**
-   * The function get the PlayerBoard and the points of the objective card you are evaluating
-   * @return the point that you get from that objective card
-   */
   @Override
   public BiFunction<PlayerBoard, Integer, Integer> getEvaluator() {
     return (playerBoard, points) ->

@@ -238,9 +238,11 @@ public class Game {
 
     try {
       PlayableCard playerCard =
-        this.gameBoard.drawCard(drawingSource, deckType, replacementCard -> {
-            pairCardId.set(replacementCard.getId());
-          });
+        this.gameBoard.drawCard(
+            drawingSource,
+            deckType,
+            replacementCard -> pairCardId.set(replacementCard.getId())
+          );
 
       this.players.get(this.currentPlayer).drawCard(playerCard);
       nextTurnEvent = () ->

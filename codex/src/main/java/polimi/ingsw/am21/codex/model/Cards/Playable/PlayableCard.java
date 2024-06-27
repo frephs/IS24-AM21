@@ -137,12 +137,6 @@ public class PlayableCard extends Card {
         .orElse(0);
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     String frontSideString = frontSide.cardToAscii(cardStringMap);

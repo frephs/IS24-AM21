@@ -5,11 +5,12 @@ import java.util.List;
 
 public class Deck<T> {
 
+  /**
+   * The list of cards in the deck
+   */
   private List<T> cards;
 
   /**
-   * Constructor
-   *
    * @param cards list of cards
    */
   public Deck(List<T> cards) {

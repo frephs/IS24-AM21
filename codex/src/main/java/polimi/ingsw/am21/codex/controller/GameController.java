@@ -32,6 +32,9 @@ import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class GameController {
 
+  /**
+   * The status of a user
+   */
   public enum UserGameContextStatus {
     MENU,
     IN_LOBBY,
@@ -178,79 +181,99 @@ public class GameController {
     }
   }
 
+  /**
+   * Used to describe how the events should be dispatched under different circumstances.
+   * For each mode we provide a description of the logic structured this way:
+   * EVENT_NAME
+   * context of the client that caused the event:
+   * - listeners that will receive the event
+   */
   public enum EventDispatchMode {
-    // EventDispatchMode is an enum used to describe how the events should be dispatched
-    // under different circumstances. for each mode we provide a description of the logic structured this way:
-    // EVENT_NAME
-    // context of the client that caused the event:
-    // - listeners that will receive the event
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     * - lobby listeners<br>
+     */
     TOP_DOWN,
-    // menu:
-    // - menu listeners
-    // lobby:
-    // - lobby listeners
-    // game:
-    // - game listeners
-    // - lobby listeners
+
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * - game listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     */
     BOTTOM_UP,
-    // menu:
-    // - menu listeners
-    // lobby:
-    // - lobby listeners
-    // - game listeners
-    // game:
-    // - game listeners
+
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * - menu listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     * - lobby listeners<br>
+     * - menu listeners<br>
+     */
     TOP_DOWN_FULL,
-    // menu:
-    // - menu listeners
-    // lobby:
-    // - lobby listeners
-    // - menu listeners
-    // game:
-    // - game listeners
-    // - menu listeners
-    // - lobby listeners
+
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * - lobby listeners<br>
+     * - game listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * - game listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     */
     BOTTOM_UP_FULL,
-    // menu:
-    // - menu listeners
-    // - lobby listeners
-    // - game listeners
-    // lobby:
-    // - lobby listeners
-    // - game listeners
-    // game:
-    // - game listeners
+
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * - game listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     * - lobby listeners<br>
+     */
     BOTH_WAYS,
-    // menu:
-    // - menu listeners
-    // lobby:
-    // - lobby listeners
-    // - game listeners
-    // game:
-    // - game listeners
-    // - lobby listeners
+
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * - game listeners<br>
+     * - lobby listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * - game listeners<br>
+     * - menu listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     * - lobby listeners<br>
+     * - menu listeners<br>
+     */
     BOTH_WAYS_FULL,
 
-    // menu:
-    // - menu listeners
-    // - game listeners
-    // - lobby listeners
-    // lobby:
-    // - lobby listeners
-    // - game listeners
-    // - menu listeners
-    // game:
-    // - game listeners
-    // - lobby listeners
-    // - menu listeners
+    /**
+     * menu:<br>
+     * - menu listeners<br>
+     * lobby:<br>
+     * - lobby listeners<br>
+     * game:<br>
+     * - game listeners<br>
+     */
     SAME_CONTEXT;
-
-    // menu:
-    // - menu listeners
-    // lobby:
-    // - lobby listeners
-    // game:
-    // - game listeners
 
     private Integer getContextRanking(UserGameContextStatus contextStatus) {
       return switch (contextStatus) {
@@ -296,26 +319,44 @@ public class GameController {
     }
   }
 
+  /**
+   * The GameManager associated with this controller
+   */
   GameManager manager;
 
+  /**
+   * The UserGameContexts associated with this controller, mapped by connection ID
+   */
   Map<UUID, UserGameContext> userContexts = new HashMap<>();
 
   public GameController() {
     manager = new GameManager();
   }
 
+  /**
+   * Returns the set of games (by ID) managed by this controller
+   */
   public Set<String> getGames() {
     return manager.getGames();
   }
 
+  /**
+   * Returns the current slots for each game (mapped by ID) managed by this controller
+   */
   public Map<String, Integer> getCurrentSlots() {
     return manager.getCurrentSlots();
   }
 
+  /**
+   * Returns the maximum slots for each game (mapped by ID) managed by this controller
+   */
   public Map<String, Integer> getMaxSlots() {
     return manager.getMaxSlots();
   }
 
+  /**
+   * Returns the game with the given ID, if it exists
+   */
   public Game getGame(String gameId) throws GameNotFoundException {
     return manager
       .getGame(gameId)
@@ -323,11 +364,13 @@ public class GameController {
   }
 
   /**
+   * Notifies the clients that one or more clients have disconnected
    * @param disconnectedClients list of clients that have disconnected
    */
   public void notifyDisconnections(List<UUID> disconnectedClients) {
     List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
 
+    // Populate the list of listeners to notify
     for (UUID disconnectedClient : disconnectedClients) {
       this.getSameContextListeners(
           disconnectedClient,
@@ -341,6 +384,7 @@ public class GameController {
         );
     }
 
+    // For each of the listeners to notify, ...
     while (!listenersToNotify.isEmpty()) {
       Pair<UUID, UUID> toNotify = listenersToNotify.removeFirst();
       UserGameContext clientToNotifyContext = userContexts.get(
@@ -353,6 +397,7 @@ public class GameController {
         clientToNotifyContext == null || clientToCheckContext == null
       ) continue;
 
+      // Call .playerConnectionChanged() on the listener
       try {
         clientToNotifyContext
           .getListener()
@@ -383,6 +428,10 @@ public class GameController {
     }
   }
 
+  /**
+   * Returns the UserGameContext associated with the given connection ID
+   * @param connectionID the connection ID
+   */
   private UserGameContext getUserContext(UUID connectionID)
     throws InvalidActionException {
     if (
@@ -653,8 +702,9 @@ public class GameController {
         )
         .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
         .collect(Collectors.toList()),
-      ((listener, targetConnectionID) ->
-          listener.playerLeftLobby(gameId, connectionID))
+      ((listener, targetConnectionID) -> {
+          listener.playerLeftLobby(gameId, connectionID);
+        })
     );
   }
 

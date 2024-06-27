@@ -36,12 +36,19 @@ public class CliUtils {
     return sb.toString();
   }
 
+  /**
+   * Colorizes a string with the given color and style, automatically resetting
+   * the formatting afterward
+   * @param colorable The colorable to colorize
+   * @param style The style to use
+   * @param length The length to truncate the string to
+   */
   public static <T extends Colorable> String colorize(
     T colorable,
     ColorStyle style,
     int length
   ) {
-    if (Cli.options.isColored()) {
+    if (Cli.Options.isColored()) {
       return (
         colorable.getColor().getCode(style) +
         colorable.toString().substring(0, length) +
@@ -52,6 +59,12 @@ public class CliUtils {
     }
   }
 
+  /**
+   * Colorizes a string with the given color and style, automatically resetting
+   * the formatting afterward
+   * @param colorable The colorable to colorize
+   * @param style The style to use
+   */
   public static <T extends Colorable> String colorize(
     T colorable,
     ColorStyle style
@@ -59,6 +72,13 @@ public class CliUtils {
     return colorize(colorable, style, colorable.toString().length());
   }
 
+  /**
+   * Colorizes a string with the given color and style, automatically resetting
+   * the formatting afterward
+   * @param string The string to colorize
+   * @param color The color to use
+   * @param style The style to use
+   */
   public static String colorize(String string, Color color, ColorStyle style) {
     if (Cli.Options.isColored()) {
       return Color.colorize(string, color, style);
@@ -66,6 +86,14 @@ public class CliUtils {
     return string;
   }
 
+  /**
+   * Colorizes a string with the given color and style, automatically resetting
+   * the formatting afterward
+   * @param colorables The list of colorable elements to colorize
+   * @param style The style to use
+   * @param length The length to truncate the string to
+   * @param padChar The character to pad the string with
+   */
   public static <T extends Colorable> String colorizeAndCenter(
     List<T> colorables,
     int length,
@@ -73,7 +101,7 @@ public class CliUtils {
     ColorStyle style
   ) {
     StringBuilder sb = new StringBuilder();
-    if (Cli.options.isColored()) {
+    if (Cli.Options.isColored()) {
       AtomicInteger ansiSize = new AtomicInteger();
       colorables.forEach(colorable -> {
         ansiSize.addAndGet(
@@ -88,17 +116,28 @@ public class CliUtils {
     return StringUtils.center(colorables.toString(), length, padChar);
   }
 
+  /**
+   * Gets the length of a colorable element when colorized with the given style
+   * @param colorable The colorable element
+   * @param colorableSize The size of the colorable element
+   * @param style The style to use
+   */
   public static int getColorableLength(
     Colorable colorable,
     int colorableSize,
     ColorStyle style
   ) {
-    if (Cli.options.isColored()) {
+    if (Cli.Options.isColored()) {
       return colorize(colorable, style, colorableSize).length();
     }
     return colorable.toString().length();
   }
 
+  /**
+   * Gets a table with the given headers and columns
+   * @param headers The headers of the table
+   * @param columns The columns of the table
+   */
   @SafeVarargs
   public static String getTable(
     String[] headers,

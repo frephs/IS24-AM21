@@ -58,12 +58,6 @@ public abstract class PlayableSide implements CliCard {
     return playerBoard -> true;
   }
 
-  /*
-   * -----------------
-   * TUI METHODS
-   * -----------------
-   * */
-
   @Override
   public String cardToAscii(HashMap<Integer, String> cardStringMap) {
     // corners

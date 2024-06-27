@@ -2,6 +2,9 @@ package polimi.ingsw.am21.codex.model.Cards.Commons.CardPair;
 
 import java.io.Serializable;
 
+/**
+ * A generic implementation of a Pair
+ */
 public class CardPairBase<T> implements Serializable {
 
   private T first;
