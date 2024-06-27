@@ -726,10 +726,19 @@ public class Gui extends Application implements View {
       .ifPresent(player -> drawHand());
   }
 
+  @Override
+  public void drawPlayerBoard(
+    String nickname,
+    int verticalOffset,
+    int horizontalOffset
+  ) {
+    drawPlayerBoard(nickname);
+  }
+
   /**
    * Draw the placed cards of the given player
    * @param nickname The nickname of the player whose playerboard is to be drawn
-   * */
+   */
   @Override
   public void drawPlayerBoard(String nickname) {
     Platform.runLater(() -> {
@@ -750,7 +759,7 @@ public class Gui extends Application implements View {
         .findFirst()
         .orElseThrow();
 
-      for (int row = 0; row < ViewGridPosition.gridSize; row++) {
+      for (int row = 0; row < GUIGridPosition.gridSize; row++) {
         RowConstraints rowConstraint = new RowConstraints();
         rowConstraint.setMinHeight(GridCell.CELL_HEIGHT);
         rowConstraint.setMaxHeight(GridCell.CELL_HEIGHT);
@@ -758,7 +767,7 @@ public class Gui extends Application implements View {
         rowConstraint.setVgrow(Priority.NEVER);
         gridPane.getRowConstraints().add(rowConstraint);
       }
-      for (int col = 0; col < ViewGridPosition.gridSize; col++) {
+      for (int col = 0; col < GUIGridPosition.gridSize; col++) {
         ColumnConstraints colConstraint = new ColumnConstraints();
         colConstraint.setMinWidth(GridCell.CELL_WIDTH);
         colConstraint.setMaxWidth(GridCell.CELL_WIDTH);
@@ -768,7 +777,7 @@ public class Gui extends Application implements View {
       }
 
       player
-        .getPlayedCards()
+        .getPlayedCardsByPosition()
         .forEach((position, cardInfo) -> {
           GridCell cell = new GridCell(
             // These cells should never be clickable since we're placing the card right away, but just in case...
@@ -778,7 +787,7 @@ public class Gui extends Application implements View {
 
           cell.placeCard(loadCardImage(cardInfo.getKey(), cardInfo.getValue()));
 
-          ViewGridPosition viewPos = new ViewGridPosition(position);
+          GUIGridPosition viewPos = new GUIGridPosition(position);
           gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
         });
 
@@ -887,7 +896,7 @@ public class Gui extends Application implements View {
 
       cell.setStatus(GridCellStatus.AVAILABLE);
 
-      ViewGridPosition viewPos = new ViewGridPosition(position);
+      GUIGridPosition viewPos = new GUIGridPosition(position);
       gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
     });
   }
@@ -909,7 +918,7 @@ public class Gui extends Application implements View {
 
       cell.setStatus(GridCellStatus.FORBIDDEN);
 
-      ViewGridPosition viewPos = new ViewGridPosition(position);
+      GUIGridPosition viewPos = new GUIGridPosition(position);
       gridPane.add(cell, viewPos.getCol(), viewPos.getRow());
     });
   }
@@ -1579,7 +1588,11 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void playerSetNickname(String gameId, UUID connectionID, String nickname) {
+  public void playerSetNickname(
+    String gameId,
+    UUID connectionID,
+    String nickname
+  ) {
     if (gameId.equals(localModel.getGameId().orElse(null))) {
       if (connectionID.equals(localModel.getConnectionID())) {
         drawObjectiveCardChoice();

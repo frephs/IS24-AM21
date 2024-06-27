@@ -89,7 +89,11 @@ public class DummyView implements View {
   public void drawPlayerBoards() {}
 
   @Override
-  public void drawPlayerBoard(String nickname) {}
+  public void drawPlayerBoard(
+    String nickname,
+    int verticalOffset,
+    int horizontalOffset
+  ) {}
 
   @Override
   public void drawGame() {}

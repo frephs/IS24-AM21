@@ -48,7 +48,27 @@ public interface View extends GameEventListener {
 
   void drawPlayerBoards();
 
-  void drawPlayerBoard(String nickname);
+  void drawPlayerBoard(
+    String nickname,
+    int verticalOffset,
+    int horizontalOffset
+  );
+
+  default void drawPlayerBoard(String nickname) {
+    drawPlayerBoard(nickname, 0, 0);
+  }
+
+  default void drawPlayerBoard(int verticalOffset, int horizontalOffset) {
+    drawPlayerBoard(
+      getLocalModel()
+        .getLocalGameBoard()
+        .orElseThrow()
+        .getPlayer()
+        .getNickname(),
+      verticalOffset,
+      horizontalOffset
+    );
+  }
 
   default void drawPlayerBoard() {
     drawPlayerBoard(

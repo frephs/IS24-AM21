@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -206,21 +205,21 @@ class MainTest {
           client1.get() == playingClient.get() &&
           localGameBoard
             .getPlayer()
-            .getPlayedCards()
+            .getPlayedCardsByPosition()
             .containsKey(new Position(0, 1)) &&
           !localGameBoard
             .getNextPlayer()
-            .getPlayedCards()
+            .getPlayedCardsByPosition()
             .containsKey(new Position(0, 1))) ||
         (localGameBoard != null &&
           client2.get() == playingClient.get() &&
           localGameBoard
             .getCurrentPlayer()
-            .getPlayedCards()
+            .getPlayedCardsByPosition()
             .containsKey(new Position(0, 1)) &&
           !localGameBoard
             .getPlayer()
-            .getPlayedCards()
+            .getPlayedCardsByPosition()
             .containsKey(new Position(0, 1)))
       );
     });

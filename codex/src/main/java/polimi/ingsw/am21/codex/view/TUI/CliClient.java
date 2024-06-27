@@ -606,6 +606,53 @@ public class CliClient extends ViewClient {
 
     commandHandlers.add(
       new CommandHandler(
+        "show playerboard <nickname> <^V<>>",
+        "Show the playerboard of the given player, navigating vertically and horizontally",
+        ClientContext.GAME
+      ) {
+        @Override
+        public void handle(String[] command) {
+          int verticalOffset = 0;
+          int horizontalOffset = 0;
+
+          for (int i = 0; i < command[3].length(); i++) {
+            if (command[3].charAt(i) == '^') {
+              verticalOffset--;
+            } else if (command[3].charAt(i) == 'V') {
+              verticalOffset++;
+            } else if (command[3].charAt(i) == '<') {
+              horizontalOffset--;
+            } else if (command[3].charAt(i) == '>') {
+              horizontalOffset++;
+            }
+          }
+
+          int finalVerticalOffset = verticalOffset;
+          int finalHorizontalOffset = horizontalOffset;
+          view
+            .getLocalModel()
+            .getLocalGameBoard()
+            .orElseThrow()
+            .getPlayerByNickname(command[2])
+            .ifPresentOrElse(
+              player ->
+                cli.drawPlayerBoard(
+                  command[2],
+                  finalVerticalOffset,
+                  finalHorizontalOffset
+                ),
+              () ->
+                cli.postNotification(
+                  NotificationType.WARNING,
+                  "Player not found"
+                )
+            );
+        }
+      }
+    );
+
+    commandHandlers.add(
+      new CommandHandler(
         "show card <id>",
         "Show the card of the given id",
         ClientContext.GAME
@@ -634,7 +681,11 @@ public class CliClient extends ViewClient {
                 // Get cards from the player hands
                 player.getHand().stream(),
                 // Get cards from the player boards
-                player.getPlayedCards().values().stream().map(Pair::getKey)
+                player
+                  .getPlayedCardsByPosition()
+                  .values()
+                  .stream()
+                  .map(Pair::getKey)
               ))
             .filter(c -> c.getId() == cardId)
             .findFirst()
@@ -659,13 +710,7 @@ public class CliClient extends ViewClient {
         public void handle(String[] command) {
           switch (command[1]) {
             case "playerboard":
-              view.drawPlayerBoard(
-                view
-                  .getLocalModel()
-                  .getLocalGameBoard()
-                  .orElseThrow()
-                  .getPlayerNickname()
-              );
+              view.drawPlayerBoard();
               break;
             case "leaderboard":
               cli.drawLeaderBoard();

@@ -81,6 +81,15 @@ public class PlayableCard extends Card {
   }
 
   /**
+   * Gets the desired side of the card
+   * @param sideType The type of the side to get
+   */
+  public PlayableSide getSide(CardSideType sideType) {
+    if (sideType == CardSideType.FRONT) return frontSide;
+    return backSide;
+  }
+
+  /**
    * Gets the currently played side, if any
    */
   public Optional<PlayableSide> getPlayedSide() {

@@ -340,40 +340,25 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawPlayerBoard(String nickname) {
+  public void drawPlayerBoard(
+    String nickname,
+    int verticalOffset,
+    int horizontalOffset
+  ) {
     LocalPlayer player = localModel
       .getLocalGameBoard()
       .orElseThrow()
       .getPlayerByNickname(nickname)
       .orElseThrow();
 
-    player
-      .getPlayedCards()
-      .forEach(
-        (position, placedCard) ->
-          printUpdate(
-            "Card " +
-            (placedCard.getKey().getId()) +
-            " placed at " +
-            position +
-            " on side " +
-            placedCard.getValue()
-          )
-      );
-    printUpdate("Available spots: ");
-    player
-      .getAvailableSpots()
-      .ifPresent(
-        availableSpots ->
-          availableSpots.forEach(position -> printUpdate(position.toString()))
-      );
-    printUpdate("Forbidden spots: ");
-    player
-      .getForbiddenSpots()
-      .ifPresent(
-        forbiddenSpots ->
-          forbiddenSpots.forEach(position -> printUpdate(position.toString()))
-      );
+    printUpdate(
+      CliPlayerBoard.drawPlayerBoard(
+        player.getPlayedCardsByOrder(),
+        player.getAvailableSpots().orElseThrow(),
+        verticalOffset,
+        horizontalOffset
+      )
+    );
   }
 
   @Override

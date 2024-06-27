@@ -420,7 +420,7 @@ public class LocalModelContainer implements GameEventListener {
     Set<Position> availablePositions,
     Set<Position> forbiddenPositions
   ) {
-    Card card = cardsLoader.getCardFromId(cardId);
+    PlayableCard card = (PlayableCard) cardsLoader.getCardFromId(cardId);
     LocalPlayer localPlayer = gameBoard.orElseThrow().getCurrentPlayer();
 
     localPlayer.addPlayedCards(card, side, position);
