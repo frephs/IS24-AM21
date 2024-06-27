@@ -115,7 +115,7 @@ public class CliClient extends ViewClient {
             cli.postNotification(
               NotificationType.WARNING,
               "The command is not available in the current context (" +
-              getClientContextContainer().get().toString() +
+              getClientContextContainer().get().get().toString() +
               "), you can use it only in " +
               matchingCommands
                 .stream()
