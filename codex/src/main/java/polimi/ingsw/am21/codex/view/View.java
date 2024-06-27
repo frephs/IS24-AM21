@@ -341,11 +341,6 @@ public interface View extends GameEventListener {
       "'turn" +
       (isLastRound ? " (last round)" : "")
     );
-
-    drawHand();
-    drawLeaderBoard();
-    drawPlayerBoard();
-    drawGameBoard();
   }
 
   @Override
@@ -366,10 +361,6 @@ public interface View extends GameEventListener {
       NotificationType.UPDATE,
       "Player " + playerId + " placed card " + cardId + " on the board"
     );
-
-    drawHand();
-    drawLeaderBoard();
-    drawPlayerBoard();
   }
 
   @Override

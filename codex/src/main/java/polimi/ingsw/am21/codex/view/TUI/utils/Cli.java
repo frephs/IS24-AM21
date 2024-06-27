@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.client.localModel.GameEntry;
+import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
@@ -630,6 +631,18 @@ public class Cli implements View {
           objectType
         )
     );
+
+    if (
+      playerId.equals(
+        localModel
+          .getLocalGameBoard()
+          .map(localGameBoard -> localGameBoard.getPlayer().getNickname())
+          .orElseThrow()
+      )
+    ) {
+      drawLeaderBoard();
+      drawPlayerBoard();
+    }
   }
 
   @Override
@@ -652,5 +665,38 @@ public class Cli implements View {
   @Override
   public void playerJoinedLobby(String gameId, UUID connectionID) {
     View.super.playerJoinedLobby(gameId, connectionID);
+  }
+
+  @Override
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
+  ) {
+    View.super.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
+    );
+    if (
+      playerNickname.equals(
+        localModel
+          .getLocalGameBoard()
+          .map(localGameBoard -> localGameBoard.getPlayer().getNickname())
+          .orElseThrow()
+      )
+    ) {
+      drawHand();
+    }
   }
 }

@@ -1718,4 +1718,65 @@ public class Gui extends Application implements View {
   public void getStarterCard(Integer cardId) {
     // Don't display the response automatically, it's handled in a different section
   }
+
+  @Override
+  public void cardPlaced(
+    String gameId,
+    String playerId,
+    Integer playerHandCardNumber,
+    Integer cardId,
+    CardSideType side,
+    Position position,
+    int newPlayerScore,
+    Map<ResourceType, Integer> updatedResources,
+    Map<ObjectType, Integer> updatedObjects,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots
+  ) {
+    View.super.cardPlaced(
+      gameId,
+      playerId,
+      playerHandCardNumber,
+      cardId,
+      side,
+      position,
+      newPlayerScore,
+      updatedResources,
+      updatedObjects,
+      availableSpots,
+      forbiddenSpots
+    );
+
+    drawHand();
+    drawLeaderBoard();
+    drawPlayerBoard();
+  }
+
+  @Override
+  public void changeTurn(
+    String gameId,
+    String playerNickname,
+    Integer playerIndex,
+    Boolean isLastRound,
+    Set<Position> availableSpots,
+    Set<Position> forbiddenSpots,
+    Integer resourceDeckTopCardId,
+    Integer goldDeckTopCardId
+  ) {
+    View.super.changeTurn(
+      gameId,
+      playerNickname,
+      playerIndex,
+      isLastRound,
+      availableSpots,
+      forbiddenSpots,
+      resourceDeckTopCardId,
+      goldDeckTopCardId
+    );
+
+    drawHand();
+    drawLeaderBoard();
+    drawPlayerBoard();
+    drawGameBoard();
+  }
 }
