@@ -264,7 +264,8 @@ public class CliPlayerBoard {
         default -> throw new IllegalStateException("Unexpected value: " + b);
       };
       case "┐" -> switch (b) {
-        case "─", "┬", "┐", "┌", " " -> "┬";
+        case "─", "┬", "┌" -> "┬";
+        case "┐", " " -> "┐";
         case "┘", "│", "┤" -> "┤";
         case "├", "└", "┴" -> "┼";
         default -> throw new IllegalStateException("Unexpected value: " + b);
