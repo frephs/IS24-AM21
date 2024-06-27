@@ -22,11 +22,11 @@ public interface CliCard {
 
   static String playableCardToAscii(HashMap<Integer, String> cardStringMap) {
     return (
-      "┌───" +
+      "╭───" +
       (cardStringMap.containsKey(0) ? "┬" : "─") +
       "─────" +
       (cardStringMap.containsKey(1) ? "┬" : "─") +
-      "───┐ " +
+      "───╮ " +
       "\n" +
       "│ " +
       cardStringMap.getOrDefault(0, " ") +
@@ -70,11 +70,11 @@ public interface CliCard {
       cardStringMap.getOrDefault(2, " ") +
       " │ " +
       "\n" +
-      "└───" +
+      "╰───" +
       (cardStringMap.containsKey(3) ? "┴" : "─") +
       "─────" +
       (cardStringMap.containsKey(2) ? "┴" : "─") +
-      "───┘ "
+      "───╯ "
     );
   }
 }
