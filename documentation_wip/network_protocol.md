@@ -5,15 +5,15 @@ Both client and server are equipped with listeners which implement the same inte
 ## General message handling 
 
 ### Client Action general handling
-The following diagram reports a general rapresentation of our architecture's interactions when a `ClientAction` is sent to the server and an update is sent back to the concerned clients.
+The following diagram reports a general representation of our architecture's interactions when a `ClientAction` is sent to the server and an update is sent back to the concerned clients.
 
 Both in client and server we set up listeners implementing the `RemoteGameEventListener` class or the `GameEventListener` (which extends it but does not throw `RemoteException`). This allows us to require all clients to process all the `GameEvents`. 
 
-As for the client listeners, the `RMICLientConnectionHandler` calls the omonymous methods in the Controller, while the `TCPClientConnectionHandler` method implementation send a message to the server which is parsed calling the same methods in the controller. 
+As for the client listeners, the `RMICLientConnectionHandler` calls the homonymous methods in the Controller, while the `TCPClientConnectionHandler` method implementation send a message to the server which is parsed calling the same methods in the controller. 
 
 As for the server listeners, we have every `RMIClientConnectionHandler` reference and every `TCPServerConnectionHandler` object registered in the server handling the connection with the client by invoking directly a method of the `ClientGameEventHandler` in the case of RMI, or sending a message which will be parsed by the `TCPCLientConnectionHandler` which will call the `ClientGameEventHandler` in the case of TCP. 
 
-In the following diagram we report a general rapresentation using `gameEventListenerMethod()` as an alias for a generic method.
+In the following diagram we report a general representation using `gameEventListenerMethod()` as an alias for a generic method.
 
 ```mermaid
 sequenceDiagram
@@ -33,9 +33,9 @@ ClientGameEventHandler -) ClientGameEventHandler : View.gameEventListenerMethod(
 ```
 
 ### Failed connection handling
-After a connection is enstablished, the client starts sending regular heartbeats. After two missed heartbeats the client loosing connection's `ClientConnectionHandler` notifies the user while the other clients are notified by the server. The client is considered disconnected after 10 missed heartbeats.
+After a connection is established, the client starts sending regular heartbeats. After two missed heartbeats the client loosing connection's `ClientConnectionHandler` notifies the user while the other clients are notified by the server. The client is considered disconnected after 10 missed heartbeats.
 
-As described above (but omitted in the following diagram), `ClientGameEventHandler` updates the `LocalModelContainer` synchronously and the view aynchronously.
+As described above (but omitted in the following diagram), `ClientGameEventHandler` updates the `LocalModelContainer` synchronously and the view asynchronously.
 
 ```mermaid
 sequenceDiagram
@@ -44,7 +44,7 @@ sequenceDiagram
     Client 1 -x ServerConnectionHandler: client.hearBeat() (timed out)
     end 
     Client 1 -> Client 1 : ClientConnectionHandler.failedHeartBeats++
-    Client 1 -) Client 1 : View.postnotification()"You're loosing connection to the server")
+    Client 1 -) Client 1 : View.postNotification()"You're loosing connection to the server")
     ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, IS_LOSING)
     ServerConnectionHandler -) Other clients : listener.playerConnectionChanged(IS_LOSING)
     Other clients -> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
@@ -52,7 +52,7 @@ sequenceDiagram
         Client 1 -) ServerConnectionHandler: client.heartBeat()
 
         Client 1 -> Client 1 : ClientConnectionHandler.failedHeartBeats = 0
-    Client 1 -) Client 1 : View.postnotification()"Connection restored")
+    Client 1 -) Client 1 : View.postNotification()"Connection restored")
     ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, CONNECTED)
     ServerConnectionHandler -) Other clients : listener.PlayerConnectionChanged(CONNECTED)
     Other clients -> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
@@ -76,9 +76,9 @@ sequenceDiagram
 ```
 
 ### "Not allowed" message handling
-In the event a client sends a message for an action that the server which is untimely for the user's context  or that they cannot perform in that moment, and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the aforesaid client. 
+In the event a client sends a message for an action that the server which is untimely for the user's context  or that they cannot perform at that moment, and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the aforesaid client. 
 
-Client's side the error's are parsed by the `ClientGameEventHandler` which implements the `GameErrorListener` interface.
+Client side the errors are parsed by the `ClientGameEventHandler` which implements the `GameErrorListener` interface.
 
 Since updates are only register by the local model once the server validates them only the `View` implements the class as the errors need only to be notified to the users. 
 
@@ -124,14 +124,14 @@ sequenceDiagram
     end 
     Controller -) ServerConnectionHandler : listener.availableGameLobbies(...)
     ServerConnectionHandler -) Client : listener.availableGameLobbies(...)
-    Client -> Client : cLientGameEventHandler.avaialableGameLobbies(...)
+    Client -> Client : clientGameEventHandler.availableGameLobbies(...)
 ```
 
 ### Lobby Flow
 The player building process requires a series of essential steps, which are reported in the following sequence diagram.
 
-For the sake of Semplicity we omit the `ServerConnectionHandler` and Listener actors. The architecture remains the same as described above.
-The `GameEventListener` method implentations of the `Controller` class call the methods omonymous the listeners which send an update the client.
+For the sake of simplicity we omit the `ServerConnectionHandler` and Listener actors. The architecture remains the same as described above.
+The `GameEventListener` method implementations of the `Controller` class call the homonymous methods the listeners which send an update the client.
 
 #### Selecting or creating a game
 ```mermaid
@@ -150,7 +150,7 @@ sequenceDiagram
         ServerConnectionHandler -) Client : listener.lobbyFull()
     else Lobby is not full
          ServerConnectionHandler -> Controller : controller.joinLobby(socketId, gameId)
-         Note over Controller, ServerConnectionHandler:  The client who joined a lobby get's the info of <br> the players already inside the lobby. (Tokens, nicknames)
+         Note over Controller, ServerConnectionHandler:  The client who joined a lobby gets the info of <br> the players already inside the lobby. (Tokens, nicknames)
         Controller -) ServerConnectionHandler : listener.lobbyInfo(...)
         ServerConnectionHandler -) Client : listener.lobbyInfo(...)
         loop for each client in the menu 
@@ -245,7 +245,7 @@ sequenceDiagram
         ServerConnectionHandler -) Client in the game view: listener.playerJoinedGame
     end
 
-    Note over Client,Client in the game view: The player is now in waitroom
+    Note over Client,Client in the game view: The player is now in wait room
     
     alt Not all players are in the game
         Note over Client,ServerConnectionHandler: The player knows he's still connected to the server.
@@ -314,7 +314,7 @@ sequenceDiagram
         end
     end
 ```
-### Game over flow
+### Game-over flow
 When `controller.nextTurn()` detects that a player has a winning score or an `EmptyDeckException` is caught by the controller, all the clients are notified of the number of remaining rounds.
 
 After the final rounds are played, the server will notify the clients the final scores after the objectives are evaluated and the winning player nickname.
@@ -329,7 +329,7 @@ sequenceDiagram
     end 
 
     Note over Controller, Client: Last round is reached
-    Controller -> Controller: GameOverExcpetion 
+    Controller -> Controller: GameOverException 
 
     Controller -) Client : listener.nextTurn() 
     loop for each client 
