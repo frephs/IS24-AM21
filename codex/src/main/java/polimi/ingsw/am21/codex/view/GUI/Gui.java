@@ -1713,16 +1713,6 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
-    // Don't display the response automatically, it's handled in a different section
-  }
-
-  @Override
-  public void getStarterCard(Integer cardId) {
-    // Don't display the response automatically, it's handled in a different section
-  }
-
-  @Override
   public void gameHalted(String gameID) {
     StackPane pane = (StackPane) scene.lookup("#content-container");
     // we load LobbyWaitRoom first

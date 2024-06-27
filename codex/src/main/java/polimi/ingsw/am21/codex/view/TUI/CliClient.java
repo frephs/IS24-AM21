@@ -445,7 +445,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.getObjectiveCards();
+          view.drawObjectiveCardChoice();
         }
       }
     );
@@ -476,7 +476,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.getStarterCard();
+          view.drawStarterCardSides();
         }
       }
     );

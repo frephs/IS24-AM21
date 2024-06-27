@@ -555,16 +555,6 @@ public class Cli implements View {
   }
 
   @Override
-  public void getObjectiveCards(Pair<Integer, Integer> objectiveCards) {
-    drawObjectiveCardChoice();
-  }
-
-  @Override
-  public void getStarterCard(Integer cardId) {
-    drawStarterCardSides();
-  }
-
-  @Override
   public void gameHalted(String gameID) {
     postNotification(
       NotificationType.UPDATE,
