@@ -43,7 +43,16 @@ public class GameController {
     public enum ConnectionStatus {
       CONNECTED,
       LOSING,
-      DISCONNECTED,
+      DISCONNECTED;
+
+      @Override
+      public String toString() {
+        return switch (this) {
+          case CONNECTED -> "is connected to";
+          case DISCONNECTED -> "has disconnected from";
+          case LOSING -> "is losing connection to";
+        };
+      }
     }
 
     private Date lastHeartBeat;
