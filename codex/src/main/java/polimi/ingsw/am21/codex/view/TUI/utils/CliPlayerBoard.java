@@ -12,8 +12,8 @@ import polimi.ingsw.am21.codex.view.TUI.utils.commons.ColorStyle;
 
 public class CliPlayerBoard {
 
-  public static final int SECTION_COLS = 21;
-  public static final int SECTION_ROWS = 21;
+  public static final int SECTION_COLS = 15;
+  public static final int SECTION_ROWS = 15;
 
   public static final List<String> BOX_CHARACTERS = List.of(
     "─",
@@ -43,7 +43,7 @@ public class CliPlayerBoard {
     List<
       Pair<Position, Pair<PlayableCard, CardSideType>>
     > playedCardsByPosition,
-    Set<Position> avaiableSpots,
+    Set<Position> availableSpots,
     int verticalOffset,
     int horizontalOffset
   ) {
@@ -53,7 +53,7 @@ public class CliPlayerBoard {
         )
     );
 
-    avaiableSpots.forEach(modelPosition -> {
+    availableSpots.forEach(modelPosition -> {
       CLIGridPosition viewPosition = new CLIGridPosition(modelPosition);
       result.set(
         CliPlayerBoard.multilineOverwrite(

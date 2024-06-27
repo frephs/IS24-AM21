@@ -340,7 +340,11 @@ public class Cli implements View {
   }
 
   @Override
-  public void drawPlayerBoard(String nickname) {
+  public void drawPlayerBoard(
+    String nickname,
+    int verticalOffset,
+    int horizontalOffset
+  ) {
     LocalPlayer player = localModel
       .getLocalGameBoard()
       .orElseThrow()
@@ -350,8 +354,8 @@ public class Cli implements View {
     CliPlayerBoard.drawPlayerBoard(
       player.getPlayedCardsByOrder(),
       player.getAvailableSpots().orElseThrow(),
-      0,
-      0
+      verticalOffset,
+      horizontalOffset
     );
     //    player
     //      .getPlayedCardsByPosition()

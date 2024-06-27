@@ -726,10 +726,19 @@ public class Gui extends Application implements View {
       .ifPresent(player -> drawHand());
   }
 
+  @Override
+  public void drawPlayerBoard(
+    String nickname,
+    int verticalOffset,
+    int horizontalOffset
+  ) {
+    drawPlayerBoard(nickname);
+  }
+
   /**
    * Draw the placed cards of the given player
    * @param nickname The nickname of the player whose playerboard is to be drawn
-   * */
+   */
   @Override
   public void drawPlayerBoard(String nickname) {
     Platform.runLater(() -> {

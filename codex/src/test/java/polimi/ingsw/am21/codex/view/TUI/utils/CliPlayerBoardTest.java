@@ -20,7 +20,35 @@ class CliPlayerBoardTest {
   void testDrawPlayerBoard() {
     new Cli.Options(true);
 
-    List<Integer> cards = List.of(1, 37, 46, 1, 37, 46, 1, 37, 46);
+    List<Integer> cards = List.of(
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46,
+      1,
+      37,
+      46
+    );
     List<Position> positions = List.of(
       new Position(0, 0),
       new Position(-1, 0),
@@ -30,7 +58,14 @@ class CliPlayerBoardTest {
       new Position(2, 1),
       new Position(3, 2),
       new Position(4, 1),
-      new Position(-2, 1)
+      new Position(-2, 1),
+      new Position(0, 10),
+      new Position(0, 11),
+      new Position(0, 12),
+      new Position(0, 13),
+      new Position(0, 14),
+      new Position(0, 15),
+      new Position(0, 16)
     );
 
     List<Pair<Position, Pair<PlayableCard, CardSideType>>> playedCards =
@@ -52,6 +87,12 @@ class CliPlayerBoardTest {
       Set.of(new Position(2, -2)),
       0,
       0
+    );
+    CliPlayerBoard.drawPlayerBoard(
+      playedCards,
+      Set.of(new Position(2, -2)),
+      -1,
+      1
     );
   }
 
