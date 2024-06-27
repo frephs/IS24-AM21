@@ -80,8 +80,6 @@ public class RMIClientConnectionHandler
       Map<String, Integer> maxPlayers =
         rmiConnectionHandler.getGamesMaxPlayers();
 
-      gameEventHandler.listGames();
-
       gameEventHandler.refreshLobbies(games, currentPlayers, maxPlayers);
     } catch (RemoteException e) {
       this.messageNotSent();
@@ -107,6 +105,9 @@ public class RMIClientConnectionHandler
   public void connectToGame(String gameId) {
     try {
       rmiConnectionHandler.joinLobby(this.getConnectionID(), gameId);
+
+      this.getObjectiveCards();
+      this.getStarterCard();
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
@@ -134,6 +135,9 @@ public class RMIClientConnectionHandler
         numberPlayers
       );
       rmiConnectionHandler.joinLobby(this.getConnectionID(), gameId);
+
+      this.getObjectiveCards();
+      this.getStarterCard();
     } catch (RemoteException e) {
       this.messageNotSent();
     } catch (InvalidActionException e) {
