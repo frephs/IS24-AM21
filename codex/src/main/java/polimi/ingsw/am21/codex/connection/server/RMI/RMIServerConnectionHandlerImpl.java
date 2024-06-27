@@ -136,8 +136,9 @@ public class RMIServerConnectionHandlerImpl
   }
 
   @Override
-  public void leaveLobby(UUID connectionID) throws RemoteException {
-    this.leaveLobby(connectionID);
+  public void leaveLobby(UUID connectionID)
+    throws RemoteException, InvalidActionException {
+    this.controller.quitFromLobby(connectionID);
   }
 
   @Override

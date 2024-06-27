@@ -850,6 +850,18 @@ public class GameController {
       userContexts
         .entrySet()
         .stream()
+        .filter(user -> user.getKey().equals(socketID))
+        .map(user -> new Pair<>(user.getKey(), user.getValue()))
+        .collect(Collectors.toList()),
+      ((listener, connectionID) -> {
+          listener.lobbyInfo(generateLobbyInfo(gameId, game));
+        })
+    );
+
+    notifyClients(
+      userContexts
+        .entrySet()
+        .stream()
         .filter(
           entry ->
             entry.getValue().getStatus().equals(UserGameContextStatus.MENU) ||
@@ -863,7 +875,6 @@ public class GameController {
         .collect(Collectors.toList()),
       ((listener, connectionID) -> {
           listener.playerJoinedLobby(gameId, socketID);
-          listener.lobbyInfo(generateLobbyInfo(gameId, game));
         })
     );
   }
@@ -1082,6 +1093,7 @@ public class GameController {
       }
     }
     manager.deleteGame(gameId);
+    // TODO remove also from userContexts?
 
     this.notifySameContextClients(
         connectionID,
@@ -1178,7 +1190,13 @@ public class GameController {
         (listener, targetSocketID) ->
           listener.changeTurn(
             gameID,
-            game.getCurrentPlayer().getNickname(),
+            game
+              .getPlayers()
+              .get(
+                (game.getCurrentPlayerIndex() - 1 + game.getPlayers().size()) %
+                game.getPlayers().size()
+              )
+              .getNickname(),
             game.getCurrentPlayerIndex(),
             game.isLastRound(),
             game.getCurrentPlayer().getBoard().getAvailableSpots(),
@@ -1228,7 +1246,15 @@ public class GameController {
               (listener, targetSocketID) ->
                 listener.changeTurn(
                   gameId,
-                  game.getCurrentPlayer().getNickname(),
+                  game
+                    .getPlayers()
+                    .get(
+                      (game.getCurrentPlayerIndex() -
+                        1 +
+                        game.getPlayers().size()) %
+                      game.getPlayers().size()
+                    )
+                    .getNickname(),
                   game.getCurrentPlayerIndex(),
                   game.isLastRound(),
                   drawingSource,

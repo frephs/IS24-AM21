@@ -6,15 +6,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.PortUnreachableException;
+import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
@@ -22,18 +30,120 @@ import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.client.RMI.RMIClientConnectionHandler;
 import polimi.ingsw.am21.codex.connection.client.TCP.TCPClientConnectionHandler;
+import polimi.ingsw.am21.codex.connection.server.AbstractServer;
+import polimi.ingsw.am21.codex.connection.server.RMI.RMIServer;
 import polimi.ingsw.am21.codex.connection.server.Server;
+import polimi.ingsw.am21.codex.connection.server.TCP.TCPServer;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
 import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 import polimi.ingsw.am21.codex.view.View;
 
 class MainTest {
 
   boolean isCI() {
     return Objects.equals(System.getenv("CI"), "true");
+  }
+
+  @BeforeEach
+  void setUp() {
+    new Main.Options(true);
+    new Cli.Options(true);
+  }
+
+  @Test
+  @DisabledIf("isCI")
+  void rmiClient() throws InterruptedException {
+    try (ExecutorService executor = Executors.newCachedThreadPool()) {
+      AtomicReference<RMIClientConnectionHandler> client1 =
+        new AtomicReference<>();
+      AtomicReference<RMIClientConnectionHandler> client2 =
+        new AtomicReference<>();
+      AtomicReference<RMIServer> server = new AtomicReference<>();
+      final CountDownLatch clientLatch = new CountDownLatch(2);
+
+      AtomicInteger i = new AtomicInteger(0);
+      executor.execute(() -> {
+        server.set(
+          new RMIServer(
+            ConnectionType.RMI.getDefaultPort(),
+            new GameController()
+          )
+        );
+        try {
+          server.get().start();
+        } catch (
+          MalformedURLException
+          | RemoteException
+          | UnknownHostException
+          | AlreadyBoundException
+          | PortUnreachableException e
+        ) {
+          i.addAndGet(1);
+          server.set(
+            new RMIServer(
+              ConnectionType.RMI.getDefaultPort() + i.get(),
+              new GameController()
+            )
+          );
+        }
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      });
+
+      executor.execute(() -> {
+        View view = new DummyView("client1");
+        client1.set(
+          new RMIClientConnectionHandler(
+            "localhost",
+            ConnectionType.RMI.getDefaultPort() + i.get(),
+            view,
+            new ClientGameEventHandler(view, view.getLocalModel()),
+            UUID.randomUUID()
+          )
+        );
+        client1.get().connect();
+        clientLatch.countDown();
+      });
+      executor.execute(() -> {
+        View view = new DummyView("client2");
+        client2.set(
+          new RMIClientConnectionHandler(
+            "localhost",
+            ConnectionType.RMI.getDefaultPort() + i.get(),
+            view,
+            new ClientGameEventHandler(view, view.getLocalModel()),
+            UUID.randomUUID()
+          )
+        );
+        client2.get().connect();
+        clientLatch.countDown();
+      });
+
+      try {
+        clientLatch.await();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+
+      List<Runnable> actions = getActions(client1, client2, server);
+      actions.forEach(action -> {
+        action.run();
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    }
   }
 
   @Test
@@ -44,21 +154,31 @@ class MainTest {
         new AtomicReference<>();
       AtomicReference<TCPClientConnectionHandler> client2 =
         new AtomicReference<>();
-      AtomicReference<Server> server = new AtomicReference<>();
+      AtomicReference<TCPServer> server = new AtomicReference<>();
       final CountDownLatch clientLatch = new CountDownLatch(2);
-
+      AtomicInteger i = new AtomicInteger(0);
       executor.execute(() -> {
         server.set(
-          new Server(
+          new TCPServer(
             ConnectionType.TCP.getDefaultPort(),
-            ConnectionType.RMI.getDefaultPort()
+            new GameController()
           )
         );
         try {
           server.get().start();
-        } catch (
-          MalformedURLException | RemoteException | PortUnreachableException e
-        ) {
+        } catch (PortUnreachableException e) {
+          i.addAndGet(0);
+          server.set(
+            new TCPServer(
+              ConnectionType.TCP.getDefaultPort() + i.get(),
+              new GameController()
+            )
+          );
+        }
+
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
       });
@@ -68,9 +188,9 @@ class MainTest {
         client1.set(
           new TCPClientConnectionHandler(
             "localhost",
-            ConnectionType.TCP.getDefaultPort(),
+            ConnectionType.TCP.getDefaultPort() + i.get(),
             view,
-            new ClientGameEventHandler(view, new LocalModelContainer())
+            new ClientGameEventHandler(view, view.getLocalModel())
           )
         );
         client1.get().connect();
@@ -83,7 +203,7 @@ class MainTest {
             "localhost",
             ConnectionType.TCP.getDefaultPort(),
             view,
-            new ClientGameEventHandler(view, new LocalModelContainer())
+            new ClientGameEventHandler(view, view.getLocalModel())
           )
         );
         client2.get().connect();
@@ -106,11 +226,11 @@ class MainTest {
 
   @NotNull
   private static List<Runnable> getActions(
-    AtomicReference<TCPClientConnectionHandler> client1,
-    AtomicReference<TCPClientConnectionHandler> client2,
-    AtomicReference<Server> server
+    AtomicReference<? extends ClientConnectionHandler> client1,
+    AtomicReference<? extends ClientConnectionHandler> client2,
+    AtomicReference<? extends AbstractServer> server
   ) {
-    final AtomicReference<TCPClientConnectionHandler> playingClient =
+    final AtomicReference<ClientConnectionHandler> playingClient =
       new AtomicReference<>(), notPlayingClient = new AtomicReference<>();
 
     List<Runnable> actions = new ArrayList<>();
