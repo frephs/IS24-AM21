@@ -385,7 +385,7 @@ public interface View extends GameEventListener {
   ) {
     postNotification(
       NotificationType.UPDATE,
-      "Player " + nickname + status.toString().toLowerCase() + " the game"
+      "Player " + nickname + " " + status.toString().toLowerCase() + " the game"
     );
   }
 
