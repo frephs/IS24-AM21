@@ -19,17 +19,25 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 
 ## Development status:
 
-| Requirement | Scope| Status |
-|-------------|---|:-------:|
-| Complete Rules | Model| 🟢 |
-| TUI | View| 🟡🟡|
-| GUI | View |🟢 |
-| Rmi  | Connection | 🟢 |
-| Socket | Connection| 🟢 | 
-| Chat | Advanced functionality 1 | 🟢|
-| Multiple games  | Advanced functionality 2| 🟢
-| Client disconnection resilience |Advanced functionality 4 | 🟡|
-| Game saving on disk | Advanced functionality 3 | ❌ |
+| Requirement                     | Scope                    | Status |
+|---------------------------------|--------------------------|:------:|
+| Complete Rules                  | Model                    |   🟢   |
+| TUI                             | View                     |  🟡🟡  |
+| GUI                             | View                     |   🟢   |
+| Rmi                             | Connection               |   🟢   |
+| Socket                          | Connection               |   🟢   | 
+| Chat                            | Advanced functionality 1 |   🟢   |
+| Multiple games                  | Advanced functionality 2 |   🟢   |
+| Client disconnection resilience | Advanced functionality 4 |   🟡   |
+| Game saving on disk             | Advanced functionality 3 |   ❌    |
+
+## Building the source
+
+To build a JAR file for your OS, run the following command:
+
+```shell
+mvn clean package
+```
 
 ## License
 All rights to Codex Naturalis © are owned by Cranio Creations ®, which provided the graphical resources to be used for educational purposes only.
