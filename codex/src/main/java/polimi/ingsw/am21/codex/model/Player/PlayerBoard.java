@@ -204,19 +204,6 @@ public class PlayerBoard {
     });
   }
 
-  /* Old Implementation
-  private <T extends CornerContentType> void updateResourcesAndObjectsMaps(Corner<T> corner, int update) {
-      corner.getContent().ifPresent(
-         content -> {
-           if (ResourceType.has(content)) {
-             this.objects.computeIfPresent((ResourceType) content, (key, val) -> val + update);
-           } else if (ObjectType.has(content)) {
-             this.objects.computeIfPresent((ObjectType) content, (key, val) -> val + update);
-           }
-         }
-         );
-    }*/
-
   /**
    * Helper method called by PlayerBoard.updateResourcesAndObjects() to
    * update the stored data structures of player's resources and objects
@@ -230,6 +217,16 @@ public class PlayerBoard {
     corner
       .getContent()
       .ifPresent(content -> content.acceptVisitor(mapUpdater, delta));
+  }
+
+  // Don't delete, it's exposed for testing purposes
+  private void updateMap(ObjectType object, int delta) {
+    mapUpdater.visit(object, delta);
+  }
+
+  // Don't delete, it's exposed for testing purposes
+  private void updateMap(ResourceType resource, int delta) {
+    mapUpdater.visit(resource, delta);
   }
 
   private class MapUpdater implements CornerContentVisitor {
