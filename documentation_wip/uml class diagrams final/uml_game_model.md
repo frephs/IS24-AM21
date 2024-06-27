@@ -178,9 +178,9 @@ class GameOverException {
     +GameOverException()
 }
 
-Game --|> Lobby : composition
-Game --|> GameOverException : composition
-Game --|> EmptyDeckException : composition
+Game --|> Lobby : contains
+Game --|> GameOverException : contains
+Game --|> EmptyDeckException : contains
 
 class GameState {
     <<Enumeration>>
@@ -233,7 +233,7 @@ class Player {
     +evaluateSecretObjective() void
 }
 
-Player *-- PlayerBuilder : composition
+Player *-- PlayerBuilder : contains
 
 class PlayerBuilder {
     -nickname: String
@@ -401,20 +401,20 @@ class EmptyDeckException {
     +EmptyDeckException()
 }
 
-Game "2"*--"4" Player : composition
-Game "1"*--"1" GameBoard : composition
-Game "1"*--"9" TokenColor : composition
-GameBoard "1"*--"4" Deck : composition
+Game "2"*--"4" Player : contains
+Game "1"*--"1" GameBoard : contains
+Game "1"*--"9" TokenColor : contains
+GameBoard "1"*--"4" Deck : contains
 
 PlayerBoard <-- Position : uses
-Player --* PlayerBoard: composition
+Player --* PlayerBoard: contains
 
 Player <-- DrawingSourceType : uses
 Player <-- DeckType : uses
 %% Player --> PlayerActions : offers
 
-GameBoard --|> EmptyDeckException : composition
-Deck --|> EmptyDeckException : composition
+GameBoard --|> EmptyDeckException : contains
+Deck --|> EmptyDeckException : contains
 
 GameBoard <-- CardPair: uses
 ```
@@ -534,7 +534,7 @@ class Corner~T~ {
     cover() void
     isCovered() bool
 }
-PlayableSide "1" *-- "1..4" Corner: composition
+PlayableSide "1" *-- "1..4" Corner: contains
 
 class PointConditionType {
     <<Enumeration>>
@@ -563,8 +563,7 @@ class Objective {
     <<Abstract>>
     getEvaluator() Function~PlayerBoard pb; Integer points, Integer~ *
 }
-ObjectiveCard "1" *-- "1" Objective: composition
-Card <|.. ObjectiveCard: realization
+ObjectiveCard "1" *-- "1" Objective: contains
 
 class GeometricObjective {
     -geometry: HashMap~AdjacentPosition, ResourceType~
@@ -654,7 +653,7 @@ class PlayableBackSide {
     cardToString()
 }
 PlayableSide <|.. PlayableBackSide: realization
-PlayableCard "1" *-- "1"  PlayableBackSide: composition
+PlayableCard "1" *-- "1"  PlayableBackSide: contains
 %% ResourceType "1..3" <-- "n" PlayableBackSide: dependency
 
 class PlayableFrontSide {
@@ -663,7 +662,7 @@ class PlayableFrontSide {
 
 }
 PlayableSide <-- PlayableFrontSide: inheritance
-PlayableCard "1" *-- "1" PlayableFrontSide: composition
+PlayableCard "1" *-- "1" PlayableFrontSide: contains
 
 class StarterCardFrontSide {
     StarterCardFrontSide()
@@ -783,7 +782,7 @@ class CardBuilder {
 
     getPlayableCard(List~ResourceType~ permanentResources, PlayableFrontSide frontSide, CardType cardType) PlayableCard
 }
-Card "1" *-- "1" CardBuilder: composition
+Card "1" *-- "1" CardBuilder: contains
 ObjectiveCard "0..1" <-- "1" CardBuilder: dependency
 GeometricObjective "0..1" <-- "1" CardBuilder: dependency
 CountingObjective "0..1" <-- "1" CardBuilder: dependency
@@ -796,7 +795,7 @@ CardBuilder --> WrongCardTypeException : throws
 CardBuilder --> MissingParametersException : throws
 CardBuilder --> ConflictingParameterException : throws
 
-%% CardType "1" *-- "1" CardBuilder: composition
+%% CardType "1" *-- "1" CardBuilder: contains
 %% ObjectType "0..1" <-- "n" CardBuilder: dependency
 %% ResourceType "0..1" <-- "n" CardBuilder: dependency
 %% PointConditionType "0..1" <-- "n" CardBuilder: dependency

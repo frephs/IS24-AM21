@@ -193,19 +193,19 @@ class Server {
 }
 
 
-Main "1" <-- "1" Server : composition 
-Main "1" <-- "1" ViewClient : composition
+Main "1" <-- "1" Server : contains 
+Main "1" <-- "1" ViewClient : contains
 
 
-Server "1" <-- "1" RMIServer  : composition
-Server "1" <-- "1" TCPServer : composition
+Server "1" <-- "1" RMIServer  : contains
+Server "1" <-- "1" TCPServer : contains
 
 TCPServer "1" <-- "0..*" TCPServerConnectionHandler : contains
 
 RMIServer "1" <-- "0..*" RMIServerConnectionHandler : contains
 
-Server "1" <-- "1" GameController : composition
-GameController "1" <-- "1" GameManager : composition
+Server "1" <-- "1" GameController : contains
+GameController "1" <-- "1" GameManager : contains
 
 
 class TCPClientConnectionHandler {
@@ -396,17 +396,17 @@ class ClientConnectionHandler {
   View <.. Cli : implements
   View <.. Gui : implements
 
-  GuiClient <-- Gui : composition
-  CliClient <-- Cli : composition
+  GuiClient <-- Gui : contains
+  CliClient <-- Cli : contains
 
   ViewClient <-- CliClient : extends
   ViewClient <-- GuiClient : extends
 
   ViewClient <-- ConnectionType : uses
   ViewClient <-- ClientType : uses
-  ViewClient <-- ClientConnectionHandler : composition
+  ViewClient <-- ClientConnectionHandler : contains
 
-  ViewClient <-- View : composition
+  ViewClient <-- View : contains
 
 
   GameErrorListener <.. ClientGameEventHandler : implements
@@ -416,8 +416,8 @@ class ClientConnectionHandler {
 
   RemoteGameEventListener <-- GameEventListener 
   
-  Cli <-- Cli-Options : composition
-  Main <-- Main-Options : composition
+  Cli <-- Cli-Options : contains
+  Main <-- Main-Options : contains
   
   ClientConnectionHandler <-- RMIClientConnectionHandler : extends
   ClientConnectionHandler <-- TCPClientConnectionHandler : extends
@@ -428,7 +428,7 @@ class ClientConnectionHandler {
 
   RMIServerConnectionHandler <.. RMIServerConnectionHandlerImpl : implements
   
-  TCPServerConnectionHandler <-- TCPServerControllerListener: composition  
+  TCPServerConnectionHandler <-- TCPServerControllerListener: contains  
   GameEventListener <.. TCPServerControllerListener : implements
 
   GameEventListener <-- View : extends 
