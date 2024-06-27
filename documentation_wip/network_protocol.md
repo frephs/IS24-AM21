@@ -18,7 +18,7 @@ In the following diagram we report a general representation using `gameEventList
 ```mermaid
 sequenceDiagram
 Actor Client 
-Client  -) ServerConnectionHandler : client.gameEventListener()
+Client  -) ServerConnectionHandler : client.gameEventListenerMethod()
 ServerConnectionHandler -> Controller : controller.gameEventListenerMethod(...)
 Note right of Controller: The action is performed by the controller which <br> the updates the correct game through the game manager. 
 Controller -> Controller : Action is performed 
@@ -44,7 +44,7 @@ sequenceDiagram
     Client 1 -x ServerConnectionHandler: client.hearBeat() (timed out)
     end 
     Client 1 -> Client 1 : ClientConnectionHandler.failedHeartBeats++
-    Client 1 -) Client 1 : View.postNotification()"You're loosing connection to the server")
+    Client 1 -) Client 1 : View.postNotification("You're loosing connection to the server")
     ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, IS_LOSING)
     ServerConnectionHandler -) Other clients : listener.playerConnectionChanged(IS_LOSING)
     Other clients -> Other clients : ClientGameEventHandler.playerConnectionChanged(...)
@@ -64,7 +64,6 @@ sequenceDiagram
 
     Client 1 -) Client 1 : view.postNotification("Connection lost")
 
-    Client 1 -> Client 1 : exit
     Destroy Client 1
     Client 1 --> Client 1 : 
     ServerConnectionHandler ->  ServerConnectionHandler : Controller.playerConnectionChanged(connectionID, DISCONNECTED)
@@ -76,11 +75,11 @@ sequenceDiagram
 ```
 
 ### "Not allowed" message handling
-In the event a client sends a message for an action that the server which is untimely for the user's context  or that they cannot perform at that moment, and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the aforesaid client. 
+In the event a client sends a message for an action which is untimely for the user's context  or that they cannot perform at that moment, and in the event a client might be modified or 'enhanced' in a way the server does not contemplate, we have messages in place to send to the aforesaid client. 
 
 Client side the errors are parsed by the `ClientGameEventHandler` which implements the `GameErrorListener` interface.
 
-Since updates are only register by the local model once the server validates them only the `View` implements the class as the errors need only to be notified to the users. 
+Since updates are only register by the local model once the server validates them, only the `View` implements the class as the errors need only to be notified to the users. 
 
 
 ```mermaid
@@ -100,10 +99,10 @@ ServerConnectionHandler -> Controller : Controller.gameEventListenerMethod(...)
     ServerConnectionHandler -->>  Client : unknownMessageTypeMessage
 ```
 
-## Game Dynamics' Flows
+## Game dynamic flows
 ### Connection and menu flow
 As the user connects to the server, a `UUID` identifying the user's client connection is sent to the server and a listener is registered attached to that UUID.
-The user then asks for the available games at the moment and the server responds with a list of game entries, containing the gameId, the current number of players and maximum number of players, which are displayed in the menu.
+The user then asks for the available games at the moment and the server responds with a list of game entries, containing the `gameId`, the current number of players and maximum number of players, which are displayed in the menu.
 
 ```mermaid
 sequenceDiagram
@@ -144,12 +143,12 @@ sequenceDiagram
 
     Client -) ServerConnectionHandler : client.connectToGame
     alt Lobby is full
-        ServerConnectionHandler -> Controller : controller.connectToGame(socketId, lobbyId)
+        ServerConnectionHandler -> Controller : controller.connectToGame(connectionId, lobbyId)
         Controller --> Controller : LobbyFullException is thrown
         Controller -) ServerConnectionHandler : listener.lobbyFull()
         ServerConnectionHandler -) Client : listener.lobbyFull()
     else Lobby is not full
-         ServerConnectionHandler -> Controller : controller.joinLobby(socketId, gameId)
+         ServerConnectionHandler -> Controller : controller.joinLobby(connectionId, gameId)
          Note over Controller, ServerConnectionHandler:  The client who joined a lobby gets the info of <br> the players already inside the lobby. (Tokens, nicknames)
         Controller -) ServerConnectionHandler : listener.lobbyInfo(...)
         ServerConnectionHandler -) Client : listener.lobbyInfo(...)
@@ -199,8 +198,8 @@ sequenceDiagram
 
     # Player Nickname
     Note over Client,ServerConnectionHandler : Client selects a nickname
-        Client -) ServerConnectionHandler : client.setNickname(..)
-        ServerConnectionHandler -> Controller: controller.lobbySetNickname(socketId, nickname)
+        Client -) ServerConnectionHandler : client.setNickname(...)
+        ServerConnectionHandler -> Controller: controller.lobbySetNickname(connectionId, nickname)
         alt Nickname is already taken   
             Controller --> Controller: NicknameAlreadyTakenException
             Controller -) ServerConnectionHandler : listener.nicknameTaken()
@@ -218,7 +217,7 @@ sequenceDiagram
     Note over Client,ServerConnectionHandler: Client selects a secret objective
     Client -) ServerConnectionHandler : client.getObjectiveCards()
     ServerConnectionHandler -) Controller : Controller.getObjectiveCards()
-    Controller --> Controller : Returns cardIds: Pair<int> 
+    Controller --> Controller : Returns cardIds: Pair<int, int> 
     Controller -) ServerConnectionHandler : listener.getObjectiveCards(pair(id1,id2))
     ServerConnectionHandler -) Client : listener.getObjectiveCards(pair(id1,id2))
     
@@ -232,17 +231,17 @@ sequenceDiagram
     Note over Client,ServerConnectionHandler: Client selects a starter card side to play
     Client -) ServerConnectionHandler : client.getStarterCardSides()
     ServerConnectionHandler -) Controller : Controller.getStarterCardSides()
-    Controller -> Controller : Returns cardIds: Pair<int> 
+    Controller -> Controller : Returns cardId: int 
     Controller -) ServerConnectionHandler : listener.gameInfo(...)
-    ServerConnectionHandler -) Client : listener.gameInfo()
+    ServerConnectionHandler -) Client : listener.gameInfo(...)
 
-    
-     loop for each client in the lobby 
-            ServerConnectionHandler -) Client in the lobby view:  listener.playerJoinedGame(first)
+    Client -) ServerConnectionHandler : listener.joinGame(CardSideType side)
+    loop for each client in the lobby 
+            ServerConnectionHandler -) Client in the lobby view:  listener.playerJoinedGame(...)
      end
 
     loop for each client in the game
-        ServerConnectionHandler -) Client in the game view: listener.playerJoinedGame
+        ServerConnectionHandler -) Client in the game view: listener.playerJoinedGame(...)
     end
 
     Note over Client,Client in the game view: The player is now in wait room
@@ -253,10 +252,10 @@ sequenceDiagram
         Client -) ServerConnectionHandler : client.heartBeat()
     end
     else All players are in the game
-        ServerConnectionHandler -> Controller: controller.playerJoinedGame(..)
+        ServerConnectionHandler -> Controller: controller.playerJoinedGame(...)
         loop for each client in the game
-        ServerConnectionHandler -) Client in the lobby view: listener.playerJoinedGame
-        ServerConnectionHandler -) Client in the game view: listener.playerJoinedGame
+        ServerConnectionHandler -) Client in the lobby view: listener.playerJoinedGame(...)
+        ServerConnectionHandler -) Client in the game view: listener.playerJoinedGame(...)
     end
         Controller -> Controller : Controller.gameStarted(gameId)
         loop for each client in the game view
@@ -268,7 +267,7 @@ sequenceDiagram
 ### Normal game turns flow 
 Until `Game.nextTurn()` detects that a player has a winning score, the messages between the server and the clients are exchanged as follows.
 
-As before, other than the `ConfirmMessage`, we have a series of messages whose recipients are all the clients in the game. They are used to update the views of the clients and to notify them of the status of the player turn.
+We have a series of messages whose recipients are all the clients in the game. They are used to update the views of the clients and to notify them of the status of the player turn.
 
 ```mermaid
 sequenceDiagram
@@ -360,15 +359,15 @@ actor Client
 participant Server as ServerConnectionHandler
 Note over Client, Server: The messages can be either <br>broadcasts or whispers.
 alt The message is a broadcast message
-    Client -) Server: client.chatMessage()
+    Client -) Server: client.chatMessage(...)
     loop for each client in the same game
-        Server -) Recipient: listener.chatMessageSent
+        Server -) Recipient: listener.chatMessageSent(...)
     end
 else The message is a private message to an user
     actor Recipient
-    Client -) Server: SendChatMessage
-    Server -) Recipient: listener.chatMessageSent()
-    Server -) Client: listener.chatMessageSent()
+    Client -) Server: client.chatMessage(...)
+    Server -) Recipient: listener.chatMessageSent(...)
+    Server -) Client: listener.chatMessageSent(....)
 end
 
 
