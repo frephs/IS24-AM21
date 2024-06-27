@@ -564,7 +564,8 @@ public class Gui extends Application implements View {
         ) {
           nicknameAndToken.getStyleClass().add("highlighted");
         }
-        nicknameAndToken.setAlignment(Pos.CENTER);
+        nicknameAndToken.setAlignment(Pos.CENTER_LEFT);
+        nicknameAndToken.setPadding(new Insets(0, 0, 0, 20));
 
         container.addRow(i, nicknameAndToken, points);
       }
