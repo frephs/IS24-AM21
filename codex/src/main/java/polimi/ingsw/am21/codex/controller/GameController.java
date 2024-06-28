@@ -1260,23 +1260,22 @@ public class GameController {
   private void nextTurnEvent(UUID connectionID, String gameID, Game game) {
     this.notifySameContextClients(
         connectionID,
-        (listener, targetConnectionID) ->
-          listener.changeTurn(
-            gameID,
-            game
-              .getPlayers()
-              .get(
-                (game.getCurrentPlayerIndex() - 1 + game.getPlayers().size()) %
-                game.getPlayers().size()
-              )
-              .getNickname(),
-            game.getCurrentPlayerIndex(),
-            game.isLastRound(),
-            game.getCurrentPlayer().getBoard().getAvailableSpots(),
-            game.getCurrentPlayer().getBoard().getForbiddenSpots(),
-            game.getGameBoard().peekResourceCardFromDeck().getId(),
-            game.getGameBoard().peekGoldCardFromDeck().getId()
-          )
+        (listener, targetConnectionID) -> {
+          try {
+            listener.changeTurn(
+              gameID,
+              getLastPlayerNickname(gameID),
+              game.getCurrentPlayerIndex(),
+              game.isLastRound(),
+              game.getCurrentPlayer().getBoard().getAvailableSpots(),
+              game.getCurrentPlayer().getBoard().getForbiddenSpots(),
+              game.getGameBoard().peekResourceCardFromDeck().getId(),
+              game.getGameBoard().peekGoldCardFromDeck().getId()
+            );
+          } catch (GameNotFoundException e) {
+            throw new RuntimeException(e);
+          }
+        }
       );
   }
 
@@ -1317,29 +1316,28 @@ public class GameController {
         (playerCardId, pairCardId) ->
           this.notifySameContextClients(
               connectionID,
-              (listener, targetConnectionID) ->
-                listener.changeTurn(
-                  gameId,
-                  game
-                    .getPlayers()
-                    .get(
-                      (game.getCurrentPlayerIndex() -
-                        1 +
-                        game.getPlayers().size()) %
-                      game.getPlayers().size()
-                    )
-                    .getNickname(),
-                  game.getCurrentPlayerIndex(),
-                  game.isLastRound(),
-                  drawingSource,
-                  deckType,
-                  targetConnectionID.equals(connectionID) ? playerCardId : null,
-                  pairCardId,
-                  game.getCurrentPlayer().getBoard().getAvailableSpots(),
-                  game.getCurrentPlayer().getBoard().getForbiddenSpots(),
-                  game.getGameBoard().peekResourceCardFromDeck().getId(),
-                  game.getGameBoard().peekGoldCardFromDeck().getId()
-                )
+              (listener, targetConnectionID) -> {
+                try {
+                  listener.changeTurn(
+                    gameId,
+                    getLastPlayerNickname(gameId),
+                    game.getCurrentPlayerIndex(),
+                    game.isLastRound(),
+                    drawingSource,
+                    deckType,
+                    targetConnectionID.equals(connectionID)
+                      ? playerCardId
+                      : null,
+                    pairCardId,
+                    game.getCurrentPlayer().getBoard().getAvailableSpots(),
+                    game.getCurrentPlayer().getBoard().getForbiddenSpots(),
+                    game.getGameBoard().peekResourceCardFromDeck().getId(),
+                    game.getGameBoard().peekGoldCardFromDeck().getId()
+                  );
+                } catch (GameNotFoundException e) {
+                  throw new RuntimeException(e);
+                }
+              }
             ),
         () -> this.nextTurnEvent(connectionID, gameId, game),
         remainingRounds ->
@@ -1353,6 +1351,35 @@ public class GameController {
       evaluateObjectives(game, connectionID);
       throw e;
     }
+  }
+
+  private String getLastPlayerNickname(String gameId)
+    throws GameNotFoundException {
+    Game game = this.getGame(gameId);
+    Set<String> connectedNicknames = userContexts
+      .values()
+      .stream()
+      .filter(
+        userGameContext ->
+          userGameContext.connectionStatus.equals(
+            UserGameContext.ConnectionStatus.CONNECTED
+          )
+      )
+      .map(userGameContext -> userGameContext.getNickname().get())
+      .collect(Collectors.toSet());
+    String lastNickname;
+    int i = 0;
+    do {
+      i++;
+      lastNickname = game
+        .getPlayers()
+        .get(
+          (game.getCurrentPlayerIndex() - i + game.getPlayers().size()) %
+          game.getPlayers().size()
+        )
+        .getNickname();
+    } while (!connectedNicknames.contains(lastNickname));
+    return lastNickname;
   }
 
   private LobbyUsersInfo generateLobbyInfo(String gameID, Game game) {
