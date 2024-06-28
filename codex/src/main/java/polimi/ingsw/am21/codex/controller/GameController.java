@@ -785,6 +785,14 @@ public class GameController {
     this.checkClientConnections(connectionID);
   }
 
+  /**
+   * Retrieves a list of listeners that share the same context as the specified connection ID.
+   *
+   * @param connectionID the UUID of the connection to match contexts with
+   * @param includeSelf a Boolean indicating whether to include the client that caused the event in the results
+   * @param mode the EventDispatchMode that determines if the event should be dispatched based on context status
+   * @return a list of pairs containing the UUID of the connections and their respective UserGameContext
+   */
   private List<Pair<UUID, UserGameContext>> getSameContextListeners(
     UUID connectionID,
     Boolean includeSelf,
@@ -793,6 +801,16 @@ public class GameController {
     return getSameContextListeners(connectionID, includeSelf, mode, false);
   }
 
+  /**
+   * Retrieves a list of listeners that share the same context as the specified connection ID,
+   * with an option to include clients that are losing connection.
+   *
+   * @param connectionID the UUID of the connection to match contexts with
+   * @param includeSelf a Boolean indicating whether to include the client that caused the event in the results
+   * @param mode the EventDispatchMode that determines if the event should be dispatched based on context status
+   * @param includeLosing a Boolean indicating whether to include clients that are losing connection
+   * @return a list of pairs containing the UUID of the connections and their respective UserGameContext
+   */
   private List<Pair<UUID, UserGameContext>> getSameContextListeners(
     UUID connectionID,
     Boolean includeSelf,
