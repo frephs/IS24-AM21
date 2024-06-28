@@ -8,6 +8,7 @@ import java.util.UUID;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.controller.exceptions.PlayerNotFoundException;
 import polimi.ingsw.am21.codex.controller.listeners.RemoteGameEventListener;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
 import polimi.ingsw.am21.codex.model.Cards.Playable.CardSideType;
@@ -15,6 +16,7 @@ import polimi.ingsw.am21.codex.model.Cards.Position;
 import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
+import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
 
 public class RMIServerConnectionHandlerImpl
   extends UnicastRemoteObject
@@ -149,7 +151,8 @@ public class RMIServerConnectionHandlerImpl
   }
 
   @Override
-  public void heartBeat(UUID connectionID) throws RemoteException {
+  public void heartBeat(UUID connectionID)
+    throws RemoteException, PlayerNotFoundException {
     this.controller.heartBeat(connectionID);
   }
 }

@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientContext;
+import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
 import polimi.ingsw.am21.codex.model.Cards.Card;
@@ -38,8 +39,13 @@ public class CliClient extends ViewClient {
   }
 
   @Override
-  public void start(ConnectionType connectionType, String address, int port) {
-    super.start(connectionType, address, port);
+  public void start(
+    ConnectionType connectionType,
+    String address,
+    int port,
+    UUID connectionID
+  ) {
+    super.start(connectionType, address, port, connectionID);
     cli.setClient(client);
 
     cli.postNotification(
@@ -52,6 +58,18 @@ public class CliClient extends ViewClient {
     while (true) {
       try {
         cli.printPrompt();
+        if (
+          cli
+            .getLocalModel()
+            .getLocalGameBoard()
+            .map(LocalGameBoard::isHalted)
+            .orElse(false)
+        ) {
+          cli.postNotification(
+            NotificationType.WARNING,
+            "The game has been halted, wait for the game to resume"
+          );
+        }
         String line = scanner.nextLine().trim();
         String[] command = line.split(" ");
 
@@ -427,7 +445,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.getObjectiveCards();
+          view.drawObjectiveCardChoice();
         }
       }
     );
@@ -458,7 +476,7 @@ public class CliClient extends ViewClient {
       ) {
         @Override
         public void handle(String[] command) {
-          client.getStarterCard();
+          view.drawStarterCardSides();
         }
       }
     );
@@ -850,8 +868,10 @@ public class CliClient extends ViewClient {
   }
 
   public static void main(String[] args) {
-    if (args.length != 3) throw new IllegalArgumentException(
-      "Usage: CliClient <connection-type> <address> <port>"
+    if (
+      args.length != 3 && args.length != 4
+    ) throw new IllegalArgumentException(
+      "Usage: CliClient <connection-type> <address> <port> ?<your-previous-id>?"
     );
 
     new Main.Options(true);
@@ -869,7 +889,10 @@ public class CliClient extends ViewClient {
         args[1] != null ? args[1] : "localhost",
         args[2] != null
           ? Integer.parseInt(args[2])
-          : connectionType.getDefaultPort()
+          : connectionType.getDefaultPort(),
+        Optional.ofNullable(args.length == 4 ? args[3] : null)
+          .map(UUID::fromString)
+          .orElse(UUID.randomUUID())
       );
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("Invalid port number");

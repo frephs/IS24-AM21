@@ -81,6 +81,7 @@ public class LocalGameBoard {
    * The index of the player associated with the client
    */
   private Integer playerIndex;
+  private Boolean halted;
 
   /**
    * Constructor for the LocalGameBoard class
@@ -211,5 +212,17 @@ public class LocalGameBoard {
 
   public void setGoldDeckTopCard(PlayableCard goldDeckTopCard) {
     this.goldDeckTopCard = goldDeckTopCard;
+  }
+
+  public void gameHalted() {
+    this.halted = true;
+  }
+
+  public void gameResumed() {
+    this.halted = false;
+  }
+
+  public Boolean isHalted() {
+    return this.halted;
   }
 }

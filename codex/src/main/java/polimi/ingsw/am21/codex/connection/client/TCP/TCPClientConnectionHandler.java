@@ -33,6 +33,7 @@ import polimi.ingsw.am21.codex.controller.messages.serverErrors.NotAClientMessag
 import polimi.ingsw.am21.codex.controller.messages.serverErrors.UnknownMessageTypeMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.UserContextMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.DrawingCardSource;
@@ -67,11 +68,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
    * The executor service that is handling all client threads
    */
   private final ExecutorService threadManager = Executors.newCachedThreadPool();
-
-  /**
-   * Whether the client is waiting for a server response
-   */
-  private Boolean waiting = false;
 
   /**
    * A queue of messages that need to be handled
@@ -193,34 +189,29 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
     Runnable failed
   ) {
     synchronized (outputStream) {
-      if (!waiting || !message.getType().isClientRequest()) {
-        try {
-          if (socket.isConnected() && !socket.isClosed()) {
-            if (
-              message.getType() != MessageType.HEART_BEAT &&
-              Main.Options.isDebug()
-            ) System.out.println("Sending " + message.getType());
-            outputStream.writeObject(message);
-            outputStream.flush();
-            outputStream.reset();
-            if (message.getType().isClientRequest()) {
-              this.waiting = true;
-              if (Main.Options.isDebug()) {
-                getView()
-                  .postNotification(
-                    NotificationType.WARNING,
-                    "Sending request. "
-                  );
-              }
+      try {
+        if (socket.isConnected() && !socket.isClosed()) {
+          if (
+            message.getType() != MessageType.HEART_BEAT &&
+            Main.Options.isDebug()
+          ) System.out.println("Sending " + message.getType());
+          outputStream.writeObject(message);
+          outputStream.flush();
+          outputStream.reset();
+          if (message.getType().isClientRequest()) {
+            if (Main.Options.isDebug()) {
+              getView()
+                .postNotification(
+                  NotificationType.WARNING,
+                  "Sending request. "
+                );
             }
           }
-        } catch (IOException e) {
-          connectionFailed(e);
-          failed.run();
-          return;
         }
-      } else {
-        this.getView().postNotification(Notification.ALREADY_WAITING);
+      } catch (IOException e) {
+        connectionFailed(e);
+        failed.run();
+        return;
       }
     }
     successful.run();
@@ -236,7 +227,6 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
 
   /**
    * Gets the view associated
-   * @return
    */
   private View getView() {
     return gameEventHandler.getView();
@@ -437,7 +427,7 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
   // <editor-fold desc="Message handling">
   public void handleMessage(Message message) {
     if (message.getType().isServerResponse()) {
-      this.waiting = false;
+      // TODO?
     }
 
     if (Main.Options.isDebug()) {
@@ -486,6 +476,8 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       case PLAYER_CONNECTION_CHANGED -> handleMessage(
         (PlayerConnectionChangedMessage) message
       );
+      case GAME_HALTED_UPDATE -> handleMessage((GameHaltedMessage) message);
+      case USER_CONTEXT -> handleMessage((UserContextMessage) message);
       // Game
       case CARD_PLACED -> handleMessage((CardPlacedMessage) message);
       case GAME_OVER -> handleMessage((GameOverMessage) message);
@@ -573,6 +565,10 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       message.getLobbyId(),
       message.getConnectionID()
     );
+    if (message.getConnectionID().equals(this.getConnectionID())) {
+      this.getObjectiveCards();
+      this.getStarterCard();
+    }
   }
 
   public void handleMessage(PlayerLeftLobbyMessage message) {
@@ -687,6 +683,18 @@ public class TCPClientConnectionHandler extends ClientConnectionHandler {
       gameEventHandler.getLocalModel().getGameId().orElse(""),
       message.getMessage()
     );
+  }
+
+  public void handleMessage(GameHaltedMessage gameHaltedMessage) {
+    if (gameHaltedMessage.getHalted()) {
+      gameEventHandler.gameHalted(gameHaltedMessage.getGameID());
+    } else {
+      gameEventHandler.gameResumed(gameHaltedMessage.getGameID());
+    }
+  }
+
+  public void handleMessage(UserContextMessage message) {
+    gameEventHandler.userContext(message.getContext());
   }
   // </editor-fold>
 }

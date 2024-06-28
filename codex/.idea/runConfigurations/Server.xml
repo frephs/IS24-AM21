@@ -2,7 +2,7 @@
   <configuration default="false" name="Server" type="Application" factoryName="Application" folderName="Server">
     <option name="MAIN_CLASS_NAME" value="polimi.ingsw.am21.codex.Main" />
     <module name="AM21" />
-    <option name="PROGRAM_PARAMETERS" value="--server" />
+    <option name="PROGRAM_PARAMETERS" value="--server --debug" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

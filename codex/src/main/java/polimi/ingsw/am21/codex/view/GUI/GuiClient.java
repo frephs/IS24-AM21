@@ -2,6 +2,8 @@ package polimi.ingsw.am21.codex.view.GUI;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import javafx.application.Application;
 import polimi.ingsw.am21.codex.Main;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
@@ -20,7 +22,12 @@ public class GuiClient extends ViewClient {
   }
 
   @Override
-  public void start(ConnectionType connectionType, String address, int port) {
+  public void start(
+    ConnectionType connectionType,
+    String address,
+    int port,
+    UUID connectionID
+  ) {
     new Thread(() -> Application.launch(gui.getClass())).start();
 
     try {
@@ -29,7 +36,7 @@ public class GuiClient extends ViewClient {
       throw new RuntimeException(e);
     }
 
-    super.start(connectionType, address, port);
+    super.start(connectionType, address, port, connectionID);
     gui.setClient(client);
 
     try {
@@ -40,8 +47,10 @@ public class GuiClient extends ViewClient {
   }
 
   public static void main(String[] args) {
-    if (args.length != 3) throw new IllegalArgumentException(
-      "Usage: GuiClient <connection-type> <address> <port>"
+    if (
+      args.length != 3 && args.length != 4
+    ) throw new IllegalArgumentException(
+      "Usage: GuiClient <connection-type> <address> <port> ?<your-previous-id>?"
     );
 
     new Main.Options(true);
@@ -55,7 +64,10 @@ public class GuiClient extends ViewClient {
         ? ConnectionType.TCP
         : ConnectionType.RMI,
       args[1] != null ? args[1] : "localhost",
-      args[2] != null ? Integer.parseInt(args[2]) : 12345
+      args[2] != null ? Integer.parseInt(args[2]) : 12345,
+      Optional.ofNullable(args.length == 4 ? args[3] : null)
+        .map(UUID::fromString)
+        .orElse(UUID.randomUUID())
     );
   }
 }

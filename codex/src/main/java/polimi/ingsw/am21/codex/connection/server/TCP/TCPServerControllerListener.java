@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import javafx.util.Pair;
 import polimi.ingsw.am21.codex.controller.GameController;
+import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.GameEventListener;
 import polimi.ingsw.am21.codex.controller.listeners.GameInfo;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
@@ -12,6 +13,7 @@ import polimi.ingsw.am21.codex.controller.messages.Message;
 import polimi.ingsw.am21.codex.controller.messages.clientActions.SendChatMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.ChatMessageMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.PlayerConnectionChangedMessage;
+import polimi.ingsw.am21.codex.controller.messages.viewUpdate.UserContextMessage;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.game.*;
 import polimi.ingsw.am21.codex.controller.messages.viewUpdate.lobby.*;
 import polimi.ingsw.am21.codex.model.Cards.*;
@@ -255,4 +257,19 @@ public class TCPServerControllerListener implements GameEventListener {
 
   @Override
   public void getStarterCard(Integer cardId) {}
+
+  @Override
+  public void gameHalted(String gameID) {
+    broadcast.accept(new GameHaltedMessage(gameID, true));
+  }
+
+  @Override
+  public void gameResumed(String gameID) {
+    broadcast.accept(new GameHaltedMessage(gameID, false));
+  }
+
+  @Override
+  public void userContext(FullUserGameContext context) {
+    broadcast.accept(new UserContextMessage(context));
+  }
 }

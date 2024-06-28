@@ -5,8 +5,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.json.JSONArray;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.exceptions.GameAlreadyStartedException;
 import polimi.ingsw.am21.codex.controller.exceptions.InvalidActionException;
+import polimi.ingsw.am21.codex.controller.exceptions.NotEnoughPlayersConnectedException;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardPair.CardPair;
 import polimi.ingsw.am21.codex.model.Cards.Commons.CardsLoader;
 import polimi.ingsw.am21.codex.model.Cards.Commons.EmptyDeckException;
@@ -18,15 +20,13 @@ import polimi.ingsw.am21.codex.model.GameBoard.*;
 import polimi.ingsw.am21.codex.model.Lobby.Lobby;
 import polimi.ingsw.am21.codex.model.Player.Player;
 import polimi.ingsw.am21.codex.model.Player.PlayerState;
-import polimi.ingsw.am21.codex.model.exceptions.GameNotReadyException;
-import polimi.ingsw.am21.codex.model.exceptions.GameOverException;
-import polimi.ingsw.am21.codex.model.exceptions.InvalidNextTurnCallException;
-import polimi.ingsw.am21.codex.model.exceptions.PlayerNotFoundGameException;
+import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class Game {
 
   static final int WINNING_POINTS = 4;
   private final List<Player> players;
+  private Set<Integer> disconnectedPlayers;
   private final GameBoard gameBoard;
   private final Lobby lobby;
   private GameState state;
@@ -36,20 +36,20 @@ public class Game {
   private final Chat chat = new Chat();
 
   public Game(int players) {
-    this.state = GameState.GAME_INIT;
-    this.lobby = new Lobby(players);
-
-    this.gameBoard = new GameBoard(new CardsLoader());
-    this.players = new ArrayList<>();
-    this.maxPlayers = players;
+    this(players, new GameBoard(new CardsLoader()));
   }
 
   public Game(int players, JSONArray cards) {
+    this(players, new GameBoard(new CardsLoader(cards)));
+  }
+
+  private Game(int players, GameBoard gameBoard) {
     this.state = GameState.GAME_INIT;
     this.lobby = new Lobby(players);
-    this.gameBoard = GameBoard.fromJSON(cards);
+    this.gameBoard = gameBoard;
     this.players = new ArrayList<>();
     this.maxPlayers = players;
+    this.disconnectedPlayers = new HashSet<>();
   }
 
   /**
@@ -204,6 +204,14 @@ public class Game {
     return Optional.of(this.remainingRounds);
   }
 
+  public Boolean isGameHalted() {
+    return getPlayersCount() - disconnectedPlayers.size() < 2;
+  }
+
+  private void checkGameHalted() throws NotEnoughPlayersConnectedException {
+    if (isGameHalted()) throw new NotEnoughPlayersConnectedException();
+  }
+
   /**
    * Draws the player card and runs nextTurnExecute();
    *
@@ -225,6 +233,7 @@ public class Game {
     Runnable nextTurnWithoutDraw,
     Consumer<Integer> remainingRoundsChange
   ) throws InvalidActionException {
+    checkGameHalted();
     AtomicReference<Integer> pairCardId = new AtomicReference<>();
 
     if (this.state == GameState.GAME_OVER) {
@@ -251,7 +260,6 @@ public class Game {
       this.remainingRounds = 2;
       remainingRoundsChange.accept(this.remainingRounds);
       this.nextTurnExecute(nextTurnEvent, remainingRoundsChange);
-      //HERE
 
       throw e;
     }
@@ -268,6 +276,7 @@ public class Game {
     Runnable nextTurnWithoutDraw,
     Consumer<Integer> remainingRoundsChange
   ) throws InvalidActionException {
+    checkGameHalted();
     if (this.state == GameState.GAME_OVER) {
       throw new GameOverException();
     }
@@ -276,6 +285,37 @@ public class Game {
     }
 
     this.nextTurnExecute(nextTurnWithoutDraw, remainingRoundsChange);
+  }
+
+  private void handleGameOver() throws GameOverException {
+    this.state = GameState.GAME_OVER;
+    for (Player player : players) {
+      player.evaluateSecretObjective();
+      CardPair<ObjectiveCard> objectiveCards = gameBoard.getObjectiveCards();
+      player.evaluate(objectiveCards.getFirst());
+      player.evaluate(objectiveCards.getSecond());
+    }
+    throw new GameOverException();
+  }
+
+  private int getPlayerIndex(String player) throws PlayerNotFoundGameException {
+    int playerIndex = getPlayers()
+      .stream()
+      .map(Player::getNickname)
+      .toList()
+      .indexOf(player);
+    if (playerIndex == -1) throw new PlayerNotFoundGameException(player);
+    return playerIndex;
+  }
+
+  public void playerDisconnected(String player)
+    throws PlayerNotFoundGameException {
+    disconnectedPlayers.add(getPlayerIndex(player));
+  }
+
+  public void playerReconnected(String player)
+    throws PlayerNotFoundGameException {
+    disconnectedPlayers.remove(getPlayerIndex(player));
   }
 
   /**
@@ -300,33 +340,26 @@ public class Game {
     Consumer<Integer> remainingRoundsChange
   ) throws InvalidActionException {
     if (this.state == GameState.GAME_OVER) throw new GameOverException();
-    if (this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS) {
-      this.state = GameState.GAME_OVER;
-      throw new GameOverException();
-    }
+    if (
+      this.players.get(currentPlayer).getPoints() >= Game.WINNING_POINTS
+    ) handleGameOver();
     this.getCurrentPlayer().resetCardPlaced();
-    currentPlayer = (currentPlayer + 1) % players.size();
-    boolean remainingRoundsChanged = false;
-    if (this.currentPlayer == 0) {
-      if (this.remainingRounds != null) {
-        this.remainingRounds--;
-        remainingRoundsChanged = true;
-        if (this.remainingRounds == 0) {
-          this.state = GameState.GAME_OVER;
-          for (Player player : players) {
-            player.evaluateSecretObjective();
-            CardPair<ObjectiveCard> objectiveCards =
-              gameBoard.getObjectiveCards();
-            player.evaluate(objectiveCards.getFirst());
-            player.evaluate(objectiveCards.getSecond());
-          }
-          throw new GameOverException();
+    do {
+      checkGameHalted();
+      currentPlayer = (currentPlayer + 1) % players.size();
+      boolean remainingRoundsChanged = false;
+      if (this.currentPlayer == 0) {
+        if (this.remainingRounds != null) {
+          this.remainingRounds--;
+          remainingRoundsChanged = true;
+          if (this.remainingRounds == 0) handleGameOver();
         }
       }
-    }
-    if (remainingRoundsChanged) remainingRoundsChange.accept(
-      this.remainingRounds
-    );
+      if (remainingRoundsChanged) remainingRoundsChange.accept(
+        this.remainingRounds
+      );
+    } while (disconnectedPlayers.contains(currentPlayer));
+
     if (nextTurnEvent != null) nextTurnEvent.run();
   }
 

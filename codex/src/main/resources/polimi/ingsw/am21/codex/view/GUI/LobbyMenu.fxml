@@ -6,88 +6,132 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <VBox alignment="TOP_CENTER" styleClass="bordered">
-         <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="43.0" prefWidth="684.0" text="Join a game or create a new one!" />
-            <HBox alignment="CENTER">
-               <children>
-                  <Label alignment="CENTER" prefHeight="38.0" prefWidth="67.0" text="Game" textAlignment="CENTER" />
-                  <TextField id="game-id-input" prefHeight="44.0" prefWidth="228.0" promptText="Game name" text="test">
-                     <HBox.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </HBox.margin>
-                  </TextField>
-                  <Label alignment="CENTER" prefHeight="38.0" prefWidth="117.0" text="Players" textAlignment="CENTER" />
-                  <ChoiceBox id="player-number-input" prefHeight="44.0" prefWidth="96.0" value="2">
-                     <HBox.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </HBox.margin>
-                      <items>
-                          <FXCollections fx:factory="observableArrayList">
-                             <Integer fx:value="1" />
-                             <Integer fx:value="2" />
-                              <Integer fx:value="3" />
-                              <Integer fx:value="4" />
-                          </FXCollections>
-                      </items>
-                  </ChoiceBox>
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </padding>
-            </HBox>
-            <HBox alignment="CENTER">
-               <children>
-                  <Button id="create-game-button" alignment="CENTER" mnemonicParsing="false" prefHeight="44.0" prefWidth="554.0" text="New Game" />
-               </children>
-               <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
-               </padding>
-            </HBox>
-            <VBox alignment="TOP_CENTER" prefHeight="368.0" prefWidth="577.0">
-               <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </VBox.margin>
-               <children>
-                  <Label styleClass="no" stylesheets="@Style.css" text="Games" textAlignment="CENTER" />
-                  <HBox alignment="CENTER" prefHeight="330.0" prefWidth="525.0">
-                     <children>
-                        <ScrollPane id="game-entry-scroll" hbarPolicy="NEVER" prefHeight="330.0" prefWidth="572.0" styleClass="bordered">
-                           <content>
-                              <VBox alignment="CENTER" prefHeight="325.0" prefWidth="573.0">
-                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="322.0" prefWidth="644.0">
-                                       <children>
-                                          <VBox alignment="TOP_CENTER" prefHeight="323.0" prefWidth="537.0">
-                                             <children>
-                                                <GridPane id="game-entry-container" alignment="CENTER" hgap="10.0" prefHeight="30.0" prefWidth="428.0" vgap="10.0">
-                                                  <columnConstraints>
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                                  </columnConstraints>
-                                                   <VBox.margin>
-                                                      <Insets />
-                                                   </VBox.margin>
-                                                </GridPane>
-                                             </children>
-                                             <padding>
-                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                             </padding>
-                                          </VBox>
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
-         </children>
-      </VBox>
-   </children>
+<VBox stylesheets="@Style.css" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox alignment="TOP_CENTER" styleClass="bordered">
+            <children>
+                <Label alignment="CENTER" contentDisplay="CENTER"
+                       prefHeight="43.0" prefWidth="684.0"
+                       text="Join a game or create a new one!"/>
+                <HBox alignment="CENTER">
+                    <children>
+                        <Label alignment="CENTER" prefHeight="38.0"
+                               prefWidth="67.0" text="Game"
+                               textAlignment="CENTER"/>
+                        <TextField id="game-id-input" prefHeight="44.0"
+                                   prefWidth="228.0" promptText="Game name"
+                                   text="test">
+                            <HBox.margin>
+                                <Insets left="10.0" right="10.0"/>
+                            </HBox.margin>
+                        </TextField>
+                        <Label alignment="CENTER" prefHeight="38.0"
+                               prefWidth="117.0" text="Players"
+                               textAlignment="CENTER"/>
+                        <ChoiceBox id="player-number-input" prefHeight="44.0"
+                                   prefWidth="96.0" value="2">
+                            <HBox.margin>
+                                <Insets left="10.0" right="10.0"/>
+                            </HBox.margin>
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <Integer fx:value="2"/>
+                                    <Integer fx:value="3"/>
+                                    <Integer fx:value="4"/>
+                                </FXCollections>
+                            </items>
+                        </ChoiceBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                top="10.0"/>
+                    </padding>
+                </HBox>
+                <HBox alignment="CENTER">
+                    <children>
+                        <Button id="create-game-button" alignment="CENTER"
+                                mnemonicParsing="false" prefHeight="44.0"
+                                prefWidth="554.0" text="New Game"/>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0"
+                                top="5.0"/>
+                    </padding>
+                </HBox>
+                <VBox alignment="TOP_CENTER" prefHeight="368.0"
+                      prefWidth="577.0">
+                    <VBox.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0"
+                                top="20.0"/>
+                    </VBox.margin>
+                    <children>
+                        <Label styleClass="no" stylesheets="@Style.css"
+                               text="Games" textAlignment="CENTER"/>
+                        <HBox alignment="CENTER" prefHeight="330.0"
+                              prefWidth="525.0">
+                            <children>
+                                <ScrollPane id="game-entry-scroll"
+                                            hbarPolicy="NEVER"
+                                            prefHeight="330.0" prefWidth="572.0"
+                                            styleClass="bordered">
+                                    <content>
+                                        <VBox alignment="CENTER"
+                                              prefHeight="325.0"
+                                              prefWidth="573.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT"
+                                                      prefHeight="322.0"
+                                                      prefWidth="644.0">
+                                                    <children>
+                                                        <VBox alignment="TOP_CENTER"
+                                                              prefHeight="323.0"
+                                                              prefWidth="537.0">
+                                                            <children>
+                                                                <GridPane
+                                                                        id="game-entry-container"
+                                                                        alignment="CENTER"
+                                                                        hgap="10.0"
+                                                                        prefHeight="30.0"
+                                                                        prefWidth="428.0"
+                                                                        vgap="10.0">
+                                                                    <columnConstraints>
+                                                                        <ColumnConstraints
+                                                                                hgrow="SOMETIMES"
+                                                                                minWidth="10.0"
+                                                                                prefWidth="100.0"/>
+                                                                        <ColumnConstraints
+                                                                                hgrow="SOMETIMES"
+                                                                                minWidth="10.0"
+                                                                                prefWidth="100.0"/>
+                                                                        <ColumnConstraints
+                                                                                hgrow="SOMETIMES"
+                                                                                minWidth="10.0"
+                                                                                prefWidth="100.0"/>
+                                                                    </columnConstraints>
+                                                                    <VBox.margin>
+                                                                        <Insets/>
+                                                                    </VBox.margin>
+                                                                </GridPane>
+                                                            </children>
+                                                            <padding>
+                                                                <Insets bottom="10.0"
+                                                                        left="10.0"
+                                                                        right="10.0"
+                                                                        top="10.0"/>
+                                                            </padding>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
 </VBox>
