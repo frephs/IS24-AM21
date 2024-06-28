@@ -32,6 +32,14 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 
 See the [deliverables folder](deliveries)
 
+## Building the source
+
+To build a JAR file for your OS, run the following command:
+
+```shell
+mvn clean package
+```
+
 ## Usage
 Run the game with
 ```
@@ -80,13 +88,6 @@ Common Parameters:
 --help: print this help message
 ```
 
-## Building the source
-
-To build a JAR file for your OS, run the following command:
-
-```shell
-mvn clean package
-```
 
 ## License
 All rights to Codex Naturalis © are owned by Cranio Creations ®, which provided the graphical resources to be used for educational purposes only.
