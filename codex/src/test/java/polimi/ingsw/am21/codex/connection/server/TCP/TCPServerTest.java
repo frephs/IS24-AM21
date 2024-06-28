@@ -62,6 +62,9 @@ class TCPServerTest {
       MessageType.PLAYER_SET_NICKNAME
     );
 
+    final CountDownLatch responsesLatch = new CountDownLatch(
+      expectedMessages.size()
+    );
     Socket clientSocket;
 
     TCPServer server = new TCPServer(PORT, new GameController());
@@ -101,6 +104,7 @@ class TCPServerTest {
             Message message = (Message) inputStream.readObject();
             System.out.println("Received message: " + message);
             receivedMessages.add(message);
+            responsesLatch.countDown();
           } catch (IOException ignored) {
             throw new RuntimeException();
           } catch (ClassNotFoundException e) {
@@ -136,6 +140,7 @@ class TCPServerTest {
         }
       });
 
+      responsesLatch.await();
       Thread.sleep(3000);
 
       assertTrue(
