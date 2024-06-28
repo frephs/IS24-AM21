@@ -1691,13 +1691,19 @@ public class Gui extends Application implements View {
     View.super.playerConnectionChanged(connectionID, nickname, status);
     //TODO make it visible in the leaderBoard
     if (
-      localModel
-        .getClientContextContainer()
-        .get()
-        .map(context -> context.equals(ClientContext.GAME))
-        .orElse(false)
+      !this.localModel.getLocalGameBoard()
+        .map(LocalGameBoard::isHalted)
+        .orElse(true)
     ) {
-      drawLeaderBoard();
+      if (
+        localModel
+          .getClientContextContainer()
+          .get()
+          .map(context -> context.equals(ClientContext.GAME))
+          .orElse(false)
+      ) {
+        drawLeaderBoard();
+      }
     }
   }
 
@@ -1738,7 +1744,7 @@ public class Gui extends Application implements View {
         .forEach(node -> {
           if (
             node.getId() == null || !node.getId().equals(waitRoomId)
-          ) node.setVisible(false);
+          ) node.setOpacity(0.1);
         });
 
       Node lobbyWaitRoom = FXMLLoader.load(
@@ -1770,7 +1776,7 @@ public class Gui extends Application implements View {
         .forEach(node -> {
           if (
             node.getId() == null || !node.getId().equals(waitRoomId)
-          ) node.setVisible(true);
+          ) node.setOpacity(1);
         });
     } catch (Exception e) {
       System.err.println(e);

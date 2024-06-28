@@ -761,6 +761,18 @@ public class GameController {
               userGameContext.removeGameId();
             }
           }
+        } else {
+          try {
+            removePlayerFromLobby(game, connectionID);
+          } catch (InvalidActionException ignored) {}
+          try {
+            joinLobby(connectionID, gameID);
+            removeGameID = false;
+          } catch (InvalidActionException e) {
+            try {
+              quitFromLobby(connectionID);
+            } catch (InvalidActionException ex) {}
+          }
         }
       } else {
         removeGameID = false;
@@ -945,24 +957,13 @@ public class GameController {
           listener.lobbyInfo(generateLobbyInfo(gameId, game)))
     );
 
-    notifyClients(
-      userContexts
-        .entrySet()
-        .stream()
-        .filter(
-          entry ->
-            entry.getValue().getStatus().equals(UserGameContextStatus.MENU) ||
-            entry
-              .getValue()
-              .getGameId()
-              .map(g -> g.equals(gameId))
-              .orElse(false)
-        )
-        .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList()),
+    notifySameContextClients(
+      connectionID,
       ((listener, targetConnectionID) -> {
           listener.playerJoinedLobby(gameId, connectionID);
-        })
+        }),
+      EventDispatchMode.TOP_DOWN_FULL,
+      false
     );
   }
 
