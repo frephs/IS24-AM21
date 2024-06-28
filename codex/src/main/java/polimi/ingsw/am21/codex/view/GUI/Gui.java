@@ -792,8 +792,11 @@ public class Gui extends Application implements View {
       }
 
       player
-        .getPlayedCardsByPosition()
-        .forEach((position, cardInfo) -> {
+        .getPlayedCardsByOrder()
+        .forEach(info -> {
+          Position position = info.getKey();
+          Pair<PlayableCard, CardSideType> cardInfo = info.getValue();
+
           GridCell cell = new GridCell(
             // These cells should never be clickable since we're placing the card right away, but just in case...
             getCellClickHandler(position),
