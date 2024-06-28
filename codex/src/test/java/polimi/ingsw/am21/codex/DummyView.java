@@ -18,7 +18,6 @@ import polimi.ingsw.am21.codex.view.View;
 public class DummyView extends Cli {
 
   final String id;
-  Cli.Options options;
 
   public DummyView(String id) {
     super();
@@ -28,11 +27,6 @@ public class DummyView extends Cli {
 
   @Override
   public void setClient(ClientConnectionHandler client) {}
-
-  @Override
-  public LocalModelContainer getLocalModel() {
-    return null;
-  }
 
   @Override
   public void postNotification(
@@ -107,6 +101,7 @@ public class DummyView extends Cli {
 
   @Override
   public void drawChatMessage(ChatMessage message) {}
+
   public void printUpdate(String string) {
     System.out.println(
       "\r" +

@@ -32,6 +32,8 @@ import polimi.ingsw.am21.codex.view.TUI.utils.Cli;
 
 class TCPServerTest {
 
+  private static final int PORT = 4568;
+
   @BeforeEach
   void setUp() {
     new Main.Options(true);
@@ -60,16 +62,11 @@ class TCPServerTest {
       MessageType.PLAYER_SET_NICKNAME
     );
 
-    final CountDownLatch responsesLatch = new CountDownLatch(
-      expectedMessages.size()
-    );
     Socket clientSocket;
 
-    TCPServer server = new TCPServer(
-      ConnectionType.TCP.getDefaultPort(),
-      new GameController()
-    );
-    try (ExecutorService executor = Executors.newCachedThreadPool()) {
+    TCPServer server = new TCPServer(PORT, new GameController());
+    ExecutorService executor = Executors.newCachedThreadPool();
+    try {
       executor.execute(() -> {
         try {
           server.start();
@@ -80,7 +77,7 @@ class TCPServerTest {
 
       server.getServerReadyLatch().await();
 
-      clientSocket = new Socket((String) null, 4567);
+      clientSocket = new Socket((String) null, PORT);
       clientSocket.setKeepAlive(true);
       clientSocket.setTcpNoDelay(true);
       System.out.println("Connected to server");
@@ -104,7 +101,6 @@ class TCPServerTest {
             Message message = (Message) inputStream.readObject();
             System.out.println("Received message: " + message);
             receivedMessages.add(message);
-            responsesLatch.countDown();
           } catch (IOException ignored) {
             throw new RuntimeException();
           } catch (ClassNotFoundException e) {
@@ -139,7 +135,8 @@ class TCPServerTest {
           throw new RuntimeException(e);
         }
       });
-      responsesLatch.await();
+
+      Thread.sleep(3000);
 
       assertTrue(
         receivedMessages

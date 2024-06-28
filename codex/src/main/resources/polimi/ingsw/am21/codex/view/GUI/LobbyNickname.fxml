@@ -13,7 +13,7 @@
       <Label prefHeight="47.0" prefWidth="185.0" text="Choose your nickname" />
       <HBox>
          <children>
-            <TextField id="nickname-input" alignment="CENTER" prefHeight="39.0" prefWidth="446.0" text="Nickname">
+            <TextField id="nickname-input" alignment="CENTER" prefHeight="39.0" prefWidth="446.0" promptText="Your user nickname">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
