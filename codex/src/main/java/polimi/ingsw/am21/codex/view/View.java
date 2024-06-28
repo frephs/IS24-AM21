@@ -339,7 +339,7 @@ public interface View extends GameEventListener {
             .orElseThrow()
             .getCurrentPlayer()
             .getNickname()) +
-      "'turn" +
+      "turn" +
       (isLastRound ? " (last round)" : "")
     );
   }
