@@ -14,7 +14,7 @@
             <HBox alignment="CENTER">
                <children>
                   <Label alignment="CENTER" prefHeight="38.0" prefWidth="67.0" text="Game" textAlignment="CENTER" />
-                  <TextField id="game-id-input" prefHeight="44.0" prefWidth="228.0" promptText="Game name" text="test">
+                  <TextField id="game-id-input" prefHeight="44.0" prefWidth="228.0" promptText="Game name">
                      <HBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </HBox.margin>
