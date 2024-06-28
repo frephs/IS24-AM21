@@ -14,6 +14,22 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
+/**
+ * The LocalModelContainer class is the container of the model of the game that is stored locally on the client side to enable client interaction with the server.
+ * <br><br>
+ * Since the server model has some controller functionality included, we opted to create a mere container local model for the view to draw things properly and keep track of game events client side.
+ * <br><br>
+ * The status of the game is updated by the server: the client is notified and
+ * the local gameboard updated through the client game event handler, which updates the local model and the view.
+ * <br><br>
+ * It contains the local menu, lobby and game board.
+ * @implNote The LocalModelContainer implements GameEventLister to be able to process game events from the server and update the local model for each of them.
+ * @see LocalMenu
+ * @see LocalLobby
+ * @see LocalGameBoard
+ * @see polimi.ingsw.am21.codex.client.ClientGameEventHandler
+ *
+ */
 public class LocalModelContainer implements GameEventListener {
 
   /**
