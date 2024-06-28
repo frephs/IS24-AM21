@@ -2,6 +2,7 @@ package polimi.ingsw.am21.codex.view;
 
 import java.util.*;
 import javafx.util.Pair;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
 import polimi.ingsw.am21.codex.controller.GameController;
@@ -394,10 +395,22 @@ public interface View extends GameEventListener {
     String nickname,
     GameController.UserGameContext.ConnectionStatus status
   ) {
-    postNotification(
-      NotificationType.UPDATE,
-      "Player " + nickname + " " + status.toString().toLowerCase() + " the game"
-    );
+    if (
+      getLocalModel()
+        .getClientContextContainer()
+        .get()
+        .map(clientContext -> !clientContext.equals(ClientContext.MENU))
+        .orElse(false)
+    ) {
+      postNotification(
+        NotificationType.UPDATE,
+        "Player " +
+        nickname +
+        " " +
+        status.toString().toLowerCase() +
+        " the game"
+      );
+    }
   }
 
   @Override
