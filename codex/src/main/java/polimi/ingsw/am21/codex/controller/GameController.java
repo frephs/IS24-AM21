@@ -916,12 +916,15 @@ public class GameController {
       userContexts
         .entrySet()
         .stream()
-        .filter(user -> user.getKey().equals(connectionID))
+        .filter(
+          user ->
+            user.getKey().equals(connectionID) &&
+            user.getValue().getListener() != null
+        )
         .map(user -> new Pair<>(user.getKey(), user.getValue()))
         .collect(Collectors.toList()),
-      ((listener, targetConnectionID) -> {
-          listener.lobbyInfo(generateLobbyInfo(gameId, game));
-        })
+      ((listener, targetConnectionID) ->
+          listener.lobbyInfo(generateLobbyInfo(gameId, game)))
     );
 
     notifyClients(
