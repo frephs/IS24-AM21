@@ -10,6 +10,7 @@ import polimi.ingsw.am21.codex.client.localModel.LocalGameBoard;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.client.localModel.LocalPlayer;
 import polimi.ingsw.am21.codex.connection.client.ClientConnectionHandler;
+import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.controller.listeners.FullUserGameContext;
 import polimi.ingsw.am21.codex.controller.listeners.LobbyUsersInfo;
 import polimi.ingsw.am21.codex.model.Cards.Card;
@@ -305,7 +306,13 @@ public class Cli implements View {
           return (
             CliUtils.colorize(
               nickname,
-              player.getToken().getColor(),
+              (player
+                    .getConnectionStatus()
+                    .equals(
+                      GameController.UserGameContext.ConnectionStatus.CONNECTED
+                    )
+                  ? player.getToken().getColor()
+                  : Color.GRAY),
               nicknameStyle
             ) +
             " - " +

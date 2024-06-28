@@ -566,6 +566,17 @@ public class Gui extends Application implements View {
         ) {
           nicknameAndToken.getStyleClass().add("highlighted");
         }
+
+        if (
+          player
+            .getConnectionStatus()
+            .equals(
+              GameController.UserGameContext.ConnectionStatus.DISCONNECTED
+            )
+        ) {
+          nicknameAndToken.getStyleClass().add("grayed-out");
+        }
+
         nicknameAndToken.setAlignment(Pos.CENTER_LEFT);
         nicknameAndToken.setPadding(new Insets(0, 0, 0, 20));
 

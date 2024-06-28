@@ -516,6 +516,12 @@ Exception Dialog
   -fx-border-radius: 8px;
 }
 
+.grayed-out {
+  -fx-background-color: rgba(152, 152, 152, 0.8);
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
+}
+
 .highlighted,
 .highlighted .label {
   -fx-text-fill: #ffffff;
