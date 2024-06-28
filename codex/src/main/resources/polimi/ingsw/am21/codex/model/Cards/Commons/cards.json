@@ -1213,7 +1213,7 @@
     "type": "GOLD",
     "backPermanentResources": ["ANIMAL"],
     "points": 2,
-    "placementCondition": ["ANIMAL", "ANIMAL", "INSECT", "INSECT"],
+    "placementCondition": ["ANIMAL", "ANIMAL", "ANIMAL", "INSECT"],
     "pointCondition": "CORNERS",
     "corners": {
       "front": {
