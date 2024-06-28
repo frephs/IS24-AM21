@@ -5,16 +5,16 @@
 
 ## UML Diagrams
 
-### Presented by deadline (not final)
-The presentation documents of the UML diagrams delivered by the deadline for peer reviews.
-- [Presentation document for the game Model](UML_presentation_document_AM21.pdf)
-- [Presentation document for the network protocol](NETWORK_presentation_document_AM21.pdf)
-
 ### Final UML diagrams of the game implementation
  - [Final High level and in-detail UML class diagrams for the project](
 uml_class_diagrams_final_implementation/README.md)
-
  - [Final UML sequence diagrams of the network protocol implementation](network_protocol.md)
 
+### Presented by deadline (archived)
+The presentation documents of the UML diagrams delivered by the deadline for peer reviews.
+- [Presentation document for the game Model](archive/UML_presentation_document_AM21.pdf)
+- [Presentation document for the network protocol](archive/NETWORK_presentation_document_AM21.pdf)
+
+
 ## JavaDoc
-- [JavaDoc](javadoc/index.html)
+- [JavaDoc](https://frephs.github.io/IS24-AM21/)
