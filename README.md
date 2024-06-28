@@ -36,9 +36,16 @@ See the [deliverables folder](deliveries)
 
 To build a JAR file for your OS, run the following command:
 
-```shell
-mvn clean package
 ```
+cd codex && mvn clean package
+```
+
+> [!NOTE]
+> `mvn package` automatically runs tests as well, which should take about 50-60 seconds.  
+>  To speed things up, you can run the following command instead:
+> ```
+> mvn package -Dmaven.test.skip
+> ```
 
 ## Usage
 Run the game with
