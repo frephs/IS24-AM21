@@ -397,10 +397,23 @@ public class Gui extends Application implements View {
 
       scene
         .lookup("#create-game-button")
-        .setOnMouseClicked(
-          (MouseEvent event) ->
+        .setOnMouseClicked((MouseEvent event) -> {
+          String gameName =
+            ((TextField) scene.lookup("#game-id-input")).getText();
+
+          if (gameName.contains(" ")) {
+            postNotification(
+              NotificationType.WARNING,
+              "No spaces allowed in game name"
+            );
+          } else if (gameName.isEmpty()) {
+            postNotification(
+              NotificationType.WARNING,
+              "Game name cannot be empty"
+            );
+          } else {
             client.createGame(
-              ((TextField) scene.lookup("#game-id-input")).getText(),
+              gameName,
               ((ChoiceBox<?>) scene.lookup("#player-number-input")).getValue()
                   .toString()
                   .isEmpty()
@@ -411,8 +424,9 @@ public class Gui extends Application implements View {
                     )).getValue()
                     .toString()
                 )
-            )
-        );
+            );
+          }
+        });
 
       List<GameEntry> games = localModel
         .getLocalMenu()
@@ -667,6 +681,11 @@ public class Gui extends Application implements View {
             postNotification(
               NotificationType.WARNING,
               "No spaces allowed in nickname"
+            );
+          } else if (nickname.isEmpty()) {
+            postNotification(
+              NotificationType.WARNING,
+              "Nickname cannot be empty"
             );
           } else {
             client.lobbySetNickname(nickname);
