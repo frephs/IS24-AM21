@@ -14,22 +14,6 @@ import polimi.ingsw.am21.codex.model.Chat.ChatMessage;
 import polimi.ingsw.am21.codex.model.GameBoard.DrawingDeckType;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-/**
- * The LocalModelContainer class is the container of the model of the game that is stored locally on the client side to enable client interaction with the server.
- * <br><br>
- * Since the server model has some controller functionality included, we opted to create a mere container local model for the view to draw things properly and keep track of game events client side.
- * <br><br>
- * The status of the game is updated by the server: the client is notified and
- * the local gameboard updated through the client game event handler, which updates the local model and the view.
- * <br><br>
- * It contains the local menu, lobby and game board.
- * @implNote The LocalModelContainer implements GameEventLister to be able to process game events from the server and update the local model for each of them.
- * @see LocalMenu
- * @see LocalLobby
- * @see LocalGameBoard
- * @see polimi.ingsw.am21.codex.client.ClientGameEventHandler
- *
- */
 public class LocalModelContainer implements GameEventListener {
 
   /**
@@ -69,7 +53,7 @@ public class LocalModelContainer implements GameEventListener {
    * A boolean that keeps track of whether the current player has place their card
    * for their turn
    */
-  private boolean currentPlayerHasPlacedCard = false; //TODO maybe refactor this to local gameboard
+  private boolean currentPlayerHasPlacedCard = false;
 
   /**
    * A class used to store the client context in the localModel,
@@ -182,7 +166,7 @@ public class LocalModelContainer implements GameEventListener {
    * @param gameId The identifier of the lobby that has been filled.
    */
   public void lobbyFull(String gameId) {
-    menu
+    if (menu.getGames().containsKey(gameId)) menu
       .getGames()
       .get(gameId)
       .setCurrentPlayers(menu.getGames().get(gameId).getMaxPlayers());
@@ -410,7 +394,12 @@ public class LocalModelContainer implements GameEventListener {
 
   @Override
   public void gameStarted(String gameId, GameInfo gameInfo) {
-    if (gameBoard.isPresent() && gameBoard.get().getGameId().equals(gameId)) {
+    if (gameBoard.isEmpty()) {
+      gameBoard = Optional.of(
+        new LocalGameBoard(gameId, gameInfo.getUsers().size())
+      );
+    }
+    if (gameBoard.get().getGameId().equals(gameId)) {
       gameBoard.get().getPlayers().clear();
 
       clientContextContainer.set(ClientContext.GAME);
@@ -418,10 +407,9 @@ public class LocalModelContainer implements GameEventListener {
       gameInfo
         .getUsers()
         .forEach((GameInfo.GameInfoUser player) -> {
-          LocalPlayer localPlayer = lobby
-            .orElseThrow()
-            .getPlayers()
-            .get(player.getConnectionID());
+          LocalLobby localLobby = lobby.orElse(new LocalLobby(gameId));
+          LocalPlayer localPlayer = new LocalPlayer(player.getConnectionID());
+          localLobby.getPlayers().put(player.getConnectionID(), localPlayer);
 
           // Initialize lobby info
           localPlayer.setNickname(player.getNickname());

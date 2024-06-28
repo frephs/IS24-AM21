@@ -445,6 +445,7 @@ public class GameController {
     List<UUID> disconnectedClients,
     List<Pair<UUID, UserGameContext>> sameContextClients
   ) {
+    if (disconnectedClients.isEmpty()) return;
     List<Pair<UUID, UUID>> listenersToNotify = new ArrayList<>();
 
     List<UUID> totalDisconnections = new ArrayList<>(disconnectedClients);
@@ -505,6 +506,7 @@ public class GameController {
           }
         }
       }
+      if (totalDisconnections.isEmpty()) return;
 
       Set<String> haltedGames = new HashSet<>();
       for (UUID disconnectClient : totalDisconnections) {
@@ -676,7 +678,8 @@ public class GameController {
       this.getSameContextListeners(
           heartBeatClient,
           false,
-          EventDispatchMode.BOTH_WAYS
+          EventDispatchMode.BOTH_WAYS,
+          true
         );
 
     contexts.forEach(
@@ -719,8 +722,7 @@ public class GameController {
         try {
           game = getGame(gameID);
         } catch (GameNotFoundException e) {
-          // the game has been removed
-          userGameContext.removeGameId();
+          // the game has been removed, removeGameID remains true
         }
 
         if (
@@ -752,6 +754,7 @@ public class GameController {
             userGameContext.removeGameId();
           } catch (RemoteException e) {
             userGameContext.disconnected();
+            removeGameID = false;
             try {
               game.playerDisconnected(userGameContext.getNickname().get());
             } catch (PlayerNotFoundGameException ex) {
@@ -787,6 +790,15 @@ public class GameController {
     Boolean includeSelf,
     EventDispatchMode mode
   ) {
+    return getSameContextListeners(connectionID, includeSelf, mode, false);
+  }
+
+  private List<Pair<UUID, UserGameContext>> getSameContextListeners(
+    UUID connectionID,
+    Boolean includeSelf,
+    EventDispatchMode mode,
+    Boolean includeLosing
+  ) {
     // the socket Ids that dispatched the event
     if (!userContexts.containsKey(connectionID)) return new ArrayList<>();
     UserGameContext targetContext = userContexts.get(connectionID);
@@ -814,10 +826,13 @@ public class GameController {
             .getGameId()
             .equals(userContexts.get(sID).getGameId())) &&
         // we filter out the clients that have disconnected or are having
-          // connection problems
-          // as those events will fail to be dispatched
-          targetContext.getConnectionStatus() ==
-          UserGameContext.ConnectionStatus.CONNECTED)
+        // connection problems
+        // as those events will fail to be dispatched
+        (userContexts.get(sID).getConnectionStatus() ==
+            UserGameContext.ConnectionStatus.CONNECTED ||
+          (includeLosing &&
+            userContexts.get(sID).getConnectionStatus() ==
+              UserGameContext.ConnectionStatus.LOSING)))
       .map(sID -> new Pair<>(sID, userContexts.get(sID)))
       .collect(Collectors.toList());
   }
@@ -840,10 +855,7 @@ public class GameController {
   }
 
   public void quitFromLobby(UUID connectionID) throws InvalidActionException {
-    if (
-      !userContexts.containsKey(connectionID)
-    ) throw new PlayerNotFoundException(connectionID);
-    UserGameContext userContext = userContexts.get(connectionID);
+    UserGameContext userContext = getUserContext(connectionID);
     String gameId = userContext
       .getGameId()
       .orElseThrow(NotInGameException::new);
@@ -929,18 +941,6 @@ public class GameController {
         .collect(Collectors.toList()),
       ((listener, targetConnectionID) -> {
           listener.playerJoinedLobby(gameId, connectionID);
-        })
-    );
-
-    notifyClients(
-      userContexts
-        .entrySet()
-        .stream()
-        .filter(user -> user.getKey().equals(connectionID))
-        .map(user -> new Pair<>(user.getKey(), user.getValue()))
-        .collect(Collectors.toList()),
-      ((listener, targetConnectionID) -> {
-          listener.lobbyInfo(new LobbyUsersInfo(userContexts, gameId, game));
         })
     );
   }

@@ -563,8 +563,8 @@ public class ClientGameEventHandler
 
   @Override
   public void gameResumed(String gameID) {
-    localModel.gameHalted(gameID);
-    view.gameHalted(gameID);
+    localModel.gameResumed(gameID);
+    view.gameResumed(gameID);
   }
 
   @Override

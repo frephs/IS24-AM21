@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import polimi.ingsw.am21.codex.Main;
+import polimi.ingsw.am21.codex.client.ClientContext;
 import polimi.ingsw.am21.codex.client.ClientGameEventHandler;
 import polimi.ingsw.am21.codex.client.localModel.LocalModelContainer;
 import polimi.ingsw.am21.codex.connection.ConnectionType;
@@ -266,6 +267,13 @@ public abstract class ClientConnectionHandler {
 
   public void connectionEstablished() {
     this.getGames();
+    if (
+      getLocalModel()
+        .getClientContextContainer()
+        .get()
+        .map(clientContext -> clientContext.equals(ClientContext.GAME))
+        .orElse(false)
+    ) this.view.drawGame();
     this.connectionStatus =
       GameController.UserGameContext.ConnectionStatus.CONNECTED;
     this.getView().postNotification(Notification.CONNECTION_ESTABLISHED);

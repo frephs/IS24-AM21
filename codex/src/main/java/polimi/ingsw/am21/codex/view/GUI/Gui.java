@@ -1783,7 +1783,16 @@ public class Gui extends Application implements View {
   }
 
   @Override
-  public void userContext(FullUserGameContext context) {}
+  public void userContext(FullUserGameContext context) {
+    if (context.getStatus() == GameController.UserGameContextStatus.IN_GAME) {
+      if (
+        context.getGameID().isPresent() && context.getGameInfo().isPresent()
+      ) this.gameStarted(
+          context.getGameID().get(),
+          context.getGameInfo().get()
+        );
+    }
+  }
 
   @Override
   public void cardPlaced(

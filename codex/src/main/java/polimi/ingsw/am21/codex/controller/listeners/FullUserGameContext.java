@@ -1,10 +1,11 @@
 package polimi.ingsw.am21.codex.controller.listeners;
 
+import java.io.Serializable;
 import java.util.Optional;
 import polimi.ingsw.am21.codex.controller.GameController;
 import polimi.ingsw.am21.codex.model.Player.TokenColor;
 
-public class FullUserGameContext {
+public class FullUserGameContext implements Serializable {
 
   private final GameController.UserGameContextStatus status;
   private final String gameID;
