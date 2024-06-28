@@ -10,7 +10,7 @@
 uml_class_diagrams_final_implementation/README.md)
  - [Final UML sequence diagrams of the network protocol implementation](network_protocol.md)
 
-### Presented by deadline (archived)
+### Presented for peer review during the semester (archived)
 The presentation documents of the UML diagrams delivered by the deadline for peer reviews.
 - [Presentation document for the game Model](archive/UML_presentation_document_AM21.pdf)
 - [Presentation document for the network protocol](archive/NETWORK_presentation_document_AM21.pdf)
