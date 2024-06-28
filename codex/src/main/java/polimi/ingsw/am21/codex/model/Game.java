@@ -24,7 +24,7 @@ import polimi.ingsw.am21.codex.model.exceptions.*;
 
 public class Game {
 
-  static final int WINNING_POINTS = 4;
+  static final int WINNING_POINTS = 20;
   private final List<Player> players;
   private Set<Integer> disconnectedPlayers;
   private final GameBoard gameBoard;
