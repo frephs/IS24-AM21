@@ -18,3 +18,6 @@ The presentation documents of the UML diagrams delivered by the deadline for pee
 
 ## JavaDoc
 - [JavaDoc](https://frephs.github.io/IS24-AM21/)
+
+## Presentation
+- [A few slides](Presentation.pdf) to present the project peculiarities
