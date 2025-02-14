@@ -85,20 +85,20 @@ _________            .___
         \/            \/    \/      \/ 
 Usage: 
 Server mode: 
-java -jar codex.jar --server
+   java -jar codex.jar --server
 Client mode: 
-java -jar codex.jar
+   java -jar codex.jar
 Client Parameters: 
---rmi: use RMI connection (by default it uses TCP)
---port=<port>: specify the port to connect to (default: 2002 for TCP, 2024 for RMI)
---ip: the IP address to connect to
---cli: use TUI client (by default it uses GUI)
+   --rmi: use RMI connection (by default it uses TCP)
+   --port=<port>: specify the port to connect to (default: 2002 for TCP, 2024 for RMI)
+   --ip: the IP address to connect to
+   --cli: use TUI client (by default it uses GUI)
 Server Parameters: 
---server: [REQUIRED] start as server (by default it starts as client)
---rmi-port=<port>: specify the RMI Server port (default 2024)
---tcp-port=<port>: specify the TCP Server port (default 2002)
+   --server: [REQUIRED] start as server (by default it starts as client)
+   --rmi-port=<port>: specify the RMI Server port (default 2024)
+   --tcp-port=<port>: specify the TCP Server port (default 2002)
 Common Parameters: 
---help: print this help message
+   --help: print this help message
 ```
 
 
