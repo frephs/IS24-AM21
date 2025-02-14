@@ -8,12 +8,12 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
  
 ## Features and development
  <div style="display: flex; gap: 10px; scroll-snap-type: x mandatory; overflow-x: auto; scroll-padding: 50px 0 0 0;">
-        <img style="border-radius: 10px" src="img/Presentation/Presentation-1.png" width="95%">
-        <img style="border-radius: 10px" src="img/Presentation/Presentation-3.png" width="95%">
-        <img style="border-radius: 10px" src="img/Presentation/Presentation-4.png" width="95%">
-        <img style="border-radius: 10px" src="img/Presentation/Presentation-5.png" width="95%">
-        <img style="border-radius: 10px" src="img/Presentation/Presentation-6.png" width="95%">
-        <img style="border-radius: 10px" src="img/Presentation/Presentation-7.png" width="95%">  
+        <img style="border-radius: 10px" src="img/Presentation/Presentation-1.png" width="350px">
+        <img style="border-radius: 10px" src="img/Presentation/Presentation-3.png" width="350px">
+        <img style="border-radius: 10px" src="img/Presentation/Presentation-4.png" width="350px">
+        <img style="border-radius: 10px" src="img/Presentation/Presentation-5.png" width="350px">
+        <img style="border-radius: 10px" src="img/Presentation/Presentation-6.png" width="350px">
+        <img style="border-radius: 10px" src="img/Presentation/Presentation-7.png" width="350px">  
 </div>
 
 
