@@ -28,6 +28,7 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 | Requirement                     | Scope                    | Status |
 |---------------------------------|--------------------------|:------:|
 | Complete Rules                  | Model                    |   🟢   |
+| TUI                             | View                     |   🟢   |
 | GUI                             | View                     |   🟢   |
 | Rmi                             | Connection               |   🟢   |
 | Socket                          | Connection               |   🟢   | 
@@ -36,7 +37,8 @@ Prova Finale (progetto di ingegneria del software) A.A. 2023-2024
 | Client disconnection resilience | Advanced functionality 3 |   🟡   |
 | Game saving on disk             | Advanced functionality 4 |   ❌    |
 
-See the [deliverables folder](deliveries) for documentation and final release.
+>[!TIP]
+> See the [deliverables folder](deliveries) for documentation and final release.
 
 ## Building the source
 
